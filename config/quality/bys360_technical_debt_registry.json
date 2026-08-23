@@ -26,6 +26,30 @@
     "future_evidence_policy": "If the original itemized 38-item ledger, a verified institutional archive, an identifiable subset, or affirmative item-level legacy-mapping evidence is found in the future, this decision's classification MUST be reopened for review.",
     "rollback_condition": "This decision record is never deleted or overwritten. A new decision record is created stating 'SUPERSEDES BYS360-GOV-LEGACY-001', documenting the newly-found evidence, and reconciliation_status is updated honestly based on what the new evidence actually supports."
   },
+  "reconciliation_ceiling_waiver_decision": {
+    "decision_id": "BYS360-GOV-CEILING-WAIVER-001",
+    "decision_status": "APPROVED",
+    "approval_mode": "HUMAN_EXPLICIT_TOKEN",
+    "approval_token": "APPROVE BYS360-GOV-CEILING-WAIVER-001",
+    "approval_date": "2026-08-23",
+    "approver_role": "HUMAN_PROJECT_OWNER",
+    "policy_id": "FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1",
+    "policy_version": "1",
+    "approval_baseline_commit": "fe984cf1542e8769e9d1e40400a9a533f5cac6d0",
+    "decision_record_reference": "docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md",
+    "preserved_legacy_total": 38,
+    "preserved_legacy_priority_split": {
+      "P0": 0,
+      "P1": 0,
+      "P2": 17,
+      "P3": 21
+    },
+    "semantic_note": "This decision is orthogonal to reconciliation_status, which stays HISTORICAL_UNRECONSTRUCTABLE and is never rewritten by it. It never asserts the 38 legacy items were reconstructed, and never behaves as FULLY_RECONCILED. approval_baseline_commit is purely documentary -- the already exact-head remotely attested commit this human approval was reasoned about -- and is deliberately never compared against 'the commit currently being scored' anywhere in code (see scripts/quality/bys360_score_reconcile_v1.py's registry_commit_verified / _registry_matches_scored_commit_tree()). Presence of this decision record alone does not make the ceiling waiver canonically active for any commit: waiver_active additionally requires, independently and freshly for whatever commit is actually being scored: fully_verified, registry_structurally_valid, registry_commit_verified (cryptographic proof the scored registry content came from that exact commit's own git tree), zero active technical debt, and independently-verified exact-head Score100 evidence -- none of which this decision record alone supplies for any commit, including its own.",
+    "rationale": "Historical gap remains factually unreconstructable -- 0 of the referenced 38 legacy items were ever deterministically recoverable, confirmed across multiple independent forensic waves this session (exhaustive git pickaxe search, dangling-object dating, direct inspection of all four historical debt-tracking schemes referenced in legacy_ledger.note). This decision does not and cannot claim otherwise. Forensic recovery was formally attempted and exhausted under BYS360-GOV-LEGACY-001. Current registered technical debt is fully closed (14/14, 0 active). The ceiling-waiver policy mechanism and its commit-binding model were implemented, hardened against a confirmed parent-scored-child-registry evidence-substitution gap, and exact-head remotely attested (Quality + Score100, USER_SUPPLIED_REMOTE_PROOF) at approval_baseline_commit. This decision record itself does not activate the waiver canonically for any commit -- the commit that actually carries it into a canonical score run still requires its own fresh exact-head Quality and Score100 evidence, independently verified via registry_commit_verified, before waiver_active can ever become True.",
+    "canonical_eligibility_note": "DECISION_RECORD_PRESENT=YES is not the same fact as CANONICAL_WAIVER_ELIGIBILITY. As of this decision's creation, no commit -- including the one this object is first committed within -- has yet supplied its own fresh exact-head Quality + Score100 evidence bound to its own SHA, so waiver_active remains False for every commit scored today. This note is documentary only; the actual gate is registry_commit_verified plus the independent evidence checks in scripts/quality/bys360_score_reconcile_v1.py, not this field.",
+    "future_evidence_policy": "If new evidence changes the underlying reconciliation_status classification, this decision must be reopened for review exactly as BYS360-GOV-LEGACY-001's own future_evidence_policy requires -- a ceiling-waiver approval never overrides or substitutes for that separate, prior determination.",
+    "rollback_condition": "This decision record is never deleted or overwritten. Revocation is performed by a new commit setting decision_status to REVOKED or SUPERSEDED (see VALID_CEILING_WAIVER_DECISION_STATUSES in scripts/quality/bys360_technical_debt_registry_gate.py), never by editing this text in place."
+  },
   "next_available_td_id": 42,
   "next_available_td_cand_id": 8,
   "id_numbering_policy": "TD-NNN is the canonical, promoted sequence. TD-CAND-NNN is a holding sequence for identified-but-not-yet-formally-promoted items, so that minting a working ID never risks colliding with a real historical TD-NNN this repo's squashed history cannot see. Promoting a TD-CAND-NNN item to TD-NNN requires: (1) incrementing next_available_td_id and using that value, (2) setting promoted_to on the TD-CAND-NNN record and promoted_from on the new TD-NNN record (neither record is deleted), (3) a human decision, not an automated one.",

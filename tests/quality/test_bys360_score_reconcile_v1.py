@@ -1035,13 +1035,22 @@ def test_old_registry_without_waiver_field_reproduces_pre_policy_behavior(tmp_pa
     assert report["TRANSFERABILITY"]["ceiling_applied_value"] <= 89
 
 
-def test_real_17be109_registry_has_no_active_waiver_and_ceiling_still_applies(tmp_path):
-    """The real, committed registry has no reconciliation_ceiling_waiver_decision --
-    this policy's mechanism is implemented, but no commit's ceiling is activated yet."""
+def test_real_registry_ceiling_waiver_decision_present_but_not_canonically_active(tmp_path):
+    """WAIVER_ACTIVATION_APPROVED (2026-08-23): the real, committed registry now has a
+    human-approved reconciliation_ceiling_waiver_decision (BYS360-GOV-CEILING-WAIVER-001,
+    bound to approval_baseline_commit fe984cf). DECISION_RECORD_PRESENT=YES is proven
+    here -- but the ceiling still does NOT canonically waive without this specific
+    scoring run's own fresh, commit-bound registry_commit_verified/Quality/Score100
+    evidence, which this call deliberately supplies none of (registry_commit_verified
+    defaults False, no canonical_manifest, no real scored_commit) -- exactly the state
+    every commit is in until it earns its own fresh remote attestation."""
     registry = json.loads(CANONICAL_REGISTRY_PATH.read_text(encoding="utf-8"))
-    assert registry.get("reconciliation_ceiling_waiver_decision") is None
+    decision = registry.get("reconciliation_ceiling_waiver_decision")
+    assert decision is not None
+    assert decision["decision_status"] == "APPROVED"
     methodology = _fixture_methodology()
     report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    assert report["registry_commit_verified"] is False
     assert report["reconciliation_ceiling_waiver_active"] is False
     assert report["evidence_completeness_ceiling_applied"] is True
 

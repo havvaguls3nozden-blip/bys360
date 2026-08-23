@@ -603,11 +603,25 @@ def test_ceiling_waiver_invalid_object_type_rejected():
     assert any(f.code == "ceiling_waiver_invalid_object" for f in result.findings)
 
 
-def test_canonical_registry_has_no_ceiling_waiver_decision_yet():
-    """This policy's mechanism is implemented, but no commit's ceiling is activated
-    yet -- activation requires its own future, separately-evidenced decision bound
-    to real Score100/Quality CI proof for a specific commit."""
+def test_canonical_registry_ceiling_waiver_decision_present_and_schema_valid():
+    """WAIVER_ACTIVATION_APPROVED (2026-08-23): a human-approved
+    reconciliation_ceiling_waiver_decision now exists (decision_id
+    BYS360-GOV-CEILING-WAIVER-001, bound to approval_baseline_commit fe984cf, itself
+    exact-head remotely attested). DECISION_RECORD_PRESENT=YES is a distinct fact from
+    canonical waiver eligibility -- registry-gate validation only confirms this
+    object's own shape/drift correctness, never that any commit's ceiling is
+    canonically waived (that additionally requires registry_commit_verified and fresh,
+    commit-bound Quality/Score100 evidence, evaluated only by the calculator)."""
     registry = json.loads(CANONICAL_REGISTRY_PATH.read_text(encoding="utf-8"))
-    assert registry.get("reconciliation_ceiling_waiver_decision") is None
+    decision = registry.get("reconciliation_ceiling_waiver_decision")
+    assert decision is not None
+    assert decision["decision_id"] == GOV_CEILING_WAIVER_001_DECISION_ID
+    assert decision["decision_status"] == "APPROVED"
+    assert decision["approval_baseline_commit"] == "fe984cf1542e8769e9d1e40400a9a533f5cac6d0"
+    assert decision["preserved_legacy_total"] == 38
+    assert decision["preserved_legacy_priority_split"] == {"P0": 0, "P1": 0, "P2": 17, "P3": 21}
     result = validate_registry(registry)
     assert result.ok, [f"{f.code}:{f.detail}" for f in result.findings]
+    # Historical truth unaffected by this decision's presence.
+    assert registry["reconciliation_status"] == "HISTORICAL_UNRECONSTRUCTABLE"
+    assert registry["legacy_ledger"]["TOTAL"] == 38
