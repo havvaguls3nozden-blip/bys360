@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -36,6 +37,15 @@ VALID_RECONCILIATION_STATUSES = {"FULLY_RECONCILED", "PARTIALLY_RECONCILED", "HI
 # docs/governance/BYS360_GOV_LEGACY_001_DECISION_RECORD.md. A bare manual status
 # flip without matching reconciliation_governance_decision metadata is rejected below.
 GOV_LEGACY_001_DECISION_ID = "BYS360-GOV-LEGACY-001"
+# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22): the only decision_id
+# currently authorized inside reconciliation_ceiling_waiver_decision. Distinct from
+# GOV_LEGACY_001_DECISION_ID by design -- that decision's own text affirmatively
+# preserves the ceiling and cannot be reused to lift it. See
+# docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md. No commit's ceiling
+# is waived merely by this constant existing -- a waiver only activates for a real
+# reconciliation_ceiling_waiver_decision object bound to a specific, eligible commit.
+GOV_CEILING_WAIVER_001_DECISION_ID = "BYS360-GOV-CEILING-WAIVER-001"
+VALID_CEILING_WAIVER_DECISION_STATUSES = {"APPROVED", "REVOKED", "SUPERSEDED", "PROPOSED_NOT_APPROVED"}
 ACTIVE_STATUSES = {"OPEN", "BLOCKED", "IN_PROGRESS", "DEFERRED", "ACCEPTED_RISK"}
 CLOSED_LIKE_STATUSES = {"CLOSED"}
 REQUIRED_ITEM_FIELDS = (
@@ -120,7 +130,7 @@ def _validate_item(item: dict[str, Any], seen_ids: set[str]) -> list[RegistryFin
     return findings
 
 
-def validate_registry(registry: dict[str, Any]) -> RegistryValidationResult:
+def validate_registry(registry: dict[str, Any], *, current_commit: str | None = None) -> RegistryValidationResult:
     findings: list[RegistryFinding] = []
     items = registry.get("items", [])
 
@@ -251,6 +261,94 @@ def validate_registry(registry: dict[str, Any]) -> RegistryValidationResult:
                     f"{current_split} -- the historical split must not drift",
                 ))
 
+    # ------------------------------------------------------------------
+    # FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22):
+    # OPTIONAL, orthogonal ceiling-waiver decision. Sibling to
+    # reconciliation_governance_decision -- never reads for write, sets, or
+    # aliases reconciliation_status/legacy_ledger. Registry remains fully
+    # valid without this key. Enforcement below applies only while
+    # decision_status == "APPROVED"; a REVOKED/SUPERSEDED/PROPOSED_NOT_APPROVED
+    # object is preserved verbatim for audit trail but is inert.
+    ceiling_waiver = registry.get("reconciliation_ceiling_waiver_decision")
+    if ceiling_waiver is not None:
+        if not isinstance(ceiling_waiver, dict):
+            findings.append(RegistryFinding(
+                "ceiling_waiver_invalid_object", None,
+                "reconciliation_ceiling_waiver_decision must be an object when present",
+            ))
+        else:
+            decision_status = ceiling_waiver.get("decision_status")
+            if decision_status not in VALID_CEILING_WAIVER_DECISION_STATUSES:
+                findings.append(RegistryFinding(
+                    "ceiling_waiver_invalid_decision_status", None,
+                    f"reconciliation_ceiling_waiver_decision.decision_status "
+                    f"'{decision_status}' not in {sorted(VALID_CEILING_WAIVER_DECISION_STATUSES)}",
+                ))
+
+            waiver_decision_id = ceiling_waiver.get("decision_id")
+            if waiver_decision_id == GOV_LEGACY_001_DECISION_ID:
+                findings.append(RegistryFinding(
+                    "ceiling_waiver_decision_id_reuses_gov_legacy_001", None,
+                    f"reconciliation_ceiling_waiver_decision.decision_id must not reuse "
+                    f"'{GOV_LEGACY_001_DECISION_ID}' -- that decision's own text affirmatively "
+                    "preserves the ceiling and cannot authorize lifting it; mint a distinct decision_id",
+                ))
+            elif waiver_decision_id != GOV_CEILING_WAIVER_001_DECISION_ID:
+                findings.append(RegistryFinding(
+                    "ceiling_waiver_wrong_decision_id", None,
+                    f"reconciliation_ceiling_waiver_decision.decision_id must be "
+                    f"'{GOV_CEILING_WAIVER_001_DECISION_ID}', got {waiver_decision_id!r}",
+                ))
+
+            if decision_status == "APPROVED":
+                if registry.get("reconciliation_status") != "HISTORICAL_UNRECONSTRUCTABLE":
+                    findings.append(RegistryFinding(
+                        "ceiling_waiver_requires_historical_unreconstructable", None,
+                        "reconciliation_ceiling_waiver_decision is APPROVED but the registry's own "
+                        f"reconciliation_status is {registry.get('reconciliation_status')!r}, not "
+                        "'HISTORICAL_UNRECONSTRUCTABLE' -- re-checked live here, never trusted from "
+                        "reconciliation_governance_decision or cached anywhere",
+                    ))
+
+                preserved_total = ceiling_waiver.get("preserved_legacy_total")
+                if preserved_total != legacy_total:
+                    findings.append(RegistryFinding(
+                        "ceiling_waiver_total_drift", None,
+                        f"reconciliation_ceiling_waiver_decision.preserved_legacy_total "
+                        f"({preserved_total}) does not match current legacy_ledger.TOTAL "
+                        f"({legacy_total}) -- the historical reference must not drift",
+                    ))
+
+                preserved_split = ceiling_waiver.get("preserved_legacy_priority_split") or {}
+                current_waiver_split = {
+                    "P0": legacy_ledger.get("P0"), "P1": legacy_ledger.get("P1"),
+                    "P2": legacy_ledger.get("P2"), "P3": legacy_ledger.get("P3"),
+                }
+                if preserved_split != current_waiver_split:
+                    findings.append(RegistryFinding(
+                        "ceiling_waiver_split_drift", None,
+                        f"reconciliation_ceiling_waiver_decision.preserved_legacy_priority_split "
+                        f"{preserved_split} does not match current legacy_ledger P0/P1/P2/P3 "
+                        f"{current_waiver_split} -- the historical split must not drift",
+                    ))
+
+                target_scored_commit = ceiling_waiver.get("target_scored_commit")
+                if current_commit is None:
+                    findings.append(RegistryFinding(
+                        "ceiling_waiver_commit_unverified", None,
+                        "reconciliation_ceiling_waiver_decision is APPROVED but no current_commit was "
+                        "supplied to validate_registry() to check target_scored_commit against -- the "
+                        "real scored commit must be verified, never assumed",
+                    ))
+                elif target_scored_commit != current_commit:
+                    findings.append(RegistryFinding(
+                        "ceiling_waiver_commit_mismatch", None,
+                        f"reconciliation_ceiling_waiver_decision.target_scored_commit "
+                        f"({target_scored_commit!r}) does not match the actual current commit "
+                        f"({current_commit!r}) -- this waiver only authorizes the exact commit it "
+                        "was approved against",
+                    ))
+
     ok = not findings
     return RegistryValidationResult(
         ok=ok,
@@ -313,13 +411,29 @@ def main() -> int:
         return 2
 
     registry = _load_registry(registry_path)
-    result = validate_registry(registry)
+
+    current_commit: str | None = None
+    try:
+        git_result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=registry_path.resolve().parent,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        if git_result.returncode == 0:
+            current_commit = git_result.stdout.strip()
+    except OSError:
+        current_commit = None
+
+    result = validate_registry(registry, current_commit=current_commit)
 
     report = {
         "generated_at": datetime.now(UTC).isoformat(),
         "ok": result.ok,
         "registry_version": registry.get("registry_version"),
         "reconciliation_status": registry.get("reconciliation_status"),
+        "current_commit": current_commit,
         "registry_counts": result.registry_counts,
         "legacy_counts": result.legacy_counts,
         "findings": [

@@ -108,6 +108,20 @@ CANONICAL_UNVERIFIED_STATUSES = {"UNKNOWN"}
 TRUSTED_EVIDENCE_TYPES = {"REMOTE_CI_VERIFIED", "LOCAL_VERIFIED", "REGISTRY_DERIVED", "STATIC_REPOSITORY_FACT", "UNKNOWN"}
 VALID_MANIFEST_PROVENANCE = {"USER_SUPPLIED_REMOTE_PROOF", "AUTOMATED_INGESTION"}
 
+# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22): the evidence-manifest
+# gate id representing exact-head PASS of the Score100 CI workflow
+# (.github/workflows/bys360-score100-quality-gate-v1.yml). This workflow is not
+# represented by any per-category gate above -- it must never be inferred from Quality
+# CI (ruff/mypy/etc.) passing, since the two workflows run independently. Consumed only
+# by _score100_evidence_verified() below, for the ceiling-waiver eligibility check; it
+# never contributes points to any category's own gate_component/rubric_component.
+SCORE100_WORKFLOW_GATE_ID = "score100_quality_gate_v1_workflow"
+
+try:
+    from scripts.quality.bys360_technical_debt_registry_gate import validate_registry
+except ImportError:  # pragma: no cover - exercised when run as a direct script, not via pytest
+    from bys360_technical_debt_registry_gate import validate_registry  # type: ignore[no-redef]
+
 
 @dataclass
 class GateResult:
@@ -673,6 +687,31 @@ def _score_category(
     )
 
 
+def _score100_evidence_verified(canonical_manifest: dict[str, Any], scored_commit: str) -> bool:
+    """Independently verify exact-head Score100 CI evidence for scored_commit.
+
+    Score100 (bys360-score100-quality-gate-v1.yml) is a separate CI workflow from
+    Quality and is not represented by any existing per-category gate -- it must never
+    be inferred from Quality gates passing. Only a commit-bound REMOTE_CI_VERIFIED PASS
+    entry with valid manifest provenance counts; there is no local equivalent that can
+    satisfy this (the workflow itself is the signal), so a missing/absent entry always
+    resolves to False, never a silent pass.
+    """
+    for gate in canonical_manifest.get("gates", []):
+        if gate.get("id") != SCORE100_WORKFLOW_GATE_ID:
+            continue
+        if gate.get("commit_sha") != scored_commit:
+            continue
+        if gate.get("status") != "PASS":
+            continue
+        if gate.get("evidence_type") != "REMOTE_CI_VERIFIED":
+            continue
+        if gate.get("provenance") not in VALID_MANIFEST_PROVENANCE:
+            continue
+        return True
+    return False
+
+
 def _round_half_up(value: float) -> int:
     return int(Decimal(str(value)).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
 
@@ -731,10 +770,43 @@ def compute_report(
 
     total_unverified = sum(cs.unverified_count for cs in category_scores.values())
     fully_verified = total_unverified == 0
-    reconciled = registry.get("reconciliation_status") == "FULLY_RECONCILED"
+
+    # SAFETY FIX (FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1, 2026-08-22): neither
+    # ceiling-removal path -- the pre-existing FULLY_RECONCILED path, nor the new
+    # ceiling-waiver path below -- may bypass registry structural validation.
+    # Previously FULLY_RECONCILED was a bare string comparison that could lift the
+    # ceiling even if the registry itself failed its own gate invariants (e.g. a
+    # drifted legacy_ledger or an internally inconsistent unmapped count). Applied
+    # symmetrically to both paths, not scoped only to the new mechanism.
+    registry_validation = validate_registry(registry, current_commit=scored_commit)
+    registry_structurally_valid = registry_validation.ok
+
+    reconciled = (
+        registry.get("reconciliation_status") == "FULLY_RECONCILED"
+        and registry_structurally_valid
+    )
+
+    # FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22): an
+    # orthogonal ceiling-waiver decision, distinct from reconciliation_status,
+    # which stays HISTORICAL_UNRECONSTRUCTABLE and is never rewritten by this
+    # mechanism (see docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md).
+    # Every term below must independently and affirmatively hold; there is no
+    # truthy default anywhere, so a missing/malformed/unapproved/wrongly-bound
+    # decision object always fails closed to waiver_active=False.
+    ceiling_waiver = registry.get("reconciliation_ceiling_waiver_decision")
+    waiver_active = (
+        fully_verified
+        and registry_structurally_valid
+        and isinstance(ceiling_waiver, dict)
+        and ceiling_waiver.get("decision_status") == "APPROVED"
+        and registry.get("reconciliation_status") == "HISTORICAL_UNRECONSTRUCTABLE"
+        and ceiling_waiver.get("target_scored_commit") == scored_commit
+        and registry_validation.registry_counts.get("REGISTRY_ACTIVE_COUNT") == 0
+        and _score100_evidence_verified(canonical_manifest, scored_commit)
+    )
 
     ceiling_cfg = methodology["evidence_completeness_ceiling"]
-    ceiling_applies = (not fully_verified) or (not reconciled)
+    ceiling_applies = ((not fully_verified) or (not reconciled)) and not waiver_active
     ceiling_value = ceiling_cfg["value"] if ceiling_applies else 100
 
     live_weights = methodology["composites"]["LIVE_READINESS"]["weights"]
@@ -787,6 +859,11 @@ def compute_report(
         "scored_commit": scored_commit,
         "fully_verified": fully_verified,
         "unverified_evidence_count": total_unverified,
+        "registry_structurally_valid": registry_structurally_valid,
+        "registry_validation_findings": [
+            {"code": f.code, "item_id": f.item_id, "detail": f.detail} for f in registry_validation.findings
+        ],
+        "reconciliation_ceiling_waiver_active": waiver_active,
         "evidence_completeness_ceiling_applied": ceiling_applies,
         "evidence_completeness_ceiling_value": ceiling_value if ceiling_applies else None,
         "category_scores": {

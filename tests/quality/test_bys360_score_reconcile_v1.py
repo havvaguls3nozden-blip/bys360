@@ -16,10 +16,15 @@ import pytest
 
 from scripts.quality.bys360_score_reconcile_v1 import (
     LEGACY_SNAPSHOT,
+    SCORE100_WORKFLOW_GATE_ID,
     _build_argv,
     _round_half_up,
     compute_report,
     resolve_python,
+)
+from scripts.quality.bys360_technical_debt_registry_gate import (
+    GOV_CEILING_WAIVER_001_DECISION_ID,
+    GOV_LEGACY_001_DECISION_ID,
 )
 
 pytestmark = pytest.mark.ci_safe
@@ -736,3 +741,261 @@ def test_no_weight_ceiling_penalty_rounding_diff_from_pre_wave_values():
     assert methodology["debt_penalty_policy"]["penalty_cap_per_category"] == 30
     assert methodology["evidence_completeness_ceiling"]["value"] == 89
     assert methodology["rounding"] == {"category_precision": 2, "composite_rule": "round_half_up", "composite_precision": 0}
+
+
+# ---------------------------------------------------------------------------
+# FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 (approved 2026-08-22):
+# reconciliation_ceiling_waiver_decision. Orthogonal to reconciliation_status
+# (stays HISTORICAL_UNRECONSTRUCTABLE, never rewritten) and to the
+# registry_reconciliation_transparency rubric (Documentation-Handover credit
+# must be provably unaffected). Every scenario below must fail closed unless
+# ALL eligibility terms hold simultaneously.
+# ---------------------------------------------------------------------------
+
+WAIVER_TARGET_COMMIT = "f" * 40
+
+
+def _historical_unreconstructable_registry(**overrides):
+    registry = _fixture_registry(items=[], reconciliation_status="HISTORICAL_UNRECONSTRUCTABLE")
+    registry["legacy_ledger"] = {"P0": 0, "P1": 0, "P2": 17, "P3": 21, "TOTAL": 38}
+    registry["reconciliation_governance_decision"] = {
+        "decision_id": GOV_LEGACY_001_DECISION_ID,
+        "decision_status": "APPROVED",
+        "preserved_legacy_total": 38,
+        "preserved_legacy_priority_split": {"P0": 0, "P1": 0, "P2": 17, "P3": 21},
+    }
+    registry.update(overrides)
+    return registry
+
+
+def _valid_waiver(**overrides):
+    decision = {
+        "decision_id": GOV_CEILING_WAIVER_001_DECISION_ID,
+        "decision_status": "APPROVED",
+        "target_scored_commit": WAIVER_TARGET_COMMIT,
+        "preserved_legacy_total": 38,
+        "preserved_legacy_priority_split": {"P0": 0, "P1": 0, "P2": 17, "P3": 21},
+    }
+    decision.update(overrides)
+    return decision
+
+
+def _score100_pass_manifest(commit_sha=WAIVER_TARGET_COMMIT):
+    return {"gates": [{
+        "id": SCORE100_WORKFLOW_GATE_ID, "commit_sha": commit_sha, "status": "PASS",
+        "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+    }]}
+
+
+def _fully_eligible_report(tmp_path, **registry_overrides):
+    methodology = _fixture_methodology()
+    overrides = {"reconciliation_ceiling_waiver_decision": _valid_waiver()}
+    overrides.update(registry_overrides)
+    registry = _historical_unreconstructable_registry(**overrides)
+    return compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+
+
+def test_ceiling_waiver_active_when_fully_eligible(tmp_path):
+    """POSITIVE: every eligibility term satisfied -- ceiling is waived."""
+    report = _fully_eligible_report(tmp_path)
+    assert report["fully_verified"] is True
+    assert report["registry_structurally_valid"] is True
+    assert report["reconciliation_ceiling_waiver_active"] is True
+    assert report["evidence_completeness_ceiling_applied"] is False
+
+
+def test_ceiling_waiver_does_not_mutate_registry_or_legacy_ledger(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
+    registry_before = json.loads(json.dumps(registry))  # deep copy
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["reconciliation_ceiling_waiver_active"] is True
+    assert registry == registry_before
+    assert registry["reconciliation_status"] == "HISTORICAL_UNRECONSTRUCTABLE"
+    assert registry["legacy_ledger"]["TOTAL"] == 38
+
+
+def test_ceiling_waiver_active_does_not_change_documentation_handover(tmp_path):
+    """Anti-gaming (Section 8 of the ratification report): an active waiver must NOT
+    raise Documentation-Handover -- the underlying historical gap is still real."""
+    methodology = _fixture_methodology()
+    registry_no_waiver = _historical_unreconstructable_registry()
+    registry_with_waiver = _historical_unreconstructable_registry(
+        reconciliation_ceiling_waiver_decision=_valid_waiver(),
+    )
+    evidence = _all_gates_pass_evidence()
+    report_no_waiver = compute_report(
+        methodology, registry_no_waiver, tmp_path, evidence,
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    report_with_waiver = compute_report(
+        methodology, registry_with_waiver, tmp_path, evidence,
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report_no_waiver["reconciliation_ceiling_waiver_active"] is False
+    assert report_with_waiver["reconciliation_ceiling_waiver_active"] is True
+    doc_no_waiver = report_no_waiver["category_scores"]["Documentation-Handover"]["final_score"]
+    doc_with_waiver = report_with_waiver["category_scores"]["Documentation-Handover"]["final_score"]
+    assert doc_with_waiver == doc_no_waiver
+
+
+def test_ceiling_waiver_blocked_when_decision_missing(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry()  # no reconciliation_ceiling_waiver_decision at all
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_decision_status_not_approved(tmp_path):
+    report = _fully_eligible_report(tmp_path, reconciliation_ceiling_waiver_decision=_valid_waiver(decision_status="REVOKED"))
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_bound_to_wrong_commit(tmp_path):
+    report = _fully_eligible_report(tmp_path, reconciliation_ceiling_waiver_decision=_valid_waiver(target_scored_commit="0" * 40))
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_quality_evidence_incomplete(tmp_path):
+    """fully_verified=False (some gate UNKNOWN) must block the waiver, even with an
+    otherwise fully valid, approved, commit-bound decision."""
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
+    report = compute_report(
+        methodology, registry, tmp_path, evidence={},  # nothing supplied -> UNKNOWN
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["fully_verified"] is False
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_score100_evidence_missing(tmp_path):
+    """Score100 must be an independent, real requirement -- never inferred from
+    Quality gates passing."""
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest={"gates": []},  # Quality-style gates all pass, but no Score100 entry at all
+        scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["fully_verified"] is True
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_score100_evidence_is_fail(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(reconciliation_ceiling_waiver_decision=_valid_waiver())
+    manifest = {"gates": [{
+        "id": SCORE100_WORKFLOW_GATE_ID, "commit_sha": WAIVER_TARGET_COMMIT, "status": "FAIL",
+        "evidence_type": "REMOTE_CI_VERIFIED", "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+    }]}
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=manifest, scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_active_debt_present(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry(
+        items=[{"id": "TD-CAND-999", "status": "OPEN", "severity": "P2", "category": "Code Quality"}],
+        reconciliation_ceiling_waiver_decision=_valid_waiver(),
+    )
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_registry_gate_validation_fails(tmp_path):
+    """Any unrelated registry-validation failure (e.g. drifted legacy total) must
+    also block the waiver -- validate_registry().ok is a blanket requirement."""
+    report = _fully_eligible_report(tmp_path, reconciliation_ceiling_waiver_decision=_valid_waiver(preserved_legacy_total=0))
+    assert report["registry_structurally_valid"] is False
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_ceiling_waiver_blocked_when_reconciliation_status_not_historical_unreconstructable(tmp_path):
+    methodology = _fixture_methodology()
+    registry = _fixture_registry(items=[], reconciliation_status="PARTIALLY_RECONCILED")
+    registry["reconciliation_ceiling_waiver_decision"] = _valid_waiver()
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_fully_reconciled_path_blocked_when_registry_structurally_invalid(tmp_path):
+    """SAFETY FIX: the pre-existing FULLY_RECONCILED path must also be gated by
+    registry validation, not just the new waiver path. A registry claiming
+    FULLY_RECONCILED but failing validate_registry() must not lift the ceiling."""
+    methodology = _fixture_methodology()
+    # unmapped_legacy_open_count != 0 while claiming FULLY_RECONCILED -> validate_registry() fails.
+    registry = _fixture_registry(items=[], reconciliation_status="FULLY_RECONCILED")
+    registry["legacy_ledger"] = {"P0": 0, "P1": 0, "P2": 17, "P3": 21, "TOTAL": 38}
+    report = compute_report(
+        methodology, registry, tmp_path, _all_gates_pass_evidence(),
+        canonical_manifest=_score100_pass_manifest(), scored_commit=WAIVER_TARGET_COMMIT,
+    )
+    assert report["registry_structurally_valid"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+
+
+def test_fully_reconciled_path_unaffected_when_registry_structurally_valid(tmp_path):
+    """The pre-existing behavior for a genuinely valid FULLY_RECONCILED registry
+    (no legacy_ledger at all, matching the existing test_no_ceiling_when_fully_verified_
+    and_fully_reconciled fixture exactly) must be completely unaffected by the safety fix."""
+    methodology = _fixture_methodology()
+    registry_full = _fixture_registry(items=[], reconciliation_status="FULLY_RECONCILED")
+    report = compute_report(methodology, registry_full, tmp_path, _all_gates_pass_evidence())
+    assert report["registry_structurally_valid"] is True
+    assert report["evidence_completeness_ceiling_applied"] is False
+
+
+def test_old_registry_without_waiver_field_reproduces_pre_policy_behavior(tmp_path):
+    """Backward compatibility: a registry with the waiver field genuinely absent
+    (not null, not present) must behave identically to before this policy existed --
+    exactly the existing test_ceiling_still_applies_for_historical_unreconstructable
+    scenario, re-asserted here alongside the new fields."""
+    methodology = _fixture_methodology()
+    registry = _historical_unreconstructable_registry()
+    assert "reconciliation_ceiling_waiver_decision" not in registry
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    assert report["fully_verified"] is True
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
+    assert report["LIVE_READINESS"]["ceiling_applied_value"] <= 89
+    assert report["TRANSFERABILITY"]["ceiling_applied_value"] <= 89
+
+
+def test_real_17be109_registry_has_no_active_waiver_and_ceiling_still_applies(tmp_path):
+    """The real, committed registry has no reconciliation_ceiling_waiver_decision --
+    this policy's mechanism is implemented, but no commit's ceiling is activated yet."""
+    registry = json.loads(CANONICAL_REGISTRY_PATH.read_text(encoding="utf-8"))
+    assert registry.get("reconciliation_ceiling_waiver_decision") is None
+    methodology = _fixture_methodology()
+    report = compute_report(methodology, registry, tmp_path, _all_gates_pass_evidence())
+    assert report["reconciliation_ceiling_waiver_active"] is False
+    assert report["evidence_completeness_ceiling_applied"] is True
