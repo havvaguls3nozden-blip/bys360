@@ -187,6 +187,44 @@ def test_composer_page_exposes_video_url_field_exactly_once(app, client):
     assert html.count('name="video_url"') == 1
 
 
+def test_composer_page_exposes_video_url_live_preview_container(app, client):
+    """The composer field alone (no client-side feedback) previously gave a
+    user zero visual confirmation that pasting a link did anything until
+    after publishing -- easy to mistake for "this doesn't work." A
+    data-portal-video-preview container, wired by
+    app/static/js/bys360_portal.js, must be present next to the field."""
+    _create_user(app, sicil_no="pv002", email="pv002@ktb.gov.tr", role="admin")
+    _login(client, "pv002")
+
+    response = client.get("/portal")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert "data-portal-video-preview" in html
+    assert "data-portal-video-url" in html
+    assert "bys360_portal.js" in html
+
+
+def test_video_link_preview_js_mirrors_backend_provider_allowlist() -> None:
+    """The client-side preview must recognize exactly the providers the
+    server accepts (YouTube incl. youtu.be/shorts/embed, Vimeo) and must
+    never render arbitrary/raw user HTML -- it only ever builds an iframe
+    src from a value it extracted and validated itself, exactly like the
+    server's _portal_video_embed_url()."""
+    js_path = Path(__file__).resolve().parents[2] / "app" / "static" / "js" / "bys360_portal.js"
+    js_source = js_path.read_text(encoding="utf-8")
+
+    assert "BYS360_PORTAL_VIDEO_LINK_PREVIEW_V1_BEGIN" in js_source
+    assert "portalVideoEmbedUrl" in js_source
+    assert "youtube-nocookie.com/embed/" in js_source
+    assert "player.vimeo.com/video/" in js_source
+    # Never trusts raw HTML/innerHTML assignment of user-controlled text --
+    # iframe.src is always assigned from the function's own return value,
+    # and error/preview content is built via createElement/textContent.
+    assert ".innerHTML = raw" not in js_source
+    assert ".innerHTML = input.value" not in js_source
+
+
 # ---------------------------------------------------------------------------
 # B) YouTube URL normalization (pure unit tests, no network, no DB)
 # ---------------------------------------------------------------------------

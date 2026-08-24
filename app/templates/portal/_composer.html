@@ -145,8 +145,9 @@
         </div>
         <div class="portal-media-field portal-media-field-wide">
           <label class="portal-field-label" for="portal-video-url"><i class="fa-brands fa-youtube"></i> Video bağlantısı <small>isteğe bağlı</small></label>
-          <input id="portal-video-url" class="portal-input" type="url" name="video_url" maxlength="700" placeholder="YouTube veya Vimeo bağlantısı yapıştırın">
+          <input id="portal-video-url" class="portal-input" type="url" name="video_url" maxlength="700" placeholder="YouTube veya Vimeo bağlantısı yapıştırın" data-portal-video-url>
           <div class="portal-video-link-help"><i class="fa-solid fa-shield-halved"></i><span>Dosya yüklemeden güvenli YouTube/Vimeo bağlantısı da ekleyebilirsiniz.</span></div>
+          <div class="portal-video-link-preview" data-portal-video-preview hidden aria-live="polite"></div>
         </div>
       </div>
       {# BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_COMPOSER #}

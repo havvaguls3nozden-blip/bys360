@@ -160,6 +160,124 @@
   });
 })();
 // /BYS360_CORPORATE_PORTAL_MEDIA_VIDEO_V2_3_JS
+// BYS360_PORTAL_VIDEO_LINK_PREVIEW_V1_BEGIN
+// Client-side-only preview/feedback for the composer's video_url field.
+// Mirrors app/portal/routes.py's _portal_video_embed_url() allowlist/ID
+// extraction (YouTube incl. youtu.be/shorts/embed, Vimeo) purely for UX --
+// this is NEVER a security boundary. The server independently re-validates
+// and normalizes every URL on submit regardless of what this preview shows;
+// an unsupported/invalid link here does not block submission (the existing
+// backend already accepts the post and simply omits the attachment with a
+// flash warning, so the client must not be stricter than that).
+(function () {
+  var YOUTUBE_ID_RE = /^[A-Za-z0-9_-]{6,32}$/;
+
+  function normalizeHost(hostname) {
+    return (hostname || '').toLowerCase().replace(/^www\./, '');
+  }
+
+  function hostMatchesDomain(host, domain) {
+    return host === domain || host.slice(-(domain.length + 1)) === ('.' + domain);
+  }
+
+  function youTubeVideoId(url) {
+    var host = normalizeHost(url.hostname);
+    var path = (url.pathname || '').replace(/^\/+|\/+$/g, '');
+    if (host === 'youtu.be') return path.split('/')[0] || '';
+    if (hostMatchesDomain(host, 'youtube.com') || hostMatchesDomain(host, 'youtube-nocookie.com')) {
+      if (path.indexOf('embed/') === 0) return path.split('/')[1] || '';
+      if (path.indexOf('shorts/') === 0) return path.split('/')[1] || '';
+      return url.searchParams.get('v') || '';
+    }
+    return '';
+  }
+
+  function portalVideoEmbedUrl(raw) {
+    var url;
+    try {
+      url = new URL(raw);
+    } catch (e) {
+      return '';
+    }
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+    var host = normalizeHost(url.hostname);
+    if (host === 'youtu.be' || hostMatchesDomain(host, 'youtube.com') || hostMatchesDomain(host, 'youtube-nocookie.com')) {
+      var videoId = youTubeVideoId(url);
+      if (YOUTUBE_ID_RE.test(videoId)) return 'https://www.youtube-nocookie.com/embed/' + videoId;
+      return '';
+    }
+    if (hostMatchesDomain(host, 'vimeo.com')) {
+      var match = /(?:video\/)?([0-9]{5,20})/.exec(url.pathname || '');
+      if (match) return 'https://player.vimeo.com/video/' + match[1];
+    }
+    return '';
+  }
+
+  function renderPreviewFrame(container, embedUrl) {
+    container.innerHTML = '';
+    var frame = document.createElement('div');
+    frame.className = 'portal-video-frame';
+    var iframe = document.createElement('iframe');
+    iframe.src = embedUrl;
+    iframe.title = 'Video önizleme';
+    iframe.loading = 'lazy';
+    iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+    iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups');
+    iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+    iframe.allowFullscreen = true;
+    frame.appendChild(iframe);
+    container.appendChild(frame);
+  }
+
+  function renderPreviewError(container) {
+    container.innerHTML = '';
+    var warn = document.createElement('p');
+    warn.className = 'portal-inline-message is-error';
+    warn.textContent = 'Bu bağlantı desteklenmiyor. YouTube veya Vimeo bağlantısı yapıştırın.';
+    container.appendChild(warn);
+  }
+
+  function ready(fn) {
+    if (document.readyState !== 'loading') fn();
+    else document.addEventListener('DOMContentLoaded', fn);
+  }
+
+  ready(function () {
+    document.querySelectorAll('[data-portal-video-url]').forEach(function (input) {
+      var wrap = input.closest('.portal-media-field');
+      var preview = wrap && wrap.querySelector('[data-portal-video-preview]');
+      if (!preview) return;
+      var timer = null;
+
+      function render() {
+        var raw = (input.value || '').trim();
+        if (!raw) {
+          preview.hidden = true;
+          preview.innerHTML = '';
+          return;
+        }
+        var embedUrl = portalVideoEmbedUrl(raw);
+        preview.hidden = false;
+        if (embedUrl) {
+          renderPreviewFrame(preview, embedUrl);
+        } else {
+          renderPreviewError(preview);
+        }
+      }
+
+      input.addEventListener('input', function () {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(render, 260);
+      });
+      input.addEventListener('paste', function () {
+        window.clearTimeout(timer);
+        timer = window.setTimeout(render, 60);
+      });
+      input.addEventListener('blur', render);
+    });
+  });
+})();
+// BYS360_PORTAL_VIDEO_LINK_PREVIEW_V1_END
 // BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_BEGIN
 (function () {
   function ready(fn){ if(document.readyState !== 'loading'){ fn(); } else { document.addEventListener('DOMContentLoaded', fn); } }
