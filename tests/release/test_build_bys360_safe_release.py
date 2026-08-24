@@ -213,6 +213,141 @@ def test_key_and_pem_suffixes_rejected(repo, tmp_path):
 
 
 # ---------------------------------------------------------------------------
+# FINAL package required-content blocker closure (2026-08-24): "archive" was
+# a bare-segment entry in FORBIDDEN_DIR_PARTS, so it matched ANY path
+# segment literally named "archive" -- including the real, git-tracked
+# Flask template directory app/templates/performance/archive/ (a live
+# feature). Separately, the .env forbidden-name regex matched
+# .env.example/.env.docker.example (legitimate operator config templates,
+# not secrets), because it only checked for ".env" immediately followed by
+# end-of-segment or a literal dot. Both false positives were confirmed via
+# a full-repository forensic scan before being fixed -- these tests pin the
+# exact repository-grounded fix: "archive" stays forbidden everywhere
+# EXCEPT under app/ (docs/archive/, reports/archive/, scripts/archive/ all
+# still exist as genuinely historical content and must stay excluded); real
+# .env secret files stay forbidden via an explicit basename allowlist for
+# the two known-safe templates, not a broadened regex.
+# ---------------------------------------------------------------------------
+
+
+def test_app_performance_archive_templates_included(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {
+        "app/templates/performance/archive/index.html": b"<html>archive index</html>\n",
+        "app/templates/performance/archive/detail.html": b"<html>archive detail</html>\n",
+        "app/templates/performance/archive/_premium_styles.html": b"<style></style>\n",
+    })
+    sha = _commit_all(root)
+    output = tmp_path / "out_app_archive.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    names = _names(output)
+    assert "app/templates/performance/archive/index.html" in names
+    assert "app/templates/performance/archive/detail.html" in names
+    assert "app/templates/performance/archive/_premium_styles.html" in names
+
+
+def test_docs_archive_storage_still_excluded(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {"docs/archive/old_note.md": b"# old\n"})
+    sha = _commit_all(root)
+    output = tmp_path / "out_docs_archive.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert "docs/archive/old_note.md" not in _names(output)
+
+
+def test_scripts_archive_storage_still_excluded(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {"scripts/archive/old_tool.py": b"# old\n"})
+    sha = _commit_all(root)
+    output = tmp_path / "out_scripts_archive.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert "scripts/archive/old_tool.py" not in _names(output)
+
+
+@pytest.mark.parametrize("env_name", [".env", ".env.local", ".env.production"])
+def test_real_env_secret_variants_forbidden(repo, tmp_path, env_name):
+    root, _ = repo
+    _write_files(root, {env_name: b"SECRET_KEY=real-value-should-never-ship\n"})
+    sha = _commit_all(root)
+    output = tmp_path / f"out_{env_name.replace('.', '_')}.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert env_name not in _names(output)
+
+
+@pytest.mark.parametrize("env_name", [".env.example", ".env.docker.example"])
+def test_env_example_templates_allowed(repo, tmp_path, env_name):
+    root, _ = repo
+    _write_files(root, {env_name: b"SECRET_KEY=replace-with-a-strong-random-value\n"})
+    sha = _commit_all(root)
+    output = tmp_path / f"out_{env_name.replace('.', '_')}.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert env_name in _names(output)
+
+
+def test_full_required_scope_has_zero_missing_files(repo, tmp_path):
+    """The exact full file-by-file comparison that caught the original
+    defect: every git-tracked file under app/ (plus the other required
+    root files) must appear in the package unless it hits an unrelated,
+    still-legitimate exclusion rule."""
+    root, sha = repo
+    _write_files(root, {
+        "app/templates/performance/archive/index.html": b"<html></html>\n",
+        "app/deep/nested/module.py": b"# module\n",
+    })
+    sha = _commit_all(root)
+    output = tmp_path / "out_full_scope.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    names = _names(output)
+    tracked_app = [
+        line for line in _git(["ls-files"], root).stdout.splitlines() if line.startswith("app/")
+    ]
+    missing = [p for p in tracked_app if p not in names]
+    assert missing == []
+
+
+def test_forbidden_content_scan_zero_after_fix(repo, tmp_path):
+    root, _ = repo
+    _write_files(root, {
+        "app/templates/performance/archive/index.html": b"<html></html>\n",
+        "docs/archive/note.md": b"# note\n",
+        "scripts/archive/old.py": b"# old\n",
+        ".env.example": b"SECRET_KEY=replace-with-a-strong-random-value\n",
+        "tests/some_test.py": b"# test\n",
+    })
+    sha = _commit_all(root)
+    output = tmp_path / "out_forbidden_scan.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    findings = builder.scan_zip(output)
+    assert findings == []
+
+
+def test_secret_gate_still_rejects_actual_secret_material(repo, tmp_path):
+    """Not the release builder itself -- confirms the repository's real
+    secret gate (bys360_secret_repo_gate.py) still flags a hardcoded secret
+    value even in a file whose NAME the release builder now allows through
+    (.env.example), proving the packaging-rule fix did not weaken the
+    separate, independent secret-content safety net."""
+    import importlib.util as _ilu
+
+    secret_gate_path = (
+        Path(__file__).resolve().parents[2] / "scripts" / "quality" / "bys360_secret_repo_gate.py"
+    )
+    spec = _ilu.spec_from_file_location("bys360_secret_repo_gate", secret_gate_path)
+    assert spec is not None
+    assert spec.loader is not None
+    gate = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(gate)
+
+    root, _ = repo
+    fixture_line = 'SECRET_KEY="a-genuinely-long-hardcoded-secret-value-1234567890"\n'  # hardcoded_secret fixture
+    (root / ".env.example").write_text(fixture_line, encoding="utf-8")
+    _commit_all(root)
+    result = gate.run(root)
+    assert result["ok"] is False
+    assert result["finding_count"] >= 1
+
+
+# ---------------------------------------------------------------------------
 # 15: unsafe symlink / path traversal fail closed
 # ---------------------------------------------------------------------------
 

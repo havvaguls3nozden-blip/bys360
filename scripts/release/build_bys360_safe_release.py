@@ -16,14 +16,52 @@ SCHEMA_VERSION = 2
 FORBIDDEN_DIR_PARTS = {
     ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
     ".pytest_cache", ".mypy_cache", ".ruff_cache", ".idea", ".vscode", ".dart_tool",
-    "instance", "logs", "uploads", "reports", "backups", "backup", "archive", "releases",
+    "instance", "logs", "uploads", "reports", "backups", "backup", "releases",
     "payload", "overlay_payload", "_security_quarantine", "_cleanup_quarantine", "_local_secrets",
     # BYS360 deterministic-package-builder hardening (2026-08-23): forensically
     # confirmed zero app/-import dependency before being added -- see
     # scripts/release/build_bys360_safe_release.py test suite and the wave's
     # forensic-comparison + include/exclude-contract agent findings.
     ".github", "tests", "mobile_flutter", ".codex", ".claude",
+    # NOTE: "archive" is intentionally NOT a bare entry here -- see
+    # _is_forbidden_archive_directory_segment() below. A flat membership
+    # check on this set would have matched ANY path segment literally named
+    # "archive", including the real, git-tracked Flask template directory
+    # app/templates/performance/archive/ (a live feature, not backup/
+    # release-archive storage) -- confirmed by the FINAL package required-
+    # content audit (2026-08-24): 5 legitimate template files were silently
+    # dropped from every package this builder produced.
 }
+
+# "archive" is forbidden everywhere EXCEPT under app/ -- repository-grounded:
+# app/ is pure application source (routes/models/services/templates/static),
+# never backup/release-archive storage, and a full-repo forensic scan found
+# exactly one legitimate exception (app/templates/performance/archive/, 5
+# files) against three genuinely-historical roots that must stay excluded
+# (docs/archive/, reports/archive/, scripts/archive/ -- 501 files total).
+def _is_forbidden_archive_directory_segment(parts: list[str]) -> bool:
+    if not parts:
+        return False
+    if parts[0].lower() == "app":
+        return False
+    return "archive" in (p.lower() for p in parts)
+
+
+# Real secret environment files (.env, .env.local, .env.production, ...)
+# remain forbidden. Operator-safe example/template files are explicitly
+# allowlisted by exact basename -- an allowlist, not a broadened regex, so
+# no other real secret variant can ever be accidentally permitted alongside
+# them. Confirmed exhaustive against this repository's full tracked tree:
+# these are the only two `.env*` files tracked anywhere (2026-08-24 scan).
+ALLOWED_ENV_TEMPLATE_BASENAMES = {".env.example", ".env.docker.example"}
+_ENV_FILE_PATTERN = re.compile(r"(^|/|\\)\.env($|\.)", re.I)
+
+
+def _is_forbidden_env_file(n: str) -> bool:
+    if not _ENV_FILE_PATTERN.search(n):
+        return False
+    basename = n.rsplit("/", 1)[-1]
+    return basename.lower() not in ALLOWED_ENV_TEMPLATE_BASENAMES
 FORBIDDEN_SUFFIXES = {
     ".sqlite3", ".sqlite", ".db", ".dump", ".bak", ".backup", ".old", ".orig",
     ".log", ".pyc", ".pyo", ".key", ".pem", ".p12", ".pfx", ".ppk", ".jks", ".keystore",
@@ -33,7 +71,7 @@ FORBIDDEN_SUFFIXES = {
     ".zip", ".7z", ".rar",
 }
 FORBIDDEN_NAME_PATTERNS = (
-    re.compile(r"(^|/|\\)\.env($|\.)", re.I),
+    # .env handling lives in _is_forbidden_env_file() (allowlist-based), not here.
     re.compile(r"\.gitignore\.bak", re.I),
     re.compile(r"\.bak_", re.I),
     re.compile(r"disabled_by_rollback", re.I),
@@ -83,12 +121,16 @@ def is_forbidden_archive_name(name: str) -> tuple[bool, str]:
     for part in lower_parts:
         if part in FORBIDDEN_DIR_PARTS:
             return True, f"yasak klasor parcasi: {part}"
+    if _is_forbidden_archive_directory_segment(parts):
+        return True, "yasak klasor parcasi: archive (app/ disinda)"
     base = parts[-1] if parts else n
     if base.lower() in FORBIDDEN_EXACT_NAMES:
         return True, f"yasak dosya adi: {base}"
     suffix = Path(base).suffix.lower()
     if suffix in FORBIDDEN_SUFFIXES:
         return True, f"yasak dosya uzantisi: {suffix}"
+    if _is_forbidden_env_file(n):
+        return True, "yasak dosya adi deseni: gercek .env dosyasi (sablon degil)"
     for pattern in FORBIDDEN_NAME_PATTERNS:
         if pattern.search(n):
             return True, f"yasak dosya adi deseni: {pattern.pattern}"
