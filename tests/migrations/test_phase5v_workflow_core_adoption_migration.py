@@ -212,6 +212,7 @@ def test_phase5v_revision_extends_the_single_current_head() -> None:
 
     assert module.revision == "5a7c9e1f2b30"
     assert module.down_revision == "bys360_portal_v2121"
-    # BYS360_P13B: e0efcd07abf7 (add_user_security_stamp) extends 29fee38a97e1
-    # and is now the single current head.
-    assert script.get_heads() == ["e0efcd07abf7"]
+    # File Center Alembic adoption wave: 10858a18e9ac (adopt File Center
+    # schema into Alembic migrations) extends e0efcd07abf7 and is now the
+    # single current head.
+    assert script.get_heads() == ["10858a18e9ac"]
