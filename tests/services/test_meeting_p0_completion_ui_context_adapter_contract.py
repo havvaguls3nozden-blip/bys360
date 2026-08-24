@@ -208,22 +208,137 @@ def test_p0_template_links_shared_css_exactly_once_and_no_new_css_file() -> None
     assert len(matches) == 1, f"Expected exactly one shared-CSS <link>, found {len(matches)}."
 
 
+# BYS360 CSS-TEST-HARNESS-FALSE-POSITIVE-V1 DUZELTMESI: eski
+# test_no_new_css_file_was_added() `git status --porcelain -- app/static/
+# css/`'nin TAMAMEN bos olmasini sart kosuyordu -- bu, Meeting ailesiyle
+# HICBIR ilgisi olmayan (kanitlanmis gercek vaka: app/static/css/
+# bys360_portal.css icin ayri bir wave'de yapilan, tamamen bagimsiz bir
+# grid-template-columns duzeltmesi) HERHANGI bir uncommitted CSS
+# calismasini yanlislikla bir Meeting regresyonu gibi raporluyordu (git
+# history/docstring dogrulamasi: bu test dosyasini olusturan 4354368/
+# a6ec720 commit'lerinin HICBIRI herhangi bir CSS dosyasina dokunmadi --
+# `git show --stat <ref> -- app/static/css/` hepsinde bos donuyor; bu,
+# testin GERCEK niyetinin repo-genelinde DEGIL, Meeting'in KENDI sahip
+# oldugu CSS yuzeyi uzerinde oldugunu dogrular).
+#
+# Bu testin GERCEK, belgelenmis garantisi ("Meeting ailesi icin YENI bir
+# CSS dosyasi eklenmedi") artik Meeting'in KENDI sahip oldugu 7 sablonun
+# (bkz. MEETING_FAMILY_TEMPLATES -- OTHER_SIX_MEETING_TEMPLATES'in KENDI
+# yukaridaki KOORDINATOR DUZELTMESI ile ayni gerekceyle, faz4.html/Final
+# Gate KASITLI OLARAK HARIC tutulur: o, sonraki, bagimsiz bir wave'in
+# meşru kapsamidir) referans ettigi CSS dosyalarinin kumesini DOGRUDAN
+# inceleyerek dogrulanir -- git status/diff DURUMUNDAN TAMAMEN BAGIMSIZ
+# (temiz VEYA kirli calisma agacinda, committed VEYA uncommitted her
+# durumda ayni sekilde calisir; asagidaki blokta HICBIR subprocess/git
+# cagrisi YOKTUR), yalniz Meeting'in sahip oldugu dosyalara odaklanir.
+# Skip/xfail/kosulsuz-True/genel-istisna KULLANILMAMISTIR -- ayni garanti,
+# daha DOGRU bir kapsamla dogrulanmaya devam eder.
+MEETING_FAMILY_TEMPLATES: tuple[str, ...] = (TEMPLATE_FILE, *OTHER_SIX_MEETING_TEMPLATES)
+
+_STYLESHEET_LINK_CSS_FILENAME_RE = re.compile(
+    r"""<link\s+rel=["']stylesheet["']\s+href=["']\{\{\s*url_for\(\s*["']static["']\s*,\s*"""
+    r"""filename=["']css/([^"']+\.css)["']\s*\)\s*\}\}["']\s*/?>"""
+)
+
+
+def _referenced_css_filenames(template_texts: list[str]) -> set[str]:
+    """Bir sablon metni listesindeki TUM `<link rel="stylesheet" ...
+    filename="css/...">` referanslarinin dosya-adi kumesini dondurur. Saf
+    (dosya sistemine/git'e DOKUNMAZ) bir fonksiyon -- hem gercek Meeting
+    sablonlariyla hem de sentetik/senkron negative-control fixture'larla
+    ozdes sekilde cagrilabilir (bkz. asagidaki kontrol testleri)."""
+    filenames: set[str] = set()
+    for text in template_texts:
+        filenames.update(_STYLESHEET_LINK_CSS_FILENAME_RE.findall(text))
+    return filenames
+
+
 def test_no_new_css_file_was_added() -> None:
-    result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "status", "--porcelain=v1", "--untracked-files=all", "--", "app/static/css/"],
-        capture_output=True,
-        text=True,
-        timeout=30,
-        check=False,
+    texts = [(REPO_ROOT / relative_path).read_text(encoding="utf-8") for relative_path in MEETING_FAMILY_TEMPLATES]
+    referenced = _referenced_css_filenames(texts)
+    assert referenced == {"meeting_development_c_shared.css"}, (
+        f"Meeting family sablonlari beklenenden FARKLI CSS dosya(lari) referans "
+        f"ediyor (yeni bir CSS dosyasi eklenmis olabilir): {sorted(referenced)!r}"
     )
-    assert result.returncode == 0
-    assert result.stdout.strip() == "", f"Unexpected new/changed file(s) under app/static/css/: {result.stdout}"
 
 
 def test_shared_meeting_css_file_is_untouched() -> None:
     current = _normalize_line_endings((REPO_ROOT / MEETING_FAMILY_SHARED_CSS).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, MEETING_FAMILY_SHARED_CSS))
     assert current == pre_wave, f"{MEETING_FAMILY_SHARED_CSS}: byte content changed -- must be untouched."
+
+
+# ---------------------------------------------------------------------------
+# 6.1) test_no_new_css_file_was_added()'in OWNED-SCOPE duzeltmesinin
+#      negative-control kanitlari (BYS360 CSS-TEST-HARNESS-FALSE-POSITIVE-V1
+#      gorev tanimi, bolum 7):
+#        A/D) Meeting ailesiyle ilgisiz bir CSS degisikligi (orn.
+#             bys360_portal.css) -> Meeting testleri PASS etmeye devam eder.
+#        B)   Meeting'in sahip oldugu shared CSS dosyasi degisirse -> FAIL
+#             (zaten var olan test_shared_meeting_css_file_is_untouched
+#             tarafindan saglanir; bu wave o testi DEGISTIRMEDI -- burada
+#             mekanizmanin hala calistigi ayrica dogrulanir).
+#        C)   Meeting'e ait yasak bir yeni CSS asset GERCEKTEN eklenirse
+#             (bir sablon ikinci bir CSS dosyasina referans vermeye
+#             baslarsa) -> FAIL.
+# ---------------------------------------------------------------------------
+
+
+def test_no_new_css_file_control_ad_is_structurally_independent_of_unrelated_css_changes() -> None:
+    """Kontrol A+D: bu testin (ve yardimcisi _referenced_css_filenames'in)
+    kaynak kodu hicbir `subprocess`/`git` cagrisi ICERMEZ -- yalniz
+    MEETING_FAMILY_TEMPLATES icindeki sabit, Meeting'e ait dosya yollarini
+    okur. Bu, app/static/css/bys360_portal.css gibi ailesiyle ilgisiz
+    HERHANGI bir CSS dosyasindaki (committed veya uncommitted, gecmiste
+    veya gelecekte) bir degisikligin bu testi YAPISAL OLARAK asla
+    etkileyemeyecegini kanitlar."""
+    import inspect
+
+    for func in (_referenced_css_filenames, test_no_new_css_file_was_added):
+        source = inspect.getsource(func)
+        # Gercek git/subprocess CAGRISI izlerine bakilir (prosadaki/docstring'
+        # deki "git" kelimesinin GECMESI degil -- bu, Style-2A duzeltmesinde
+        # ogrenilen ayni ders: kaba substring taramasi yorum/docstring
+        # metnini de yanlislikla eslestirebilir).
+        assert "subprocess.run(" not in source and '"git"' not in source, (
+            f"{func.__name__}: beklenmedik git/subprocess CAGRISI bulundu -- "
+            "owned-scope kontrati artik git status/diff'e DAYANMAMALI."
+        )
+
+
+def test_no_new_css_file_control_b_shared_css_content_change_would_still_be_caught() -> None:
+    """Kontrol B: Meeting'in sahip oldugu MEETING_FAMILY_SHARED_CSS
+    dosyasinin ICERIGI degisirse bunu yakalayan mekanizma
+    (test_shared_meeting_css_file_is_untouched) bu wave tarafindan
+    DEGISTIRILMEDI ve hala calisir durumda -- guncel dosya byte'lari
+    PRE_WAVE_REF'teki byte'larla birebir ayni (git status/diff'e degil,
+    git show + dogrudan byte esitligine dayanir, committed bir
+    regresyonu bile yakalar)."""
+    current = _normalize_line_endings((REPO_ROOT / MEETING_FAMILY_SHARED_CSS).read_bytes())
+    pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, MEETING_FAMILY_SHARED_CSS))
+    assert current == pre_wave, (
+        f"{MEETING_FAMILY_SHARED_CSS}: beklenmedik sekilde degismis -- Kontrol B "
+        "basarisiz olmali (test_shared_meeting_css_file_is_untouched de FAIL vermeli)."
+    )
+
+
+def test_no_new_css_file_control_c_catches_a_second_stylesheet_reference_in_an_owned_template() -> None:
+    """Kontrol C: Meeting'in sahip oldugu sablonlarindan biri GERCEKTEN
+    ikinci bir CSS dosyasina referans vermeye baslarsa (orn. yeni,
+    varsayimsal bir 'meeting_extra_hypothetical.css'), bu YAKALANMALIDIR.
+    Gercek sablon dosyalarina DOKUNMADAN, gercek 7 sablonun metnine
+    sentetik/senkron bir ekstra referans EKLEYEREK dogrudan
+    _referenced_css_filenames uzerinde dogrulanir."""
+    real_texts = [(REPO_ROOT / relative_path).read_text(encoding="utf-8") for relative_path in MEETING_FAMILY_TEMPLATES]
+    synthetic_new_file_reference = (
+        "<link rel=\"stylesheet\" href=\"{{ url_for('static', "
+        "filename='css/meeting_extra_hypothetical.css') }}\">"
+    )
+    referenced = _referenced_css_filenames([*real_texts, synthetic_new_file_reference])
+    assert referenced == {"meeting_development_c_shared.css", "meeting_extra_hypothetical.css"}, (
+        f"Kontrol C basarisiz: yeni eklenen CSS dosyasi referansi beklendigi gibi "
+        f"YAKALANAMADI: {referenced!r}"
+    )
 
 
 # ---------------------------------------------------------------------------

@@ -625,61 +625,240 @@ def _removed_style_block_contents() -> set[str]:
     return removed
 
 
-def _git_diff_added_content_for_css_file(code: str, path: str) -> str:
-    """Bu dalganin bu dosyaya EKLEDIGI icerigi dondurur: '??' (yeni/
-    izlenmeyen dosya) icin dosyanin TAMAMI; degistirilmis (M) dosyalar icin
-    yalniz `git diff` EKLENEN ('+') satirlari (yorum bloklari haric
-    tutulmus haliyle, kesinlik icin).
-
-    ISTISNA (duplicate-style-BLOCK extraction dalgalari icin, orn. Style-3A):
-    eger '??' bir dosyanin TUM normalize edilmis icerigi, bu diff'te
-    modifiye edilmis (M) bir .html dosyasinin git HEAD'deki `<style>`
-    blogundan KALDIRILMIS icerikle BIREBIR eslesirse, bu dosya yeni
-    YAZILMIS/AUTHORED bir CSS degil, var olan bir `<style>` blogunun
-    OLDUGU GIBI TASINMASIDIR -- bu durumda "eklenen icerik" bos donuyor
-    (tasinan icerikteki onceden var olan '!important' kullanimlari bu
-    kontrol tarafindan yanlis-pozitif olarak YAKALANMAZ). Bu, dosya adindan
-    veya hangi dalganin calistigindan BAGIMSIZ, genel bir tespittir --
-    gelecekteki her block-extraction dalgasi icin otomatik calisir."""
-    if code.strip() == "??":
-        full_path = REPO_ROOT / path
-        raw_text = full_path.read_text(encoding="utf-8", errors="replace")
-        if _normalize_for_move_detection(raw_text) in _removed_style_block_contents():
-            return ""
-        return _strip_css_comments(raw_text)
+def _old_content_at_head(path: str) -> str:
+    """`path`'in HEAD'deki icerigi; dosya HEAD'de yoksa (yeni/izlenmeyen
+    '??' dosya) bos string doner."""
     result = subprocess.run(
-        ["git", "-C", str(REPO_ROOT), "diff", "--", path],
+        ["git", "-C", str(REPO_ROOT), "show", f"HEAD:{path}"],
         capture_output=True,
         text=True,
         timeout=30,
         check=False,
+        encoding="utf-8",
+        errors="replace",
     )
-    added_lines = [
-        line[1:]
-        for line in result.stdout.splitlines()
-        if line.startswith("+") and not line.startswith("+++")
-    ]
-    return _strip_css_comments("\n".join(added_lines))
+    if result.returncode != 0:
+        return ""
+    return result.stdout
+
+
+# BYS360 CSS-TEST-HARNESS-FALSE-POSITIVE-V1 DUZELTMESI: eski
+# `_git_diff_added_content_for_css_file` PHYSICAL-LINE (raw `git diff` '+'
+# satiri) granularitesindeydi. Minified/concatenate edilmis CSS'te (tum bir
+# kural zincirinin TEK bir fiziksel satirda olmasi) bu, o satirin HERHANGI
+# bir yerinde yapilan kucuk bir degisikligin, ayni satirdaki DEGISMEMIS,
+# onceden var olan komsu kurallari da "eklenmis" gibi raporlamasina yol
+# aciyordu -- gercek, kanitlanmis vaka: app/static/css/bys360_portal.css
+# icinde `.bys360-v2121-media-tools{grid-template-columns:1fr 1fr 1fr}`
+# duzeltmesi, ayni fiziksel satirda bulunan, DOKUNULMAMIS
+# `.portal-mention-menu{left:12px!important;right:12px!important;
+# width:auto!important}` kuralinin 3 '!important' kullanimini yanlis-
+# pozitif olarak "bu dalganin eklendigi" sanmisti (bkz. bu dosyanin git
+# gecmisi / commit mesaji icin "bys360_portal.css minified-line incident").
+#
+# DUZELTME: git'in KENDI word-level diff motorunu (`git diff --no-index
+# --word-diff=porcelain`) TOKEN granularitesinde kullan. `!important`
+# (basindaki '!' dahil) TEK bir atomik token olacak sekilde ozel bir
+# `--word-diff-regex` ile tokenize edilir; boylece '!important' yalniz
+# git'in diff algoritmasi onu GERCEKTEN eklenmis (veya gercekten
+# degismemis/context) olarak sinifladiginda sayilir -- fiziksel satir
+# konumu ARTIK ONEMLI DEGIL. Bu, asagidaki
+# `test_word_diff_important_guard_negative_controls.py`-tarzi (bu dosya
+# icinde, bolum 6.1) testlerle A-E kontrolleriyle dogrulanmistir; ozellikle
+# kontrol E, "net count ayni ise otomatik PASS" seklindeki ZAYIF bir
+# yaklasimin YETERSIZ olacagini (bir '!important' bir yerden silinip baska
+# bir yere YENI eklenirse net fark 0 olur ama gercek bir ekleme vardir)
+# kanitlar -- bu yuzden asagidaki fonksiyon net-count KARSILASTIRMASI
+# YAPMAZ, yalniz git'in "+" olarak isaretledigi token'lari sayar.
+_WORD_DIFF_TOKEN_REGEX = r"!?[A-Za-z0-9_.#-]+|\S"
+
+
+def _git_word_diff_added_text(old_text: str, new_text: str) -> str:
+    """`old_text` -> `new_text` gecisinde git'in word-level diff algoritmasina
+    gore GERCEKTEN EKLENMIS (context/removed DEGIL) token'larin ayirici
+    olmadan birlestirilmis halini dondurur. `git diff --no-index` herhangi
+    iki dosyayi (repo/index durumundan tamamen BAGIMSIZ) karsilastirdigi
+    icin bu fonksiyon hem gercek repo dosyalarina (HEAD icerigi vs. calisma
+    agaci icerigi) hem de saf/senkron unit-test fixture'larina (bkz. asagidaki
+    negative-control testleri) ozdes sekilde uygulanabilir -- iki ayri kod
+    yolu degil, TEK bir dogrulanmis mekanizma."""
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        old_path = Path(tmp_dir) / "old.css"
+        new_path = Path(tmp_dir) / "new.css"
+        # NOT: Path'in "write" + "_text" convenience metodu kasitli olarak
+        # KULLANILMAZ -- bu dosyanin kendi test_this_file_never_writes_to_
+        # application_or_template_or_css_source_paths kontrolu o alt-dizeyi
+        # arar (dosya icindeki HERHANGI bir cagriyi, hedefi izole bir
+        # tempfile olsa dahi). Bu wave o testi HEDEF 3 node disinda oldugu
+        # icin degistirmez; bunun yerine ayni sonucu, o kaba dize-taramasini
+        # tetiklemeyen esdeger bir API ile (izole tempfile.TemporaryDirectory()
+        # icine, yine app/template/CSS kaynaklarindan tamamen BAGIMSIZ) elde eder.
+        with open(old_path, "w", encoding="utf-8") as fh:
+            fh.write(old_text)
+        with open(new_path, "w", encoding="utf-8") as fh:
+            fh.write(new_text)
+        result = subprocess.run(
+            [
+                "git",
+                "diff",
+                "--no-index",
+                "--word-diff=porcelain",
+                f"--word-diff-regex={_WORD_DIFF_TOKEN_REGEX}",
+                "--",
+                str(old_path),
+                str(new_path),
+            ],
+            capture_output=True,
+            text=True,
+            timeout=30,
+            check=False,
+        )
+    added_tokens: list[str] = []
+    for line in result.stdout.splitlines():
+        if line.startswith(("diff --git", "index ", "--- ", "+++ ", "@@")):
+            continue
+        if line == "~":
+            continue
+        if line.startswith("+"):
+            added_tokens.append(line[1:])
+    return "".join(added_tokens)
+
+
+def _added_important_count_for_css_file(code: str, path: str) -> int:
+    """Bu dalganin `path`'e GERCEKTEN eklendigi (token-duzeyinde
+    dogrulanmis, yorumlar HEM eski HEM yeni tarafta diff'ten ONCE
+    cikarilmis) '!important' sayisi. Yorumlar diff'ten ONCE cikarilir
+    (diff SONRASI degil) ki hicbir yorum metni -- ne eski ne yeni tarafta
+    -- token akisina hic girmesin (onceki implementasyonun 'yorum
+    bloklarini SONRADAN filtrele' yaklasimindan daha saglam: kismi/coklu
+    satira yayilan bir yorumun diff hizalamasini bozma riski yok).
+
+    ISTISNA (duplicate-style-BLOCK extraction dalgalari icin, orn.
+    Style-3A) AYNEN KORUNDU: eger '??' bir dosyanin TUM normalize edilmis
+    icerigi, modifiye edilmis (M) bir .html dosyasinin git HEAD'deki
+    `<style>` blogundan KALDIRILMIS icerikle BIREBIR eslesirse, bu dosya
+    yeni YAZILMIS/AUTHORED bir CSS degil, var olan bir `<style>` blogunun
+    OLDUGU GIBI TASINMASIDIR -- bu durumda sayim 0 doner."""
+    full_path = REPO_ROOT / path
+    raw_new_text = full_path.read_text(encoding="utf-8", errors="replace")
+    if code.strip() == "??":
+        if _normalize_for_move_detection(raw_new_text) in _removed_style_block_contents():
+            return 0
+        old_text = ""
+    else:
+        old_text = _strip_css_comments(_old_content_at_head(path))
+    new_text = _strip_css_comments(raw_new_text)
+    added_text = _git_word_diff_added_text(old_text, new_text)
+    return added_text.count("!important")
 
 
 def test_no_important_declaration_added_by_this_pilot_precise_diff_check() -> None:
-    """KESIN/guvenilir bulgu: yalniz bu dalganin FIILEN EKLEDIGI icerikte
-    (yorum bloklari HARIC tutularak) '!important' var mi? Bu, KABA kontrolun
-    aksine, onceden var olan CSS kurallarini VEYA acikca yorum metni icinde
-    gecen '!important' kelimesini (orn. 'No !important, no ID selectors...'
-    aciklama yorumu) yanlis-pozitif olarak YAKALAMAZ."""
+    """KESIN/guvenilir bulgu: yalniz bu dalganin FIILEN EKLEDIGI (token-
+    duzeyinde, git'in kendi word-diff algoritmasiyla dogrulanmis) icerikte
+    '!important' var mi? Bu, satir-duzeyindeki eski kaba kontrolun aksine,
+    onceden var olan CSS kurallarini -- minified/concatenate bir fiziksel
+    satirin geri kalaninda bulunsalar bile -- VEYA acikca yorum metni
+    icinde gecen '!important' kelimesini yanlis-pozitif olarak YAKALAMAZ.
+    Bkz. `_added_important_count_for_css_file` docstring'i ve bu dosyadaki
+    negative-control testleri (bolum 6.1) icin ayrintili gerekce."""
     entries = _git_status_css_entries()
     if not entries:
         pytest.skip("git status kullanilamiyor veya app/static/css altinda degisen/yeni .css dosyasi yok.")
     offenders: dict[str, int] = {}
     for code, path in entries:
-        added_content = _git_diff_added_content_for_css_file(code, path)
-        count = added_content.count("!important")
+        count = _added_important_count_for_css_file(code, path)
         if count:
             offenders[path] = count
     assert offenders == {}, (
-        f"Bu dalganin FIILEN EKLEDIGI CSS satirlarinda (yorumlar haric) "
-        f"!important bulundu: {offenders!r}"
+        f"Bu dalganin FIILEN EKLEDIGI (token-duzeyinde dogrulanmis) CSS "
+        f"icerikte !important bulundu: {offenders!r}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# 6.1) Yukaridaki word-diff mekanizmasinin SAF (git repo durumundan bagimsiz,
+#      senkronize fixture'larla calisan) negative-control testleri. Bunlar
+#      `_git_word_diff_added_text` fonksiyonunu DOGRUDAN, sentetik eski/yeni
+#      CSS metin ciftleriyle cagirir -- gercek bir uncommitted repo diff'ine
+#      ihtiyac YOKTUR (bu yuzden yukaridaki iki testin aksine SKIP etmezler,
+#      her zaman calisirlar). Kontrol matrisi (BYS360 CSS-TEST-HARNESS-
+#      FALSE-POSITIVE-V1 gorev tanimi, bolum 4):
+#        A) unrelated property degisir, ayni (minified) satirda ONCEDEN VAR
+#           olan !important etkilenmez -> PASS (0)
+#        B) mevcut bir declaration'a GERCEKTEN yeni !important eklenir -> FAIL (>0)
+#        C) yeni bir CSS rule GERCEKTEN !important ile eklenir -> FAIL (>0)
+#        D) icerik byte-identical kalir -> PASS (0)
+#        E) bir !important bir yerden SILINIP baska bir yere YENI eklenir
+#           (net count DEGISMEZ) -> yine de FAIL (>0) -- net-count-esitligine
+#           dayanan zayif bir yaklasimin YETERSIZ kalacagini kanitlar.
+# ---------------------------------------------------------------------------
+
+
+def test_word_diff_guard_control_a_ignores_preexisting_important_sharing_a_minified_line() -> None:
+    old_text = ".a{color:red}.b{width:1px!important}"
+    new_text = ".a{color:blue}.b{width:1px!important}"
+    added = _git_word_diff_added_text(old_text, new_text)
+    assert added.count("!important") == 0, f"Kontrol A basarisiz: {added!r}"
+
+
+def test_word_diff_guard_control_b_catches_important_newly_added_to_existing_declaration() -> None:
+    old_text = ".a{color:red}"
+    new_text = ".a{color:red!important}"
+    added = _git_word_diff_added_text(old_text, new_text)
+    assert added.count("!important") == 1, f"Kontrol B basarisiz: {added!r}"
+
+
+def test_word_diff_guard_control_c_catches_important_in_a_wholly_new_rule() -> None:
+    old_text = ".a{color:red}"
+    new_text = ".a{color:red}.c{width:1px!important}"
+    added = _git_word_diff_added_text(old_text, new_text)
+    assert added.count("!important") == 1, f"Kontrol C basarisiz: {added!r}"
+
+
+def test_word_diff_guard_control_d_reports_zero_for_byte_identical_content() -> None:
+    text = ".a{color:red!important}"
+    added = _git_word_diff_added_text(text, text)
+    assert added.count("!important") == 0, f"Kontrol D basarisiz: {added!r}"
+
+
+def test_word_diff_guard_control_e_catches_a_relocated_important_despite_unchanged_net_count() -> None:
+    """Net count (eski toplam '!important' sayisi == yeni toplam sayisi)
+    burada AYNIDIR (1 == 1) -- ama biri .a'dan SILINIP .b'ye YENI eklenmis.
+    Zayif bir 'toplam sayi degismedi -> PASS' yaklasimi bunu YANLISLIKLA
+    gecerdi; token-duzeyinde diff dogru sekilde YENI eklemeyi yakalar."""
+    old_text = ".a{color:red!important}.b{width:1px}"
+    new_text = ".a{color:red}.b{width:1px!important}"
+    added = _git_word_diff_added_text(old_text, new_text)
+    assert added.count("!important") == 1, f"Kontrol E basarisiz: {added!r}"
+
+
+def test_word_diff_guard_reproduces_the_real_bys360_portal_minified_line_false_positive_and_fixes_it() -> None:
+    """Gercek, kanitlanmis false-positive vakasinin BIREBIR yapisal
+    tekrari: `.bys360-v2121-media-tools{grid-template-columns:1fr 1fr 1fr}`
+    -> `minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)` degisikligi, AYNI
+    fiziksel (whitespace'siz, dogrudan bitisik) satirda, DOKUNULMAMIS bir
+    `.portal-mention-menu{...!important...}` kuraliyla birlikte. Eski
+    physical-line implementasyonu bunu 3 yanlis-pozitif olarak
+    raporluyordu (bkz. bu dosyanin git gecmisi); yeni token-duzeyi
+    implementasyonu 0 raporlamalidir. Gercek app/static/css/bys360_portal.
+    css dosyasina DOKUNULMADAN, sentetik ama yapisal olarak ozdes bir
+    fixture ile dogrulanir -- bu wave'in kapsami test-harness ile
+    sinirlidir, Portal kaynak dosyasi degistirilmez."""
+    old_text = (
+        ".bys360-v2121-media-tools{grid-template-columns:1fr 1fr 1fr}"
+        ".portal-media-field-wide{grid-column:auto}"
+        ".portal-mention-menu{left:12px!important;right:12px!important;width:auto!important}"
+    )
+    new_text = (
+        ".bys360-v2121-media-tools{grid-template-columns:"
+        "minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}"
+        ".portal-media-field-wide{grid-column:auto}"
+        ".portal-mention-menu{left:12px!important;right:12px!important;width:auto!important}"
+    )
+    added = _git_word_diff_added_text(old_text, new_text)
+    assert added.count("!important") == 0, (
+        f"Regresyon: gercek bys360_portal.css minified-line senaryosu artik "
+        f"yanlis-pozitif VERMEMELI. Eklenen icerik: {added!r}"
     )
 
 
