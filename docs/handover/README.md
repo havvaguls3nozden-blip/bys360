@@ -12,15 +12,17 @@ Bu klasör, BYS360 projesinin kurulum, canlıya alma, bakım, güvenlik, modül 
 
 ## Okuma Sırası (Yeni Operatör İçin)
 
-1. **`BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md`** — tek kanonik, güncel devir belgesi (single source of truth). Tüm mimari, deployment, DB, backup, CI, güvenlik, Scheduled Task, rollback, disaster-recovery bilgisi burada tek dosyada toplanmıştır.
-2. Kök dizindeki `DEPLOYMENT.md` ve `BACKUP_RUNBOOK.md` — kanonik ana dosyanın dayandığı, güncel (Ağustos 2026) operasyonel runbook'lar.
-3. Kök dizindeki `README.md`, `CONTRIBUTING.md`, `SECURITY.md` — genel bakış ve katkı kuralları.
+1. **`BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md`** — tek kanonik, güncel devir belgesi (single source of truth). Tüm mimari, deployment, DB, backup, CI, güvenlik, Scheduled Task, rollback, disaster-recovery bilgisi burada tek dosyada toplanmıştır (34 bölüm, Dosya Merkezi §34 dahil).
+2. **`BYS360_FEATURE_COVERAGE_MATRIX.md`** — repo-türetilmiş TAM özellik envanteri (38 feature) ve her birinin gerçek devir-kapsam durumu (DOCUMENTED/PARTIAL/UNDOCUMENTED/HISTORICAL/FUTURE). "Bu özellik handover'da unutuldu mu?" sorusunun kanıtlı cevabı için buraya bakın.
+3. Kök dizindeki `DEPLOYMENT.md` ve `BACKUP_RUNBOOK.md` — kanonik ana dosyanın dayandığı, güncel (Ağustos 2026) operasyonel runbook'lar.
+4. Kök dizindeki `README.md`, `CONTRIBUTING.md`, `SECURITY.md` — genel bakış ve katkı kuralları.
 
 Aşağıdaki listedeki diğer dosyalar **SUPERSEDED** veya **HISTORICAL**'dir (silinmemiştir, ama artık kanonik kaynak değildir — ayrıntılı gerekçe için kanonik dosyanın §33 "Eski Belgeler" bölümüne bakın):
 
 | Belge | Durum | Tarih |
 |---|---|---|
 | `BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md` | **CURRENT** | 2026-08-24 |
+| `BYS360_FEATURE_COVERAGE_MATRIX.md` | **CURRENT** (companion) | 2026-08-24 |
 | `BYS360_DEVIR_PAKETI_V1.md` | SUPERSEDED | 2026-06-24 |
 | `BYS360_KURULUM_REHBERI.md` | SUPERSEDED | 2026-06-24 |
 | `BYS360_CANLIYA_ALMA_REHBERI.md` | SUPERSEDED | 2026-06-24 |

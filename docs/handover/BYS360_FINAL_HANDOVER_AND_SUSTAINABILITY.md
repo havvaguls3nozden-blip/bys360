@@ -88,16 +88,38 @@ Kimlik doğrulama, yetkilendirme, dosya depolama, arka plan işleri, mail gibi o
 | **Portal** | Kurum-içi sosyal akış: gönderi, fotoğraf, video dosyası, harici video linki, yorum, moderasyon | `app/portal/routes.py` (862 satır) | `menu_key_required`; ayrıca `PORTAL_EDITOR_ROLES`/`PORTAL_GROUP_MANAGER_ROLES`/`PORTAL_PROFILE_ADMIN_ROLES` | Video-URL görünürlük geçmişi ve backend detayları için bkz. §16. |
 | **Anketler (Surveys)** | Anket oluşturma/atama/sonuç | `app/communication/surveys_routes.py` (1074 satır) | `menu_key_required` + `consume_form_token` (çift-gönderim önleyici) | — |
 | **İletişim (Communication)** | Mesaj, bildirim, duyuru, popup | `app/communication/routes.py` (uyumluluk hub'ı) + `communication_phase2..9_service.py` (çok sayıda faz-numaralı servis dosyası) | `menu_key_required` | Okunmamış bildirim sayısı için `app_context_processor` kaydı var. |
+| **Nabız Yoklaması (Feedback/Pulse)** | Kurum-içi periyodik geri bildirim anketleri, kampanya/aksiyon takibi, yönetici görünümü | `app/communication/feedback_*_routes.py` (action-plan, analytics, campaign, core, meeting); servisler `app/services/feedback_*` | `menu_key_required` (menü anahtarları `feedback_dashboard`/`feedback_pulse`/`feedback_campaigns`/`feedback_results`/`feedback_actions`/`feedback_manager`/`feedback_admin`) | Genel Anketler (Surveys) modülünden AYRI, kendi analitik/kampanya altyapısına sahip bir alt sistemdir. |
+| **Kurumsal Bilgilendirme Merkezi (CIC)** | Doğum günü/yıldönümü gibi kurumsal otomatik bilgilendirme e-postaları | `app/communication/corporate_information_center_routes.py`; servisler `app/services/cic/*` (kendi README.md'si var) | admin/yönetici | Ayrı Scheduled Task ailesi var (bkz. §18); `app/services/corporate_information_center.py` (2764 satır) repodaki "kritik dev dosya" örneklerinden biri (bkz. bu bölümün altındaki "Bilinen mimari borç" notu). |
+| **Yönetici Özeti (Executive Summary)** | Yöneticiler için otomatik özet raporu + test-mail | `app/executive_summary/routes.py` (`/yonetici-ozeti`, `/yonetici-ozeti/data`, `/yonetici-ozeti/test-mail`); servisler `app/services/executive_mail_center.py` + `_v2.py` | admin/sistem yöneticisi (menü bölümü `executive_summary`) | Sabah/gece otomatik mail görevleri için bkz. §18 (Executive Summary 0001/0830). |
+| **Mobil API / PWA** | Flutter mobil istemci için salt-okunur+sınırlı-yazma JSON API; web tarafında Progressive Web App desteği | `app/api/mobile/` (blueprint `/api/mobile`, `domains/*` alt paketleri — iletişim, performans, destek, anket, AI özet, asistan); PWA: `app/pwa/routes.py` **ve** `app/pwa_blueprint.py` | Mobil auth guard (`app/api/mobile/domains/auth.py`) — mobil login için ayrı brute-force throttle YOK (bkz. yukarıdaki Authentication notu) | **⚠️ İki ayrı PWA implementasyonu bulundu** (`app/pwa/` ve `app/pwa_blueprint.py`, ikisi de `/manifest.webmanifest` benzeri uçlar kaydediyor) — hangisinin kanonik olduğu bu tur içinde netleştirilemedi, ayrı bir teknik-borç maddesi olarak §26'da işaretlendi. |
 | **Destek (Support)** | Talep/bilet, yardım makaleleri | `app/support/routes.py` (1213 satır), `help_center_content.py` (1061 satır) | `admin_required`/`is_admin_family_user`/`is_manager_family_user`/`menu_key_required` | Ek dosyası doğrulaması `app/security/upload_security.py` üzerinden. |
 | **Ayarlar/Yetki Matrisi** | Menü görünürlüğü, rol/yetki motoru, kataloglar | Admin UI `app/admin/role_matrix_routes.py` vb.; **asıl mantık bir servis paketi**: `app/services/settings/*` | Kendisi yetkilendirmenin kaynağı | `effective_menu.py` (2111 satır) — repodaki tek "kritik dev dosya" işaretli modüllerden biri; canlı menü görünürlüğünün otoriter kaynağı. |
 | **Dashboard** | Ana HTML pano + JSON veri/grafik uçları | `app/dashboard/routes.py` | `login_required` + `menu_key_required("dashboard")` | Rotalar: `/dashboard`, `/performance/dashboard` (alias), `/dashboard/rebuild-data`. |
 | **Sanal Asistan (AI Agent)** | Sohbet tabanlı asistan | `app/ai_agent/routes.py` (ayrı `Blueprint`, `/ai-agent` öneki) | Kendi `before_request` guard'ı; `/healthz` hariç kimlik doğrulama zorunlu | Bkz. §28. |
 | **AI Karar Destek** | Performans/analiz panellerinde öneri/analiz | `app/ai/routes.py`, `app/admin/ai_*_routes.py` (çok sayıda faz dosyası); `app/services/ai/*` | Admin/yönetici erişimi | **Varsayılan olarak `AI_PROVIDER_MODE=stub`** — gerçek bir LLM'e bağlanmaz, deterministik `StubAIClient` kullanır. Gerçek sağlayıcı için `AI_API_KEY`/`AI_PROVIDER_MODE` açıkça ayarlanmalı. Bkz. §28. |
-| **Dosya Merkezi (File Center)** | Güvenli dosya paylaşım/depolama | `app/file_center/{routes,services,mail_service,settings_service,maintenance_service,permissions}.py` | Kendi izin modeli + guest link/upload bayrakları | ClamAV entegrasyonu opsiyonel (`FILE_CENTER_CLAMAV_ENABLED`); varsayılan kapalı (`FILE_CENTER_ENABLED=false`). |
+| **Dosya Merkezi (File Center)** | Kurum-içi güvenli dosya paylaşımı ve büyük dosya transferi (upload/download, şifreli süreli guest link, guest upload talebi, chunked büyük dosya yükleme, transfer paketleri, kota, güvenlik taraması) | `app/file_center/{routes,services,mail_service,settings_service,maintenance_service,permissions}.py` (44 route, 1154+1268 satır); 15 model `app/models/file_center_models.py` | Kendi rol-matrisi tabanlı izin modeli (`app/file_center/permissions.py`, 14 `can_*` bayrak) + guest link/upload akışları için ayrı token+parola katmanı | ClamAV entegrasyonu opsiyonel (`FILE_CENTER_CLAMAV_ENABLED`), varsayılan kapalı — devre dışıyken yalnız uzantı/MIME sezgisel kontrolü çalışır, gerçek virüs taraması yapılmaz. **⚠️ 15 tablosunun hiçbiri Alembic migration ile takip edilmiyor** (bkz. §34.7). Tam ayrıntı: **§34**. |
 
 **Veri akışı özeti:** İstemci (tarayıcı/mobil) → Flask route (yetki guard'ı) → servis katmanı (iş mantığı; CONTRIBUTING.md kuralı: route dosyaları iş mantığı İÇERMEMELİ, servis katmanını çağırmalı) → SQLAlchemy ORM → PostgreSQL. Şablon render'da CSP nonce enjekte edilir. Dosya yüklemeleri `app/security/upload_security.py`'den geçer.
 
 **Bilinen mimari borç:** `app/services/corporate_information_center.py` (2764 satır) ve birkaç başka dosya, 2026-06-09 tarihli bir envanterde (`docs/architecture/BYS360_ROUTE_ARCHITECTURE_INVENTORY_P1A.md`) "kritik dev dosya" (god file) olarak işaretlenmişti; mobil API route dosyası (`app/api/mobile/routes.py`) benzer bir bölünmeden geçirilerek 2379→235 satıra indirildi (P1B-P1E dalgaları, `app/api/mobile/domains/*`). Bu, gelecekteki "büyük dosya bölme" çalışmaları için kanıtlanmış bir şablon sunar.
+
+**Kod tabanında mevcut ama aktif olmayan modüller:** `app/config/removed_modules.py`'deki `REMOVED_MODULES` sözlüğü, üç modülün kodunun repoda TAM olarak durduğunu ama route/menü/AI bağlamından ÇIKARILDIĞINI gösterir: `repository` (Belge/Medya Merkezi), `education` (Eğitim/İSG), `strategy` (Strateji) — üçü de `True` (kaldırılmış); `portal` açıkça `False` (aktif) olarak işaretlenmiştir, karışıklığı önlemek için. Bu üç modülün kodu silinmemiştir ama bu belge onları CURRENT/aktif özellik olarak SUNMAZ.
+
+**Menüde görünmeyen ama operasyonel açıdan önemli sistemler** (bu turun kod taraması ile bulundu, önceki devir dosyasında hiç geçmiyordu):
+
+| Sistem | Ne işe yarar | Kod konumu |
+|---|---|---|
+| **Schema Guard** | DB şema kendiliğinden onarım/kontrol katmanı, `AUTO_REPAIR_SCHEMA` env bayrağına bağlı | `app/schema_guard*.py` (app kökünde 5 dosya) |
+| **Query Health** | DB/sorgu sağlığı gözlem paneli, statik sorgu koruması, index sözleşmeleri | `app/services/query_health/` |
+| **Settings Snapshot/Rollback** | Ayarların versiyonlanması ve geri alınabilmesi | `app/services/settings/snapshots.py`, `rollback_handler.py` |
+| **Onboarding servisi** | Kullanıcı ilk-kullanım/karşılama akışı | `app/services/onboarding_service.py` |
+| **Excel toplu içe/dışa aktarma** | Personel/hiyerarşi/karne verisi için toplu Excel import-export | `app/services/excel_import_pipeline_service.py`, `app/services/personnel/excel_import.py`, `app/services/hierarchy_excel_preview_service.py` |
+| **Asistan eğitim bankası / adım-adım tutor** | Sanal Asistan'ın rehberli kullanım kılavuzu/eğitim katmanı, sohbet Q&A'dan AYRI | `app/assistant_training_bank/`, `app/services/ai_agent/assistant_*_tutor*.py`, `assistant_knowledge_bank_v1.py` |
+| **Otomatik Hiyerarşi / yönetici zinciri senkronu** | Organizasyon şemasının otomatik türetilmesi | `app/services/auto_hierarchy_service.py`, `explicit_manager_chain_service.py`, `assignment_sync_service.py` |
+| **Portal Sosyal Otomatik İçe Aktarma (Instagram)** | Instagram içeriğinin Portal'a otomatik aktarımı — menüde SAYFASI yok, yalnız arka-plan otomasyonu (bilinçli olarak; kod içi not: link havuzu sayfası kasıtlı olarak geri getirilmedi) | `app/services/instagram_portal_sync.py`, `app/services/portal_social_task_service.py`; Scheduled Task için bkz. §18 |
+| **Maintenance Mode** | Genel bakım-modu banner'ı/kilidi | `MAINTENANCE_MODE`/`MAINTENANCE_MESSAGE` env bayrakları |
+
+Bunların HER BİRİ yalnız yukarıdaki tek satırla belgelenmiştir (PARTIAL kapsam) — derinlemesine akış/güvenlik/DB detayı bu dokümantasyon dalgasının kapsamı dışındadır. **Tam, repo-türetilmiş özellik envanteri ve her özelliğin gerçek devir-kapsam durumu (DOCUMENTED/PARTIAL/UNDOCUMENTED/HISTORICAL) için bkz. `docs/handover/BYS360_FEATURE_COVERAGE_MATRIX.md`.**
 
 ---
 
@@ -124,7 +146,7 @@ Bu makine (Claude Code oturumunun çalıştığı geliştirme/build ortamı) `C:
 `BYS360_DEVIR_PAKETI_V1.md` ve `scripts/release/build_bys360_safe_release.py`'nin dışlama kuralları, bu ayrımı somutlaştırır:
 
 - **Uygulama kaynağı** (release paketine girer, git-tracked): `app/`, `migrations/`, `requirements.txt`, `wsgi.py`, `run_server.py`, `config.py`, `DEPLOYMENT.md` (builder'ın `REQUIRED_PACKAGE_PATH_PREFIXES`'i).
-- **Persistent/hassas veri** (release paketine ASLA girmez, builder tarafından dışlanır): `.env*` (yalnız `.env.example`/`.env.docker.example` istisna), `instance/`, `logs/`, `uploads/`, `reports/`, `backups/`, `.git/`, SQLite/dump/bak/log/anahtar dosyaları.
+- **Persistent/hassas veri** (release paketine ASLA girmez, builder tarafından dışlanır): `.env*` (yalnız `.env.example`/`.env.docker.example` istisna), `instance/`, `logs/`, `uploads/`, `reports/`, `backups/`, `.git/`, SQLite/dump/bak/log/anahtar dosyaları, **Dosya Merkezi storage kökü** (`FILE_CENTER_STORAGE_ROOT`, tanımlıysa — bkz. §34.6).
 
 ---
 
@@ -402,7 +424,8 @@ Canlı restore, yetkili onay + planlı kesinti gerektirir — bu otomatikleştir
 | `.env` | Sunucu üzerinde, güvenli kanal | Hayır |
 | `instance/` | Uygulama çalışma dizini | Hayır |
 | `logs/` | `C:\bys360\logs` | Hayır |
-| Yüklenen dosyalar (`app/static/uploads`, Dosya Merkezi storage) | Ayrı, kalıcı disk/volume | Hayır |
+| Yüklenen dosyalar (`app/static/uploads`) | Ayrı, kalıcı disk/volume (git-ignored) | Hayır |
+| **Dosya Merkezi storage** (`FILE_CENTER_STORAGE_ROOT`) | Ayrı, kalıcı disk/volume — DB yalnız metadata tutar, dosya baytları burada | Hayır — ayrı, dosya-sistemi-seviyeli yedek gerekir (bkz. §34.6/§34.10) |
 | PostgreSQL verisi | PostgreSQL sunucu instance'ı, ayrı `pg_dump` yedeği | Hayır (kod paketinden tamamen bağımsız) |
 
 ### Saklama (retention) politikası
@@ -594,7 +617,9 @@ python scripts/release/build_bys360_safe_release.py \
 - **Düşük skor süreci:** `app/models/performance_low_score_models.py` ve `app/services/performance/low_score_process_service.py` dosyalarının varlığı, sistemde ayrı bir "düşük skor" (repoda "<70" için özel bir sayısal eşik doğrudan doğrulanamadı — YALNIZ ayrı bir süreç/model dosyasının VARLIĞI doğrulanabildi) sürecinin ayrı bir iş akışı olarak ele alındığını gösterir.
 - **Arşiv (archive):** `app/models/performance_archive_models.py` ve `app/templates/performance/archive/` (5 şablon dosyası, release builder'ın açıkça KORUDUĞU bir dizin — bkz. §12) — geçmiş değerlendirme dönemlerinin arşivlendiği ayrı bir alt sistem doğrulanmıştır.
 - **Vekalet:** `app/institutional/hr_personnel_delegation_routes.py` dosyasının varlığı, personel/İK tarafında bir vekalet (delegasyon) mekanizması olduğunu doğrular; bu mekanizmanın Performans modülünün amir-onay zincirine NASIL entegre olduğu bu araştırma turunda tek tek doğrulanmadı.
-- **Dönemler (periods), hatırlatmalar (reminders), notlar (notes), gelişim önerileri (development suggestions):** `phase10_development_guidance_ui.py` dosya adı "gelişim rehberliği" (development guidance) özelliğinin var olduğunu doğrular.
+- **Dönemler (periods), gelişim önerileri (development suggestions):** `phase10_development_guidance_ui.py` dosya adı "gelişim rehberliği" (development guidance) özelliğinin var olduğunu doğrular; menü anahtarı `performance_development_guidance`.
+- **Hatırlatmalar (reminders):** menü anahtarı `performance_meeting_p3_reminders` ("Hatırlatma ve Aksatan Amirler"), `app/services/performance/reminder_notification_service.py`, `phase9_reminder_policy.py`, `phase10_reminder_notification_center.py`, ayrıca `app/services/ai_decision/reminder_integration.py`/`reminder_policy.py` (AI Karar Destek entegrasyonu).
+- **Notlar (interim notes):** menü anahtarı `performance_interim_notes` ("Dönem İçi Notlar"), `app/services/performance/scorecard_midterm_notes.py`, `interim_notes_runtime.py`, `interim_feedback_policy.py`.
 
 **⚠️ Bu belge, "<70 süreci", ">90 çok başarılı" gibi SAYISAL eşikleri veya "üçüncü amir" gibi organizasyonel detayları, bu araştırma turunda repo içinde doğrudan doğrulanan bir kaynak (config değeri, sabit tanım, veya açık dokümantasyon cümlesi) BULUNAMADIĞI için İDDİA ETMEZ.** Yeni operatör, bu spesifik sayısal eşikleri ve organizasyonel akış detaylarını `app/services/performance/` içindeki servis kodunu doğrudan okuyarak veya sistemin mevcut iş sahibiyle (product owner) doğrulayarak tamamlamalıdır.
 
@@ -609,8 +634,8 @@ python scripts/release/build_bys360_safe_release.py \
 | BYS360 CIC Auto Mail Scheduler | Ready | `install_bys360_cic_auto_mail_scheduler_task.ps1` — REPO-VERIFIED |
 | BYS360 CIC Staff Noon Mail 1300 | Disabled | — (adı bu araştırma turunda tek başına doğrulanamadı) |
 | BYS360 Daily Weather Personnel Mail | Ready | `install_bys360_daily_mail_tasks_v1_4.ps1` / `install_bys360_daily_weather_mail_task.ps1` — REPO-VERIFIED |
-| BYS360 Executive Summary 0001 | Ready | `register_bys360_executive_summary_tasks_v2_14_x.ps1` — REPO-VERIFIED |
-| BYS360 Executive Summary 0830 | Ready | `register_bys360_executive_summary_tasks_v2_14_x.ps1` — REPO-VERIFIED |
+| BYS360 Executive Summary 0001 | Ready | `register_bys360_executive_summary_tasks_v2_14_3.ps1` (kanonik; `_v2_14_1.ps1` eski/devreden) — REPO-VERIFIED |
+| BYS360 Executive Summary 0830 | Ready | `register_bys360_executive_summary_tasks_v2_14_3.ps1` (kanonik; `_v2_14_1.ps1` eski/devreden) — REPO-VERIFIED |
 | BYS360 Internal Test | Disabled | — |
 | BYS360 Live 80 | Disabled | — (muhtemelen `BYS360 Live Waitress 80`'in öncülü/eski versiyonu) |
 | **BYS360 Live Waitress 80** | **Running** | `install_bys360_live_waitress_80_task_v1.ps1` — REPO-VERIFIED, KANONİK canlı task |
@@ -750,6 +775,9 @@ Bu proje boyunca fiilen kullanılan ve doğrulanmış geliştirici akışı:
 [ ] 12. SECURITY.md ve bu dosyanın §15'i okundu
 [ ] 13. §12 (Release Builder) çalışma mantığı anlaşıldı (henüz kendisi çalıştırılmadı)
 [ ] 14. Üretim erişimi almadan ÖNCE §11 (Deployment Runbook) ve §20 (Rollback) baştan sona okundu
+[ ] 15. §34 (Dosya Merkezi) okundu; Dosya Merkezi storage yapısı ve **15 tablosunun Alembic migration'a DAHİL OLMADIĞI** (§34.7) anlaşıldı
+[ ] 16. Dosya Merkezi guest/share güvenlik mekanizması (token+parola, `app/file_center/permissions.py`) incelendi
+[ ] 17. Dosya Merkezi ile ilgili mevcut testler çalıştırıldı: `python -m pytest tests/security/test_file_center_v1l_hardening_static.py tests/security/test_file_center_sidebar_v1n_static.py tests/security/test_csp_wave9_file_center_contract.py -v`
 ```
 
 ---
@@ -806,6 +834,10 @@ Bu proje boyunca fiilen kullanılan ve doğrulanmış geliştirici akışı:
 - Mobil login (`/api/mobile/auth/login`) için özel bir throttle mekanizması YOK, yalnız genel 200/dk rate-limit'e tabi (bilinçli kabul edilmiş risk, STATUS.md Faz 2B).
 - Windows/Waitress ve Docker/gunicorn olmak üzere iki ayrı deployment yolu repoda bir arada bulunuyor, tek bir belgede uzlaştırılmamış — hangisinin ne zaman kullanılacağı netleştirilmeli.
 - `install_bys360_live_waitress_80_task_v1.ps1`, SYSTEM/Highest çalıştırma düzeyini script içinde açıkça ayarlamıyor — canlı görevin gerçek principal'ı doğrudan doğrulanmalı.
+- **Dosya Merkezi'nin 15 tablosu hiçbir Alembic migration dosyasında yer almıyor** — bootstrap tarihsel olarak arşivlenmiş bir tek-seferlik `db.create_all()` script'i (`scripts/archive/pre_handover_20260708/local/create_file_center_tables_local_v1.py`) ile yapılmış. Yeni bir ortamda yalnız `flask db upgrade` çalıştırmak bu tabloları OLUŞTURMAZ (bkz. §34.7). Bu, kalıcı bir teknik borçtur — düzeltmek ödev/geliştirme kapsamı gerektirir, bu dokümantasyon dalgasının kapsamı DIŞINDADIR.
+- **İki ayrı, örtüşen PWA implementasyonu** bulundu: `app/pwa/routes.py` ve `app/pwa_blueprint.py`, ikisi de benzer manifest/service-worker uçları kaydediyor gibi görünüyor — hangisinin kanonik/aktif olduğu bu dokümantasyon dalgası kapsamında netleştirilemedi (kod davranışı değiştirilmedi, yalnız tespit edildi).
+- Menü kayıt sistemi (`app/menu_registry.py`, 1514 satır) çalışma zamanında onlarca ardışık `BEGIN/END` blok yamasıyla mutasyona uğratılıyor — statik dosya okuması "gerçek" canlı menüyü tam yansıtmayabilir, yalnız kodu ÇALIŞTIRARAK kesin doğrulanabilir.
+- Repoda kodu TAM duran ama aktif olmayan üç modül var (`repository`/Belge-Medya, `education`/Eğitim-İSG, `strategy`/Strateji — `app/config/removed_modules.py`) — bunlar CURRENT/aktif özellik SAYILMAZ, yeni operatör bunları yanlışlıkla aktifleştirmemelidir.
 
 **HISTORICAL (kapanmış, artık aktif borç DEĞİL — aktif borçmuş gibi gösterilmez):**
 - Windows UTF-8 cp1252 startup çökmesi — kalıcı olarak düzeltildi (§7), iki katmanlı korumayla.
@@ -930,15 +962,24 @@ Sunucu tamamen kaybedildiğinde, sıfırdan geri dönüş sıralı adımları:
     repo/git bundle'ı temin edilir
 6.  `.env` GÜVENLİ KANALDAN (§31) geri alınır — repo/pakette ASLA yoktur
 7.  `instance\` klasörü (varsa ayrı yedeği) geri konur
-8.  Dosya/Portal/Dosya Merkezi storage (§3, ayrı kalıcı disk/volume) geri konur
+8.  `app/static/uploads` (varsa) VE **Dosya Merkezi storage kökü**
+    (`FILE_CENTER_STORAGE_ROOT`, ayrı kalıcı disk/volume) dosya-sistemi
+    seviyesinde geri konur — DB restore'undan (adım 9) BAĞIMSIZ, ayrı bir
+    dosya-kopyalama işlemidir (bkz. §34.10)
 9.  PostgreSQL restore: `pg_restore --clean --if-exists --dbname "%DATABASE_URL%" <dump>`
 10. `python -m venv .venv` + `pip install -r requirements.txt`
 11. `flask db current` ile restore edilen DB'nin revizyonu doğrulanır — `e0efcd07abf7`
-    ile eşleşmeli (veya paketle birlikte gelen migration'lar varsa `flask db upgrade`)
+    ile eşleşmeli (veya paketle birlikte gelen migration'lar varsa `flask db upgrade`).
+    **⚠️ Dosya Merkezi'nin 15 tablosu bu revizyon zincirinde YOKTUR** (§34.7) — bunlar
+    yalnız adım 9'daki PostgreSQL restore'u SIFIRDAN bir DB değil, Dosya Merkezi
+    tablolarını zaten içeren gerçek bir yedekten yapıyorsanız geri gelir. Sıfırdan bir
+    DB + yalnız `flask db upgrade` senaryosunda Dosya Merkezi tabloları OLUŞMAZ.
 12. `scripts\windows\install_bys360_live_waitress_80_task_v1.ps1` (önce dry-run,
     sonra `-Apply -ConfirmReplace`) ile Scheduled Task kurulur
 13. `/healthz` (local, proxy header taklidiyle + public) doğrulanır
-14. §11'deki smoke listesi (login, ana modül ekranları) çalıştırılır
+14. §11'deki smoke listesi (login, ana modül ekranları) çalıştırılır — Dosya Merkezi
+    için ayrıca `/file-center` sayfasının açıldığı ve mevcut kayıtların (varsa)
+    göründüğü doğrulanır
 15. Log gate (§19) taranır — kritik pattern YOK doğrulanır
 ```
 
@@ -1013,3 +1054,206 @@ Eski handover paketleri/belgeleri SİLİNMEMİŞTİR — aşağıda CURRENT/SUPE
 | `docs/archive/legacy-root/*.json` | **HISTORICAL** | Eski manifest/rapor dosyaları |
 
 **Not:** Bu devir dalgasının kendi brifinginde örnek olarak verilen `BYS360_HANDOVER_10_10_SOURCE_V6_20260708` adlı bir paket, tam repo taramasıyla ARANDI ve **bu isimle repoda hiçbir dosya/paket bulunamadı**. En yakın gerçek eşleşme `HANDOVER_10_10_EVIDENCE_20260708.md`'dir (farklı isim, aynı tarih) — bu belge yukarıdaki tabloda HISTORICAL olarak zaten doğru şekilde işaretlenmiştir. Var olmayan bir dosya adı bu index'e gerçekmiş gibi eklenmemiştir.
+
+---
+
+## 34. Dosya Merkezi / Güvenli Dosya Transferi
+
+**Not — bu bölümün eklenme gerekçesi:** İlk devir dalgasında Dosya Merkezi yalnız §2'nin modül tablosunda tek bir satırla ve birkaç dağınık cümleyle geçiyordu (kanıt: bu turun kendi araştırma ajanı, 9 ayrı satır/cümle buldu, hiçbiri Portal Video (§16) veya Performance (§17) kadar derinlikli değildi). Bu bölüm o boşluğu kapatır. **WeTransfer benzeri bir ürün değildir** — tüm "guest" akışları hâlâ kimliği doğrulanmış bir sahip kullanıcı tarafından BAŞLATILIR (link/talep oluşturma authenticated bir işlemdir); bu belge Dosya Merkezi'ni **"kurum içi güvenli dosya paylaşımı ve büyük dosya transferi"** olarak tanımlar.
+
+### 34.1 Amaç
+
+Kurum-içi kullanıcıların dosya yüklemesi/indirmesi, parola korumalı süreli misafir bağlantılarıyla dış kişilerle güvenli paylaşım yapması, misafirlerden dosya talep etmesi, büyük dosyaları parçalı (chunked) yüklemesi ve bunların hepsinin kota/güvenlik/denetim kaydı altında yönetilmesi.
+
+### 34.2 Kaynak dosyalar
+
+| Katman | Dosya(lar) |
+|---|---|
+| Route'lar (44 endpoint) | `app/file_center/routes.py` (1154 satır) |
+| Servisler | `app/file_center/services.py` (1268 satır, çekirdek mantık), `mail_service.py` (SMTP), `settings_service.py` (DB-destekli ayarlar), `maintenance_service.py` (bakım/kota/expiry), `permissions.py` (rol-matrisi yetkilendirme) |
+| Modeller | `app/models/file_center_models.py` (348 satır, 15 model sınıfı) |
+| Şablonlar (13 dosya) | `app/templates/file_center/{index,chunk_upload,guest_download,guest_upload,admin,logs,maintenance,quota,requests,role_matrix,security,settings,transfers}.html` |
+| JS | **Ayrı `app/static/js/*file_center*` dosyası YOK** — tüm istemci JS'i şablonlar içinde inline `<script>` bloklarıdır (`chunk_upload.html:20-51`, `index.html:178-187`) |
+| Menü | `app/templates/base.html:613-640` (ayrı `menu_registry.py` dosyası YOK — bu repoda menü ana olarak `base.html` içinde tanımlıdır); alt-öğeler: Dosyalarım, Transfer Paketleri, Dosya Talepleri, Büyük Dosya Yükleme, Dosya Merkezi Yönetimi, Güvenlik Taraması, Kota Yönetimi, Bakım Merkezi, Ayarlar, Rol Matrisi |
+| Operasyon script'leri | `scripts/local/file_center_ops_tick_v1l.py` (bakım tick'i), `scripts/local/audit_file_center_secret_hygiene_v1l.py`, `scripts/windows/repair_file_center_secret_hygiene_v1l.ps1` |
+
+Tüm route'lar `main_bp` üzerinde kayıtlıdır (ayrı bir Blueprint DEĞİL), `app/routes.py:304`'te import edilir. Guest-olmayan HER route, `_enabled_or_message()` ile hem `can_use_file_center(current_user)` hem `file_center_enabled()` (DB/env destekli kapatma anahtarı) kontrolünden geçer.
+
+### 34.3 Kullanıcı akışı (authenticated)
+
+| Akış | Route | Metod | Durum |
+|---|---|---|---|
+| Dosya yükleme | `/file-center/upload` | POST | **IMPLEMENTED** — tek dosya, `FILE_CENTER_MAX_FILE_GB` (varsayılan 5GB) sınırlı |
+| Dosya indirme (sahip) | `/file-center/download/<id>` | GET | **IMPLEMENTED** |
+| Dosya silme | `/file-center/delete/<id>` | POST | **IMPLEMENTED** — soft-delete, aktif guest linkleri de iptal eder |
+| Guest link oluşturma | `/file-center/share/<id>` | POST | **IMPLEMENTED** — zorunlu parola (route seviyesinde min 6 karakter) |
+| Guest link iptali | `/file-center/share/<id>/revoke` | POST | **IMPLEMENTED** |
+| Transfer paketi (çoklu dosya gruplama) | `/file-center/transfers*` | GET/POST | **CONDITIONAL** — birden fazla ZATEN-yüklenmiş dosyayı gruplar; alıcı (`FileTransferRecipient`) satırları kaydedilir ama route'larda onları GERÇEKTEN e-postalayan bir adım BULUNAMADI (bkz. §34.13) |
+| Misafirden dosya talebi oluşturma | `/file-center/requests/create` | POST | **IMPLEMENTED** — parola, expiry, izinli uzantı listesi, istek-özel boyut sınırı |
+| Talep daveti e-postası gönderme | `/file-center/requests/<id>/send-email` | POST | **IMPLEMENTED** — sahip tarafından tetiklenir, otomatik DEĞİL |
+| Klasörler | — | — | **NOT_IMPLEMENTED (kullanıcı arayüzünde)** — `FileStorageFolder` modeli var ama onu oluşturan/listeleyen hiçbir route bulunamadı; muhtemelen gelecekteki bir özellik için hazırlanmış taslak |
+
+### 34.4 Guest/share akışı (kimlik doğrulama gerektirmeyen kısım)
+
+**Guest download** (`GET/POST /guest/files/<token>`, `file_center_guest_download`, giriş GEREKMEZ):
+- Token: sahip kullanıcı `create_guest_link()` çağırır → `secrets.token_urlsafe(32)` üretilir; DB'de yalnız `sha256(token)` (`token_hash`, unique+indexed) saklanır. **Ayrıca** düz-metin `public_token` da ayrı bir kolonda tutulur (sahibin arayüzünde linki tekrar gösterebilmesi için) — yani token tamamen hash-only değildir.
+- **Parola:** zorunlu, `werkzeug.security.generate_password_hash` ile saklanır.
+- **Süre sonu (expiry):** `expires_at = now + gün` (varsayılan 7 gün, `FILE_CENTER_GUEST_DEFAULT_EXPIRES_DAYS`).
+- **İndirme sayacı:** `download_count` vs `max_downloads` (varsayılan 5, `FILE_CENTER_DEFAULT_DOWNLOAD_LIMIT`).
+- **Not/mesaj alanı:** `FileShareLink` modelinde YOK.
+- Kullanılabilirlik: `is_active AND expires_at >= now AND download_count < max_downloads`.
+- Her indirme denemesi `FileDownloadLog`'a yazılır (`wrong_password`/`blocked_by_security`/`success`).
+
+**Guest upload** (`GET/POST /guest/upload/<token>`, `file_center_guest_upload`, giriş GEREKMEZ):
+- Aynı token/hash/parola deseni, `FileRequest` üzerinde.
+- İstek-özel `max_file_gb` ve `allowed_extensions` (global sınırla birlikte, daha KISITLAYICI olan uygulanır).
+- Guest'ten `guest_name`/`guest_email` (opsiyonel) toplanır, `FileRequestUpload` satırına IP+user-agent ile birlikte kaydedilir.
+- Talep sahibinin kotasına yazılır (dosya sahibi=talep sahibi, guest DEĞİL).
+- İndirme sayacı kavramı YOK (bu bir yükleme ucu); `upload_count`/`last_upload_at` sayaç olarak tutulur.
+
+**Genel durum özeti:** Guest download = **IMPLEMENTED**; Guest upload = **IMPLEMENTED**; Parola = **IMPLEMENTED** (zorunlu); Expiry = **IMPLEMENTED**; İndirme sayısı = **IMPLEMENTED** (yalnız download tarafında); Not alanı = **NOT_IMPLEMENTED**; Bildirim (guest'e otomatik mail) = **CONDITIONAL** (yalnız sahip elle tetiklerse).
+
+### 34.5 Chunk (parçalı) büyük dosya yükleme — tam akış
+
+Sayfa: `/file-center/chunk-upload` (`chunk_upload.html`). Üç adım:
+
+1. **Session create** — `POST /file-center/chunk-upload/session-json` (JS/AJAX; form-encoded `/session` varyantı da var) → `create_chunk_upload_session()`: `total_size_bytes`, `chunk_size_bytes` (varsayılan `FILE_CENTER_DEFAULT_CHUNK_MB`=10MB), opsiyonel bütün-dosya `sha256_hash` alır; `token_urlsafe(32)` session token üretir, `storage_root()/temp/chunk_sessions/<owner_id>/<token>` geçici dizinini açar, `expires_at = now+24h`.
+2. **Part upload** — `POST .../chunk/<index>` → her parça `{index:08d}.part.tmp` olarak stream edilir, atomik `.replace()` ile `.part`'a dönüşür. **Parçalar salt `chunk_index` ile sıralanır/kimliklenir** (client hash'i DEĞİL). Her parçanın SHA256+boyutu ayrıca hesaplanıp `FileUploadChunk` satırına yazılır; son parça hariç her parçanın boyutu `chunk_size_bytes`'ı AŞAMAZ.
+3. **Finalize** — `POST .../finalize` → `finalize_chunk_upload_session()`:
+   - **Eksik-parça kontrolü:** `range(total_chunks)` içindeki her index karşılığı bir satır var mı — yoksa `ValueError` ile temiz başarısızlık (eksik index listesi hata mesajında).
+   - Kota tekrar kontrol edilir (tam `total_size_bytes` için).
+   - Yasaklı uzantı reddi.
+   - Parçalar **sırayla** birleştirilirken YENİDEN bir SHA256 ve toplam bayt hesaplanır.
+   - **Boyut doğrulaması:** `total != expected` ise → durum `failed`, kısmi dosya SİLİNİR, hata fırlatılır.
+   - **Hash doğrulaması:** session-create'te client bir `sha256_hash` verdiyse, hesaplanan hash ile karşılaştırılır; UYUŞMAZSA → `failed`, dosya SİLİNİR. Client hash vermediyse bu kontrol ATLANIR (durum `verified` yerine `completed` olur).
+   - Başarıda: yeni `FileStorageItem` (`scan_status="pending"`), bir `FileSecurityScan` kaydı kuyruğa alınır, geçici dizin silinir.
+
+**Client-side resume:** `chunk_upload.html`'in inline JS'i, önce status endpoint'ini sorgular, zaten alınmış index'leri bir `Set`'e koyar ve onları tekrar göndermez — "bağlantı kopunca devam" tamamen istemci-taraflı bir davranıştır, sunucu tarafında idempotent parça saklaması dışında zorunlu kılınmaz.
+
+**Chunk bütünlüğü — özet:** parça-boyutu kontrolü VAR, eksik-parça kontrolü VAR, toplam-boyut kontrolü VAR, TÜM-DOSYA SHA256 kontrolü VAR (ama yalnız client bunu session-create'te sağladıysa) — **parça-bazlı client-declared hash karşılaştırması YOK** (parça hash'i hesaplanıp saklanır ama hiçbir şeyle karşılaştırılmaz).
+
+### 34.6 Storage
+
+- Kök: `storage_root()` — `FILE_CENTER_STORAGE_ROOT` env/config değerinden okunur. **Prod'da (APP_ENV/FLASK_ENV/ENV `production`/`prod`/`canli`/`live` veya `BYS360_PRODUCTION` bayrağı) tanımsızsa `RuntimeError` fırlatır** — üretimde bu değişken ZORUNLUDUR. Local'de `<instance_path>/file_center_storage`'a düşer. Alt klasörler: `uploads/`, `deleted/`, `quarantine/`, `temp/`.
+- `.env.example` örnekleri: Windows `D:/bys360_storage/file_center`, Linux `/var/lib/bys360/file_center` — gerçek değer BOŞ gönderilir (repo hiçbir gerçek yol içermez).
+- **DB yalnız metadata tutar** (`storage_path`, `original_filename`, `stored_filename`, `content_type`, `extension`, `size_bytes`, `sha256_hash`) — dosya baytları YALNIZ diskte yaşar; `FileStorageItem` modelinde BLOB/bytes kolonu YOK.
+- Path-traversal koruması: `secure_file_path()` sonuçlanan yolu `.relative_to(root)` ile kontrol eder — kök dışına çıkan bir yol `ValueError` fırlatır.
+- Güvenlik-işaretli dosyalar `uploads/`↔`quarantine/` arasında fiziksel olarak TAŞINIR (kopyalanmaz).
+- **Cleanup:** `run_file_center_maintenance_tick()` (linkler/talepler expiry + kota yeniden hesaplama + bekleyen tarama + disk-doluluk özeti) tek çağrıda çalışır, `scripts/local/file_center_ops_tick_v1l.py` ile tetiklenir. **Bu script uygulama-içi bir zamanlayıcıya (Celery/RQ) BAĞLI DEĞİL** — harici bir Windows Görev Zamanlayıcı girişi gerektirir; bu turda böyle bir görevin repoda AKTİF şekilde kurulu olduğuna dair kanıt bulunamadı (yalnız arşivlenmiş `install_file_center_scheduled_tasks_v1l.ps1` var). **Yeni operatör bunu doğrulamalı ve gerekiyorsa kurmalıdır.**
+- **Orphan-file taraması YOK** — bakım tick'i link/talep süre-dolumu ve kota hesabı yapar ama diskte DB kaydı olmayan dosyaları ARAMAZ.
+
+### 34.7 Database (gerçek modeller, yalnız var olan alanlar)
+
+15 model, hepsi `app/models/file_center_models.py`, hepsi `TimestampMixin` (created_at/updated_at) miras alır:
+
+| Model | Tablo | Ana alanlar |
+|---|---|---|
+| `FileStorageFolder` | `file_storage_folders` | id, owner_user_id, parent_id, name, is_deleted *(route'suz — kullanılmıyor)* |
+| `FileStorageItem` | `file_storage_items` | id, owner_user_id, folder_id, original_filename, stored_filename, storage_path, content_type, extension, size_bytes, sha256_hash, status, **scan_status**, is_deleted, deleted_at, deleted_by_user_id |
+| `FileTransfer` | `file_transfers` | id, owner_user_id, title, message, status, expires_at |
+| `FileTransferItem` | `file_transfer_items` | id, transfer_id, file_id |
+| `FileTransferRecipient` | `file_transfer_recipients` | id, transfer_id, recipient_user_id, recipient_email, recipient_name, status |
+| `FileShareLink` | `file_share_links` | id, file_id, **token_hash** (unique), **public_token**, password_hash, expires_at, max_downloads, download_count, is_active, revoked_at/by |
+| `FileRequest` | `file_requests` | id, owner_user_id, title, description, recipient_name/email, token_hash, public_token, password_hash, expires_at, max_file_gb, allowed_extensions, status, upload_count, closed_at, revoked_at/by |
+| `FileRequestUpload` | `file_request_uploads` | id, request_id, file_id, guest_name, guest_email, ip_address, user_agent, status |
+| `FileDownloadLog` | `file_download_logs` | id, file_id, share_link_id, downloaded_by_user_id, guest_label, ip_address, user_agent, status |
+| `FileAccessLog` | `file_access_logs` | id, file_id, actor_user_id, action, ip_address, user_agent, detail |
+| `FileQuotaUsage` | `file_quota_usage` | id, user_id (unique), used_bytes, file_count |
+| `FileSecurityScan` | `file_security_scans` | id, file_id, status, scanner, result_message, scanned_at |
+| `FileAuditLog` | `file_audit_logs` | id, actor_user_id, file_id, action, message, ip_address, user_agent |
+| `FileQuotaPolicy` | `file_quota_policies` | id, scope_type, scope_value, max_storage_gb, max_single_file_gb, max_transfer_gb, warning_threshold_percent, **hard_stop_enabled** |
+| `FileUploadSession` | `file_upload_sessions` | id, owner_user_id, session_token, total_size_bytes, chunk_size_bytes, total_chunks, sha256_hash, status, temp_dir, finalized_file_id, expires_at |
+| `FileUploadChunk` | `file_upload_chunks` | id, session_id, chunk_index, size_bytes, sha256_hash, storage_path, status |
+| `FileCenterMailLog` | `file_center_mail_logs` | id, request_id, actor_user_id, recipient_email, subject, body, purpose, status, error_message, sent_at |
+| `FileCenterRolePermission` | `file_center_role_permissions` | id, role_key (unique), 14 adet `can_*` boolean bayrak |
+| `FileCenterSetting` | `file_center_settings` | id, key (unique), value, value_type, group_key |
+
+**⚠️ KRİTİK OPERASYONEL BULGU:** Bu 15 tablonun HİÇBİRİ `migrations/versions/` altında bir Alembic dosyasına sahip DEĞİLDİR. Repo geçmişinde bunlar bir kerelik, artık **arşivlenmiş** bir script (`scripts/archive/pre_handover_20260708/local/create_file_center_tables_local_v1.py`, `db.create_all()` çağıran) ile oluşturulmuştu. **Sonuç:** sıfırdan bir ortamda yalnız `flask db upgrade` çalıştırmak Dosya Merkezi tablolarını OLUŞTURMAZ. Bu, mevcut canlı veritabanında (zaten bir kez `db.create_all()` ile oluşturulduğu için) sorun YARATMAZ, ama gelecekteki bir "sıfırdan kurulum" veya "yeni ortam" senaryosunda ciddi bir şaşırtıcı boşluktur. **Bu, bu dokümantasyon dalgasının düzeltme kapsamı DIŞINDADIR** (yalnız belgeleniyor) — düzeltmek gerçek bir Alembic migration dosyası yazmayı gerektirir, bu uygulama-kodu değişikliğidir.
+
+### 34.8 Security
+
+| Kontrol | Mekanizma |
+|---|---|
+| Auth/ownership | `@login_required` + `_can_manage_file()`/`_can_manage_request()` (owner_user_id eşleşmesi veya admin-benzeri) |
+| Rol-bazlı yetki | `app/file_center/permissions.py`, rol-matrisi tabanlı (`can_manage_file_center_admin`, `can_create_guest_links`, `can_create_guest_upload_requests`, `can_use_chunk_upload`, `can_manage_file_center_settings`, `can_manage_file_center_quota_policy`, `can_manage_file_center_role_matrix` dahil) |
+| Guest token üretimi | `secrets.token_urlsafe(32)`; yalnız SHA256 hash sorgulanır (`token_hash`), ama düz metin de `public_token` kolonunda AYRICA saklanır |
+| Parola | `werkzeug.security.generate_password_hash`/`check_password_hash` (salted); minimum 6 karakter route seviyesinde |
+| Path traversal | `werkzeug.utils.secure_filename()` + `secure_file_path()`'in `.relative_to(root)` kontrolü |
+| Uzantı/MIME | `blocked_extensions()` (varsayılan `.exe,.bat,.cmd,.ps1,.vbs,.scr,.dll,.msi,.js,.jar,.com,.pif`, `FILE_CENTER_BLOCKED_EXTENSIONS` ile genişletilebilir), opsiyonel allow-list (`FILE_CENTER_ALLOWED_EXTENSIONS`), çift-uzantı sezgisi, şüpheli MIME prefix listesi |
+| Boyut sınırı | `FILE_CENTER_MAX_FILE_GB` (varsayılan 5.0), `FILE_CENTER_MAX_TRANSFER_GB` (varsayılan 20.0) — hem `Content-Length` ön-kontrolü hem stream-sırasında sayaç |
+| Virüs taraması | **Opsiyonel ClamAV** (`FILE_CENTER_CLAMAV_ENABLED`, varsayılan `false`) — `subprocess.run` ile `FILE_CENTER_CLAMAV_COMMAND` (varsayılan `clamscan --no-summary --infected`) çalıştırır, timeout `FILE_CENTER_CLAMAV_TIMEOUT_SECONDS` (varsayılan 60). **Kapalıyken yalnız sezgisel (uzantı/MIME/çift-uzantı/boş-dosya) kontrol yapılır — GERÇEK virüs taraması YOKTUR** (kod içi literal mesaj: "Temel dosya türü ve güvenlik ön kontrolü geçti. Gerçek antivirüs taraması etkin değil.", `tests/security/test_file_center_v1l_hardening_static.py:51`'de de doğrulanmıştır). |
+| Rate limiting | Bkz. §34.9 |
+| CSRF | Global `CSRFProtect()`; iki misafir şablonu dahil TÜM formlarda `csrf_token`; chunk-upload AJAX JS'i her `FormData` POST'una `csrf_token` ekler |
+| İndirme yetkisi | Her indirmede `can_download_file()` (silinmiş/karantinada/bloklu/tarama-temiz-değil → engellenir) |
+| Audit logging | `FileAuditLog` (hemen hemen her durum-değiştiren işlemde), ayrıca `FileAccessLog`/`FileDownloadLog` (okuma/indirme-özel) |
+| Süresi dolmuş/iptal token | `is_available()` kontrolü (`is_active`, `expires_at`, sayaç) her erişimde tekrar değerlendirilir |
+
+### 34.9 Rate limit'ler (gerçek config key'leri)
+
+Dinamik olarak, route-dekoratörü DEĞİL, `app/security/api_rate_limit.py::_apply_file_center_limits()` ile uygulanır (`app/__init__.py:294`'ten çağrılır):
+
+| Endpoint | Config key | Varsayılan |
+|---|---|---|
+| `file_center_guest_download` | `FILE_CENTER_GUEST_DOWNLOAD_RATE_LIMIT` | 20/saat |
+| `file_center_guest_upload` | `FILE_CENTER_GUEST_UPLOAD_RATE_LIMIT` | 10/saat |
+| `file_center_upload` | `FILE_CENTER_AUTH_UPLOAD_RATE_LIMIT` | 30/saat |
+| `file_center_chunk_upload_session_create` **ve** `..._session_create_json` | `FILE_CENTER_CHUNK_SESSION_RATE_LIMIT` (İKİSİ AYNI KEY'İ PAYLAŞIR) | 20/saat |
+| `file_center_chunk_upload_part` | `FILE_CENTER_CHUNK_PART_RATE_LIMIT` | 240/saat |
+| `file_center_chunk_upload_finalize` | `FILE_CENTER_CHUNK_FINALIZE_RATE_LIMIT` | 60/saat |
+
+`ENABLE_API_RATE_LIMIT=true` (varsayılan) ve `flask-limiter` paketi gerektirir; paket eksikse sessizce no-op olur.
+
+### 34.10 Backup / Restore
+
+- **DB backup TEK BAŞINA YETERLİ DEĞİLDİR.** DB yalnız metadata tutar (§34.6) — dosya baytları `FILE_CENTER_STORAGE_ROOT` altında, PostgreSQL'in tamamen dışında yaşar.
+- Doğru sıra: (1) `pg_dump` (DB metadata), (2) `FILE_CENTER_STORAGE_ROOT` kökünün dosya-sistemi seviyeli yedeği (örn. `robocopy`/benzeri, `uploads/`+`deleted/`+`quarantine/` alt klasörleri dahil — `temp/` hariç tutulabilir, oturum-geçicidir).
+- Restore sırası: PostgreSQL restore + storage-kökü restore BİRLİKTE, tutarlı bir zaman noktasından yapılmalı — biri diğerinden farklı bir zaman noktasından gelirse DB'de dosya kaydı olup fiziksel dosyanın olmaması (veya tersi) riski oluşur (bkz. §34.13 incident sınıfları).
+- §10'daki genel "Hangi veri ayrı korunur" tablosu artık Dosya Merkezi storage'ı ayrı bir satır olarak listeler.
+
+### 34.11 Operasyon (yeni sistem yöneticisi için)
+
+- **Storage kapasitesi takibi:** `storage_health_summary()` (bakım tick'inin bir parçası) disk doluluk yüzdesini hesaplar, `FILE_CENTER_DISK_ALERT_PERCENT` (varsayılan 85) aşılırsa `file_center_disk_alert` audit kaydı YAZAR — **bu yalnız bir UYARI mekanizmasıdır, upload'ları ENGELLEMEZ.**
+- **Hangi klasör yedeklenir:** `FILE_CENTER_STORAGE_ROOT` kökünün tamamı (temp/ hariç tutulabilir).
+- **Orphan file riski:** VAR — bakım tick'i diskte DB kaydı olmayan dosyaları ARAMAZ (§34.6). Periyodik manuel/scripted bir çapraz-kontrol henüz yoktur.
+- **Cleanup nasıl çalışır:** `run_file_center_maintenance_tick()` → link/talep expiry + kota yeniden hesaplama + bekleyen güvenlik taraması + disk özeti; harici bir zamanlayıcı (Windows Görev Zamanlayıcı) gerektirir, uygulama-içi otomatik DEĞİLDİR (§34.6).
+- **DB restore sonrası storage neden AYRICA gerekir:** çünkü DB yalnız "bu dosya şu yolda, şu boyutta" der — dosyanın kendisi PostgreSQL'in içinde DEĞİLDİR; DB'yi geri yükleyip storage'ı geri yüklemezseniz, uygulama var olmayan dosyalara işaret eden kayıtlarla dolu olur (indirme denemeleri 404/500 verir).
+- **Kota:** `FileQuotaPolicy.hard_stop_enabled=True` DEĞİLSE (varsayılan `False`), kota aşımı upload'u ENGELLEMEZ — yalnız arayüzde uyarı/tehlike rengi gösterir. Gerçek bir sert-durdurma istiyorsanız ilgili politikada bu bayrağı açık ayarlamak gerekir.
+
+### 34.12 Troubleshooting — gerçek anlamlı incident sınıfları
+
+| Sınıf | Muhtemel neden |
+|---|---|
+| Upload 413 / boyut reddi | `FILE_CENTER_MAX_FILE_GB`/`_MAX_TRANSFER_GB` aşıldı, veya ters-proxy'nin kendi `client_max_body_size`'ı |
+| Chunk finalize başarısız — "Eksik parçalar var" | Bir veya daha fazla `chunk_index` hiç yüklenmedi/timeout oldu — istemci JS'in resume mantığını tetiklemesi gerekir |
+| Chunk finalize başarısız — hash uyuşmazlığı | Ağ bozulması veya istemcinin gönderdiği `sha256_hash` yanlış — dosya SİLİNMİŞ, yeniden yüklenmesi gerekir |
+| Süresi dolmuş guest link/talep | `expires_at` geçmiş — `is_available()` `False` döner, kullanıcıya "süresi doldu" mesajı |
+| Geçersiz token | Yanlış/eski link, ya da veritabanında hiç eşleşme yok (`token_hash` bulunamadı) |
+| Storage path erişilemez | `FILE_CENTER_STORAGE_ROOT` yanlış yapılandırılmış, disk bağlı değil, veya izin sorunu — prod'da bu env eksikse `RuntimeError` ile BAŞLANGIÇTA engellenir |
+| Disk dolu | `storage_health_summary()`'nin `file_center_disk_alert` audit kaydı loglarda aranmalı |
+| DB kaydı var, dosya yok | Storage restore'u DB restore'undan farklı bir zaman noktasından yapıldıysa (bkz. §34.10) — indirme `send_file` seviyesinde hata verir |
+| Dosya var, DB kaydı yok | Manuel dosya-sistemi müdahalesi veya kısmi restore sonrası — orphan file, hiçbir otomatik tarama bunu bulmaz (§34.6) |
+| Guest-link parola/erişim sorunu | Yanlış parola denemeleri `FileDownloadLog`'da `wrong_password` olarak görünür — brute-force paterni için loglar taranmalı |
+
+### 34.13 Known Limitations (yalnız kod tarafından gerçekten desteklenen sınırlamalar)
+
+- Maksimum dosya boyutu: `FILE_CENTER_MAX_FILE_GB` (varsayılan 5GB); transfer paketi toplamı: `FILE_CENTER_MAX_TRANSFER_GB` (varsayılan 20GB) — sabit değil, DB'den de override edilebilir (`settings_service.py`).
+- Desteklenen dosya türleri: allow-list boşsa (varsayılan) hemen hemen her tür kabul edilir, yalnız sabit bir blocked-list (`.exe,.bat,.cmd,.ps1,.vbs,.scr,.dll,.msi,.js,.jar,.com,.pif`) reddedilir.
+- Expiry davranışı: guest link/talep süresi dolunca erişim otomatik kapanır (`is_available()`), ama fiziksel dosya/DB kaydı OTOMATİK silinmez — yalnız erişim engellenir.
+- Guest kısıtlamaları: parola ZORUNLU, not/mesaj alanı YOK, indirme sayacı yalnız download tarafında var (upload tarafında yok).
+- **Quota:** varsayılan olarak yalnız advisory (uyarı) — `hard_stop_enabled=True` açıkça ayarlanmadıkça sert bir engelleme YOKTUR.
+- **Virüs taraması:** varsayılan olarak YOKTUR (yalnız ClamAV açıkça etkinleştirilirse gerçek tarama olur; aksi halde yalnız sezgisel kontrol).
+- **Harici obje depolama (S3/Azure Blob/GCS) desteği YOKTUR** — yalnız yerel dosya sistemi (`storage_root()` altında).
+- **Çoklu dosya tek-istekte yükleme YOKTUR** — hem normal upload hem guest upload tam olarak bir dosya/istek kabul eder; "Transfer Paketleri" özelliği zaten-yüklenmiş dosyaları GRUPLAR, tek-istekte çoklu yükleme değildir.
+- **Klasör (folder) özelliği kullanıcı arayüzünde YOKTUR** — model var, route/servis desteği yok.
+- **Transfer alıcılarına (`FileTransferRecipient`) otomatik e-posta bildirimi bulunamadı** — kayıtlar oluşturulur ama route'larda onları e-postalayan bir adım tespit edilemedi.
+- **15 tablonun hiçbiri Alembic migration'da DEĞİLDİR** (bkz. §34.7 — bu bölümün en kritik operasyonel bulgusudur).
+
+### 34.14 Source of Truth (Dosya Merkezi için, §32'nin genel kuralına ek)
+
+| Konu | Kaynak |
+|---|---|
+| Davranış | `app/file_center/routes.py` + `services.py` (bu bölümdeki HER iddia bunlardan doğrudan okunmuştur) |
+| DB | `app/models/file_center_models.py` — **Alembic migration YOK, yalnız model tanımı + tarihsel bir kerelik bootstrap script'i** (§34.7) |
+| Storage | `FILE_CENTER_STORAGE_ROOT` ortam değişkeni/DB ayarı — gerçek üretim yolu bu dokümantasyon oturumunda doğrulanmadı, operatör tarafından RDP ile teyit edilmelidir |
+| Security | `app/file_center/permissions.py`, `app/security/api_rate_limit.py`, `tests/security/test_file_center_*.py` |
+| Production state | OPERATOR-ATTESTED dağıtım kanıtı (bkz. §0) — bu bölüm Dosya Merkezi'nin CANLIDA gerçekten hangi verilerle dolu olduğunu İDDİA ETMEZ, yalnız KODUN neyi desteklediğini belgeler |
