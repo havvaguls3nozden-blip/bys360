@@ -419,6 +419,60 @@ def test_apply_with_custom_port_is_reflected_in_action_command(tmp_path: Path) -
     assert "APP_PORT" in action_calls[0]["Argument"]
 
 
+def test_apply_action_sets_pythonutf8_env_var(tmp_path: Path) -> None:
+    """Windows Scheduled Task redirected stdout defaults to the system ANSI
+    codepage (cp1252) -- proven directly on the live "BYS360 Live Waitress 80"
+    task to kill run_server.py's Turkish startup print before Waitress ever
+    binds the port. The installer must set PYTHONUTF8=1 on the task action
+    as one of two independent defense layers (the other being run_server.py's
+    own _ensure_utf8_stdio() in-process reconfigure)."""
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=False,
+    )
+
+    assert harness_result["success"] is True
+    action_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") == "New-ScheduledTaskAction"]
+    assert len(action_calls) == 1
+    argument = action_calls[0]["Argument"]
+    assert "PYTHONUTF8" in argument
+    assert "PYTHONUTF8 = '1'" in argument
+
+
+def test_apply_action_sets_pythonioencoding_env_var(tmp_path: Path) -> None:
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=False,
+    )
+
+    assert harness_result["success"] is True
+    action_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") == "New-ScheduledTaskAction"]
+    assert len(action_calls) == 1
+    argument = action_calls[0]["Argument"]
+    assert "PYTHONIOENCODING" in argument
+    assert "PYTHONIOENCODING = 'utf-8'" in argument
+
+
+def test_apply_action_still_sets_app_port_alongside_utf8_env_vars(tmp_path: Path) -> None:
+    """The new PYTHONUTF8/PYTHONIOENCODING assignments must not have
+    displaced the pre-existing APP_PORT assignment in the same inner
+    command."""
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=False, port=8080,
+    )
+
+    assert harness_result["success"] is True
+    action_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") == "New-ScheduledTaskAction"]
+    argument = action_calls[0]["Argument"]
+    assert "APP_PORT" in argument and "8080" in argument
+    assert "PYTHONUTF8" in argument
+    assert "PYTHONIOENCODING" in argument
+
+
 def test_apply_with_existing_task_is_refused_without_confirm_replace(tmp_path: Path) -> None:
     project_root = _build_fake_project_root(tmp_path / "sandbox")
 

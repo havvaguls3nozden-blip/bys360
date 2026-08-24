@@ -65,9 +65,21 @@ if (!(Test-Path $RunServerScript)) {
 # native bir "environment variable" alani yoktur; bu yuzden bir powershell.exe
 # katmani ile once $env:APP_PORT atanir, sonra venv python'u run_server.py
 # ile calistirilir. Cikti (stdout+stderr) LogPath'e eklenir (append).
+#
+# PYTHONUTF8/PYTHONIOENCODING de ayni katmanda aciyla atanir: Windows
+# Scheduled Task altinda redirected stdout varsayilan olarak sistem ANSI
+# codepage'ini (genellikle cp1252) kullanir, ve bu codepage run_server.py'nin
+# Turkce baslangic mesajini (or. "s,"/"i" iceren karakterler) encode edemez --
+# canli "BYS360 Live Waitress 80" gorevinde dogrulanan gercek kok neden.
+# run_server.py kendi icinde stdout/stderr'i UTF-8'e reconfigure eder (bkz.
+# run_server.py:_ensure_utf8_stdio), ama PYTHONIOENCODING'i burada, proses
+# baslamadan once acikca ayarlamak ikinci, bagimsiz bir savunma katmanidir:
+# Python yorumlayicisinin ilk stdio codec secimini de kapsar, boylece
+# _ensure_utf8_stdio calismadan once calisan herhangi bir import-zamanli
+# cikti bile etkilenmez.
 # ---------------------------------------------------------------------------
 
-$InnerCommand = "`$env:APP_PORT = '$Port'; & '$PythonExe' '$RunServerScript' *>> '$LogPath'"
+$InnerCommand = "`$env:APP_PORT = '$Port'; `$env:PYTHONUTF8 = '1'; `$env:PYTHONIOENCODING = 'utf-8'; & '$PythonExe' '$RunServerScript' *>> '$LogPath'"
 $ActionArgument = "-NoProfile -ExecutionPolicy Bypass -WindowStyle Hidden -Command `"$InnerCommand`""
 
 Write-Host "==================================================================="
