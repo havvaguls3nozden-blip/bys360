@@ -187,6 +187,62 @@ def test_composer_page_exposes_video_url_field_exactly_once(app, client):
     assert html.count('name="video_url"') == 1
 
 
+@pytest.mark.parametrize("role", ["personel", "admin"], ids=["normal_role", "admin_role"])
+def test_composer_page_exposes_video_url_field_for_any_portal_role(app, client, role):
+    """Regression proof for a real live-visibility report: the field itself
+    was never gated by role/permission/config in the template (confirmed by
+    direct source inspection -- .portal-media-tools has zero {% if %}/role/
+    permission conditionals around any of its three media fields), so any
+    user with portal_feed access must see it identically regardless of role.
+    The actual root cause of the live report was a CSS Grid sizing bug (see
+    test_media_tools_grid_uses_minmax_to_prevent_track_overflow below) -- this
+    test guards the template/permission side of that investigation."""
+    _create_user(app, sicil_no=f"pvrole_{role}", email=f"pvrole_{role}@ktb.gov.tr", role=role)
+    _login(client, f"pvrole_{role}")
+
+    response = client.get("/portal")
+
+    assert response.status_code == 200
+    html = response.get_data(as_text=True)
+    assert 'name="video_url"' in html
+    assert 'id="portal-video-url"' in html
+
+
+def test_media_tools_grid_uses_minmax_to_prevent_track_overflow():
+    """Real live-visibility bug, root-caused via actual rendered DOM geometry
+    (getBoundingClientRect), not string presence: .portal-media-tools /
+    .bys360-v2121-media-tools used bare `1fr` grid tracks. CSS Grid's `1fr`
+    alone resolves to `minmax(auto, 1fr)` -- a track will NOT shrink below
+    its content's min-content size. The two <input type="file"> fields
+    (photo, video file) have wide intrinsic min-content width, so their
+    tracks refused to shrink, and the computed track widths (measured
+    403px + 403px + 138.89px = 945px) exceeded the actual grid container's
+    rendered width (429px in the reproduction). The third (video-url) field
+    was consequently laid out far outside the container and the viewport
+    (measured x=1494 in a 1440px-wide window) and clipped by the composer
+    card's own `overflow:hidden` -- present in the DOM, `display:block`,
+    `visibility:visible`, yet genuinely invisible to a real user. Confirmed
+    fixed empirically: switching to `minmax(0, 1fr)` tracks (which explicitly
+    allow shrinking below content size) put the field back at x=938,
+    fully within the viewport, with three equal 125px columns.
+
+    This test guards the CSS source pattern only (real layout verification
+    requires a browser, exercised separately, not by this pytest suite) --
+    it exists so this exact bug class cannot silently regress unnoticed."""
+    css_path = Path(__file__).resolve().parents[2] / "app" / "static" / "css" / "bys360_portal.css"
+    css = css_path.read_text(encoding="utf-8")
+
+    assert ".portal-media-tools{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);" in css
+    assert ".bys360-v2121-media-tools{grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr)}" in css
+
+    # The unsafe bare-1fr multi-track pattern that caused the overflow must
+    # not reappear for these two selectors specifically (single-column `1fr`
+    # in the responsive breakpoints is fine -- a lone track has nothing to
+    # compete with, so it cannot blow out its container).
+    assert ".portal-media-tools{display:grid;grid-template-columns:1fr 1fr;" not in css
+    assert ".bys360-v2121-media-tools{grid-template-columns:1fr 1fr 1fr}" not in css
+
+
 def test_composer_page_exposes_video_url_live_preview_container(app, client):
     """The composer field alone (no client-side feedback) previously gave a
     user zero visual confirmation that pasting a link did anything until
