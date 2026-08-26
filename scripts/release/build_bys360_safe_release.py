@@ -4,14 +4,39 @@ import argparse
 import hashlib
 import json
 import re
+import shutil
 import subprocess
+import sys
+import tempfile
 import time
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
 
+# scan_bys360_release_secrets.py is a sibling module in this same directory
+# (scripts/release/) -- imported directly rather than re-implemented, for
+# the same reason WheelhouseIntegrityError's docstring gives for not
+# re-implementing wheelhouse verification here: a second, potentially-
+# diverging copy of secret-scanning logic is worse than importing the one
+# real implementation. sys.path is adjusted explicitly (not relying on
+# "python <script.py>" auto-inserting the script's own directory) so this
+# import also works when the module is imported rather than run directly.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import scan_bys360_release_secrets as secret_scanner  # noqa: E402
+
 PACKAGE = "BYS360_SAFE_RELEASE_BUILDER_PHASE2_V3_DETERMINISTIC"
 SCHEMA_VERSION = 2
+
+# Handover-grade "FULL" build mode (candidate/cutover/rollback architecture
+# wave, 2026-08-25): an opt-in extension, triggered only when --wheelhouse-dir
+# is supplied. Legacy callers that never pass the new flags get byte-for-byte
+# the same schema_version=2 manifest/behavior as before -- see main() and
+# write_manifest(). VALID_SCHEMA_VERSIONS is what verify_package() accepts.
+SCHEMA_VERSION_FULL = 3
+VALID_SCHEMA_VERSIONS = (SCHEMA_VERSION, SCHEMA_VERSION_FULL)
+FULL_BUILD_PYTHON_REQUIREMENT = "3.12"
+FULL_BUILD_PLATFORM_TARGET = "win_amd64"
+FULL_BUILD_ARCHITECTURE = "x86_64"
 
 FORBIDDEN_DIR_PARTS = {
     ".git", ".hg", ".svn", ".venv", "venv", "env", "node_modules", "__pycache__",
@@ -108,6 +133,35 @@ class DirtySourceError(RuntimeError):
     """The requested source commit does not match HEAD, or the tracked
     working tree is not clean. A production release package must never be
     built from state that could silently differ from its claimed source SHA."""
+
+
+class WheelhouseIntegrityError(RuntimeError):
+    """The offline wheelhouse directory does not match its own build report
+    (missing wheel, extra/unexpected wheel, or a wheel whose live SHA256
+    differs from what the report recorded). A FULL package must never bundle
+    a wheelhouse that cannot be proven identical to the one that actually
+    passed offline-install acceptance -- see
+    scripts/release/build_bys360_wheelhouse.py, which produces the report
+    this class validates against, and never re-implement that validation
+    here as a second, potentially-diverging copy."""
+
+
+class MigrationHeadError(RuntimeError):
+    """The migrations/ tree does not resolve to exactly one Alembic head."""
+
+
+class SecretScanError(RuntimeError):
+    """The assembled FULL release tree failed its own secret gate.
+
+    Coordinator addition (2026-08-25, schema-contract-drift wave close-out,
+    section 5: "SECRET SCANNING MUST NOT REMAIN MANUAL ONLY"). Raised when
+    scan_bys360_release_secrets.py finds one or more real-looking secrets in
+    the fully assembled release tree (extracted from the just-built zip, so
+    this is exactly what would ship -- not a proxy check against source
+    files that might differ from the final archive). A FULL package must
+    never be finalized if its own contents fail this gate; see main()'s
+    handling, which deletes the just-built zip and returns non-zero rather
+    than writing a success manifest/report."""
 
 
 def normalize(name: str) -> str:
@@ -257,10 +311,140 @@ def iter_source_files(root: Path) -> tuple[str, list[tuple[Path, str]], list[dic
     return "git-ls-files-filtered", included, excluded
 
 
+def sha256_of_file(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def load_wheelhouse_report(report_path: Path) -> dict:
+    if not report_path.is_file():
+        raise WheelhouseIntegrityError(
+            f"wheelhouse build raporu bulunamadi: {report_path} -- once "
+            "scripts/release/build_bys360_wheelhouse.py --clean calistirin."
+        )
+    try:
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        raise WheelhouseIntegrityError(f"wheelhouse raporu gecersiz JSON: {exc}") from exc
+    if report.get("ok") is not True:
+        raise WheelhouseIntegrityError(
+            f"wheelhouse raporu basarisiz derlemeyi gosteriyor (ok={report.get('ok')!r}): {report_path}"
+        )
+    if "manifest" not in report or not isinstance(report["manifest"], list):
+        raise WheelhouseIntegrityError(f"wheelhouse raporunda 'manifest' listesi yok: {report_path}")
+    return report
+
+
+def verify_and_collect_wheelhouse_files(
+    wheelhouse_dir: Path, report: dict
+) -> list[tuple[Path, str]]:
+    """Cross-checks the live wheelhouse directory against its own build
+    report (not against requirements.lock a second time -- the wheelhouse
+    builder already did that verification; this re-detects drift/tampering
+    of the directory *since* that report was written). Fails closed on any
+    missing wheel, any unexpected extra .whl file, or any hash mismatch."""
+    if not wheelhouse_dir.is_dir():
+        raise WheelhouseIntegrityError(f"wheelhouse dizini bulunamadi: {wheelhouse_dir}")
+
+    expected: dict[str, dict] = {entry["filename"]: entry for entry in report["manifest"]}
+    actual_files = sorted(p for p in wheelhouse_dir.iterdir() if p.is_file())
+    actual_names = {p.name for p in actual_files}
+
+    missing = sorted(set(expected) - actual_names)
+    if missing:
+        raise WheelhouseIntegrityError(f"wheelhouse'ta eksik wheel dosyalari: {missing}")
+
+    unexpected = sorted(n for n in actual_names if n not in expected)
+    if unexpected:
+        raise WheelhouseIntegrityError(f"wheelhouse'ta beklenmeyen ekstra dosyalar: {unexpected}")
+
+    collected: list[tuple[Path, str]] = []
+    for path in actual_files:
+        entry = expected[path.name]
+        live_digest = sha256_of_file(path)
+        if live_digest != entry["sha256"]:
+            raise WheelhouseIntegrityError(
+                f"wheelhouse dosyasi rapor sonrasi degismis (SHA256 uyusmuyor): {path.name}"
+            )
+        collected.append((path, f"wheelhouse/{path.name}"))
+
+    if len(collected) != len(expected):
+        raise WheelhouseIntegrityError(
+            f"wheelhouse dosya sayisi rapor ile eslesmiyor: beklenen={len(expected)} bulunan={len(collected)}"
+        )
+    collected.sort(key=lambda item: item[1])
+    return collected
+
+
+def scan_assembled_tree_for_secrets(zip_path: Path) -> dict:
+    """Extracts the just-built FULL package zip to a disposable temp
+    directory and runs scan_bys360_release_secrets.scan_path() against it --
+    the actual assembled tree (application, migrations, runtime/release
+    scripts, operator docs, manifest/checksum inventory, wheelhouse
+    filenames/metadata, allowlisted example/template files), not a proxy
+    check against the source tree that might diverge from what actually
+    landed in the archive. Raises SecretScanError on any finding; the temp
+    directory is always removed, success or failure. Returns a small,
+    secret-free summary dict (never the actual findings' redacted text --
+    scan_bys360_release_secrets.py already redacts values, but this
+    function's return value is what ends up in the release manifest, so it
+    is deliberately kept to counts/status only)."""
+    temp_dir = Path(tempfile.mkdtemp(prefix="bys360_full_release_secret_scan_"))
+    try:
+        with zipfile.ZipFile(zip_path) as zf:
+            zf.extractall(temp_dir)
+        findings, files_scanned = secret_scanner.scan_path(temp_dir)
+        if findings:
+            by_category: dict[str, int] = {}
+            for f in findings:
+                by_category[f.category] = by_category.get(f.category, 0) + 1
+            summary = ", ".join(f"{k}={v}" for k, v in sorted(by_category.items()))
+            raise SecretScanError(
+                f"assembled FULL release tree failed secret gate: {len(findings)} finding(s) "
+                f"across {files_scanned} file(s) scanned ({summary}). First finding: "
+                f"[{findings[0].severity}] [{findings[0].category}] {findings[0].file} -- {findings[0].detail}"
+            )
+        return {
+            "secret_scan_status": "PASS",
+            "secret_scan_findings": 0,
+            "secret_scan_files_scanned": files_scanned,
+            "secret_scan_scope": "assembled_release_tree",
+        }
+    finally:
+        shutil.rmtree(temp_dir, ignore_errors=True)
+
+
+def resolve_migration_head(root: Path) -> str:
+    """Uses Alembic's own ScriptDirectory against migrations/ -- the same
+    mechanism scripts/windows/prepare_bys360_candidate.ps1's
+    Test-CandidateMigrationHead uses -- rather than parsing revision/
+    down_revision out of migration files by hand. Requires alembic to be
+    importable in whatever Python runs this builder."""
+    try:
+        from alembic.config import Config
+        from alembic.script import ScriptDirectory
+    except ImportError as exc:
+        raise MigrationHeadError(f"alembic import edilemedi: {exc}") from exc
+
+    migrations_dir = root / "migrations"
+    cfg = Config()
+    cfg.set_main_option("script_location", str(migrations_dir))
+    script = ScriptDirectory.from_config(cfg)
+    heads = script.get_heads()
+    if len(heads) != 1:
+        raise MigrationHeadError(f"migrations/ tek bir head'e cozulmuyor: {heads!r}")
+    return heads[0]
+
+
 def build_filtered_zip(
-    root: Path, output: Path, source_sha: str
+    root: Path, output: Path, source_sha: str, extra_files: list[tuple[Path, str]] | None = None
 ) -> tuple[str, list[tuple[Path, str]], list[dict[str, str]]]:
     source, included, excluded = iter_source_files(root)
+    if extra_files:
+        tracked_names = {rel for _, rel in included}
+        collided = [rel for _, rel in extra_files if rel in tracked_names]
+        if collided:
+            raise DirtySourceError(f"extra_files git-tracked yollarla catisiyor: {collided}")
+        included = sorted(included + list(extra_files), key=lambda item: item[1])
     epoch = resolve_commit_epoch(root, source_sha)
     date_time = _fixed_date_time(epoch)
     with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED) as zf:
@@ -306,10 +490,11 @@ def write_manifest(
     included: list[tuple[Path, str]],
     excluded: list[dict[str, str]],
     sha256sums_filename: str,
+    full_build: dict | None = None,
 ) -> dict:
     files = sorted(rel for _, rel in included)
     manifest = {
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": SCHEMA_VERSION if full_build is None else SCHEMA_VERSION_FULL,
         "package": PACKAGE,
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
         "source_sha": source_sha,
@@ -319,6 +504,9 @@ def write_manifest(
         "excluded_sample": excluded[:200],
         "sha256sums_file": sha256sums_filename,
     }
+    if full_build is not None:
+        manifest["source_short_sha"] = source_sha[:12]
+        manifest.update(full_build)
     manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
     return manifest
 
@@ -343,10 +531,28 @@ def verify_package(
     except Exception as exc:
         return {"ok": False, "findings": [f"manifest gecersiz JSON: {exc}"]}
 
-    if manifest.get("schema_version") != SCHEMA_VERSION:
+    if manifest.get("schema_version") not in VALID_SCHEMA_VERSIONS:
         findings.append(f"beklenmeyen manifest schema_version: {manifest.get('schema_version')!r}")
 
     manifest_files = set(manifest.get("files", []))
+
+    if manifest.get("schema_version") == SCHEMA_VERSION_FULL:
+        wheelhouse_files_in_manifest = [f for f in manifest_files if f.startswith("wheelhouse/") and f.endswith(".whl")]
+        expected_wheel_count = manifest.get("wheelhouse_file_count")
+        if expected_wheel_count is None:
+            findings.append("FULL paket manifest'inde wheelhouse_file_count alani yok")
+        elif len(wheelhouse_files_in_manifest) != expected_wheel_count:
+            findings.append(
+                f"wheelhouse dosya sayisi manifest alanindan farkli: "
+                f"wheelhouse_file_count={expected_wheel_count} pakette bulunan={len(wheelhouse_files_in_manifest)}"
+            )
+        if "requirements.lock" not in manifest_files:
+            findings.append("FULL paket icin gerekli icerik eksik: requirements.lock")
+        if manifest.get("secret_scan_status") != "PASS" or manifest.get("secret_scan_findings") != 0:
+            findings.append(
+                f"FULL paket secret gate temiz degil: secret_scan_status={manifest.get('secret_scan_status')!r} "
+                f"secret_scan_findings={manifest.get('secret_scan_findings')!r}"
+            )
 
     recorded_hashes: dict[str, str] = {}
     for line in sha256sums_path.read_text(encoding="utf-8").splitlines():
@@ -425,6 +631,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--audit-only", action="store_true", help="Paketi yine uretir ve sadece paket icindeki yasakli dosyalari denetler.")
     parser.add_argument("--verify", default=None, help="Verify mode: dogrulanacak zip yolu.")
     parser.add_argument("--expected-source-sha", default=None, help="Verify mode: manifest source_sha bu deger ile eslesmeli.")
+    parser.add_argument(
+        "--wheelhouse-dir", default=None,
+        help="FULL build mode tetikleyicisi: build/wheelhouse gibi bir dizin. Verilirse manifest "
+             "schema_version=3 olur ve wheelhouse pakete dahil edilir.",
+    )
+    parser.add_argument("--wheelhouse-report", default=None, help="FULL build: wheelhouse build raporu yolu (varsayilan: reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json).")
+    parser.add_argument("--requirements-lock", default=None, help="FULL build: requirements.lock yolu (varsayilan: <root>/requirements.lock).")
+    parser.add_argument("--candidate-script", default=None, help="FULL build: prepare_bys360_candidate.ps1 yolu.")
+    parser.add_argument("--cutover-script", default=None, help="FULL build: cutover_bys360_candidate.ps1 yolu.")
+    parser.add_argument("--rollback-script", default=None, help="FULL build: rollback_bys360_candidate.ps1 yolu.")
+    parser.add_argument("--secret-scanner", default=None, help="FULL build: scan_bys360_release_secrets.py yolu.")
     args = parser.parse_args(argv)
 
     root = Path(args.root).resolve()
@@ -444,18 +661,84 @@ def main(argv: list[str] | None = None) -> int:
     if output.exists():
         output.unlink()
 
+    full_build_extras: dict | None = None
+    extra_files: list[tuple[Path, str]] = []
+
     try:
         source_sha = resolve_source_sha(root, args.source_sha)
         assert_clean_tracked_worktree(root)
-        source, included, excluded = build_filtered_zip(output=output, root=root, source_sha=source_sha)
-    except (GitDiscoveryError, DirtySourceError) as exc:
+
+        if args.wheelhouse_dir:
+            wheelhouse_dir = Path(args.wheelhouse_dir).resolve()
+            wheelhouse_report_path = (
+                Path(args.wheelhouse_report).resolve() if args.wheelhouse_report
+                else root / "reports" / "quality" / "BYS360_WHEELHOUSE_BUILD_REPORT.json"
+            )
+            requirements_lock_path = (
+                Path(args.requirements_lock).resolve() if args.requirements_lock
+                else root / "requirements.lock"
+            )
+            candidate_script_path = Path(args.candidate_script).resolve() if args.candidate_script else root / "scripts" / "windows" / "prepare_bys360_candidate.ps1"
+            cutover_script_path = Path(args.cutover_script).resolve() if args.cutover_script else root / "scripts" / "windows" / "cutover_bys360_candidate.ps1"
+            rollback_script_path = Path(args.rollback_script).resolve() if args.rollback_script else root / "scripts" / "windows" / "rollback_bys360_candidate.ps1"
+            secret_scanner_path = Path(args.secret_scanner).resolve() if args.secret_scanner else root / "scripts" / "release" / "scan_bys360_release_secrets.py"
+
+            for label, p in (
+                ("requirements.lock", requirements_lock_path),
+                ("candidate-script", candidate_script_path),
+                ("cutover-script", cutover_script_path),
+                ("rollback-script", rollback_script_path),
+                ("secret-scanner", secret_scanner_path),
+            ):
+                if not p.is_file():
+                    raise WheelhouseIntegrityError(f"FULL build icin gerekli dosya bulunamadi ({label}): {p}")
+
+            wheelhouse_report = load_wheelhouse_report(wheelhouse_report_path)
+            wheelhouse_files = verify_and_collect_wheelhouse_files(wheelhouse_dir, wheelhouse_report)
+            extra_files = list(wheelhouse_files)
+
+            migration_head = resolve_migration_head(root)
+
+            full_build_extras = {
+                "migration_head": migration_head,
+                "python_requirement": FULL_BUILD_PYTHON_REQUIREMENT,
+                "platform_target": FULL_BUILD_PLATFORM_TARGET,
+                "architecture": FULL_BUILD_ARCHITECTURE,
+                "requirements_lock_sha256": sha256_of_file(requirements_lock_path),
+                "wheelhouse_file_count": wheelhouse_report["wheel_count"],
+                "wheelhouse_total_bytes": wheelhouse_report["total_bytes"],
+                "wheelhouse_identity_sha256": wheelhouse_report["wheelhouse_identity_sha256"],
+                "candidate_script_sha256": sha256_of_file(candidate_script_path),
+                "cutover_script_sha256": sha256_of_file(cutover_script_path),
+                "rollback_script_sha256": sha256_of_file(rollback_script_path),
+                "secret_scanner_sha256": sha256_of_file(secret_scanner_path),
+            }
+
+        source, included, excluded = build_filtered_zip(output=output, root=root, source_sha=source_sha, extra_files=extra_files)
+    except (GitDiscoveryError, DirtySourceError, WheelhouseIntegrityError, MigrationHeadError) as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False, indent=2))
         return 2
 
     findings = scan_zip(output)
+
+    if full_build_extras is not None:
+        try:
+            secret_scan_result = scan_assembled_tree_for_secrets(output)
+        except SecretScanError as exc:
+            output.unlink(missing_ok=True)
+            print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False, indent=2))
+            return 2
+        full_build_extras.update(secret_scan_result)
+
     manifest_path, sha256sums_path = _default_sidecar_paths(output)
     sha_pairs = compute_sha256_manifest(output)
     sha256sums_path.write_text(sha256sums_text(sha_pairs), encoding="utf-8", newline="\n")
+
+    if full_build_extras is not None:
+        full_build_extras["package_file_count"] = len(included)
+        full_build_extras["package_integrity_identity_sha256"] = hashlib.sha256(
+            sha256sums_text(sha_pairs).encode("utf-8")
+        ).hexdigest()
 
     manifest = write_manifest(
         manifest_path=manifest_path,
@@ -463,6 +746,7 @@ def main(argv: list[str] | None = None) -> int:
         included=included,
         excluded=excluded,
         sha256sums_filename=sha256sums_path.name,
+        full_build=full_build_extras,
     )
 
     report_dir = root / "reports" / "quality"

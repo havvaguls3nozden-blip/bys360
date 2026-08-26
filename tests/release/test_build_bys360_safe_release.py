@@ -622,3 +622,312 @@ def test_verify_missing_manifest_fails(tmp_path):
     with zipfile.ZipFile(fake_zip, "w") as zf:
         zf.writestr("app/__init__.py", b"x")
     assert _verify(fake_zip) != 0
+
+
+# ---------------------------------------------------------------------------
+# FULL build mode (candidate/cutover/rollback architecture wave, 2026-08-25):
+# opt-in wheelhouse bundling + manifest schema_version=3. Every test above
+# this point exercises the legacy path with zero new flags and must keep
+# passing unchanged -- these new tests exercise only the new, additive path.
+# ---------------------------------------------------------------------------
+
+import hashlib as _hashlib  # noqa: E402
+
+
+def _write_migration(root: Path, revision: str, down_revision: str | None) -> None:
+    versions_dir = root / "migrations" / "versions"
+    versions_dir.mkdir(parents=True, exist_ok=True)
+    (versions_dir / f"{revision}_test.py").write_text(
+        f'revision = "{revision}"\ndown_revision = {down_revision!r}\n'
+        "def upgrade(): pass\ndef downgrade(): pass\n",
+        encoding="utf-8",
+    )
+
+
+def _make_wheelhouse_fixture(tmp_path: Path) -> tuple[Path, Path]:
+    """Two tiny fake wheels + a matching, genuinely-'ok' build report --
+    mirrors the real shape scripts/release/build_bys360_wheelhouse.py
+    produces (same field names), without needing a real 51MB wheelhouse in
+    a unit test."""
+    wheelhouse_dir = tmp_path / "build" / "wheelhouse"
+    wheelhouse_dir.mkdir(parents=True)
+    manifest_entries = []
+    for name, version, content in (
+        ("fakepkg_a", "1.0.0", b"fake wheel a content"),
+        ("fakepkg_b", "2.0.0", b"fake wheel b content"),
+    ):
+        filename = f"{name}-{version}-py3-none-any.whl"
+        (wheelhouse_dir / filename).write_bytes(content)
+        manifest_entries.append({
+            "name": name, "version": version, "filename": filename,
+            "sha256": _hashlib.sha256(content).hexdigest(),
+            "size_bytes": len(content), "pytag": "py3", "abitag": "none", "platform": "any",
+        })
+    report = {
+        "package": "TEST_WHEELHOUSE_BUILDER", "generated_at": "2026-08-25T00:00:00",
+        "wheel_count": len(manifest_entries),
+        "total_bytes": sum(e["size_bytes"] for e in manifest_entries),
+        "wheelhouse_identity_sha256": "0" * 64,
+        "manifest": manifest_entries, "ok": True,
+    }
+    report_path = tmp_path / "reports" / "quality" / "BYS360_WHEELHOUSE_BUILD_REPORT.json"
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+    return wheelhouse_dir, report_path
+
+
+def _full_build_repo(tmp_path: Path) -> tuple[Path, str]:
+    root = tmp_path / "full_repo"
+    files = dict(BASE_FILES)
+    # BASE_FILES' migrations/versions/0001_init.py is a placeholder comment,
+    # not a real Alembic revision file (no revision/down_revision
+    # attributes) -- resolve_migration_head() needs a genuine one instead.
+    del files["migrations/versions/0001_init.py"]
+    files["scripts/windows/prepare_bys360_candidate.ps1"] = b"# candidate\n"
+    files["scripts/windows/cutover_bys360_candidate.ps1"] = b"# cutover\n"
+    files["scripts/windows/rollback_bys360_candidate.ps1"] = b"# rollback\n"
+    files["scripts/release/scan_bys360_release_secrets.py"] = b"# scanner\n"
+    files["requirements.lock"] = b"fakepkg-a==1.0.0\nfakepkg-b==2.0.0\n"
+    _init_repo(root, files)
+    _write_migration(root, "abc123", None)
+    sha = _commit_all(root, "add migration")
+    _make_wheelhouse_fixture(root)
+    return root, sha
+
+
+def _full_build(root: Path, output: Path, *, source_sha: str | None = None) -> int:
+    argv = ["--root", str(root), "--output", str(output), "--wheelhouse-dir", str(root / "build" / "wheelhouse")]
+    if source_sha is not None:
+        argv += ["--source-sha", source_sha]
+    return builder.main(argv)
+
+
+def test_full_build_bundles_wheelhouse_and_produces_schema_v3_manifest(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    output = tmp_path / "full1.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+
+    names = _names(output)
+    assert "wheelhouse/fakepkg_a-1.0.0-py3-none-any.whl" in names
+    assert "wheelhouse/fakepkg_b-2.0.0-py3-none-any.whl" in names
+    assert "requirements.lock" in names
+
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == 3
+    assert manifest["migration_head"] == "abc123"
+    assert manifest["python_requirement"] == "3.12"
+    assert manifest["platform_target"] == "win_amd64"
+    assert manifest["wheelhouse_file_count"] == 2
+    assert manifest["wheelhouse_total_bytes"] > 0
+    assert manifest["wheelhouse_identity_sha256"] == "0" * 64
+    assert len(manifest["requirements_lock_sha256"]) == 64
+    assert len(manifest["candidate_script_sha256"]) == 64
+    assert len(manifest["cutover_script_sha256"]) == 64
+    assert len(manifest["rollback_script_sha256"]) == 64
+    assert len(manifest["secret_scanner_sha256"]) == 64
+    assert len(manifest["package_integrity_identity_sha256"]) == 64
+    assert manifest["package_file_count"] == manifest["included_count"]
+    assert manifest["source_short_sha"] == sha[:12]
+
+
+def test_full_build_rejects_missing_wheel(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    next((root / "build" / "wheelhouse").glob("fakepkg_a*")).unlink()
+    output = tmp_path / "full_missing.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+    assert not output.exists()
+
+
+def test_full_build_rejects_extra_unexpected_wheel(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    (root / "build" / "wheelhouse" / "unexpected-9.9.9-py3-none-any.whl").write_bytes(b"intruder")
+    output = tmp_path / "full_extra.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+
+
+def test_full_build_rejects_tampered_wheel_hash(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    victim = next((root / "build" / "wheelhouse").glob("fakepkg_a*"))
+    victim.write_bytes(victim.read_bytes() + b"TAMPERED")
+    output = tmp_path / "full_tampered.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+
+
+def test_full_build_rejects_missing_wheelhouse_report(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    (root / "reports" / "quality" / "BYS360_WHEELHOUSE_BUILD_REPORT.json").unlink()
+    output = tmp_path / "full_noreport.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+
+
+def test_full_build_rejects_not_ok_wheelhouse_report(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    report_path = root / "reports" / "quality" / "BYS360_WHEELHOUSE_BUILD_REPORT.json"
+    report = json.loads(report_path.read_text(encoding="utf-8"))
+    report["ok"] = False
+    report_path.write_text(json.dumps(report), encoding="utf-8")
+    output = tmp_path / "full_notok.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+
+
+def test_full_build_verify_accepts_schema_v3(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    output = tmp_path / "full_verify.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    assert _verify(output, expected_source_sha=sha) == 0
+
+
+def test_full_build_verify_rejects_wheelhouse_file_count_tamper(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    output = tmp_path / "full_verify_tamper.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["wheelhouse_file_count"] = 999
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    assert _verify(output, expected_source_sha=sha) != 0
+
+
+def test_full_build_deterministic_repeat(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    output1 = tmp_path / "full_det1.zip"
+    output2 = tmp_path / "full_det2.zip"
+    assert _full_build(root, output1, source_sha=sha) == 0
+    assert _full_build(root, output2, source_sha=sha) == 0
+    assert output1.read_bytes() == output2.read_bytes()
+
+    m1_path, s1_path = _sidecars(output1)
+    m2_path, s2_path = _sidecars(output2)
+    m1 = json.loads(m1_path.read_text(encoding="utf-8"))
+    m2 = json.loads(m2_path.read_text(encoding="utf-8"))
+    for key in m1:
+        if key in ("generated_at", "sha256sums_file"):  # filename-derived, expected to differ across output names
+            continue
+        assert m1[key] == m2[key], f"manifest field diverged across identical builds: {key}"
+    assert s1_path.read_text(encoding="utf-8") == s2_path.read_text(encoding="utf-8")
+
+
+def test_legacy_build_without_wheelhouse_flag_stays_schema_v2(repo, tmp_path):
+    root, sha = repo
+    output = tmp_path / "legacy_still_v2.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["schema_version"] == 2
+    assert "wheelhouse_file_count" not in manifest
+    assert "wheelhouse/" not in " ".join(_names(output))
+
+
+# ---------------------------------------------------------------------------
+# Automatic assembled-release secret gate (schema-contract-drift wave
+# close-out, 2026-08-25, section 5-7: "SECRET SCANNING MUST NOT REMAIN
+# MANUAL ONLY"). scan_bys360_release_secrets.py is now wired directly into
+# the FULL build path -- run_assembled_tree_secret_scan() extracts the
+# just-built zip to a temp dir and scans THAT (the actual bytes that would
+# ship), not the source tree. Real fixtures use only synthetic, clearly-fake
+# secret material (never anything resembling a real credential).
+# ---------------------------------------------------------------------------
+
+def _full_build_repo_with_extra_files(tmp_path: Path, extra_files: dict[str, bytes]) -> tuple[Path, str]:
+    """Same shape as _full_build_repo(), plus caller-supplied extra tracked
+    files (used to plant secret-shaped or false-positive-shaped content in
+    a specific file for one test, without duplicating the whole fixture)."""
+    root = tmp_path / "full_repo"
+    files = dict(BASE_FILES)
+    del files["migrations/versions/0001_init.py"]
+    files["scripts/windows/prepare_bys360_candidate.ps1"] = b"# candidate\n"
+    files["scripts/windows/cutover_bys360_candidate.ps1"] = b"# cutover\n"
+    files["scripts/windows/rollback_bys360_candidate.ps1"] = b"# rollback\n"
+    files["scripts/release/scan_bys360_release_secrets.py"] = b"# scanner\n"
+    files["requirements.lock"] = b"fakepkg-a==1.0.0\nfakepkg-b==2.0.0\n"
+    files.update(extra_files)
+    _init_repo(root, files)
+    _write_migration(root, "abc123", None)
+    sha = _commit_all(root, "add migration")
+    _make_wheelhouse_fixture(root)
+    return root, sha
+
+
+def test_full_build_secret_gate_passes_on_clean_repo(tmp_path):
+    root, sha = _full_build_repo(tmp_path)
+    output = tmp_path / "secretgate_clean.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["secret_scan_status"] == "PASS"
+    assert manifest["secret_scan_findings"] == 0
+    assert manifest["secret_scan_scope"] == "assembled_release_tree"
+
+
+def test_full_build_secret_gate_rejects_planted_secret_key(tmp_path):
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {
+        "app/planted_config.py": (
+            b"SECRET_KEY = 'kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0'\n"
+        ),
+    })
+    output = tmp_path / "secretgate_secret_key.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+    assert not output.exists(), "a package that fails the secret gate must never be left on disk as a deliverable"
+
+
+def test_full_build_secret_gate_rejects_planted_database_url_password(tmp_path):
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {
+        "app/planted_settings.py": (
+            b"DATABASE_URL = 'postgresql://bys360_user:Tr0ub4dor-Genuine-Secret@dbhost.internal:5432/bys360'\n"
+        ),
+    })
+    output = tmp_path / "secretgate_db_url.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+    assert not output.exists()
+
+
+def test_full_build_secret_gate_rejects_planted_api_token(tmp_path):
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {
+        "app/planted_integration.py": (
+            b"GITHUB_TOKEN = 'ghp_abcdefghijklmnopqrstuvwxyz0123456789AB'\n"
+        ),
+    })
+    output = tmp_path / "secretgate_token.zip"
+    assert _full_build(root, output, source_sha=sha) == 2
+    assert not output.exists()
+
+
+def test_full_build_secret_gate_does_not_false_positive_on_powershell_variable_interpolation(tmp_path):
+    """The exact class of false positive this scanner's is_placeholder()
+    was written to avoid (see scan_bys360_release_secrets.py's docstring,
+    which cites these very deploy/candidate scripts): a runtime-constructed
+    connection string using PowerShell variable interpolation is CODE, not
+    a literal secret, and must not fail the gate."""
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {
+        "scripts/windows/prepare_bys360_candidate.ps1": (
+            b"# candidate\n"
+            b'$shadowUrl = "postgresql://$($DbConn.User):$($DbConn.Password)@$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName"\n'
+        ),
+    })
+    output = tmp_path / "secretgate_ps_interpolation.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["secret_scan_status"] == "PASS"
+    assert manifest["secret_scan_findings"] == 0
+
+
+def test_full_build_secret_gate_allows_env_example_placeholder(tmp_path):
+    """A value-free .env.example template (explicitly allowlisted by exact
+    basename in both this builder and scan_bys360_release_secrets.py) must
+    not fail the gate even though it contains SECRET_KEY=/DATABASE_URL=
+    -shaped lines -- they are documentation placeholders, not real values."""
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {
+        ".env.example": (
+            b"SECRET_KEY=change_me_before_production\n"
+            b"DATABASE_URL=sqlite:///instance/bys360_local_dev.sqlite3\n"
+        ),
+    })
+    output = tmp_path / "secretgate_env_example.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    manifest_path, _ = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["secret_scan_status"] == "PASS"
+    assert manifest["secret_scan_findings"] == 0
+    assert ".env.example" in _names(output)

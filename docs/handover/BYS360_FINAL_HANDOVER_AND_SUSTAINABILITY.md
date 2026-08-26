@@ -11,6 +11,32 @@ Last Production Validation: 2026-08-24
 Handover Status: READY
 ```
 
+> **Revizyon terminolojisi netleştirmesi (2026-08-25 eklendi — el kitabının ilerleyen
+> bölümlerinde `e0efcd07abf7`/`10858a18e9ac` bir arada geçtiğinde karışıklığı önlemek için):**
+> yukarıdaki başlık bloğundaki `Database Revision: e0efcd07abf7` alanı, o zamanki **son
+> doğrulanmış canlı üretim dağıtımının** (`Production Source SHA: cb2e57c...`) veritabanı
+> revizyonudur — repository'nin migration zincirinin o anki en son (head) revizyonu
+> **değildir**. Karışıklığı önlemek için üç ayrı, açıkça adlandırılmış değer kullanılmalıdır:
+> - **`PRODUCTION_CURRENT_DB_REVISION`** — canlı üretim veritabanının fiilen bulunduğu
+>   revizyon. Bu belgenin başlığı bunu `e0efcd07abf7` olarak kaydeder (OPERATOR-ATTESTED; bu
+>   oturumun canlıya doğrudan erişimi yoktur).
+> - **`FILE_CENTER_MIGRATION_REVISION`** — Dosya Merkezi'nin 19 tablosunu Alembic'e dahil eden
+>   sabit tarihsel migration: `10858a18e9ac`. §34.7'deki "HISTORICAL/RESOLVED" ibaresi bu
+>   migration'ın **repository'nin migration zincirinde zaten tanımlı olduğu** anlamına gelir
+>   — canlı veritabanının fiilen bu revizyona **dağıtıldığı** anlamına gelmez; o adım ayrı bir
+>   cutover'ın konusudur.
+> - **`RELEASE_TARGET_DB_REVISION`** — hazırlanmakta olan güncel release'in migration zinciri
+>   head'i. Bu, candidate/cutover araçlarında (`prepare_bys360_candidate.ps1`) hiçbir yerde
+>   sabit kodlanmamıştır; her zaman gerçek migration zincirinden dinamik olarak çözümlenir.
+>   2026-08-25 itibarıyla, bu worktree'de `flask db heads` ile doğrudan doğrulanan güncel
+>   değer `c51c29032d4f`'dir (schema-contract drift kapatma migration'ı, ayrıntı:
+>   `docs/handover/DATABASE_MIGRATION.md`). Bu değer yeni migration eklendikçe değişir —
+>   kalıcı bir gerçek olarak değil, kontrol talimatı olarak okuyun.
+>
+> Bu belgenin geri kalanındaki `10858a18e9ac` referansları (§34.7 ve ilgili bölümler) repo'nun
+> migration zincirine dahil edilme tarihini doğru şekilde anlatır ve **değiştirilmemiştir** —
+> yalnızca yukarıdaki üç terim ile hangi "revizyon"dan bahsedildiğini netleştiriniz.
+
 **Bu belge kimdir için yazıldı:** Bu dosyayı ve repository'yi teslim alan yeni bir profesyonel geliştirici, sistem yöneticisi veya dış firma — bu sohbete, önceki geliştiriciye, ya da başka bir AI asistanına erişimi olmadan — BYS360'ı anlayabilmeli, kurabilmeli, test edebilmeli, geliştirebilmeli, release üretebilmeli, canlıya güvenli şekilde deploy edebilmeli ve bir sonraki kişiye devredebilmelidir.
 
 **Kanıt disiplini notu (bu belgenin kendi metodolojisi):** Bu belgedeki her iddia iki kategoriden birine aittir ve açıkça öyle işaretlenmiştir:
