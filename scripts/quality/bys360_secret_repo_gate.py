@@ -289,6 +289,21 @@ def looks_placeholder(value: str) -> bool:
         return True
     if lower.startswith("${") or lower.startswith("%") or lower.startswith("os.environ"):
         return True
+    # BYS360 secret-gate PowerShell-placeholder fix (2026-08-26): a value
+    # starting with "$" is a PowerShell variable/expression reference
+    # ($($DbConn.Password), $env:FOO, $shadowUrl, ...) -- CODE building a
+    # value at runtime, never a literal secret sitting in source. Mirrors
+    # the identical, already-shipped fix in the release-package scanner
+    # (scripts/release/scan_bys360_release_secrets.py, is_placeholder():
+    # `if v.startswith("$"): return True`), found there against this exact
+    # scripts/windows/prepare_bys360_candidate.ps1 / deploy_bys360_ec4e56b_
+    # production_v*.ps1 shape (`$shadowUrl = "postgresql://$($DbConn.User):
+    # $($DbConn.Password)@..."`). Scoped narrowly to a leading "$" -- a real
+    # credential value (e.g. "hunter2", "MyRealPassword123") never
+    # legitimately starts with a bare "$" character, so this does not widen
+    # detection past PowerShell/shell variable-reference syntax.
+    if v.startswith("$"):
+        return True
     if "<" in v and ">" in v:
         return True
     # BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): real API

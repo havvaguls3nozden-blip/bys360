@@ -188,16 +188,16 @@ def verify_wheelhouse(
             )
 
         actual_hash = sha256_of(wheel)
-        req = expected_hashes.get(actual_hash.lower())
-        if req is None:
+        matched_req = expected_hashes.get(actual_hash.lower())
+        if matched_req is None:
             raise VerificationError(
                 f"{wheel.name}: sha256={actual_hash} kilit dosyasindaki hicbir gereksinimle eslesmiyor"
             )
-        matched_reqs.add(id(req))
+        matched_reqs.add(id(matched_req))
         manifest.append(
             {
-                "name": req.name,
-                "version": req.version,
+                "name": matched_req.name,
+                "version": matched_req.version,
                 "filename": wheel.name,
                 "sha256": actual_hash,
                 "size_bytes": wheel.stat().st_size,
@@ -255,7 +255,14 @@ def build(
 
     manifest = verify_wheelhouse(output, requirements, platform)
     identity = wheelhouse_identity(manifest)
-    total_bytes = sum(int(row["size_bytes"]) for row in manifest)
+    total_bytes = 0
+    for row in manifest:
+        row_size = row["size_bytes"]
+        if not isinstance(row_size, int):
+            raise WheelhouseBuildError(
+                f"manifest kaydinda beklenmeyen size_bytes turu: {type(row_size).__name__}"
+            )
+        total_bytes += row_size
 
     result = {
         "package": PACKAGE,

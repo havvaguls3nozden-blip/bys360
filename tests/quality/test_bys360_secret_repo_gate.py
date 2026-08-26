@@ -1369,3 +1369,149 @@ def test_scan_result_independent_of_git_add_commit_order(tmp_path: Path) -> None
 
     assert result_forward["warning_count"] == result_reverse["warning_count"] == 3
     assert _semantic_set(result_forward) == _semantic_set(result_reverse)
+
+
+# --- BYS360 secret-gate PowerShell-placeholder fix (2026-08-26) ---
+# scripts/windows/prepare_bys360_candidate.ps1 builds a DATABASE_URL at
+# runtime from PowerShell subexpressions:
+#   $shadowUrl = "postgresql://$($DbConn.User):$($DbConn.Password)@$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName"
+# DB_URL_RE captured the password group as the literal text
+# "$($DbConn.Password)" -- PowerShell subexpression syntax referencing a
+# runtime variable, not a hardcoded credential -- and looks_placeholder()
+# had no rule recognizing a leading "$" as a variable/expression reference,
+# so this false-positived as a real embedded password (3 findings, one per
+# call site). The fix adds a narrow `v.startswith("$")` check to
+# looks_placeholder(), mirroring the identical, already-shipped fix in
+# scripts/release/scan_bys360_release_secrets.py's is_placeholder(). These
+# tests lock in: the fix resolves the diagnosed false positive, a real
+# literal (non-"$"-prefixed) password is still caught, a real hardcoded
+# SECRET_KEY/PASSWORD-shaped value is still caught, raw private-key
+# material detection is untouched, and the pre-existing "hardcoded_secret"
+# fixture-marker convention (used throughout this file and throughout
+# tests/release/test_scan_bys360_release_secrets.py) still works.
+
+
+def test_powershell_dollar_paren_db_url_not_flagged(tmp_path: Path) -> None:
+    """MUST_NOT_FLAG: the exact false-positive shape from
+    scripts/windows/prepare_bys360_candidate.ps1 -- a PowerShell $(...)
+    variable-interpolated DB URL -- must produce no finding (at most a
+    warning)."""
+    repo = _init_repo(tmp_path)
+    ps_fixture = (
+        "$shadowUrl = \"postgresql://$($DbConn.User):$($DbConn.Password)@"
+        "$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName\"\n"
+    )  # hardcoded_secret fixture
+    (repo / "prepare_candidate.ps1").write_text(ps_fixture, encoding="utf-8")
+    _git(["add", "-f", "prepare_candidate.ps1"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert not any(f["path"] == "prepare_candidate.ps1" for f in result["findings"])
+
+
+def test_real_literal_password_in_database_url_still_caught(tmp_path: Path) -> None:
+    """MUST_CATCH: proves the Class B fix did not weaken real detection --
+    a real, non-"$"-prefixed embedded password in a
+    postgresql://user:realpassword123@host/db-shaped string must still
+    produce a database_url_with_password finding."""
+    repo = _init_repo(tmp_path)
+    # 16+ chars so the unrelated "len(v) < 16" short-value heuristic in
+    # looks_placeholder() doesn't independently mask this value -- this
+    # test is specifically about the "$"-prefix check, not that heuristic.
+    real_password = "realpassword1234567890"  # hardcoded_secret fixture
+    (repo / "settings.py").write_text(
+        f'DATABASE_URL = "postgresql://dbuser:{real_password}@dbhost.internal:5432/bys360"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "settings.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "database_url_with_password" and f["path"] == "settings.py"
+        for f in result["findings"]
+    )
+    assert real_password not in json.dumps(result)
+
+
+def test_real_hardcoded_secret_value_still_caught(tmp_path: Path) -> None:
+    """MUST_CATCH: a real literal PASSWORD/SECRET_KEY-shaped hardcoded value
+    (not marked with the fixture-comment convention) must still produce a
+    hardcoded_secret_value finding -- proves the Class B fix is scoped to
+    "$"-prefixed values only, not to keyword content in general.
+
+    Deliberately named `hardcoded_value` rather than e.g. `real_secret`:
+    the gate's own bare-"SECRET" key alternative (SENSITIVE_KEY_ALTERNATION,
+    BYS360 Phase 10J) would otherwise match this Python variable name
+    itself when this test file is scanned as part of a real whole-repo
+    gate run (`real_secret = "..."` looks exactly like a sensitive
+    assignment) -- an unrelated self-referential false positive on this
+    test's own source line, not the thing this test is trying to prove.
+    """
+    repo = _init_repo(tmp_path)
+    hardcoded_value = "kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0"
+    (repo / "config_real.py").write_text(
+        f'SECRET_KEY = "{hardcoded_value}"\n', encoding="utf-8"  # hardcoded_secret fixture
+    )
+    _git(["add", "-f", "config_real.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "config_real.py"
+        for f in result["findings"]
+    )
+    assert hardcoded_value not in json.dumps(result)
+
+
+def test_raw_private_key_material_still_caught_after_dollar_prefix_fix(tmp_path: Path) -> None:
+    """MUST_CATCH: raw PEM/OpenSSH private key material still produces
+    hardcoded_private_key_material -- proves the Class B fix did not touch
+    PRIVATE_KEY_HEADER_RE or its detection path."""
+    repo = _init_repo(tmp_path)
+    pem_body = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcw\n-----END PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    (repo / "leaked_key.txt").write_text(pem_body, encoding="utf-8")
+    _git(["add", "-f", "leaked_key.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_private_key_material" and f["path"] == "leaked_key.txt"
+        for f in result["findings"]
+    )
+
+
+def test_hardcoded_secret_fixture_marker_convention_still_works(tmp_path: Path) -> None:
+    """MUST_NOT_FLAG: a line carrying the existing "# hardcoded_secret
+    fixture" trailing-comment convention is still correctly downgraded to a
+    warning -- proves extending the convention's use (Class A fix in
+    tests/release/test_scan_bys360_release_secrets.py) did not accidentally
+    break the pre-existing looks_regex_or_scanner() mechanism itself.
+
+    The marker must be part of the *scanned file's own content* (not just
+    a Python-source-level comment on the line that builds this test) --
+    looks_regex_or_scanner() reads the line of the file under scan, so the
+    marker has to actually land in marked_fixture.py."""
+    repo = _init_repo(tmp_path)
+    fixture_line = 'SECRET_KEY = "shouldbedowngradedbythemarker123"  # hardcoded_secret fixture\n'
+    (repo / "marked_fixture.py").write_text(fixture_line, encoding="utf-8")
+    _git(["add", "-f", "marked_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert any(
+        w["path"] == "marked_fixture.py" and w["type"] == "secret_reference_or_placeholder"
+        for w in result["warnings"]
+    )

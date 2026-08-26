@@ -652,12 +652,14 @@ def _make_wheelhouse_fixture(tmp_path: Path) -> tuple[Path, Path]:
     wheelhouse_dir = tmp_path / "build" / "wheelhouse"
     wheelhouse_dir.mkdir(parents=True)
     manifest_entries = []
+    total_size = 0
     for name, version, content in (
         ("fakepkg_a", "1.0.0", b"fake wheel a content"),
         ("fakepkg_b", "2.0.0", b"fake wheel b content"),
     ):
         filename = f"{name}-{version}-py3-none-any.whl"
         (wheelhouse_dir / filename).write_bytes(content)
+        total_size += len(content)
         manifest_entries.append({
             "name": name, "version": version, "filename": filename,
             "sha256": _hashlib.sha256(content).hexdigest(),
@@ -666,7 +668,7 @@ def _make_wheelhouse_fixture(tmp_path: Path) -> tuple[Path, Path]:
     report = {
         "package": "TEST_WHEELHOUSE_BUILDER", "generated_at": "2026-08-25T00:00:00",
         "wheel_count": len(manifest_entries),
-        "total_bytes": sum(e["size_bytes"] for e in manifest_entries),
+        "total_bytes": total_size,
         "wheelhouse_identity_sha256": "0" * 64,
         "manifest": manifest_entries, "ok": True,
     }
@@ -863,7 +865,7 @@ def test_full_build_secret_gate_passes_on_clean_repo(tmp_path):
 def test_full_build_secret_gate_rejects_planted_secret_key(tmp_path):
     root, sha = _full_build_repo_with_extra_files(tmp_path, {
         "app/planted_config.py": (
-            b"SECRET_KEY = 'kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0'\n"
+            b"SECRET_KEY = 'kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0'\n"  # hardcoded_secret fixture
         ),
     })
     output = tmp_path / "secretgate_secret_key.zip"
@@ -874,7 +876,7 @@ def test_full_build_secret_gate_rejects_planted_secret_key(tmp_path):
 def test_full_build_secret_gate_rejects_planted_database_url_password(tmp_path):
     root, sha = _full_build_repo_with_extra_files(tmp_path, {
         "app/planted_settings.py": (
-            b"DATABASE_URL = 'postgresql://bys360_user:Tr0ub4dor-Genuine-Secret@dbhost.internal:5432/bys360'\n"
+            b"DATABASE_URL = 'postgresql://bys360_user:Tr0ub4dor-Genuine-Secret@dbhost.internal:5432/bys360'\n"  # hardcoded_secret fixture
         ),
     })
     output = tmp_path / "secretgate_db_url.zip"
@@ -885,7 +887,7 @@ def test_full_build_secret_gate_rejects_planted_database_url_password(tmp_path):
 def test_full_build_secret_gate_rejects_planted_api_token(tmp_path):
     root, sha = _full_build_repo_with_extra_files(tmp_path, {
         "app/planted_integration.py": (
-            b"GITHUB_TOKEN = 'ghp_abcdefghijklmnopqrstuvwxyz0123456789AB'\n"
+            b"GITHUB_TOKEN = 'ghp_abcdefghijklmnopqrstuvwxyz0123456789AB'\n"  # hardcoded_secret fixture
         ),
     })
     output = tmp_path / "secretgate_token.zip"
@@ -902,7 +904,7 @@ def test_full_build_secret_gate_does_not_false_positive_on_powershell_variable_i
     root, sha = _full_build_repo_with_extra_files(tmp_path, {
         "scripts/windows/prepare_bys360_candidate.ps1": (
             b"# candidate\n"
-            b'$shadowUrl = "postgresql://$($DbConn.User):$($DbConn.Password)@$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName"\n'
+            b'$shadowUrl = "postgresql://$($DbConn.User):$($DbConn.Password)@$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName"\n'  # hardcoded_secret fixture
         ),
     })
     output = tmp_path / "secretgate_ps_interpolation.zip"

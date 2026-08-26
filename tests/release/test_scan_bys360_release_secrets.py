@@ -48,37 +48,37 @@ def _scan_text(tmp_path: Path, text: str, name: str = "sample.py"):
 # ---------------------------------------------------------------------------
 
 def test_real_secret_key_assignment_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'SECRET_KEY = "kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0"\n')
+    findings, _ = _scan_text(tmp_path, 'SECRET_KEY = "kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0"\n')  # hardcoded_secret fixture
     assert any(f.category == "secret_key" for f in findings)
 
 
 def test_real_api_key_assignment_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'API_KEY = "z9Xk3mQ7wR2vL8nT5pJ4bF6hY1sA0eC9dK"\n')
+    findings, _ = _scan_text(tmp_path, 'API_KEY = "z9Xk3mQ7wR2vL8nT5pJ4bF6hY1sA0eC9dK"\n')  # hardcoded_secret fixture
     assert any(f.category in ("api_token", "generic_high_entropy") for f in findings)
 
 
 def test_real_api_token_assignment_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'API_TOKEN = "tK9mZ3xQ7wR2vL8nJ4bF6hY1sA0eC9dP5"\n')
+    findings, _ = _scan_text(tmp_path, 'API_TOKEN = "tK9mZ3xQ7wR2vL8nJ4bF6hY1sA0eC9dP5"\n')  # hardcoded_secret fixture
     assert any(f.category in ("api_token", "generic_high_entropy") for f in findings)
 
 
 def test_synthetic_openai_style_key_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'OPENAI_API_KEY = "sk-abcdefghijklmnopqrstuvwxyzABCDEFGH1234"\n')
+    findings, _ = _scan_text(tmp_path, 'OPENAI_API_KEY = "sk-abcdefghijklmnopqrstuvwxyzABCDEFGH1234"\n')  # hardcoded_secret fixture
     assert any(f.category in ("api_token", "generic_high_entropy") for f in findings)
 
 
 def test_synthetic_github_token_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'GITHUB_TOKEN = "ghp_abcdefghijklmnopqrstuvwxyz0123456789AB"\n')
+    findings, _ = _scan_text(tmp_path, 'GITHUB_TOKEN = "ghp_abcdefghijklmnopqrstuvwxyz0123456789AB"\n')  # hardcoded_secret fixture
     assert any(f.category == "api_token" and "github_token" in f.rule_id.lower() for f in findings)
 
 
 def test_database_url_with_real_password_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'DATABASE_URL = "postgresql://bys360_user:Tr0ub4dor-Genuine-Secret@dbhost.internal:5432/bys360"\n')
+    findings, _ = _scan_text(tmp_path, 'DATABASE_URL = "postgresql://bys360_user:Tr0ub4dor-Genuine-Secret@dbhost.internal:5432/bys360"\n')  # hardcoded_secret fixture
     assert any(f.category == "database_url" for f in findings)
 
 
 def test_mail_password_still_caught(tmp_path):
-    findings, _ = _scan_text(tmp_path, 'MAIL_PASSWORD = "hK7mQ3xW9vR2nL8bJ4pF6dY1sA0eC9tZ5"\n')
+    findings, _ = _scan_text(tmp_path, 'MAIL_PASSWORD = "hK7mQ3xW9vR2nL8bJ4pF6dY1sA0eC9tZ5"\n')  # hardcoded_secret fixture
     assert any(f.category == "password" for f in findings)
 
 
@@ -94,7 +94,7 @@ def test_private_key_header_still_caught(tmp_path):
 def test_jwt_like_secret_still_caught(tmp_path):
     findings, _ = _scan_text(
         tmp_path,
-        'token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dQw4w9WgXcQmZ8vRb2Nc3Ef4Gh5Ij6Kl7Mn"\n',
+        'token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dQw4w9WgXcQmZ8vRb2Nc3Ef4Gh5Ij6Kl7Mn"\n',  # hardcoded_secret fixture
     )
     assert any(f.rule_id == "KNOWN_FORMAT_JWT_LIKE" for f in findings)
 
