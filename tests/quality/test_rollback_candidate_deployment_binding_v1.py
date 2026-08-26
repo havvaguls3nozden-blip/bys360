@@ -61,6 +61,30 @@ ROLLBACK_SCRIPT = ROOT / "scripts" / "windows" / "rollback_bys360_candidate.ps1"
 # executes automatically.
 AUTO_INVOKE_MARKER = "try {\n    Main\n    exit 0\n} catch {"
 
+# The stable text marking the start of the top-level (non-function) global
+# state initialization block that sits between the param block and the
+# first function definition. That block includes
+# `$Script:DeployLogDir = Join-Path $DeployLogsRoot "rollback_..."`, which
+# uses $DeployLogsRoot's Windows-only default ("C:\bys360\deploy_logs").
+# Dot-sourcing a PowerShell script executes ALL top-level statements
+# immediately -- not just function bodies -- so that Join-Path call runs
+# the instant the extracted slice is dot-sourced, and throws
+# `Join-Path: Cannot find drive...` on non-Windows pwsh hosts (e.g.
+# GitHub's ubuntu-latest CI runner) before any test gets anywhere near
+# Assert-ActiveDeploymentBinding. This state is never actually needed:
+# _run_binding_gate() below reassigns $Script:DeployLogDir / $LogFile /
+# $Receipt itself right after dot-sourcing, and $Script:DeployId is not
+# referenced by Assert-ActiveDeploymentBinding or anything it calls. So
+# _function_defs_only() excludes this block entirely -- see there.
+GLOBAL_STATE_BLOCK_MARKER = (
+    "# =====================================================================\n"
+    "# Global state / logging / receipt helpers"
+)
+
+# The stable text marking the start of the first function definition, i.e.
+# where the excluded global-state block above ends.
+FIRST_FUNCTION_MARKER = "function Write-DeployLog {"
+
 CANDIDATE_SHA = "a" * 40
 PREVIOUS_SHA = "b" * 40
 
@@ -97,16 +121,39 @@ def _ps_single_quote(value: str) -> str:
 
 
 def _function_defs_only(tmp_path: Path) -> Path:
-    """Write a COPY of rollback_bys360_candidate.ps1, truncated immediately
-    before its trailing `try { Main; exit 0 } catch {...}` block, into
-    tmp_path. See module docstring for why. The real file on disk is only
-    ever read, never modified."""
+    """Write a COPY of rollback_bys360_candidate.ps1 into tmp_path, keeping
+    the param block + Set-StrictMode/$ErrorActionPreference + every
+    function DEFINITION, but EXCLUDING both the top-level global-state init
+    block (see GLOBAL_STATE_BLOCK_MARKER -- it contains a Windows-only
+    Join-Path call that would run immediately on dot-source) and the
+    trailing `try { Main; exit 0 } catch {...}` auto-invocation block. See
+    module docstring for why. The real file on disk is only ever read,
+    never modified."""
     text = ROLLBACK_SCRIPT.read_text(encoding="utf-8")
-    idx = text.index(AUTO_INVOKE_MARKER)
-    defs_only = text[:idx]
+
+    global_state_idx = text.index(GLOBAL_STATE_BLOCK_MARKER)
+    first_function_idx = text.index(FIRST_FUNCTION_MARKER)
+    auto_invoke_idx = text.index(AUTO_INVOKE_MARKER)
+    assert global_state_idx < first_function_idx < auto_invoke_idx, (
+        "Marker ordering assumption violated (expected global-state block "
+        "< first function < auto-invoke marker in source order) -- "
+        "extraction slice is wrong."
+    )
+
+    # Two concatenated pieces: everything up to (not including) the
+    # excluded global-state block, plus everything from the first function
+    # definition up to (not including) the auto-invoke block.
+    defs_only = text[:global_state_idx] + text[first_function_idx:auto_invoke_idx]
+
     assert "function Assert-ActiveDeploymentBinding" in defs_only, (
-        "Assert-ActiveDeploymentBinding definition not found before the "
-        "auto-invocation marker -- extraction slice is wrong."
+        "Assert-ActiveDeploymentBinding definition not found in the "
+        "extracted slice -- extraction is wrong."
+    )
+    assert "Join-Path $DeployLogsRoot" not in defs_only, (
+        "Extracted slice still contains the Windows-only "
+        "'$Script:DeployLogDir = Join-Path $DeployLogsRoot ...' top-level "
+        "statement -- this throws on non-Windows pwsh hosts the instant "
+        "the slice is dot-sourced. The global-state exclusion is broken."
     )
     out_path = tmp_path / "rollback_candidate_defs_only.ps1"
     out_path.write_text(defs_only, encoding="utf-8")
@@ -242,6 +289,72 @@ def test_auto_invoke_marker_present_in_real_script() -> None:
         "longer matches AUTO_INVOKE_MARKER -- update the marker in this "
         "test file so the function-extraction technique keeps working."
     )
+
+
+def test_global_state_block_markers_present_in_real_script() -> None:
+    """Static guard for the two markers _function_defs_only() uses to
+    excise the Windows-only top-level global-state init block (see
+    GLOBAL_STATE_BLOCK_MARKER docstring). Fails loudly, not silently, if
+    the real script's structure around that block ever changes."""
+    text = ROLLBACK_SCRIPT.read_text(encoding="utf-8")
+    assert GLOBAL_STATE_BLOCK_MARKER in text, (
+        "rollback_bys360_candidate.ps1's top-level global-state comment "
+        "block no longer matches GLOBAL_STATE_BLOCK_MARKER -- update the "
+        "marker in this test file so the function-extraction technique "
+        "keeps excluding the Windows-only init block."
+    )
+    assert FIRST_FUNCTION_MARKER in text, (
+        "rollback_bys360_candidate.ps1's first function definition "
+        "(Write-DeployLog) no longer matches FIRST_FUNCTION_MARKER -- "
+        "update the marker in this test file so the function-extraction "
+        "technique knows where the excluded init block ends."
+    )
+    assert text.index(GLOBAL_STATE_BLOCK_MARKER) < text.index(FIRST_FUNCTION_MARKER) < text.index(
+        AUTO_INVOKE_MARKER
+    ), (
+        "Marker ordering assumption violated (expected global-state block "
+        "< first function < auto-invoke marker in source order) -- "
+        "update _function_defs_only()'s extraction logic."
+    )
+
+
+def test_defs_only_excludes_windows_only_global_state_init(tmp_path: Path) -> None:
+    """Regression test for the real GitHub Actions ubuntu-latest CI
+    failure: the extraction used to be one contiguous slice
+    (text[:auto_invoke_idx]) that incidentally included the top-level
+    `$Script:DeployLogDir = Join-Path $DeployLogsRoot "rollback_..."`
+    statement. Dot-sourcing a PowerShell script runs ALL top-level
+    statements immediately -- not just function bodies -- so that
+    Join-Path call executed the instant the slice was dot-sourced.
+    $DeployLogsRoot defaults to "C:\\bys360\\deploy_logs" (Windows-only),
+    so on Linux/macOS pwsh (no C: PSDrive) this threw
+    `Join-Path: Cannot find drive. A drive with the name 'C' does not
+    exist.` before any test ever reached Assert-ActiveDeploymentBinding --
+    exactly what happened for all 10 tests in this file on
+    ubuntu-latest, every failure at
+    `rollback_candidate_defs_only.ps1:167`. Proves the fixed extraction
+    slice no longer contains that statement, while every function
+    definition Assert-ActiveDeploymentBinding needs (transitively) is
+    still present, unchanged."""
+    defs_path = _function_defs_only(tmp_path)
+    defs_only = defs_path.read_text(encoding="utf-8")
+
+    assert "Join-Path $DeployLogsRoot" not in defs_only
+    assert "$Script:DeployLogDir = Join-Path" not in defs_only
+    assert "$Script:DeployId = Get-Date" not in defs_only
+    assert "$Script:Receipt = [ordered]@{" not in defs_only
+
+    # Nothing else was lost: every function definition survives intact.
+    for func_name in (
+        "Write-DeployLog",
+        "Write-FailureReceipt",
+        "Invoke-FailClosed",
+        "Test-PreviousDirIdentity",
+        "Test-CurrentActiveIdentity",
+        "Assert-ActiveDeploymentBinding",
+        "Main",
+    ):
+        assert f"function {func_name} {{" in defs_only, f"function {func_name} missing from extracted slice"
 
 
 # ---------------------------------------------------------------------------
