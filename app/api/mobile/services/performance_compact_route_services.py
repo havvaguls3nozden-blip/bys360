@@ -57,12 +57,21 @@ def phase3c_mobile_performance_criteria_service(user: Any, deps: dict[str, Any])
 
 
 def phase3c_mobile_performance_in_period_notes_legacy_service(user: Any, deps: dict[str, Any]):
+    _has_global_scope = deps['_has_global_scope']
     _item = deps['_item']
     _metric = deps['_metric']
     _module_payload = deps['_module_payload']
     _v2852_items_from_models = deps['_v2852_items_from_models']
 
-    items = _v2852_items_from_models(['PerformanceInPeriodNote', 'PerformancePeriodNote', 'PerformanceObservationNote', 'PerformanceInterimFeedback', 'FeedbackActionPlan'], ['employee_name', 'title', 'subject', 'note_type'], ['note', 'description', 'body', 'observation'], ['status', 'note_type', 'state'], ['period_name', 'created_at', 'created_by_name'], ['value'], limit=100, progress=60)
+    # BYS360_SECURITY_FIX_DEFECT_O3: _v2852_items_from_models() runs a
+    # zero-filter, organization-wide query across every model in its list.
+    # There is no pre-existing scoped alternative for this exact legacy
+    # multi-model lookup, so non-global callers are routed straight to the
+    # existing empty-state placeholder instead of the unscoped shortcut.
+    # The already-correctly-scoped GET /performance/in-period-notes/v2 route
+    # (phase3c_mobile_performance_in_period_notes_v2853_service) remains the
+    # fully functional, unaffected successor to this legacy route.
+    items = _v2852_items_from_models(['PerformanceInPeriodNote', 'PerformancePeriodNote', 'PerformanceObservationNote', 'PerformanceInterimFeedback', 'FeedbackActionPlan'], ['employee_name', 'title', 'subject', 'note_type'], ['note', 'description', 'body', 'observation'], ['status', 'note_type', 'state'], ['period_name', 'created_at', 'created_by_name'], ['value'], limit=100, progress=60) if _has_global_scope(user) else []
     if not items:
         items = [_item('note-empty', 'Dönem içi not kaydı bulunmadı', 'Olumlu/olumsuz olay, başarı, gelişim ihtiyacı veya genel gözlem notu oluştuğunda burada görünür.', 'Bilgi', 'Puanı otomatik üretmez', '', 35)]
     return _module_payload([

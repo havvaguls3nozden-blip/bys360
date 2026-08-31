@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.models import EvaluationAssignment
+
 
 def phase3c_mobile_performance_in_period_notes_v2853_service(user: Any, deps: dict[str, Any]):
     PerformancePeriod = deps['PerformancePeriod']
@@ -77,6 +79,7 @@ def phase3c_mobile_performance_in_period_notes_v2853_service(user: Any, deps: di
 
 
 def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, deps: dict[str, Any]):
+    _has_global_scope = deps['_has_global_scope']
     _v2853_ensure_interim_notes_table = deps['_v2853_ensure_interim_notes_table']
     _v2853_note_bool = deps['_v2853_note_bool']
     _v2853_note_type_label = deps['_v2853_note_type_label']
@@ -101,8 +104,25 @@ def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, de
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         employee_id = None
+    requesting_user_id = int(getattr(user, 'id', 0) or 0)
     if not employee_id:
-        employee_id = int(getattr(user, 'id', 0) or 0)
+        employee_id = requesting_user_id
+    # BYS360 SECURITY FIX (Defect N): a caller may only create an in-period
+    # note about themselves (self-note, pre-existing default behavior),
+    # about anyone if they hold global scope, or about an employee they are
+    # a real EvaluationAssignment evaluator for. Any other target is denied
+    # BEFORE the INSERT/commit -- fail closed on lookup errors.
+    if employee_id != requesting_user_id and not _has_global_scope(user):
+        try:
+            has_relationship = EvaluationAssignment.query.filter_by(
+                evaluator_id=requesting_user_id,
+                employee_id=employee_id,
+            ).first() is not None
+        except Exception:
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            has_relationship = False
+        if not has_relationship:
+            return jsonify({'message': 'Bu personel için not oluşturma yetkiniz bulunmamaktadır.'}), 403
     note_type = str(payload.get('note_type') or 'genel_gozlem').strip()[:80] or 'genel_gozlem'
     title = str(payload.get('title') or _v2853_note_type_label(note_type)).strip()[:255]
     remind = _v2853_note_bool(payload.get('remind_during_scoring'), True)

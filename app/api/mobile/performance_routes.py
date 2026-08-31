@@ -867,7 +867,12 @@ def mobile_performance_in_period_notes(user: User):
     return delegate_mobile_performance_in_period_notes(user)
 
 def _bys360_legacy_mobile_performance_development_suggestions(user: User):
-    items = _v2852_items_from_models(['PerformanceDevelopmentSuggestion', 'PerformanceDevelopmentPlan', 'DevelopmentSuggestion', 'FeedbackActionPlan'], ['employee_name', 'title', 'suggestion_title', 'name'], ['suggestion', 'description', 'development_area', 'action_text'], ['status', 'state'], ['period_name', 'created_at', 'owner_name'], ['priority', 'score'], limit=100, progress=65)
+    # BYS360_SECURITY_FIX_DEFECT_O1: _v2852_items_from_models() runs a
+    # zero-filter, organization-wide query (see _v2852_query()) across every
+    # model in its list. That unscoped shortcut must only ever be reachable
+    # for _has_global_scope() callers; non-global callers must go straight to
+    # the already-correctly-scoped _snapshot_query_for(user) fallback below.
+    items = _v2852_items_from_models(['PerformanceDevelopmentSuggestion', 'PerformanceDevelopmentPlan', 'DevelopmentSuggestion', 'FeedbackActionPlan'], ['employee_name', 'title', 'suggestion_title', 'name'], ['suggestion', 'description', 'development_area', 'action_text'], ['status', 'state'], ['period_name', 'created_at', 'owner_name'], ['priority', 'score'], limit=100, progress=65) if _has_global_scope(user) else []
     if not items:
         try:
             q = _snapshot_query_for(user).order_by(PerformanceResultSnapshot.id.desc())

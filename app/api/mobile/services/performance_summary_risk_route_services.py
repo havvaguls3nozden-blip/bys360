@@ -53,6 +53,7 @@ def phase3c_mobile_performance_publish_preapproval_service(user: Any, deps: dict
     PerformanceResultSnapshot = deps['PerformanceResultSnapshot']
     User = deps['User']
     _full_name = deps['_full_name']
+    _has_global_scope = deps['_has_global_scope']
     _item = deps['_item']
     _metric = deps['_metric']
     _mobile_perf_safe_all = deps['_mobile_perf_safe_all']
@@ -64,7 +65,12 @@ def phase3c_mobile_performance_publish_preapproval_service(user: Any, deps: dict
     _v2852_score = deps['_v2852_score']
     logger = deps['logger']
 
-    items = _v2852_items_from_models(['PerformancePublishPreApproval', 'PerformancePublicationPreApproval', 'PerformancePublishApproval', 'PerformancePublishLog', 'PerformancePublicationApproval'], ['employee_name', 'title', 'name', 'period_name'], ['description', 'note', 'period_name', 'status_text'], ['status', 'approval_status', 'state'], ['period_name', 'created_at', 'approved_by_name'], ['final_score', 'score'])
+    # BYS360_SECURITY_FIX_DEFECT_O2: _v2852_items_from_models() runs a
+    # zero-filter, organization-wide query across every model in its list.
+    # That unscoped shortcut must only ever be reachable for
+    # _has_global_scope() callers; non-global callers must go straight to
+    # the already-correctly-scoped _snapshot_query_for(user) fallback below.
+    items = _v2852_items_from_models(['PerformancePublishPreApproval', 'PerformancePublicationPreApproval', 'PerformancePublishApproval', 'PerformancePublishLog', 'PerformancePublicationApproval'], ['employee_name', 'title', 'name', 'period_name'], ['description', 'note', 'period_name', 'status_text'], ['status', 'approval_status', 'state'], ['period_name', 'created_at', 'approved_by_name'], ['final_score', 'score']) if _has_global_scope(user) else []
     if not items:
         pending = []
         try:
