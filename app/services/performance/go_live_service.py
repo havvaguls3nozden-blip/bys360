@@ -94,15 +94,24 @@ def build_performance_go_live_center(
     manager_rows: list[dict[str, Any]] = []
     request_rows: list[dict[str, Any]] = []
 
-    scoped_employee_ids = sorted({int(item) for item in (scope_employee_ids or []) if item is not None})
+    scoped_employee_ids: list[int] | None
+    if scope_employee_ids is None:
+        scoped_employee_ids = None
+    else:
+        scoped_employee_ids = sorted({int(item) for item in scope_employee_ids if item is not None})
+
     assignments: list[EvaluationAssignment] = []
     evaluations: list[PerformanceEvaluation] = []
     if active_period is not None:
         assignment_query = EvaluationAssignment.query.filter_by(period_id=active_period.id)
         evaluation_query = PerformanceEvaluation.query.filter_by(period_id=active_period.id)
-        if scoped_employee_ids:
-            assignment_query = assignment_query.filter(EvaluationAssignment.employee_id.in_(scoped_employee_ids))
-            evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id.in_(scoped_employee_ids))
+        if scoped_employee_ids is not None:
+            if scoped_employee_ids:
+                assignment_query = assignment_query.filter(EvaluationAssignment.employee_id.in_(scoped_employee_ids))
+                evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id.in_(scoped_employee_ids))
+            else:
+                assignment_query = assignment_query.filter(EvaluationAssignment.employee_id == -1)
+                evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id == -1)
         assignments = assignment_query.all()
         evaluations = evaluation_query.all()
 
