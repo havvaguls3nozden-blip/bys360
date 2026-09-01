@@ -83,9 +83,11 @@ def _effective_final_total(evaluation: Any) -> float:
         return round(stored, 2)
 
 
-def _coerce_employee_ids(values: Iterable[Any] | None) -> list[int]:
+def _coerce_employee_ids(values: Iterable[Any] | None) -> list[int] | None:
+    if values is None:
+        return None
     result: list[int] = []
-    for item in values or []:
+    for item in values:
         try:
             if item is None:
                 continue
@@ -147,8 +149,11 @@ def _load_period_evaluations(period_id: int, employee_ids: list[int] | None = No
         )
         .filter_by(period_id=period_id)
     )
-    if employee_ids:
-        query = query.filter(PerformanceEvaluation.employee_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            query = query.filter(PerformanceEvaluation.employee_id.in_(employee_ids))
+        else:
+            query = query.filter(PerformanceEvaluation.employee_id == -1)
     return [evaluation for evaluation in query.all() if not _skip_publish_exempt(evaluation)]
 
 # BYS360_REPORTING_WORKSPACE_FLOW_STATUS_REPAIR_V1
