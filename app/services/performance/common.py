@@ -221,9 +221,11 @@ def get_active_period() -> PerformancePeriod | None:
 def get_active_weight_config(period_id: int | None = None) -> PerformanceWeightConfig | None:
     query = PerformanceWeightConfig.query.filter_by(is_active=True)
     if period_id is not None:
-        row = query.filter_by(period_id=period_id).order_by(PerformanceWeightConfig.id.desc()).first()
-        if row:
-            return row
+        # BYS360 DEFECT X: a period-scoped lookup must never fall back to
+        # another period's config. Returning None here is the correct signal
+        # for callers (e.g. get_base_weight_map) to apply their own existing
+        # period-level/global default weighting.
+        return query.filter_by(period_id=period_id).order_by(PerformanceWeightConfig.id.desc()).first()
     return query.order_by(PerformanceWeightConfig.id.desc()).first()
 
 

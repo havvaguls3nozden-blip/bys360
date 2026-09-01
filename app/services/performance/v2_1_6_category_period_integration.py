@@ -267,6 +267,17 @@ def create_or_update_period_from_plan(plan_key: str, *, created_by: int | None =
     _set_if_has(period, "results_published", False)
     _set_if_has(period, "is_locked", False)
 
+    if activate_period:
+        # BYS360 DEFECT W: reuses the same canonical single-active-period
+        # invariant enforced by performance_period_toggle_active
+        # (app/performance/admin_core_routes.py) -- activating a period
+        # through this integration path must not leave two periods active.
+        (
+            PerformancePeriod.query
+            .filter(PerformancePeriod.is_active.is_(True), PerformancePeriod.id != period.id)
+            .update({PerformancePeriod.is_active: False}, synchronize_session=False)
+        )
+
     _db().session.flush()
     payload = {
         "plan_key": plan_key,
