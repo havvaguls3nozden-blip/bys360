@@ -177,14 +177,12 @@ def _filtered_assignment_query(period_id: int, *, q: str = "", status: str = "",
     return query, normalized_status, normalized_level
 
 def build_task_management_dashboard_payload(selected_period, *, q: str = "", status: str = "", manager_level: int | None = None, scope_user_ids: set | None = None, selected_scope: str = "") -> dict[str, Any]:
-    scope_user_ids = scope_user_ids or set()
-
     hierarchy_alerts = analyze_hierarchy_gaps(selected_period.id if selected_period else None)
     hierarchy_alerts = [row for row in hierarchy_alerts if getattr(row.get("user"), "role", None) != "admin"]
-    if scope_user_ids:
+    if scope_user_ids is not None:
         hierarchy_alerts = [row for row in hierarchy_alerts if getattr(row.get("user"), "id", None) in scope_user_ids]
 
-    total_users = _active_personnel_count(scope_user_ids if scope_user_ids else None)
+    total_users = _active_personnel_count(scope_user_ids)
 
     alert_summary = {
         "total_users": total_users,
@@ -214,22 +212,22 @@ def build_task_management_dashboard_payload(selected_period, *, q: str = "", sta
     latest_assignment_log_summary = build_assignment_log_summary([])
 
     if selected_period:
-        stats.update(_assignment_stats_for_period(selected_period.id, scope_user_ids if scope_user_ids else None))
-        coverage_summary.update(_assignment_source_summary_for_period(selected_period.id, scope_user_ids if scope_user_ids else None))
+        stats.update(_assignment_stats_for_period(selected_period.id, scope_user_ids))
+        coverage_summary.update(_assignment_source_summary_for_period(selected_period.id, scope_user_ids))
 
         delegated_assignments = _assignment_source_rows(
             selected_period.id,
             "delegated",
-            scope_user_ids if scope_user_ids else None,
+            scope_user_ids,
         )
         uncovered_assignments = _assignment_source_rows(
             selected_period.id,
             "uncovered",
-            scope_user_ids if scope_user_ids else None,
+            scope_user_ids,
         )
 
         exempt_query = PerformanceEvaluation.query.filter_by(period_id=selected_period.id, evaluation_exempted=True)
-        if scope_user_ids:
+        if scope_user_ids is not None:
             exempt_query = exempt_query.filter(PerformanceEvaluation.employee_id.in_(_normal_scope_ids(scope_user_ids)))
         exempt_evaluations = safe_all(
             exempt_query.order_by(PerformanceEvaluation.updated_at.desc(), PerformanceEvaluation.id.desc()).limit(TASK_MANAGEMENT_COVERAGE_LIMIT),
@@ -239,7 +237,7 @@ def build_task_management_dashboard_payload(selected_period, *, q: str = "", sta
         latest_log_payload = get_latest_assignment_generation_logs(
             selected_period.id,
             limit=250,
-            employee_ids=_normal_scope_ids(scope_user_ids) if scope_user_ids else None,
+            employee_ids=_normal_scope_ids(scope_user_ids) if scope_user_ids is not None else None,
         )
         latest_assignment_logs = list(latest_log_payload.get("rows") or [])
         latest_assignment_log_run_key = latest_log_payload.get("run_key")
@@ -259,7 +257,7 @@ def build_task_management_dashboard_payload(selected_period, *, q: str = "", sta
             q=q,
             status=status,
             manager_level=manager_level,
-            scope_user_ids=scope_user_ids if scope_user_ids else None,
+            scope_user_ids=scope_user_ids,
         )
         filtered_count = int(filtered_query.order_by(None).count() or 0)
         assignments = safe_all(
@@ -362,7 +360,7 @@ def matches_audit_query(row, q: str) -> bool:
 
 def build_audit_employee_options(scope_user_ids: set | None = None):
     query = User.query.filter(User.is_active.is_(True), User.role != "admin")
-    if scope_user_ids:
+    if scope_user_ids is not None:
         query = query.filter(User.id.in_(list(scope_user_ids)))
     return query.order_by(User.ad.asc(), User.soyad.asc()).limit(500).all()
 
@@ -522,8 +520,7 @@ def build_assignment_recommendation_payload(selected_period, selected_scope: str
     if not selected_period:
         return empty
 
-    scope_user_ids = scope_user_ids or set()
-    employee_ids = list(scope_user_ids) if scope_user_ids else None
+    employee_ids = list(scope_user_ids) if scope_user_ids is not None else None
     latest_bundle = get_latest_assignment_generation_logs(selected_period.id, limit=800, employee_ids=employee_ids)
     visible_rows = list(latest_bundle.get("rows") or [])
     if severity:
