@@ -166,42 +166,68 @@ def _insert_if_columns(
     return True
 
 
+def _add_column_if_missing(table_name: str, column_name: str, ddl_type: str, existing: set[str]) -> None:
+    """BYS360 DEFECT AJ: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically, identical to Defect AI's
+    finding in process_engine_phase8_tracking.py). Existence is checked
+    first via this module's own dialect-neutral ``_columns()`` (already
+    SQLAlchemy-``inspect()``-based, correct on both dialects), then a plain
+    ``ADD COLUMN`` (portable to both dialects) runs only when the column is
+    actually missing."""
+    if column_name in existing:
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
+    existing.add(column_name)
+
+
 def ensure_phase3_columns() -> None:
     """Faz 3 için gerekli kolonları mevcut tablolara güvenli şekilde ekler."""
-    ddl_statements = [
-        # Puanlama geçmişi
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS evaluation_id INTEGER",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS period_id INTEGER",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS employee_id INTEGER",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS scorer_user_id INTEGER",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS scorer_name VARCHAR(255)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS scorer_role VARCHAR(120)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS manager_level VARCHAR(50)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS score_value NUMERIC(6,2)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS score_source VARCHAR(120)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS general_comment TEXT",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS action_status VARCHAR(80)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS next_owner_user_id INTEGER",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS next_owner_name VARCHAR(255)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS next_stage VARCHAR(120)",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS action_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-        "ALTER TABLE performance_scoring_history ADD COLUMN IF NOT EXISTS event_key VARCHAR(80)",
-        # Süreç adımları
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS evaluation_id INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS period_id INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS employee_id INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS step_code VARCHAR(120)",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS step_title VARCHAR(255)",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS step_order INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS actor_user_id INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS actor_name VARCHAR(255)",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS owner_user_id INTEGER",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS owner_name VARCHAR(255)",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS status VARCHAR(80)",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS description TEXT",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS action_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-        "ALTER TABLE performance_process_flow_steps ADD COLUMN IF NOT EXISTS event_key VARCHAR(80)",
-    ]
+    scoring_history_columns = {
+        "evaluation_id": "INTEGER",
+        "period_id": "INTEGER",
+        "employee_id": "INTEGER",
+        "scorer_user_id": "INTEGER",
+        "scorer_name": "VARCHAR(255)",
+        "scorer_role": "VARCHAR(120)",
+        "manager_level": "VARCHAR(50)",
+        "score_value": "NUMERIC(6,2)",
+        "score_source": "VARCHAR(120)",
+        "general_comment": "TEXT",
+        "action_status": "VARCHAR(80)",
+        "next_owner_user_id": "INTEGER",
+        "next_owner_name": "VARCHAR(255)",
+        "next_stage": "VARCHAR(120)",
+        "action_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "event_key": "VARCHAR(80)",
+    }
+    flow_step_columns = {
+        "evaluation_id": "INTEGER",
+        "period_id": "INTEGER",
+        "employee_id": "INTEGER",
+        "step_code": "VARCHAR(120)",
+        "step_title": "VARCHAR(255)",
+        "step_order": "INTEGER",
+        "actor_user_id": "INTEGER",
+        "actor_name": "VARCHAR(255)",
+        "owner_user_id": "INTEGER",
+        "owner_name": "VARCHAR(255)",
+        "status": "VARCHAR(80)",
+        "description": "TEXT",
+        "action_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "event_key": "VARCHAR(80)",
+    }
+    existing_scoring_history = _columns(SCORING_HISTORY_TABLE)
+    for column_name, ddl_type in scoring_history_columns.items():
+        _add_column_if_missing(SCORING_HISTORY_TABLE, column_name, ddl_type, existing_scoring_history)
+
+    existing_flow_steps = _columns(FLOW_STEPS_TABLE)
+    for column_name, ddl_type in flow_step_columns.items():
+        _add_column_if_missing(FLOW_STEPS_TABLE, column_name, ddl_type, existing_flow_steps)
+
+    # CREATE INDEX IF NOT EXISTS is valid, dialect-portable syntax on both
+    # PostgreSQL and SQLite -- unlike ADD COLUMN IF NOT EXISTS above, these
+    # were never part of Defect AJ and are left unchanged.
     index_statements = [
         "CREATE INDEX IF NOT EXISTS ix_perf_scoring_event_key ON performance_scoring_history(event_key)",
         "CREATE INDEX IF NOT EXISTS ix_perf_scoring_eval_actor ON performance_scoring_history(evaluation_id, scorer_user_id)",
@@ -210,7 +236,7 @@ def ensure_phase3_columns() -> None:
         "CREATE INDEX IF NOT EXISTS ix_perf_flow_step_eval_status ON performance_process_flow_steps(evaluation_id, status)",
         "CREATE INDEX IF NOT EXISTS ix_perf_flow_step_owner_status ON performance_process_flow_steps(owner_user_id, status)",
     ]
-    for sql in ddl_statements + index_statements:
+    for sql in index_statements:
         db.session.execute(text(sql))
     db.session.commit()
 

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 
@@ -27,40 +27,30 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
 
 
 def table_exists(table_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-            )
-            """,
-            {"table_name": table_name},
-        )
-    )
+    """BYS360 DEFECT AJ: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction (works identically against SQLite/PostgreSQL) -- the
+    same proven pattern already used by process_engine_phase3_history.py's
+    ``_table_exists`` and process_engine_phase8_tracking.py's own fixed
+    helpers."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def column_exists(table_name: str, column_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                  AND column_name = :column_name
-            )
-            """,
-            {"table_name": table_name, "column_name": column_name},
-        )
-    )
+    return column_name in _table_columns(table_name)
 
 
 def _add_column(table_name: str, column_name: str, ddl_type: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column_name} {ddl_type}"))
+    """BYS360 DEFECT AJ: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically, identical to Defect AI's
+    finding in process_engine_phase8_tracking.py). Existence is checked
+    first via ``column_exists`` (now dialect-neutral), then a plain
+    ``ADD COLUMN`` (portable to both dialects) runs only when the column is
+    actually missing."""
+    if column_exists(table_name, column_name):
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
 
 
 def _create_index(index_name: str, ddl: str) -> None:
@@ -145,18 +135,12 @@ def apply_phase4_schema() -> None:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    return {
-        row["column_name"]
-        for row in _rows(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = :table_name
-            """,
-            {"table_name": table_name},
-        )
-    }
+    """BYS360 DEFECT AJ: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query (same fix rationale as ``table_exists`` above)."""
+    if not table_exists(table_name):
+        return set()
+    return {col["name"] for col in inspect(db.engine).get_columns(table_name)}
 
 
 def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int:
