@@ -933,3 +933,210 @@ def test_full_build_secret_gate_allows_env_example_placeholder(tmp_path):
     assert manifest["secret_scan_status"] == "PASS"
     assert manifest["secret_scan_findings"] == 0
     assert ".env.example" in _names(output)
+
+
+# ---------------------------------------------------------------------------
+# BYS360_DEFECT_AH_EMBEDDED_SOURCE_SHA
+#
+# AH closure (selected design: embed the authoritative release source SHA
+# INSIDE the release package, before the package integrity hashes are
+# finalized -- see build_bys360_safe_release.py's EMBEDDED_SOURCE_SHA_FILENAME
+# / write_embedded_source_sha() / verify_package()'s embedded/sidecar
+# cross-check). The prior gap: manifest.json (the sidecar) sits NEXT TO the
+# ZIP, not inside it, so it carried no cryptographic binding to the ZIP's own
+# SHA256SUMS chain -- editing source_sha in the sidecar alone went completely
+# undetected by verify_package() unless an operator happened to supply
+# --expected-source-sha out of band. This section is the mechanical tamper
+# matrix required by that closure: CLEAN_PACKAGE=PASS,
+# ZIP_BYTES_TAMPERED=FAIL (already covered by test_sha256_mismatch_verify_fails
+# above), EMBEDDED_SOURCE_SHA_TAMPERED=FAIL, SIDECAR_SOURCE_SHA_TAMPERED=FAIL,
+# EXPECTED_SOURCE_SHA_WRONG=FAIL, EXPECTED_SOURCE_SHA_CORRECT=PASS.
+# ---------------------------------------------------------------------------
+
+
+def _embedded_source_sha_text(output: Path) -> str:
+    with zipfile.ZipFile(output) as zf:
+        return zf.read(builder.EMBEDDED_SOURCE_SHA_FILENAME).decode("utf-8")
+
+
+def test_release_build_embeds_expected_git_head_sha(repo, tmp_path):
+    """1: release build embeds expected Git HEAD SHA."""
+    root, sha = repo
+    output = tmp_path / "ah_embed_head.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert builder.EMBEDDED_SOURCE_SHA_FILENAME in _names(output)
+    assert _embedded_source_sha_text(output).strip() == sha
+
+
+def test_embedded_source_sha_is_covered_by_package_integrity_evidence(repo, tmp_path):
+    """2: embedded source SHA is included in package integrity evidence --
+    it appears in both the sidecar manifest's files[] list and in
+    SHA256SUMS, exactly like every other packaged file."""
+    root, sha = repo
+    output = tmp_path / "ah_embed_evidence.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert builder.EMBEDDED_SOURCE_SHA_FILENAME in manifest["files"]
+    sums_paths = {
+        line.split("  ", 1)[1]
+        for line in sha256_path.read_text(encoding="utf-8").splitlines()
+        if line
+    }
+    assert builder.EMBEDDED_SOURCE_SHA_FILENAME in sums_paths
+
+
+def test_clean_package_with_embedded_sha_verifies_successfully(repo, tmp_path):
+    """3: normal untouched release verifies successfully (CLEAN_PACKAGE=PASS)."""
+    root, sha = repo
+    output = tmp_path / "ah_clean.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert _verify(output) == 0
+    manifest_path, sha256_path = _sidecars(output)
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["ok"] is True
+    assert result["embedded_source_sha"] == sha
+    assert result["sidecar_source_sha"] == sha
+    assert result["source_sha"] == sha
+
+
+def test_tampering_sidecar_manifest_source_sha_alone_fails_verification(repo, tmp_path):
+    """4: tamper sidecar manifest source_sha only -> verification FAILS.
+    This is the exact gap AH closes: before this fix, editing only the
+    sidecar (never touching the ZIP) was undetectable."""
+    root, sha = repo
+    output = tmp_path / "ah_sidecar_tamper.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["source_sha"] = "f" * 40
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["ok"] is False
+    assert any("sidecar" in f.lower() and "gomulu" in f.lower() for f in result["findings"])
+    assert _verify(output) != 0
+
+
+def test_tampering_embedded_source_sha_file_after_extraction_fails_verification(repo, tmp_path):
+    """5: tamper embedded source-sha file after extraction -> verification
+    FAILS. Rewrites the packaged RELEASE_SOURCE_SHA.txt entry inside the ZIP
+    itself (simulating a tampered/rebuilt archive) without regenerating
+    SHA256SUMS -- the existing per-file SHA256 check must catch this exactly
+    like it would for any other packaged file."""
+    root, sha = repo
+    output = tmp_path / "ah_embedded_tamper.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    with zipfile.ZipFile(output, "a") as zf:
+        # zipfile has no in-place rewrite; simplest tamper is to write a
+        # second entry with the same name -- the last one wins on read,
+        # matching how a naive on-disk tamper (unzip, edit, rezip) would land.
+        zf.writestr(builder.EMBEDDED_SOURCE_SHA_FILENAME, "e" * 40 + "\n")
+
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["ok"] is False
+    assert any("SHA256 uyusmuyor" in f and builder.EMBEDDED_SOURCE_SHA_FILENAME in f for f in result["findings"])
+    assert _verify(output) != 0
+
+
+def test_sidecar_and_embedded_sha_mismatch_reason_is_explicit(repo, tmp_path):
+    """6: sidecar and embedded SHA mismatch is reported with both values so
+    a human/PS caller can distinguish this from a generic hash failure."""
+    root, sha = repo
+    output = tmp_path / "ah_mismatch_reason.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    other_sha = "a" * 40
+    manifest["source_sha"] = other_sha
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["ok"] is False
+    assert result["sidecar_source_sha"] == other_sha
+    assert result["embedded_source_sha"] == sha
+
+
+def test_candidate_ready_source_sha_would_come_from_embedded_not_sidecar(repo, tmp_path):
+    """7: the value verify_package() reports as authoritative (source_sha) --
+    the value CANDIDATE_READY.json's SOURCE_SHA is derived from on the
+    PowerShell side -- is the EMBEDDED value, not the sidecar, whenever they
+    disagree."""
+    root, sha = repo
+    output = tmp_path / "ah_authoritative.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["source_sha"] = "b" * 40
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["source_sha"] == sha  # embedded wins, even though ok=False
+
+
+def test_wrong_expected_source_sha_against_embedded_fails(repo, tmp_path):
+    """8: wrong --expected-source-sha -> FAIL, checked against the embedded
+    value."""
+    root, sha = repo
+    output = tmp_path / "ah_expected_wrong.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert _verify(output, expected_source_sha="c" * 40) != 0
+
+
+def test_correct_expected_source_sha_against_embedded_passes(repo, tmp_path):
+    """9: correct --expected-source-sha -> PASS."""
+    root, sha = repo
+    output = tmp_path / "ah_expected_correct.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    assert _verify(output, expected_source_sha=sha) == 0
+
+
+def test_missing_embedded_source_sha_file_fails_verification(repo, tmp_path):
+    """Package built by an older/incompatible builder (or one whose embedded
+    file was stripped) has no RELEASE_SOURCE_SHA.txt at all -- must fail
+    closed, not silently fall back to trusting the sidecar."""
+    root, sha = repo
+    output = tmp_path / "ah_missing_embedded.zip"
+    assert _build(root, output, source_sha=sha) == 0
+    manifest_path, sha256_path = _sidecars(output)
+
+    # Rebuild the zip without the embedded file (and drop its SHA256SUMS/
+    # manifest entries so the "unexpected extra file" / "missing file"
+    # checks don't mask the specific finding under test).
+    with zipfile.ZipFile(output) as zf:
+        entries = {name: zf.read(name) for name in zf.namelist() if name != builder.EMBEDDED_SOURCE_SHA_FILENAME}
+    output.unlink()
+    with zipfile.ZipFile(output, "w") as zf:
+        for name, content in entries.items():
+            zf.writestr(name, content)
+
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["files"] = [f for f in manifest["files"] if f != builder.EMBEDDED_SOURCE_SHA_FILENAME]
+    manifest["included_count"] = len(manifest["files"])
+    manifest_path.write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    lines = [
+        line for line in sha256_path.read_text(encoding="utf-8").splitlines()
+        if line and not line.endswith(f"  {builder.EMBEDDED_SOURCE_SHA_FILENAME}")
+    ]
+    sha256_path.write_text("".join(f"{line}\n" for line in lines), encoding="utf-8", newline="\n")
+
+    result = builder.verify_package(output, manifest_path, sha256_path)
+    assert result["ok"] is False
+    assert any(builder.EMBEDDED_SOURCE_SHA_FILENAME in f for f in result["findings"])
+    assert result["embedded_source_sha"] is None
+
+
+def test_full_build_also_embeds_source_sha(tmp_path):
+    """FULL (schema_version=3) builds get the same embedded artifact as
+    legacy builds -- this is not a FULL-only feature."""
+    root, sha = _full_build_repo_with_extra_files(tmp_path, {})
+    output = tmp_path / "ah_full_embed.zip"
+    assert _full_build(root, output, source_sha=sha) == 0
+    assert builder.EMBEDDED_SOURCE_SHA_FILENAME in _names(output)
+    assert _embedded_source_sha_text(output).strip() == sha
+    assert _verify(output) == 0

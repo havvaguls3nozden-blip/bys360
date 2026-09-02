@@ -201,6 +201,12 @@ def _build_fake_project_root(tmp_path: Path) -> Path:
     _make_dummy_file(project_root / ".venv" / "Scripts" / "python.exe", "dummy python.exe\n")
     _make_dummy_file(project_root / "scripts" / "windows" / "run_cic_auto_mail_scheduler.ps1", "# dummy launcher\n")
     _make_dummy_file(project_root / "scripts" / "communication" / "send_daily_pulse_check_mail.py", "# dummy runner\n")
+    # BYS360 DEFECT AA closure: install_bys360_daily_pulse_mail_task.ps1 now
+    # delegates to this launcher (see tests/quality/test_installer_launcher_
+    # overwrite_guard_v1.py for the AA/AG-specific behavioral contract
+    # tests) instead of passing shell-redirection syntax as literal argv to
+    # python.exe -- its own pre-flight Test-Path guard requires this file.
+    _make_dummy_file(project_root / "scripts" / "communication" / "run_daily_pulse_check_mail.ps1", "# dummy launcher\n")
     _make_dummy_file(project_root / "scripts" / "communication" / "run_corporate_information_center_task_v3_0_phase2.py", "# dummy runner\n")
     return project_root
 

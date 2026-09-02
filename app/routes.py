@@ -150,19 +150,56 @@ def _bys360_release_identity() -> dict[str, str | None]:
     }
 
 
+_LOOPBACK_ADDRESSES = {"127.0.0.1", "::1"}
+
+
+def _bys360_request_is_from_loopback() -> bool:
+    """BYS360 DEFECT AF: True only for a caller connected directly over the
+    raw TCP loopback interface -- e.g. cutover_bys360_candidate.ps1's own
+    curl.exe call to http://127.0.0.1:$AppPort during a local cutover run.
+
+    Deliberately reads werkzeug.proxy_fix.orig_remote_addr (the RAW socket
+    peer address Werkzeug's ProxyFix middleware observed before rewriting
+    it from X-Forwarded-For -- see app/core/reverse_proxy.py) rather than
+    request.remote_addr. request.remote_addr is exactly what ProxyFix
+    rewrites TO, from an operator-configured number of trusted X-Forwarded-
+    For hops (x_for=1 here); an external caller that reaches the app
+    directly (bypassing the real reverse proxy -- a firewall/network
+    misconfiguration this check must not silently trust) could otherwise
+    spoof "X-Forwarded-For: 127.0.0.1" and satisfy a request.remote_addr-
+    based check with no actual loopback connection at all. The raw socket
+    peer address cannot be forged by any HTTP header."""
+    raw_peer = request.environ.get("werkzeug.proxy_fix.orig_remote_addr", request.remote_addr)
+    return str(raw_peer or "") in _LOOPBACK_ADDRESSES
+
+
 @main_bp.get("/versionz")
 def versionz():
     runtime_manifest = current_app.extensions.get("runtime_route_manifest") or {}
     schema_errors = list(current_app.extensions.get("schema_check_errors", []) or [])
-    release = _bys360_release_identity()
-    return jsonify({
+    payload = {
         "service": "bys360",
         "app_env": current_app.config.get("APP_ENV", "development"),
         "route_count": len(runtime_manifest) if isinstance(runtime_manifest, dict) else 0,
         "schema_error_count": len(schema_errors),
-        "source_sha": release["source_sha"],
-        "migration_head": release["migration_head"],
-    }), 200
+    }
+    # BYS360 DEFECT AF: source_sha/migration_head identify the exact
+    # deployed git commit and Alembic revision -- real, if low-severity,
+    # deployment-fingerprinting information. /versionz has no @login_
+    # required (matching /healthz and /readyz, an intentional, pre-existing
+    # design this fix does not change), so these two fields are exposed
+    # only to callers connecting from the loopback interface -- exactly
+    # what cutover_bys360_candidate.ps1's own Test-ReleaseIdentityBinding
+    # needs (it always curls http://127.0.0.1:$AppPort directly) and
+    # nothing more. Every other field above remains public, unchanged.
+    if _bys360_request_is_from_loopback():
+        release = _bys360_release_identity()
+        payload["source_sha"] = release["source_sha"]
+        payload["migration_head"] = release["migration_head"]
+    else:
+        payload["source_sha"] = None
+        payload["migration_head"] = None
+    return jsonify(payload), 200
 
 
 @main_bp.before_app_request

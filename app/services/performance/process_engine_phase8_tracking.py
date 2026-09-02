@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import bindparam, text
 
 from app.extensions import db
 
@@ -52,12 +52,28 @@ class Phase8SyncResult:
     flows_updated: int = 0
 
 
-def _scalar(sql: str, params: dict[str, Any] | None = None) -> Any:
-    return db.session.execute(text(sql), params or {}).scalar()
+def _prepare_clause(sql: str, expanding: tuple[str, ...]):
+    """BYS360 DEFECT AB: builds a dialect-neutral TextClause. `expanding`
+    names bind parameters whose value is a Python list that must become a
+    real SQL IN-list (`IN (:p_1, :p_2, ...)`) at execute time, working
+    identically on PostgreSQL and SQLite -- unlike PostgreSQL's `= ANY(:x)`
+    array-bind syntax, which SQLite has no equivalent for at all."""
+    clause = text(sql)
+    if expanding:
+        clause = clause.bindparams(*(bindparam(name, expanding=True) for name in expanding))
+    return clause
 
 
-def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
-    return list(db.session.execute(text(sql), params or {}).mappings())
+def _scalar(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> Any:
+    return db.session.execute(_prepare_clause(sql, expanding), params or {}).scalar()
+
+
+def _rows(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> list[Any]:
+    return list(db.session.execute(_prepare_clause(sql, expanding), params or {}).mappings())
+
+
+def _execute(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> Any:
+    return db.session.execute(_prepare_clause(sql, expanding), params or {})
 
 
 def table_exists(table_name: str) -> bool:
@@ -204,7 +220,18 @@ def _period_name_select_expr(alias: str, cols: set[str]) -> str:
     return "CAST(f.period_id AS TEXT) AS period_name,"
 
 def _add_column(table_name: str, column_name: str, ddl_type: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column_name} {ddl_type}"))
+    """BYS360 DEFECT AI: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically), so every call to
+    ``apply_phase8_schema()`` was completely broken under SQLite. Existence
+    is now checked with this module's own dialect-neutral ``column_exists``
+    (already used elsewhere in this file), then a plain ``ADD COLUMN``
+    (portable to both dialects) runs only when the column is actually
+    missing -- preserving idempotency without depending on PostgreSQL-only
+    syntax."""
+    if column_exists(table_name, column_name):
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
 
 
 def _create_index(index_name: str, ddl: str) -> None:
@@ -582,11 +609,12 @@ def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
         f"""
         SELECT *
         FROM performance_process_flow_steps
-        WHERE flow_id = ANY(:flow_ids)
+        WHERE flow_id IN :flow_ids
           AND COALESCE(tracking_visible, TRUE) = TRUE
         ORDER BY {order_expr}
         """,
         {"flow_ids": flow_ids},
+        expanding=("flow_ids",),
     )
     grouped: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
@@ -619,10 +647,11 @@ def _history_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
         FROM performance_scoring_history h
         JOIN performance_process_flows f
           ON f.evaluation_id = h.evaluation_id
-        WHERE f.id = ANY(:flow_ids)
+        WHERE f.id IN :flow_ids
         ORDER BY COALESCE(h.action_at, h.created_at, CURRENT_TIMESTAMP), h.id
         """,
         {"flow_ids": flow_ids},
+        expanding=("flow_ids",),
     )
     grouped: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
@@ -747,24 +776,27 @@ def _delete_tracking_flow_ids(flow_ids: list[int]) -> int:
 
     try:
         if table_exists("performance_process_flow_steps") and column_exists("performance_process_flow_steps", "flow_id"):
-            db.session.execute(
-                text("DELETE FROM performance_process_flow_steps WHERE flow_id = ANY(:flow_ids)"),
+            _execute(
+                "DELETE FROM performance_process_flow_steps WHERE flow_id IN :flow_ids",
                 {"flow_ids": clean_ids},
+                expanding=("flow_ids",),
             )
 
         if table_exists("performance_process_notifications") and column_exists("performance_process_notifications", "flow_id"):
-            db.session.execute(
-                text("DELETE FROM performance_process_notifications WHERE flow_id = ANY(:flow_ids)"),
+            _execute(
+                "DELETE FROM performance_process_notifications WHERE flow_id IN :flow_ids",
                 {"flow_ids": clean_ids},
+                expanding=("flow_ids",),
             )
 
-        result = db.session.execute(
-            text("DELETE FROM performance_process_flows WHERE id = ANY(:flow_ids)"),
+        result = _execute(
+            "DELETE FROM performance_process_flows WHERE id IN :flow_ids",
             {"flow_ids": clean_ids},
+            expanding=("flow_ids",),
         )
         db.session.commit()
         try:
-            return int(result.rowcount or 0)  # type: ignore[attr-defined]
+            return int(result.rowcount or 0)
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return len(clean_ids)

@@ -110,6 +110,13 @@ REQUIRED_PACKAGE_PATH_PREFIXES = (
     "app/", "migrations/", "requirements.txt", "wsgi.py", "run_server.py", "config.py", "DEPLOYMENT.md",
 )
 
+# BYS360 DEFECT AH: the single canonical embedded release-identity artifact.
+# "Do NOT create multiple competing source-sha authorities" -- this is the
+# only name ever written into a package's root by this builder, and the
+# only name prepare_bys360_candidate.ps1's Test-EmbeddedSourceSha reads.
+EMBEDDED_SOURCE_SHA_FILENAME = "RELEASE_SOURCE_SHA.txt"
+_SOURCE_SHA_PATTERN = re.compile(r"^[0-9a-f]{40}$")
+
 # Fixed, uniform zip metadata applied to every packaged entry -- see
 # _fixed_date_time()/build_filtered_zip(): archive bytes must not depend on
 # the build machine's OS, timezone, or on-disk file permissions.
@@ -435,6 +442,25 @@ def resolve_migration_head(root: Path) -> str:
     return heads[0]
 
 
+def write_embedded_source_sha(staging_dir: Path, source_sha: str) -> Path:
+    """Writes the embedded release-identity artifact to a disposable staging
+    location so it can be passed into build_filtered_zip()'s existing
+    extra_files mechanism.
+
+    BYS360 DEFECT AH: this MUST be called, and its result added to
+    extra_files, before build_filtered_zip() is invoked -- that function
+    writes every extra_files entry into the ZIP as part of the same
+    zipfile.ZipFile(...) write pass that packages git-tracked content, which
+    runs strictly before compute_sha256_manifest() ever opens the finished
+    ZIP to hash it. There is no code path in main() where hashing happens
+    first and embedding happens after; the ordering is structural, not
+    merely conventional -- see main()'s call sequence.
+    """
+    path = staging_dir / EMBEDDED_SOURCE_SHA_FILENAME
+    path.write_text(source_sha + "\n", encoding="utf-8", newline="\n")
+    return path
+
+
 def build_filtered_zip(
     root: Path, output: Path, source_sha: str, extra_files: list[tuple[Path, str]] | None = None
 ) -> tuple[str, list[tuple[Path, str]], list[dict[str, str]]]:
@@ -568,6 +594,7 @@ def verify_package(
     if set(recorded_hashes) != manifest_files:
         findings.append("SHA256SUMS icerigi manifest dosya kumesiyle eslesmiyor")
 
+    embedded_source_sha_raw: str | None = None
     try:
         with zipfile.ZipFile(zip_path) as zf:
             zip_names = set(normalize(n) for n in zf.namelist())
@@ -578,12 +605,24 @@ def verify_package(
                 forbidden, reason = is_forbidden_archive_name(rel)
                 if forbidden:
                     findings.append(f"yasak yol pakette bulundu ({reason}): {rel}")
-                actual_digest = hashlib.sha256(zf.read(info)).hexdigest()
+                content = zf.read(info)
+                actual_digest = hashlib.sha256(content).hexdigest()
                 expected_digest = recorded_hashes.get(rel)
                 if expected_digest is None:
                     findings.append(f"beklenmeyen ekstra dosya (manifest disi): {rel}")
                 elif actual_digest != expected_digest:
                     findings.append(f"SHA256 uyusmuyor: {rel}")
+                if rel == EMBEDDED_SOURCE_SHA_FILENAME:
+                    # BYS360 DEFECT AH: this file's bytes already went through
+                    # the exact same per-file SHA256 check as every other
+                    # packaged file above -- EMBEDDED_SOURCE_SHA_PACKAGE_
+                    # AUTHENTICATED is therefore already proven by the
+                    # "SHA256 uyusmuyor" branch above when the embedded file
+                    # was tampered post-build (the recorded hash in
+                    # SHA256SUMS would no longer match). What is captured
+                    # here is only its decoded text, for the format and
+                    # cross-check validations below.
+                    embedded_source_sha_raw = content.decode("utf-8", errors="replace")
     except zipfile.BadZipFile as exc:
         return {"ok": False, "findings": [f"paket acilamadi: {exc}"]}
 
@@ -599,16 +638,50 @@ def verify_package(
         if any(f.startswith(excluded_root) for f in manifest_files):
             findings.append(f"yasak dizin pakette bulundu: {excluded_root}")
 
-    source_sha = manifest.get("source_sha")
-    if expected_source_sha is not None and source_sha != expected_source_sha:
-        findings.append(
-            f"source SHA metadata uyusmuyor: manifest={source_sha!r} beklenen={expected_source_sha!r}"
-        )
+    # BYS360 DEFECT AH: manifest.json's source_sha (the sidecar) is NOT
+    # cryptographically bound to the ZIP -- it lives next to the ZIP, not
+    # inside it, so nothing above this point would catch an edit to that
+    # one field alone. The embedded RELEASE_SOURCE_SHA.txt (validated for
+    # format and per-file SHA256 above) is now the authoritative value:
+    # the sidecar is only accepted when it AGREES with the embedded value,
+    # and any operator-supplied expected_source_sha is checked against the
+    # embedded value directly, never against the sidecar alone.
+    sidecar_source_sha = manifest.get("source_sha")
+    embedded_source_sha: str | None = None
+
+    if EMBEDDED_SOURCE_SHA_FILENAME not in zip_names:
+        findings.append(f"gomulu kaynak SHA dosyasi pakette yok: {EMBEDDED_SOURCE_SHA_FILENAME}")
+    elif embedded_source_sha_raw is None:
+        findings.append(f"gomulu kaynak SHA dosyasi okunamadi: {EMBEDDED_SOURCE_SHA_FILENAME}")
+    else:
+        candidate = embedded_source_sha_raw.strip().lower()
+        if not _SOURCE_SHA_PATTERN.fullmatch(candidate):
+            findings.append(
+                f"gomulu kaynak SHA formati gecersiz (40 hex karakter degil): {embedded_source_sha_raw!r}"
+            )
+        else:
+            embedded_source_sha = candidate
+            if sidecar_source_sha != embedded_source_sha:
+                findings.append(
+                    f"sidecar manifest source_sha, gomulu (paket-ici, hash-zincirinde dogrulanmis) "
+                    f"degerle uyusmuyor: sidecar={sidecar_source_sha!r} gomulu={embedded_source_sha!r}. "
+                    "Sidecar manifest.json ZIP'e kriptografik olarak baglanmamistir; bagimsiz olarak "
+                    "degistirilmis olabilir -- gomulu deger yetkilidir."
+                )
+            if expected_source_sha is not None and embedded_source_sha != expected_source_sha:
+                findings.append(
+                    f"gomulu kaynak SHA beklenenle uyusmuyor: gomulu={embedded_source_sha!r} "
+                    f"beklenen={expected_source_sha!r}"
+                )
+
+    authoritative_source_sha = embedded_source_sha if embedded_source_sha is not None else sidecar_source_sha
 
     return {
         "ok": len(findings) == 0,
         "findings": findings,
-        "source_sha": source_sha,
+        "source_sha": authoritative_source_sha,
+        "sidecar_source_sha": sidecar_source_sha,
+        "embedded_source_sha": embedded_source_sha,
         "included_count": manifest.get("included_count"),
         "checked_file_count": len(zip_names),
     }
@@ -663,10 +736,22 @@ def main(argv: list[str] | None = None) -> int:
 
     full_build_extras: dict | None = None
     extra_files: list[tuple[Path, str]] = []
+    embed_dir = Path(tempfile.mkdtemp(prefix="bys360_release_embed_"))
 
     try:
         source_sha = resolve_source_sha(root, args.source_sha)
         assert_clean_tracked_worktree(root)
+
+        # BYS360 DEFECT AH: embed the authenticated source SHA inside the
+        # release package itself, BEFORE build_filtered_zip() writes the
+        # ZIP (and therefore before compute_sha256_manifest() ever hashes
+        # it) -- unconditionally, for both legacy (schema_version=2) and
+        # FULL (schema_version=3) builds, since the provenance gap this
+        # closes applies to every package this builder produces, not just
+        # FULL ones. See write_embedded_source_sha()'s own docstring for why
+        # this ordering is structural rather than merely conventional.
+        embedded_source_sha_path = write_embedded_source_sha(embed_dir, source_sha)
+        extra_files.append((embedded_source_sha_path, EMBEDDED_SOURCE_SHA_FILENAME))
 
         if args.wheelhouse_dir:
             wheelhouse_dir = Path(args.wheelhouse_dir).resolve()
@@ -695,7 +780,7 @@ def main(argv: list[str] | None = None) -> int:
 
             wheelhouse_report = load_wheelhouse_report(wheelhouse_report_path)
             wheelhouse_files = verify_and_collect_wheelhouse_files(wheelhouse_dir, wheelhouse_report)
-            extra_files = list(wheelhouse_files)
+            extra_files.extend(wheelhouse_files)
 
             migration_head = resolve_migration_head(root)
 
@@ -718,6 +803,8 @@ def main(argv: list[str] | None = None) -> int:
     except (GitDiscoveryError, DirtySourceError, WheelhouseIntegrityError, MigrationHeadError) as exc:
         print(json.dumps({"ok": False, "error": str(exc)}, ensure_ascii=False, indent=2))
         return 2
+    finally:
+        shutil.rmtree(embed_dir, ignore_errors=True)
 
     findings = scan_zip(output)
 

@@ -212,8 +212,8 @@ def test_phase5v_revision_extends_the_single_current_head() -> None:
 
     assert module.revision == "5a7c9e1f2b30"
     assert module.down_revision == "bys360_portal_v2121"
-    # Schema-contract drift closure wave: c51c29032d4f (close
-    # performance/messaging schema-contract drift) extends 10858a18e9ac
-    # (adopt File Center schema into Alembic migrations) and is now the
-    # single current head.
-    assert script.get_heads() == ["c51c29032d4f"]
+    # BYS360 DEFECT AD: v1a2d3e4f5b6 (add DB-level single-active-
+    # PerformancePeriod partial unique index) extends c51c29032d4f (close
+    # performance/messaging schema-contract drift) and is now the single
+    # current head.
+    assert script.get_heads() == ["v1a2d3e4f5b6"]

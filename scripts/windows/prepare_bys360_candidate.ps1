@@ -125,9 +125,28 @@ assuming this connects anywhere near production)
 
 FAILURE PHASES (recorded verbatim in the failure receipt's "Phase" field)
   PRECHECK_FAILED, PACKAGE_FAILED, MANIFEST_FAILED, EXTRACT_FAILED,
-  VENV_FAILED, PIP_CHECK_FAILED, IMPORT_GATE_FAILED, APP_FACTORY_FAILED,
-  MIGRATION_HEAD_FAILED, DB_BACKUP_FAILED, SHADOW_REHEARSAL_FAILED,
-  HEALTH_BOOT_FAILED, RECEIPT_FAILED
+  SOURCE_SHA_FAILED, VENV_FAILED, PIP_CHECK_FAILED, IMPORT_GATE_FAILED,
+  APP_FACTORY_FAILED, MIGRATION_HEAD_FAILED, DB_BACKUP_FAILED,
+  SHADOW_REHEARSAL_FAILED, HEALTH_BOOT_FAILED, RECEIPT_FAILED
+
+EMBEDDED SOURCE SHA -- release-provenance trust chain (BYS360 DEFECT AH,
+2026-09-02)
+  scripts\release\build_bys360_safe_release.py embeds RELEASE_SOURCE_SHA.txt
+  INSIDE the release ZIP itself, written before the ZIP's own per-file
+  SHA256SUMS are computed -- so that file's bytes are covered by the
+  whole-ZIP hash this script already verifies in Phase 2 (Test-PackageHash).
+  Test-EmbeddedSourceSha (Phase 4b, right after extraction, before the
+  extracted-candidate secret re-scan) reads that file
+  from the extracted candidate tree, validates its format, and requires it
+  to equal what Phase 3 (Test-PackageManifest) read from the sidecar
+  manifest.json -- the sidecar alone is NOT cryptographically bound to the
+  ZIP (it is a plain file sitting next to it) and is no longer trusted on
+  its own. From that point on the EMBEDDED value is authoritative:
+  $Script:Receipt.SOURCE_SHA is overwritten with it, so CANDIDATE_READY.json
+  and every later phase (Test-CandidateMigrationHead's already-existing
+  cross-checks, cutover_bys360_candidate.ps1's Test-ReleaseIdentityBinding,
+  /versionz) are bound to a source identity that is provably part of the
+  verified package bytes, not a free-standing claim next to them.
 #>
 
 [CmdletBinding()]
@@ -708,7 +727,57 @@ function Expand-CandidatePackage {
 }
 
 # =====================================================================
-# Phase 4b: extracted-candidate secret re-scan (defense in depth).
+# Phase 4b: embedded RELEASE_SOURCE_SHA.txt verification (BYS360 DEFECT AH)
+#
+# See the script header's "EMBEDDED SOURCE SHA" section for the full
+# rationale. Summary: Phase 3 (Test-PackageManifest) read source_sha from
+# the sidecar manifest.json, which is NOT cryptographically bound to the
+# ZIP (Phase 2's whole-ZIP hash only covers the ZIP's own bytes). An
+# attacker or an honest mistake (e.g. a stale manifest.json copied next to
+# a newer zip) editing that one sidecar field alone would previously go
+# completely undetected. scripts\release\build_bys360_safe_release.py now
+# embeds RELEASE_SOURCE_SHA.txt INSIDE the ZIP before its own SHA256SUMS
+# are computed, so that file's bytes ARE covered by Phase 2's hash gate.
+# This function makes the sidecar no longer the sole source of truth: it
+# requires the embedded value to equal what Phase 3 read from the sidecar,
+# then makes the EMBEDDED value authoritative for everything downstream
+# (CANDIDATE_READY.json, cutover's Test-ReleaseIdentityBinding, /versionz).
+# =====================================================================
+
+function Test-EmbeddedSourceSha {
+    param([Parameter(Mandatory)][string]$CandidateDir)
+
+    Write-DeployLog "Phase 4b/16: embedded RELEASE_SOURCE_SHA.txt verification"
+
+    $embeddedPath = Join-Path $CandidateDir "RELEASE_SOURCE_SHA.txt"
+    if (-not (Test-Path $embeddedPath)) {
+        Invoke-FailClosed -Phase "SOURCE_SHA_FAILED" -Reason "Extracted candidate is missing RELEASE_SOURCE_SHA.txt -- this release package does not embed an authenticated source SHA (built by an older/incompatible builder, or the embedded file was stripped). Refusing to trust the sidecar manifest source_sha alone."
+    }
+
+    $embeddedRaw = Get-Content -Path $embeddedPath -Raw -Encoding UTF8
+    $embeddedSha = $embeddedRaw.Trim().ToLowerInvariant()
+
+    if ($embeddedSha -notmatch '^[0-9a-f]{40}$') {
+        Invoke-FailClosed -Phase "SOURCE_SHA_FAILED" -Reason "Embedded RELEASE_SOURCE_SHA.txt content is not a valid 40-hex-character git SHA: '$embeddedRaw'."
+    }
+
+    $sidecarSha = $Script:Receipt.SOURCE_SHA
+    if ($embeddedSha -ne $sidecarSha) {
+        Invoke-FailClosed -Phase "SOURCE_SHA_FAILED" -Reason "Sidecar manifest source_sha ('$sidecarSha') does not match the embedded, package-integrity-authenticated RELEASE_SOURCE_SHA.txt ('$embeddedSha'). manifest.json is not cryptographically bound to the ZIP and may have been edited independently -- refusing to trust it. The embedded value is authoritative and the two disagree, so this candidate is rejected."
+    }
+
+    if ($ExpectedSourceSha -and $embeddedSha -ne $ExpectedSourceSha.ToLowerInvariant()) {
+        Invoke-FailClosed -Phase "SOURCE_SHA_FAILED" -Reason "Embedded RELEASE_SOURCE_SHA.txt ('$embeddedSha') != -ExpectedSourceSha ('$ExpectedSourceSha')."
+    }
+
+    $Script:Receipt.SOURCE_SHA = $embeddedSha
+    Write-DeployLog "Embedded source SHA verified and now authoritative: SOURCE_SHA=$embeddedSha (matches sidecar manifest and, if supplied, -ExpectedSourceSha)."
+    Write-DeployLog "EMBEDDED SOURCE SHA VERIFICATION PASSED."
+    return $embeddedSha
+}
+
+# =====================================================================
+# Phase 4c: extracted-candidate secret re-scan (defense in depth).
 #
 # scripts\release\build_bys360_safe_release.py already requires a clean
 # scripts\release\scan_bys360_release_secrets.py pass against the ASSEMBLED
@@ -729,7 +798,7 @@ function Test-CandidateExtractedSecretScan {
         [Parameter(Mandatory)][string]$CandidateDir,
         [Parameter(Mandatory)][string]$BasePython312
     )
-    Write-DeployLog "Phase 4b/16: extracted-candidate secret re-scan (defense in depth)"
+    Write-DeployLog "Phase 4c/16: extracted-candidate secret re-scan (defense in depth)"
 
     $scannerPath = Join-Path $CandidateDir "scripts\release\scan_bys360_release_secrets.py"
     if (-not (Test-Path $scannerPath)) {
@@ -1807,6 +1876,7 @@ function Main {
     $basePython312 = Resolve-Bys360BasePython312
 
     $candidateDir = Expand-CandidatePackage -SourceSha $sourceSha
+    $sourceSha = Test-EmbeddedSourceSha -CandidateDir $candidateDir
     Test-CandidateExtractedSecretScan -CandidateDir $candidateDir -BasePython312 $basePython312
     $venvPython = New-CandidateVirtualEnv -CandidateDir $candidateDir -BasePython312 $basePython312
 
@@ -1836,18 +1906,29 @@ function Main {
     Write-DeployLog "================================================================"
 }
 
-try {
-    Main
-    exit 0
-} catch {
-    $existingFailureReceipt = if ($Script:DeployLogDir) { Join-Path $Script:DeployLogDir "FAILURE_RECEIPT.txt" } else { $null }
-    if ($existingFailureReceipt -and (Test-Path $existingFailureReceipt)) {
-        Write-DeployLog -Level "FATAL" "Stopping after phase failure (see $existingFailureReceipt)."
-    } else {
-        Write-DeployLog -Level "FATAL" "UNHANDLED (no prior phase-specific failure receipt): $($_.Exception.Message)"
-        if ($Script:DeployLogDir) {
-            Write-FailureReceipt -Phase "UNHANDLED" -Reason $_.Exception.Message | Out-Null
+# BYS360 DEFECT AH (testability, zero behavioral change to real invocation):
+# same dot-source guard already established in cutover_bys360_candidate.ps1
+# (see its own comment above this identical check). $MyInvocation.
+# InvocationName is '.' only when this script is DOT-SOURCED, never when
+# run directly (-File or &) -- the only way this script is ever actually
+# invoked for a real candidate preparation. Dot-sourcing loads every
+# function definition above (Test-EmbeddedSourceSha, Test-PackageManifest,
+# etc.) without running Main() or calling `exit`, so a test harness can
+# call these pure, parameterized functions in isolation.
+if ($MyInvocation.InvocationName -ne '.') {
+    try {
+        Main
+        exit 0
+    } catch {
+        $existingFailureReceipt = if ($Script:DeployLogDir) { Join-Path $Script:DeployLogDir "FAILURE_RECEIPT.txt" } else { $null }
+        if ($existingFailureReceipt -and (Test-Path $existingFailureReceipt)) {
+            Write-DeployLog -Level "FATAL" "Stopping after phase failure (see $existingFailureReceipt)."
+        } else {
+            Write-DeployLog -Level "FATAL" "UNHANDLED (no prior phase-specific failure receipt): $($_.Exception.Message)"
+            if ($Script:DeployLogDir) {
+                Write-FailureReceipt -Phase "UNHANDLED" -Reason $_.Exception.Message | Out-Null
+            }
         }
+        exit 1
     }
-    exit 1
 }

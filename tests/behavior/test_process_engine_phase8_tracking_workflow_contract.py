@@ -11,31 +11,31 @@ away the logic under test:
     ``SimpleNamespace``/``dict`` inputs, real function calls.
   * Tier 2 -- a real, isolated SQLite database (own Flask app + own tmp
     dir, ``Config`` patched before ``create_app()`` per the project's
-    proven pattern) for every function whose SQL contains no
-    ``ANY(:param)``: ``table_exists``, ``column_exists``, ``_flow_base_rows``,
-    ``synchronize_phase8_tracking``. ``build_process_tracking_workspace``
-    is also proven here for real (its own row-selection, bucket/label
-    assembly, and counts aggregation), with ``_steps_for_flows``/
-    ``_history_for_flows`` stubbed to return ``{}`` -- both of those two
-    helpers independently issue their own ``ANY(:flow_ids)`` statements
-    and cannot run against a real SQLite connection with a non-empty
-    flow_ids list, the identical constraint that pushes the delete
-    functions to Tier 3.
+    proven pattern) for ``table_exists``, ``column_exists``,
+    ``_flow_base_rows``, ``synchronize_phase8_tracking``.
+    ``build_process_tracking_workspace`` is also proven here for real (its
+    own row-selection, bucket/label assembly, and counts aggregation),
+    with ``_steps_for_flows``/``_history_for_flows`` stubbed to return
+    ``{}`` to isolate the aggregation loop from the row-fetch helpers --
+    both of those two helpers are separately proven for real against
+    SQLite in tests/behavior/test_process_engine_phase8_dual_database_
+    binding_contract.py (BYS360 DEFECT AB fix).
   * Tier 3 -- a fake ``db.session`` boundary (module's own ``db`` name
     replaced, same shape as
     tests/behavior/test_president_approvals_authorization_and_workspace_contract.py
-    lines 71-153) for the three delete functions, because
-    ``_delete_tracking_flow_ids`` issues raw
-    ``WHERE flow_id = ANY(:flow_ids)`` statements. This is PostgreSQL-only
-    array-binding syntax: ``text("SELECT * FROM t WHERE id = ANY(:ids)")``
-    bound to a Python list raises ``sqlite3.OperationalError: no such
-    function: ANY`` against a real SQLite engine (verified empirically
-    while building this file). It is a pre-existing dev/CI SQLite
-    portability gap in an internal SQL helper, not a business-logic bug,
-    and this file does not attempt to run any ``ANY()``-based query
-    against a real SQLite connection anywhere -- those three functions are
-    proven entirely through the fake-session boundary instead, per this
-    wave's instructions.
+    lines 71-153) for the three delete functions, matching this file's own
+    established fake-session pattern for exercising raw ``text()`` DELETE
+    statements without a real database. As of BYS360 DEFECT AB,
+    ``_delete_tracking_flow_ids``'s statements use the dialect-neutral
+    "expanding IN" bind pattern (``WHERE flow_id IN :flow_ids`` +
+    ``bindparam("flow_ids", expanding=True)``, compiled SQL literal text
+    ``IN (__[POSTCOMPILE_flow_ids])``), which -- unlike the prior
+    PostgreSQL-only ``= ANY(:flow_ids)`` -- runs correctly against real
+    SQLite too (see test_process_engine_phase8_dual_database_binding_
+    contract.py for that real-SQLite proof); the fake-session boundary
+    here is retained purely to keep this file's existing call-count/
+    call-order/commit-vs-rollback assertions isolated from database state,
+    not because the SQL itself is SQLite-incompatible.
 
 Two genuine, pre-existing production defects were found while building
 this file through real execution (not just reading) and are reported in
@@ -683,15 +683,12 @@ def test_build_process_tracking_workspace_assembles_items_counts_and_bucket_labe
     """build_process_tracking_workspace's own contribution beyond
     _flow_base_rows (already proven for real above) is the counts/bucket-
     label/item-assembly loop -- proven here against a real Tier-2 DB.
-    _steps_for_flows and _history_for_flows are stubbed to return {}: both
-    issue `WHERE ... = ANY(:flow_ids)`, the same PostgreSQL-only syntax
-    _delete_tracking_flow_ids uses (see module docstring), so they cannot run
-    against a real SQLite connection with a non-empty flow_ids list -- this
-    is the same legitimate schema-introspection-style boundary used
-    elsewhere in this file, not a mock of the aggregation logic under test.
-    Every other function this workspace call touches (_flow_base_rows,
-    _row_bucket, _visible_bucket, _bucket_tone, _full_name_from_row) runs
-    for real."""
+    _steps_for_flows and _history_for_flows are stubbed to return {} to
+    isolate this aggregation loop from the row-fetch helpers (both are
+    separately proven for real against SQLite elsewhere, see module
+    docstring's BYS360 DEFECT AB note). Every other function this
+    workspace call touches (_flow_base_rows, _row_bucket, _visible_bucket,
+    _bucket_tone, _full_name_from_row) runs for real."""
     monkeypatch.setattr(pt, "_steps_for_flows", lambda flow_ids: {})
     monkeypatch.setattr(pt, "_history_for_flows", lambda flow_ids: {})
 
@@ -988,15 +985,20 @@ def test_delete_process_tracking_flow_authorized_issues_three_ordered_deletes_sc
     notif_sql, notif_params = execute.calls[1]
     flows_sql, flows_params = execute.calls[2]
 
+    # BYS360 DEFECT AB: the dialect-neutral "expanding IN" bind pattern
+    # compiles to "IN (__[POSTCOMPILE_flow_ids])" placeholder text before
+    # parameter substitution (real values are bound at execute time, see
+    # steps_params/notif_params/flows_params below) -- this is what
+    # replaced the prior PostgreSQL-only "= ANY(:flow_ids)" literal.
     assert "performance_process_flow_steps" in steps_sql
-    assert "DELETE FROM performance_process_flow_steps WHERE flow_id = ANY(:flow_ids)" in steps_sql
+    assert "DELETE FROM performance_process_flow_steps WHERE flow_id IN (__[POSTCOMPILE_flow_ids])" in steps_sql
     assert steps_params["flow_ids"] == [55]
 
     assert "performance_process_notifications" in notif_sql
-    assert "DELETE FROM performance_process_notifications WHERE flow_id = ANY(:flow_ids)" in notif_sql
+    assert "DELETE FROM performance_process_notifications WHERE flow_id IN (__[POSTCOMPILE_flow_ids])" in notif_sql
     assert notif_params["flow_ids"] == [55]
 
-    assert "DELETE FROM performance_process_flows WHERE id = ANY(:flow_ids)" in flows_sql
+    assert "DELETE FROM performance_process_flows WHERE id IN (__[POSTCOMPILE_flow_ids])" in flows_sql
     assert flows_params["flow_ids"] == [55]
 
     # No evaluation/scorecard/president-approval/personnel table is ever

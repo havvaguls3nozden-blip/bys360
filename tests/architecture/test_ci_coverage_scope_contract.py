@@ -1161,3 +1161,101 @@ def test_publish_preflight_rules_behavior_appears_in_exactly_one_ci_workflow_run
         f"expected {PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH} in exactly one CI run command, "
         f"found {len(hits)}: {hits}"
     )
+
+
+# =====================================================================
+# BYS360 AE Coverage Metadata Drift Closure (AA-AH Final Closure Phase 1)
+#
+# Mechanically confirmed gap: the P0 Critical Coverage Hotspot Wave
+# (2026-08-12, section above) added BOTH the "tests/performance" directory
+# and PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH to the live workflow's
+# Step2 command, and the tests immediately above lock their presence in
+# the LIVE WORKFLOW -- but nothing anywhere in this file, until now, ever
+# checked that reports/quality/coverage_baseline.json's own recorded
+# "commands" field (a separate, hand-maintained copy -- see the "BYS360
+# Coverage Baseline Metadata Consistency Fix" precedent in that file's own
+# _history for why this field exists and must track the ACTIVE baseline)
+# also reflects them. It didn't: "tests/performance" was never in
+# commands[1] at all, and PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH's own
+# addition to the live workflow was checked here (the two tests directly
+# above) but never cross-checked against the baseline's own copy. This
+# section closes both the drift (coverage_baseline.json's commands field,
+# fixed via the same workflow_run_commands() re-extraction the 2026-08-11
+# Metadata Consistency Fix already established as this project's canonical
+# mechanism -- see that file's _history) and the test gap that let it go
+# undetected (the tests below, which fail loudly the next time either the
+# live workflow or coverage_baseline.json's commands field changes without
+# the other following).
+#
+# NUMERIC_BASELINE_UNCHANGED: this closure did not re-run coverage or
+# touch combined_pct/lines_covered/branches_covered/tolerance_pct -- see
+# coverage_baseline.json's own _history entry for the full disclosure of
+# why the existing floor remains valid (the live command only ever ADDS
+# test scope on top of the same invocation, a strict superset).
+# =====================================================================
+
+TESTS_PERFORMANCE_DIRECTORY = "tests/performance"
+
+
+def test_tests_performance_directory_is_included_in_coverage_instrumented_ci_step() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert TESTS_PERFORMANCE_DIRECTORY in command.split()
+
+
+def test_tests_performance_directory_is_not_also_run_in_the_ci_safe_step() -> None:
+    ci_safe_command = _ci_safe_step_command()
+    assert TESTS_PERFORMANCE_DIRECTORY not in ci_safe_command.split()
+
+
+def test_tests_performance_directory_appears_in_exactly_one_ci_workflow_run_command() -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if TESTS_PERFORMANCE_DIRECTORY in c.split()]
+    assert len(hits) == 1, f"expected {TESTS_PERFORMANCE_DIRECTORY} in exactly one CI run command, found {len(hits)}: {hits}"
+
+
+def test_tests_performance_directory_exists_on_disk() -> None:
+    assert (ROOT / TESTS_PERFORMANCE_DIRECTORY).is_dir()
+
+
+def test_coverage_baseline_commands_include_tests_performance_directory() -> None:
+    """The specific assertion that was missing and let AE drift silently:
+    coverage_baseline.json's OWN recorded commands[1] (not the workflow
+    YAML, already checked above) must also list tests/performance."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(TESTS_PERFORMANCE_DIRECTORY in c.split() for c in commands), (
+        "coverage_baseline.json's recorded 'commands' must reflect the real live-workflow "
+        f"scope, including {TESTS_PERFORMANCE_DIRECTORY}"
+    )
+
+
+def test_coverage_baseline_commands_include_publish_preflight_rules_behavior_path() -> None:
+    """Same class of check as the one above, for the OTHER path the P0
+    Critical Coverage Hotspot Wave added to the live workflow but never
+    cross-checked against coverage_baseline.json's own commands field."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in c.split() for c in commands), (
+        "coverage_baseline.json's recorded 'commands' must reflect the real live-workflow "
+        f"scope, including {PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH}"
+    )
+
+
+def test_coverage_baseline_commands_step2_exactly_matches_live_workflow_step2_command() -> None:
+    """The strongest possible AE regression lock: coverage_baseline.json's
+    commands[1] must be BYTE-IDENTICAL to the live workflow's own Step2
+    command, not merely a superset/substring check. If a future workflow
+    edit changes Step2 in ANY way (add, remove, reorder a path or flag)
+    without a matching, deliberate update to coverage_baseline.json's
+    commands field, this test fails immediately -- the exact class of
+    silent drift this closure fixed."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    baseline_step2 = data["commands"][1]
+    live_step2 = _coverage_instrumented_broad_step_command()
+    assert baseline_step2 == live_step2, (
+        "coverage_baseline.json's commands[1] has drifted from the live workflow's Step2 "
+        "command again. If this is a deliberate, reviewed workflow change: update "
+        "commands[1] via scripts.quality.bys360_quality9_ci_gate.workflow_run_commands "
+        "(do NOT hand-edit or touch combined_pct/lines_covered/etc.) and add a new "
+        "_history entry documenting why the existing numeric floor still holds."
+    )

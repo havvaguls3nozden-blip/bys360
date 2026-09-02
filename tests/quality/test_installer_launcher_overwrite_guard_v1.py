@@ -48,6 +48,7 @@ PS_EXE = shutil.which("pwsh") or shutil.which("powershell")
 
 INSTALL_V1_4 = ROOT / "scripts" / "windows" / "install_bys360_daily_mail_tasks_v1_4.ps1"
 INSTALL_WEATHER = ROOT / "scripts" / "windows" / "install_bys360_daily_weather_mail_task.ps1"
+INSTALL_PULSE_STANDALONE = ROOT / "scripts" / "windows" / "install_bys360_daily_pulse_mail_task.ps1"
 REGISTER_V2_14_3 = ROOT / "scripts" / "windows" / "register_bys360_executive_summary_tasks_v2_14_3.ps1"
 
 CANONICAL_WEATHER_LAUNCHER = ROOT / "scripts" / "communication" / "run_daily_weather_personnel_mail.ps1"
@@ -609,29 +610,187 @@ def test_register_v2_14_3_throws_when_a_launcher_has_invalid_syntax(broken: str,
 
 
 # ---------------------------------------------------------------------------
-# 4) BLOCKED / kapsam disi bulgular: eksik launcher uydurulmadi.
+# 4) BYS360 DEFECT AG closure: the previously-missing launcher now exists,
+#    with a real, reviewed, mechanically-proven contract -- not a guess.
 # ---------------------------------------------------------------------------
 
 
-def test_daily_pulse_check_mail_launcher_is_still_blocked_and_not_fabricated() -> None:
-    """scripts\\communication\\run_daily_pulse_check_mail.ps1 gercek repoda
-    HALA YOKTUR. install_bys360_daily_mail_tasks_v1_4.ps1 ve
-    install_bys360_daily_weather_mail_task.ps1 bu yolu Launcher olarak
-    referans etmeye devam ediyor; bu, kurulum sirasinda ACIK bir `throw` ile
-    BLOCKED olarak raporlanir (installer artik bu dosyayi uretmiyor/uydurmuyor).
-    Bu test, birinin bu launcher'i varsayimla/isimden davranis uydurarak
-    eklemedigini kilitler - tipki watch_bys360_live_waitress80.ps1 ve
-    run_performance_mail_reminder_09.ps1 icin onceki turda kilitlenen kurala
-    benzer sekilde."""
-    assert not PULSE_LAUNCHER_REAL.exists(), (
-        "run_daily_pulse_check_mail.ps1 repoda bulundu; bu dosyanin gercek "
-        "davranis sozlesmesi/kod incelemesi olmadan bu gorev kapsaminda "
-        "olusturulmamis/dogrulanmamis olmasi bekleniyordu (BLOCKED bulgusu "
-        "gecersiz hale geldi, raporu guncelle)."
+def test_daily_pulse_check_mail_launcher_now_exists_with_reviewed_canonical_contract() -> None:
+    """BYS360 DEFECT AG (closure of the prior BLOCKED finding): scripts\\
+    communication\\run_daily_pulse_check_mail.ps1 was mechanically confirmed
+    missing (install_bys360_daily_mail_tasks_v1_4.ps1 /
+    install_bys360_daily_weather_mail_task.ps1 already referenced it as
+    their Pulse sub-task's required Launcher, so that sub-task could never
+    install -- Install-BysTask's own Test-Path guard threw first). This
+    wave created it, mirroring the sibling run_daily_weather_personnel_
+    mail.ps1 launcher's exact, already-canonical contract: resolve Python/
+    script/log paths from a fixed project root, pre-flight Test-Path guard
+    both, cd into the project root, let a real PowerShell process (not
+    argv passed to python.exe) own ">>"/"2>&1" redirection, and re-throw on
+    a non-zero Python exit code so the Scheduled Task correctly reports
+    failure."""
+    assert PULSE_LAUNCHER_REAL.exists(), "run_daily_pulse_check_mail.ps1 hala repoda bulunamadi -- AG kapatilmadi."
+    _parse_ok(PULSE_LAUNCHER_REAL)
+
+    text = PULSE_LAUNCHER_REAL.read_text(encoding="utf-8")
+    assert "send_daily_pulse_check_mail.py" in text
+    assert "Test-Path $Python" in text
+    assert "Test-Path $Script" in text
+    assert "& $Python $Script >> $LogPath 2>&1" in text, (
+        "Launcher gercek PowerShell redirection operatorlerini kullanmali "
+        "(argv olarak degil) -- Defect AA'nin kok nedeniyle ayni sinif hata."
     )
+    assert "$LASTEXITCODE -ne 0" in text and "throw" in text, (
+        "Launcher, Python'un sifir olmayan cikis kodunu Scheduled Task'a "
+        "yaymak icin throw etmeli."
+    )
+
     for installer in (INSTALL_V1_4, INSTALL_WEATHER):
-        text = installer.read_text(encoding="utf-8")
-        assert "run_daily_pulse_check_mail.ps1" in text
+        installer_text = installer.read_text(encoding="utf-8")
+        assert "run_daily_pulse_check_mail.ps1" in installer_text
+
+
+# ---------------------------------------------------------------------------
+# 5) BYS360 DEFECT AG end-to-end proof: v1_4/weather actually install the
+#    Pulse sub-task successfully using the REAL launcher file's own content
+#    (not the synthetic sandbox fixture used by the tests above).
+# ---------------------------------------------------------------------------
+
+
+def _build_weather_sandbox_with_real_pulse_launcher(tmp_path: Path) -> Path:
+    project_root = _build_weather_sandbox(tmp_path, include_pulse_launcher=False)
+    _make_dummy_file(
+        project_root / "scripts" / "communication" / "run_daily_pulse_check_mail.ps1",
+        PULSE_LAUNCHER_REAL.read_text(encoding="utf-8"),
+    )
+    return project_root
+
+
+@pytest.mark.parametrize("installer", [INSTALL_V1_4, INSTALL_WEATHER], ids=["v1_4", "weather_task_variant"])
+def test_pulse_subtask_installs_successfully_using_the_real_launcher_content(installer: Path, tmp_path: Path) -> None:
+    """AG closure proof: this is NOT the synthetic PULSE_LAUNCHER_TEST_FIXTURE
+    -- the sandbox is seeded with the ACTUAL bytes of scripts/communication/
+    run_daily_pulse_check_mail.ps1 read straight off disk, proving the real,
+    just-created file (not an assumption about its shape) satisfies Install-
+    BysTask's launcher-content-reference contract end to end."""
+    project_root = _build_weather_sandbox_with_real_pulse_launcher(tmp_path / "sandbox")
+    pulse_launcher = project_root / "scripts" / "communication" / "run_daily_pulse_check_mail.ps1"
+
+    harness_result = _run_mocked_installer(installer, project_root, tmp_path / "harness", runs=1)
+    run = harness_result["results"][0]
+    assert run["Success"] is True, f"Pulse sub-task kurulumu basarisiz oldu: {run.get('Error')}"
+
+    action_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") == "New-ScheduledTaskAction"]
+    pulse_actions = [c for c in action_calls if str(pulse_launcher) in (c.get("Argument") or "")]
+    assert len(pulse_actions) == 1, "Gercek launcher iceriginden tam olarak bir Pulse Scheduled Task action'i beklenir."
+
+
+# ---------------------------------------------------------------------------
+# 6) BYS360 DEFECT AA: the standalone install_bys360_daily_pulse_mail_
+#    task.ps1 no longer passes ">>"/"2>&1" as literal argv to python.exe.
+# ---------------------------------------------------------------------------
+
+
+def _build_standalone_pulse_sandbox(tmp_path: Path, *, include_launcher: bool = True, include_runner: bool = True) -> Path:
+    project_root = tmp_path / "project"
+    _make_dummy_file(project_root / ".venv" / "Scripts" / "python.exe", "dummy python.exe\n")
+    if include_runner:
+        _make_dummy_file(project_root / "scripts" / "communication" / "send_daily_pulse_check_mail.py", "# dummy runner\n")
+    if include_launcher:
+        _make_dummy_file(
+            project_root / "scripts" / "communication" / "run_daily_pulse_check_mail.ps1",
+            PULSE_LAUNCHER_REAL.read_text(encoding="utf-8"),
+        )
+    return project_root
+
+
+def _run_mocked_standalone_pulse_installer(project_root: Path, work_dir: Path) -> dict:
+    """install_bys360_daily_pulse_mail_task.ps1'i mock'lanmis bir PowerShell
+    oturumunda calistirir (ayni MOCK_SCHEDULED_TASK_CMDLETS katmani, ama
+    sadece -ProjectRoot alan tek bir installer icin, -File tabanli calistirma
+    olmadan -- bu dosya Apply/dry-run modu yok, dogrudan calistirilir)."""
+    exe = _require_ps()
+    work_dir.mkdir(parents=True, exist_ok=True)
+    out_json = work_dir / "harness_out.json"
+    harness_path = work_dir / "harness.ps1"
+
+    harness = MOCK_SCHEDULED_TASK_CMDLETS
+    harness += "\n$installerPath = " + _ps_single_quote(str(INSTALL_PULSE_STANDALONE)) + "\n"
+    harness += "$projectRoot = " + _ps_single_quote(str(project_root)) + "\n"
+    harness += r"""
+$errMsg = $null
+$success = $true
+try {
+    & $installerPath -ProjectRoot $projectRoot
+} catch {
+    $success = $false
+    $errMsg = $_.Exception.Message
+}
+$output = [PSCustomObject]@{
+    Success = $success
+    Error = $errMsg
+    MockCalls = @($Global:MockCalls)
+}
+"""
+    harness += "$output | ConvertTo-Json -Depth 8 | Set-Content -Path " + _ps_single_quote(str(out_json)) + " -Encoding UTF8\n"
+    harness_path.write_text(harness, encoding="utf-8")
+
+    result = subprocess.run(
+        [exe, "-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-File", str(harness_path)],
+        capture_output=True, text=True, timeout=60, check=False,
+    )
+    assert result.returncode == 0, f"Mock harness kendisi basarisiz oldu: stdout={result.stdout!r} stderr={result.stderr!r}"
+    assert out_json.exists(), f"Harness JSON ciktisi olusmadi: stdout={result.stdout!r} stderr={result.stderr!r}"
+
+    raw = json.loads(out_json.read_text(encoding="utf-8-sig"))
+    mock_calls = raw.get("MockCalls") or []
+    if isinstance(mock_calls, dict):
+        mock_calls = [mock_calls]
+    return {"success": raw["Success"], "error": raw.get("Error"), "mock_calls": mock_calls}
+
+
+def test_standalone_pulse_installer_no_longer_passes_redirection_operators_as_python_argv(tmp_path: Path) -> None:
+    project_root = _build_standalone_pulse_sandbox(tmp_path / "sandbox")
+
+    result = _run_mocked_standalone_pulse_installer(project_root, tmp_path / "harness")
+    assert result["success"] is True, f"Installer basarisiz oldu: {result.get('error')}"
+
+    action_calls = [c for c in result["mock_calls"] if c.get("Cmdlet") == "New-ScheduledTaskAction"]
+    assert len(action_calls) == 1
+    action = action_calls[0]
+
+    assert action["Execute"] == "powershell.exe", (
+        f"Action artik python.exe'yi DOGRUDAN degil, launcher uzerinden powershell.exe ile "
+        f"calistirmali. Execute={action['Execute']!r}"
+    )
+    argument = action["Argument"] or ""
+    assert ">>" not in argument, "Defect AA: '>>' artik argv olarak gecilmemeli."
+    assert "2>&1" not in argument, "Defect AA: '2>&1' artik argv olarak gecilmemeli."
+    assert "-File" in argument
+    assert "run_daily_pulse_check_mail.ps1" in argument
+
+    register_calls = [c for c in result["mock_calls"] if c.get("Cmdlet") in ("Register-ScheduledTask", "Set-ScheduledTask")]
+    assert len(register_calls) == 1
+    principal = register_calls[0].get("Principal") or {}
+    assert principal.get("UserId") == "SYSTEM", "Defect Y'nin SYSTEM principal'i Defect AA duzeltmesiyle bozulmamali."
+
+
+def test_standalone_pulse_installer_throws_when_launcher_is_missing(tmp_path: Path) -> None:
+    project_root = _build_standalone_pulse_sandbox(tmp_path / "sandbox", include_launcher=False)
+
+    result = _run_mocked_standalone_pulse_installer(project_root, tmp_path / "harness")
+    assert result["success"] is False, "Launcher eksikken installer sessizce basarili olmamali."
+    assert "Launcher bulunamadi" in (result.get("error") or "")
+    assert result["mock_calls"] == [], "Launcher eksikken hicbir Scheduled Task mutasyonu denenmemeli."
+
+
+def test_standalone_pulse_installer_throws_when_python_runner_script_is_missing(tmp_path: Path) -> None:
+    project_root = _build_standalone_pulse_sandbox(tmp_path / "sandbox", include_runner=False)
+
+    result = _run_mocked_standalone_pulse_installer(project_root, tmp_path / "harness")
+    assert result["success"] is False, "Runner script eksikken installer sessizce basarili olmamali."
+    assert "Script bulunamadi" in (result.get("error") or "")
+    assert result["mock_calls"] == []
 
 
 def test_two_unrelated_unproven_launchers_remain_untouched() -> None:
