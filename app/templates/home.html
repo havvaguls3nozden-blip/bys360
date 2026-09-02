@@ -17,7 +17,6 @@
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_home_weather.css') }}?v=home-weather-executive-v3">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/announcement_popup.css') }}?v=home-announcement-popup-fix">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/ai_decision_faz12.css') }}?v=home-karar-destek-karti-v1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/bys360_portal.css') }}?v=corporate-portal-v1">
 {# BYS360_CORPORATE_PORTAL_V1_HOME_CSS #}
 
@@ -197,10 +196,6 @@
       <span>Personel kapsamı</span>
       <strong>{{ summary.user_count|default(0, true) if summary.user_count else 'Yetkili görünüm' }}</strong>
     </div>
-  </section>
-
-  <section class="home-faz1-ai-decision-wrap" aria-label="Karar Destek Merkezi ana sayfa kartı">
-    {% include 'ai_decision/_final_gate_panel.html' ignore missing %}
   </section>
 
 </div>
