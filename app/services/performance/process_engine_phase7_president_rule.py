@@ -83,35 +83,30 @@ def _exec(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = current_schema()
-                  AND table_name = :table_name
-            )
-            """
-        ),
-        {"table_name": table_name},
-    ).scalar()
-    return bool(row)
+    """BYS360 DEFECT AK: raw PostgreSQL-only ``information_schema.tables``
+    query (filtered by the PostgreSQL-only ``current_schema()`` SQL
+    function) replaced with SQLAlchemy's ``inspect()``, which is
+    dialect-neutral by construction -- the same proven pattern already
+    used elsewhere in this codebase (process_engine_phase3_history.py,
+    process_engine_phase4_flow.py, process_engine_phase6_president_
+    approvals.py, process_engine_phase8_tracking.py, and this same file's
+    own AJ-fixed ``_add_column_if_missing``). SQLite has no
+    ``information_schema`` and no ``current_schema()`` function at all;
+    real execution confirmed ``sqlite3.OperationalError: no such table:
+    information_schema.tables`` unconditionally."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = current_schema()
-              AND table_name = :table_name
-            """
-        ),
-        {"table_name": table_name},
-    ).scalars().all()
-    return {str(row) for row in rows}
+    """BYS360 DEFECT AK: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query (same fix rationale as ``_table_exists`` above). Preserves the
+    missing-table contract exactly: an absent table returns an empty set,
+    matching the original query's behavior (a WHERE clause that matches no
+    rows), not an exception."""
+    if not _table_exists(table_name):
+        return set()
+    return {col["name"] for col in inspect(db.engine).get_columns(table_name)}
 
 
 def _first_existing(columns: set[str], candidates: Iterable[str]) -> str | None:
