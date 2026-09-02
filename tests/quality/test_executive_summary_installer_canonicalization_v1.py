@@ -101,8 +101,9 @@ function New-ScheduledTaskSettingsSet {
 }
 function New-ScheduledTaskPrincipal {
     [CmdletBinding()]
-    param([string]$UserId, [string]$RunLevel)
-    return [PSCustomObject]@{}
+    param([string]$UserId, [string]$LogonType, [string]$RunLevel)
+    [void]$Global:MockCalls.Add(@{Cmdlet='New-ScheduledTaskPrincipal'; UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel})
+    return [PSCustomObject]@{UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel}
 }
 function Get-ScheduledTask {
     [CmdletBinding()]
@@ -112,14 +113,14 @@ function Get-ScheduledTask {
 }
 function Set-ScheduledTask {
     [CmdletBinding()]
-    param([string]$TaskName,$Action,$Trigger,$Settings)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName})
+    param([string]$TaskName,$Action,$Trigger,$Settings,$Principal)
+    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName; Principal=$Principal})
     return $null
 }
 function Register-ScheduledTask {
     [CmdletBinding()]
     param([string]$TaskName,$Action,$Trigger,$Settings,[string]$Description,[switch]$Force,$Principal)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description})
+    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description; Principal=$Principal})
     return $null
 }
 function Unregister-ScheduledTask {

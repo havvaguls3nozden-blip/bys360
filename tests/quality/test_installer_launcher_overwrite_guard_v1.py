@@ -85,8 +85,9 @@ function New-ScheduledTaskSettingsSet {
 }
 function New-ScheduledTaskPrincipal {
     [CmdletBinding()]
-    param([string]$UserId, [string]$RunLevel)
-    return [PSCustomObject]@{}
+    param([string]$UserId, [string]$LogonType, [string]$RunLevel)
+    [void]$Global:MockCalls.Add(@{Cmdlet='New-ScheduledTaskPrincipal'; UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel})
+    return [PSCustomObject]@{UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel}
 }
 function Get-ScheduledTask {
     [CmdletBinding()]
@@ -96,14 +97,14 @@ function Get-ScheduledTask {
 }
 function Set-ScheduledTask {
     [CmdletBinding()]
-    param([string]$TaskName,$Action,$Trigger,$Settings)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName})
+    param([string]$TaskName,$Action,$Trigger,$Settings,$Principal)
+    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName; Principal=$Principal})
     return $null
 }
 function Register-ScheduledTask {
     [CmdletBinding()]
     param([string]$TaskName,$Action,$Trigger,$Settings,[string]$Description,[switch]$Force,$Principal)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description})
+    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description; Principal=$Principal})
     return $null
 }
 function Unregister-ScheduledTask {
@@ -441,6 +442,28 @@ def test_install_bystask_never_modifies_canonical_launchers_and_is_idempotent(in
 
 
 @pytest.mark.parametrize("installer", [INSTALL_V1_4, INSTALL_WEATHER], ids=["v1_4", "weather_task_variant"])
+def test_install_bystask_registers_every_task_with_explicit_system_service_account_principal(installer: Path, tmp_path: Path) -> None:
+    """BYS360 DEFECT Y: without an explicit Principal, Register-ScheduledTask/
+    Set-ScheduledTask default to the CURRENT INTERACTIVE caller's identity --
+    wrong for these unattended, timer-driven daily mail tasks (SMTP-based,
+    no Outlook/COM/interactive-desktop dependency). Every Install-BysTask
+    registration must carry an explicit SYSTEM / ServiceAccount / Highest
+    principal."""
+    project_root = _build_weather_sandbox(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(installer, project_root, tmp_path / "harness", runs=1)
+    assert harness_result["results"][0]["Success"] is True
+
+    register_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") in ("Register-ScheduledTask", "Set-ScheduledTask")]
+    assert len(register_calls) == 2, "Weather + Pulse gorevleri icin tam olarak iki kayit cagrisi beklenir."
+    for call in register_calls:
+        principal = call.get("Principal") or {}
+        assert principal.get("UserId") == "SYSTEM", f"Principal SYSTEM olmali: {call!r}"
+        assert principal.get("LogonType") == "ServiceAccount", f"LogonType ServiceAccount olmali: {call!r}"
+        assert principal.get("RunLevel") == "Highest", f"RunLevel Highest olmali: {call!r}"
+
+
+@pytest.mark.parametrize("installer", [INSTALL_V1_4, INSTALL_WEATHER], ids=["v1_4", "weather_task_variant"])
 def test_install_bystask_throws_when_weather_launcher_is_missing(installer: Path, tmp_path: Path) -> None:
     project_root = _build_weather_sandbox(tmp_path / "sandbox", include_weather_launcher=False)
 
@@ -524,6 +547,26 @@ def test_register_v2_14_3_never_modifies_canonical_launchers_and_is_idempotent(t
     assert len(night_actions) == 2
     assert morning_actions[0]["Argument"] == morning_actions[1]["Argument"]
     assert night_actions[0]["Argument"] == night_actions[1]["Argument"]
+
+
+def test_register_v2_14_3_registers_both_tasks_with_explicit_system_service_account_principal(tmp_path: Path) -> None:
+    """BYS360 DEFECT Y: "BYS360 Executive Summary 0001" fires at 00:01, when
+    no operator is realistically logged on. Without an explicit Principal,
+    Register-ScheduledTask defaults to the current interactive caller's
+    identity -- both tasks must carry an explicit SYSTEM / ServiceAccount /
+    Highest principal."""
+    project_root = _build_exec_summary_sandbox(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(REGISTER_V2_14_3, project_root, tmp_path / "harness", runs=1)
+    assert harness_result["results"][0]["Success"] is True
+
+    register_calls = [c for c in harness_result["mock_calls"] if c.get("Cmdlet") in ("Register-ScheduledTask", "Set-ScheduledTask")]
+    assert len(register_calls) == 2, "Morning + night gorevleri icin tam olarak iki kayit cagrisi beklenir."
+    for call in register_calls:
+        principal = call.get("Principal") or {}
+        assert principal.get("UserId") == "SYSTEM", f"Principal SYSTEM olmali: {call!r}"
+        assert principal.get("LogonType") == "ServiceAccount", f"LogonType ServiceAccount olmali: {call!r}"
+        assert principal.get("RunLevel") == "Highest", f"RunLevel Highest olmali: {call!r}"
 
 
 @pytest.mark.parametrize(

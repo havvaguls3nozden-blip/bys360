@@ -15,6 +15,11 @@ $tasks = @(
   @{Name="BYS360 CIC Yonetici Sabah"; Key="MANAGER_MORNING"; Hour=7; Minute=45},
   @{Name="BYS360 CIC Yonetici Aksam"; Key="MANAGER_EVENING"; Hour=17; Minute=45}
 )
+# BYS360 DEFECT Y: explicit unattended-service principal -- without this,
+# Register-ScheduledTask/Set-ScheduledTask default to the current
+# interactive caller's identity/logon type, which these daily mail tasks
+# cannot depend on.
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 foreach ($t in $tasks) {
   $log = Join-Path $LogDir ($t.Key.ToLower() + ".log")
   $arg = "-NoProfile -ExecutionPolicy Bypass -Command `"cd '$ProjectRoot'; & '$Python' '$Runner' --task-key $($t.Key) --log-file '$log'`""
@@ -23,10 +28,10 @@ foreach ($t in $tasks) {
   $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
   $existing = Get-ScheduledTask -TaskName $t.Name -ErrorAction SilentlyContinue
   if ($existing) {
-    Set-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger -Settings $settings | Out-Null
+    Set-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger -Settings $settings -Principal $principal | Out-Null
     Write-Host "Güncellendi: $($t.Name) => $($t.Hour):$($t.Minute.ToString('00'))"
   } else {
-    Register-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger -Settings $settings -Description "BYS360 Kurumsal Bilgilendirme Merkezi otomatik mail görevi" | Out-Null
+    Register-ScheduledTask -TaskName $t.Name -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "BYS360 Kurumsal Bilgilendirme Merkezi otomatik mail görevi" | Out-Null
     Write-Host "Kuruldu: $($t.Name) => $($t.Hour):$($t.Minute.ToString('00'))"
   }
 }

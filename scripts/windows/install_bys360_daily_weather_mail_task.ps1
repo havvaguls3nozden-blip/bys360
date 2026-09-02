@@ -50,12 +50,17 @@ function Install-BysTask {
     $TriggerTime = (Get-Date).Date.AddHours($Hour).AddMinutes($Minute)
     $Trigger = New-ScheduledTaskTrigger -Daily -At $TriggerTime
     $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+    # BYS360 DEFECT Y: explicit unattended-service principal -- without this,
+    # Register-ScheduledTask/Set-ScheduledTask default to the current
+    # interactive caller's identity/logon type, which this daily mail task
+    # cannot depend on.
+    $Principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
     $Existing = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
     if ($Existing) {
-        Set-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings | Out-Null
+        Set-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal | Out-Null
         Write-Host "Mevcut gorev guncellendi: $TaskName"
     } else {
-        Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description $Description | Out-Null
+        Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description $Description | Out-Null
         Write-Host "Yeni gorev olusturuldu: $TaskName"
     }
     Write-Host "Saat: $($Hour.ToString('00')):$($Minute.ToString('00')) | Log: $LogPath"

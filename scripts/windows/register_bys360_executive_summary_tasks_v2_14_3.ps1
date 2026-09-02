@@ -43,13 +43,19 @@ function Assert-LauncherReady {
 Assert-LauncherReady -Path $morningScript -Label "Executive Summary 0830" -ExpectedFragment "--type morning"
 Assert-LauncherReady -Path $nightScript -Label "Executive Summary 0001" -ExpectedFragment "--type night"
 
+# BYS360 DEFECT Y: explicit unattended-service principal -- without this,
+# Register-ScheduledTask defaults to the current interactive caller's
+# identity/logon type. "BYS360 Executive Summary 0001" fires at 00:01, when
+# no operator is realistically logged on -- both tasks need SYSTEM.
+$Principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+
 $actionMorning = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$morningScript`"" -WorkingDirectory $ProjectRoot
 $triggerMorning = New-ScheduledTaskTrigger -Daily -At 08:30
-Register-ScheduledTask -TaskName "BYS360 Executive Summary 0830" -Action $actionMorning -Trigger $triggerMorning -Description "BYS360 Günaydın Yönetici Özeti otomatik mail görevi" -Force | Out-Null
+Register-ScheduledTask -TaskName "BYS360 Executive Summary 0830" -Action $actionMorning -Trigger $triggerMorning -Principal $Principal -Description "BYS360 Günaydın Yönetici Özeti otomatik mail görevi" -Force | Out-Null
 
 $actionNight = New-ScheduledTaskAction -Execute "powershell.exe" -Argument "-NoProfile -ExecutionPolicy Bypass -File `"$nightScript`"" -WorkingDirectory $ProjectRoot
 $triggerNight = New-ScheduledTaskTrigger -Daily -At 00:01
-Register-ScheduledTask -TaskName "BYS360 Executive Summary 0001" -Action $actionNight -Trigger $triggerNight -Description "BYS360 Gece Sistem Kontrolü otomatik mail görevi" -Force | Out-Null
+Register-ScheduledTask -TaskName "BYS360 Executive Summary 0001" -Action $actionNight -Trigger $triggerNight -Principal $Principal -Description "BYS360 Gece Sistem Kontrolü otomatik mail görevi" -Force | Out-Null
 
 Write-Host "BYS360_EXECUTIVE_SUMMARY_TASKS_REGISTERED"
 Get-ScheduledTask -TaskName "BYS360 Executive Summary 0830","BYS360 Executive Summary 0001" | Select-Object TaskName, State

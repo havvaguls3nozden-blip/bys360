@@ -59,8 +59,46 @@ reinvented)
 FAILURE PHASES (recorded verbatim in the failure receipt's "Phase" field)
   RECEIPT_INVALID, PRECHECK_FAILED, DB_BACKUP_FAILED, STATE_PRESERVE_FAILED,
   SERVICE_STOP_FAILED, PROMOTION_FAILED, LIVE_MIGRATION_FAILED,
-  SERVICE_START_FAILED, LOCAL_HEALTH_FAILED, PUBLIC_HEALTH_FAILED,
-  SMOKE_FAILED, POST_DEPLOY_SECURITY_FAILED
+  SERVICE_START_FAILED, LOCAL_HEALTH_FAILED, RELEASE_IDENTITY_FAILED,
+  READINESS_FAILED, PUBLIC_HEALTH_FAILED, SMOKE_FAILED,
+  POST_DEPLOY_SECURITY_FAILED
+
+DEFECT Z -- STALE/WRONG-PROCESS REJECTION (read before assuming "port is
+listening and /healthz is 200" ever meant "the right process is up")
+  Before this fix, SERVICE_STOP (Phase 7/8) only WARNED if something was
+  still listening on $AppPort after Stop-ScheduledTask, and SERVICE_START
+  (Phase 15) accepted ANY process listening on $AppPort as success -- with
+  no PID/path/freshness check and no comparison of the release identity the
+  responding process actually reports against the candidate this run
+  intended to promote. A stale/orphaned process left over from before
+  cutover (or, in principle, an unrelated process that happened to be
+  listening) could therefore be silently accepted as "the new candidate is
+  live." This is now closed by THREE independent, fail-closed bindings, all
+  required together:
+    1. PROCESS BINDING (Test-ProcessBinding, used by both Stop-LiveService
+       -- which now fails closed instead of warning if anything is still
+       listening after stop -- and Start-LiveService): the PID owning
+       $AppPort must resolve (via Win32_Process) to the EXACT expected
+       venv python.exe path under the just-promoted $ProjectRoot, its
+       command line must reference run_server.py, and its process start
+       time must be AFTER this run's own Start-ScheduledTask invocation --
+       proving it is a genuinely fresh process this run started, not a
+       leftover.
+    2. RELEASE IDENTITY BINDING (Test-ReleaseIdentityBinding, new Phase
+       16a/20): calls the now-extended GET /versionz (see
+       app/routes.py::_bys360_release_identity -- the ONE minimal,
+       justified app-source change this defect required, because every
+       promoted release lives at the identical fixed path, so process/PID
+       metadata alone can never prove WHICH release's code is loaded) and
+       requires its source_sha/migration_head to exactly match the
+       candidate this run intended to promote.
+    3. READINESS GATE (Test-ReadinessGate, new Phase 16b/20): calls GET
+       /readyz and requires both HTTP 200 and body status=="ready" --
+       previously never called by this script at all.
+  Any of the three failing prevents SUCCESS (Invoke-FailClosed), exactly
+  like every other phase in this script; rollback via
+  rollback_bys360_candidate.ps1 remains unaffected and still bound to the
+  previous release the normal way (PREVIOUS_DIR in the receipt).
 #>
 
 [CmdletBinding()]
@@ -124,7 +162,10 @@ $Script:Receipt = [ordered]@{
     FILE_CENTER_TABLES       = ""
     SCHEMA_CONTRACT_CHECK    = ""
     SERVICE_RESULT           = ""
+    PROCESS_BINDING          = ""
     LOCAL_HEALTH             = ""
+    RELEASE_IDENTITY         = ""
+    READINESS                = ""
     PUBLIC_HEALTH            = ""
     SMOKE                    = ""
     SECURITY_CRITICAL        = ""
@@ -278,6 +319,132 @@ function Test-LogForRealErrors {
         if ($LogText -match $p) { $hits += $p }
     }
     return ,$hits
+}
+
+function Get-ListeningProcessOnPort {
+    <# BYS360 DEFECT Z: resolves the PID owning $Port (if any) to its real
+       executable path / command line / start time via Win32_Process --
+       Get-NetTCPConnection alone only proves "something is listening",
+       never WHICH process or whether it is fresh. #>
+    param([Parameter(Mandatory)][int]$Port)
+    $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+    if (-not $conn) { return $null }
+    $ownerPid = $conn.OwningProcess
+    $proc = Get-CimInstance -ClassName Win32_Process -Filter "ProcessId=$ownerPid" -ErrorAction SilentlyContinue
+    if (-not $proc) {
+        return [PSCustomObject]@{ Pid = $ownerPid; ExecutablePath = $null; CommandLine = $null; CreationDate = $null }
+    }
+    return [PSCustomObject]@{
+        Pid            = $ownerPid
+        ExecutablePath = $proc.ExecutablePath
+        CommandLine    = $proc.CommandLine
+        CreationDate   = $proc.CreationDate
+    }
+}
+
+function Test-ProcessBinding {
+    <# BYS360 DEFECT Z: proves the process currently listening on $Port is
+       (a) our own venv python.exe under the just-promoted $ProjectRoot,
+       (b) running run_server.py, and (c) genuinely fresh -- started AFTER
+       $NotBeforeUtc (this run's own Start-ScheduledTask invocation, or the
+       Stop-LiveService check timestamp) -- not a stale/leftover process
+       from before cutover. Does NOT and cannot prove WHICH release's code
+       is loaded (every promoted version shares the identical path); that
+       is Test-ReleaseIdentityBinding's job. #>
+    param(
+        [Parameter(Mandatory)][int]$Port,
+        [Parameter(Mandatory)][string]$ExpectedExecutablePath,
+        [Parameter(Mandatory)][string]$ExpectedCommandLineFragment,
+        [datetime]$NotBeforeUtc
+    )
+    $binding = Get-ListeningProcessOnPort -Port $Port
+    if (-not $binding) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "NO_LISTENER"; Binding = $null }
+    }
+    if (-not $binding.ExecutablePath) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "EXECUTABLE_PATH_UNRESOLVED"; Binding = $binding }
+    }
+    $expectedExeFull = [System.IO.Path]::GetFullPath($ExpectedExecutablePath)
+    $actualExeFull = [System.IO.Path]::GetFullPath($binding.ExecutablePath)
+    if ($actualExeFull -ne $expectedExeFull) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "EXECUTABLE_PATH_MISMATCH"; Binding = $binding }
+    }
+    if (-not $binding.CommandLine -or ($binding.CommandLine -notlike "*$ExpectedCommandLineFragment*")) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "COMMAND_LINE_MISMATCH"; Binding = $binding }
+    }
+    if ($NotBeforeUtc -and $binding.CreationDate) {
+        $creationUtc = ([datetime]$binding.CreationDate).ToUniversalTime()
+        if ($creationUtc -lt $NotBeforeUtc.AddSeconds(-2)) {
+            return [PSCustomObject]@{ Ok = $false; Reason = "STALE_PROCESS_PREDATES_START"; Binding = $binding }
+        }
+    }
+    return [PSCustomObject]@{ Ok = $true; Reason = "OK"; Binding = $binding }
+}
+
+function Test-ReleaseIdentityBinding {
+    <# BYS360 DEFECT Z: calls the now-extended GET /versionz (see
+       app/routes.py::_bys360_release_identity) and requires its
+       source_sha/migration_head to exactly match the candidate this run
+       intended to promote. Reuses the exact same curl.exe + Host-header
+       pattern as Test-LocalHealth (Invoke-WebRequest's -Headers @{"Host"=}
+       does not actually change the wire-level Host header under Windows
+       PowerShell 5.1 -- see that function's own note). #>
+    param(
+        [Parameter(Mandatory)][string]$BaseUrl,
+        [Parameter(Mandatory)][string]$HostHeader,
+        [Parameter(Mandatory)][string]$ExpectedSourceSha,
+        [Parameter(Mandatory)][string]$ExpectedMigrationHead,
+        [int]$TimeoutSec = 15
+    )
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if (-not $curl) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "CURL_NOT_FOUND"; Body = $null }
+    }
+    $bodyText = (Invoke-Native { & curl.exe -s --max-time $TimeoutSec -H "Host: $HostHeader" -H "X-Forwarded-Proto: https" "$BaseUrl/versionz" 2>&1 } | Out-String)
+    try {
+        $parsed = $bodyText | ConvertFrom-Json
+    } catch {
+        return [PSCustomObject]@{ Ok = $false; Reason = "INVALID_JSON"; Body = $bodyText }
+    }
+    if ([string]$parsed.source_sha -ne $ExpectedSourceSha) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "SOURCE_SHA_MISMATCH"; Body = $parsed }
+    }
+    if ([string]$parsed.migration_head -ne $ExpectedMigrationHead) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "MIGRATION_HEAD_MISMATCH"; Body = $parsed }
+    }
+    return [PSCustomObject]@{ Ok = $true; Reason = "OK"; Body = $parsed }
+}
+
+function Test-ReadinessGate {
+    <# BYS360 DEFECT Z: calls GET /readyz and requires BOTH HTTP 200 AND
+       body status=="ready" -- previously never called anywhere in this
+       script. A readiness failure must block SUCCESS, not merely be
+       observed. #>
+    param(
+        [Parameter(Mandatory)][string]$BaseUrl,
+        [Parameter(Mandatory)][string]$HostHeader,
+        [int]$TimeoutSec = 15
+    )
+    $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+    if (-not $curl) {
+        return [PSCustomObject]@{ Ok = $false; Reason = "CURL_NOT_FOUND"; StatusCode = $null; Body = $null }
+    }
+    $raw = (Invoke-Native { & curl.exe -s --max-time $TimeoutSec -w "`n___HTTP_CODE___%{http_code}" -H "Host: $HostHeader" -H "X-Forwarded-Proto: https" "$BaseUrl/readyz" 2>&1 } | Out-String)
+    $parts = $raw -split "___HTTP_CODE___"
+    $bodyText = $parts[0]
+    $code = if ($parts.Count -gt 1) { $parts[1].Trim() } else { "" }
+    try {
+        $parsed = $bodyText | ConvertFrom-Json
+    } catch {
+        return [PSCustomObject]@{ Ok = $false; Reason = "INVALID_JSON"; StatusCode = $code; Body = $bodyText }
+    }
+    if ($code -ne "200") {
+        return [PSCustomObject]@{ Ok = $false; Reason = "HTTP_$code"; StatusCode = $code; Body = $parsed }
+    }
+    if ([string]$parsed.status -ne "ready") {
+        return [PSCustomObject]@{ Ok = $false; Reason = "STATUS_NOT_READY"; StatusCode = $code; Body = $parsed }
+    }
+    return [PSCustomObject]@{ Ok = $true; Reason = "OK"; StatusCode = $code; Body = $parsed }
 }
 
 function Get-WheelhouseIdentitySha256 {
@@ -655,12 +822,20 @@ function Stop-LiveService {
     Write-DeployLog "Task '$TaskName' state after stop: $afterState"
 
     Write-DeployLog "Phase 8/20: confirm port $AppPort stopped listening"
-    $listening = Get-NetTCPConnection -LocalPort $AppPort -State Listen -ErrorAction SilentlyContinue
-    if ($listening) {
-        Write-DeployLog -Level "WARN" "Something is still listening on port $AppPort after stopping the task (pid(s): $($listening.OwningProcess -join ',')). Investigate before continuing if unexpected."
-    } else {
-        Write-DeployLog "Confirmed: nothing listening on port $AppPort."
+    # BYS360 DEFECT Z: this was previously a WARN-only check -- a stale
+    # process that Stop-ScheduledTask failed to actually terminate (e.g. an
+    # orphaned python.exe no longer tracked by Task Scheduler) could keep
+    # holding $AppPort right through promotion and the live migration, then
+    # get silently accepted as "the new candidate is up" by Start-
+    # LiveService's port-listening check alone. Failing closed here, before
+    # the application tree is even touched, is the single most direct way
+    # to guarantee a stale process can never masquerade as the freshly
+    # promoted one.
+    $stalePortBinding = Get-ListeningProcessOnPort -Port $AppPort
+    if ($stalePortBinding) {
+        Invoke-FailClosed -Phase "SERVICE_STOP_FAILED" -Reason "Port $AppPort is still listening after Stop-ScheduledTask (pid=$($stalePortBinding.Pid) exe='$($stalePortBinding.ExecutablePath)' cmd='$($stalePortBinding.CommandLine)'). Refusing to proceed while a stale process may still be serving traffic -- investigate and terminate it manually before re-running cutover."
     }
+    Write-DeployLog "Confirmed: nothing listening on port $AppPort."
     Write-DeployLog "SERVICE STOP PASSED."
 }
 
@@ -913,6 +1088,12 @@ function Start-LiveService {
     Write-DeployLog "Phase 15/20: start live Scheduled Task"
     if (Test-Path $LogPath) { $preStartSize = (Get-Item $LogPath).Length } else { $preStartSize = 0 }
 
+    # BYS360 DEFECT Z: captured immediately before Start-ScheduledTask so
+    # Test-ProcessBinding below can prove the eventually-listening process
+    # is genuinely FRESH (started by this exact invocation), not a stale
+    # leftover that slipped past the now-fail-closed Stop-LiveService check.
+    $startInvokeUtc = (Get-Date).ToUniversalTime()
+
     Start-ScheduledTask -TaskName $TaskName
     $started = $false
     for ($i = 0; $i -lt 20; $i++) {
@@ -925,6 +1106,20 @@ function Start-LiveService {
         Invoke-FailClosed -Phase "SERVICE_START_FAILED" -Reason "Nothing is listening on port $AppPort after 40 seconds of waiting post Start-ScheduledTask. Check $LogPath."
     }
     Write-DeployLog "Confirmed listening on port $AppPort."
+
+    # BYS360 DEFECT Z: "something is listening" alone is not proof it is
+    # OUR freshly-started process serving the just-promoted tree -- bind the
+    # actual owning PID's executable path / command line / start time.
+    $expectedExe = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
+    $processBinding = Test-ProcessBinding -Port $AppPort -ExpectedExecutablePath $expectedExe -ExpectedCommandLineFragment "run_server.py" -NotBeforeUtc $startInvokeUtc
+    if (-not $processBinding.Ok) {
+        $Script:Receipt.SERVICE_RESULT = "FAIL"
+        $Script:Receipt.PROCESS_BINDING = "FAIL:$($processBinding.Reason)"
+        $bindingDetail = if ($processBinding.Binding) { "pid=$($processBinding.Binding.Pid) exe='$($processBinding.Binding.ExecutablePath)' cmd='$($processBinding.Binding.CommandLine)' created='$($processBinding.Binding.CreationDate)'" } else { "(no binding resolved)" }
+        Invoke-FailClosed -Phase "SERVICE_START_FAILED" -Reason "Process binding check failed: $($processBinding.Reason). $bindingDetail. The listener on port $AppPort could not be proven to be a genuinely fresh process running the just-promoted candidate's own run_server.py."
+    }
+    $Script:Receipt.PROCESS_BINDING = "PASS:pid=$($processBinding.Binding.Pid)"
+    Write-DeployLog "Process binding confirmed: pid=$($processBinding.Binding.Pid) exe='$($processBinding.Binding.ExecutablePath)'"
 
     Start-Sleep -Seconds 3
     $freshLogText = ""
@@ -981,6 +1176,29 @@ function Test-LocalHealth {
     }
     $Script:Receipt.LOCAL_HEALTH = "200"
     Write-DeployLog "LOCAL HEALTH PASSED (HTTP 200)."
+}
+
+function Invoke-ReleaseIdentityCheck {
+    param([Parameter(Mandatory)][string]$ExpectedSourceSha, [Parameter(Mandatory)][string]$ExpectedMigrationHead)
+    Write-DeployLog "Phase 16a/20: release identity binding (GET /versionz)"
+    $result = Test-ReleaseIdentityBinding -BaseUrl "http://127.0.0.1:$AppPort" -HostHeader $PublicHostName -ExpectedSourceSha $ExpectedSourceSha -ExpectedMigrationHead $ExpectedMigrationHead
+    if (-not $result.Ok) {
+        $Script:Receipt.RELEASE_IDENTITY = "FAIL:$($result.Reason)"
+        Invoke-FailClosed -Phase "RELEASE_IDENTITY_FAILED" -Reason "/versionz release identity check failed: $($result.Reason). Expected source_sha=$ExpectedSourceSha migration_head=$ExpectedMigrationHead, response body: $($result.Body | ConvertTo-Json -Compress -Depth 4)"
+    }
+    $Script:Receipt.RELEASE_IDENTITY = "PASS"
+    Write-DeployLog "RELEASE IDENTITY BINDING PASSED: source_sha=$ExpectedSourceSha migration_head=$ExpectedMigrationHead"
+}
+
+function Invoke-ReadinessCheck {
+    Write-DeployLog "Phase 16b/20: readiness gate (GET /readyz)"
+    $result = Test-ReadinessGate -BaseUrl "http://127.0.0.1:$AppPort" -HostHeader $PublicHostName
+    if (-not $result.Ok) {
+        $Script:Receipt.READINESS = "FAIL:$($result.Reason)"
+        Invoke-FailClosed -Phase "READINESS_FAILED" -Reason "/readyz readiness gate failed: $($result.Reason) (http_code=$($result.StatusCode)). Response body: $($result.Body | ConvertTo-Json -Compress -Depth 4)"
+    }
+    $Script:Receipt.READINESS = "PASS"
+    Write-DeployLog "READINESS GATE PASSED."
 }
 
 function Test-PublicHealth {
@@ -1185,6 +1403,8 @@ function Main {
 
     Start-LiveService
     Test-LocalHealth
+    Invoke-ReleaseIdentityCheck -ExpectedSourceSha $CandidateSourceSha -ExpectedMigrationHead ([string]$receipt.MIGRATION_HEAD)
+    Invoke-ReadinessCheck
     Test-PublicHealth
     Test-SmokeChecks -VenvPython $venvPython
     Test-PostDeploySecurity
@@ -1196,19 +1416,31 @@ function Main {
     Write-DeployLog "================================================================"
 }
 
-try {
-    Main
-    exit 0
-} catch {
-    $Script:Receipt.DEPLOY_EXIT_CODE = "1"
-    $existingFailureReceipt = if ($Script:DeployLogDir) { Join-Path $Script:DeployLogDir "FAILURE_RECEIPT.txt" } else { $null }
-    if ($existingFailureReceipt -and (Test-Path $existingFailureReceipt)) {
-        Write-DeployLog -Level "FATAL" "Stopping after phase failure (see $existingFailureReceipt)."
-    } else {
-        Write-DeployLog -Level "FATAL" "UNHANDLED (no prior phase-specific failure receipt): $($_.Exception.Message)"
-        if ($Script:DeployLogDir) {
-            Write-FailureReceipt -Phase "UNHANDLED" -Reason $_.Exception.Message | Out-Null
+# BYS360 DEFECT Z (testability, zero behavioral change to real invocation):
+# $MyInvocation.InvocationName is '.' only when this script is DOT-SOURCED
+# (". .\cutover_bys360_candidate.ps1"), never when run directly (-File or
+# &) -- the only way this script is ever actually invoked for a real
+# cutover. Dot-sourcing loads every function definition above (Test-
+# ProcessBinding, Test-ReleaseIdentityBinding, Test-ReadinessGate, etc.)
+# without running Main() or calling `exit` (which would terminate the
+# CALLING session too), so a test harness can call these pure, parameterized
+# functions in isolation against real local disposable resources -- no real
+# Scheduled Task, no real port 80, no real PostgreSQL, no real C:\bys360\project.
+if ($MyInvocation.InvocationName -ne '.') {
+    try {
+        Main
+        exit 0
+    } catch {
+        $Script:Receipt.DEPLOY_EXIT_CODE = "1"
+        $existingFailureReceipt = if ($Script:DeployLogDir) { Join-Path $Script:DeployLogDir "FAILURE_RECEIPT.txt" } else { $null }
+        if ($existingFailureReceipt -and (Test-Path $existingFailureReceipt)) {
+            Write-DeployLog -Level "FATAL" "Stopping after phase failure (see $existingFailureReceipt)."
+        } else {
+            Write-DeployLog -Level "FATAL" "UNHANDLED (no prior phase-specific failure receipt): $($_.Exception.Message)"
+            if ($Script:DeployLogDir) {
+                Write-FailureReceipt -Phase "UNHANDLED" -Reason $_.Exception.Message | Out-Null
+            }
         }
+        exit 1
     }
-    exit 1
 }

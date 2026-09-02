@@ -85,8 +85,9 @@ function New-ScheduledTaskSettingsSet {
 }
 function New-ScheduledTaskPrincipal {
     [CmdletBinding()]
-    param([string]$UserId, [string]$RunLevel)
-    return [PSCustomObject]@{}
+    param([string]$UserId, [string]$LogonType, [string]$RunLevel)
+    [void]$Global:MockCalls.Add(@{Cmdlet='New-ScheduledTaskPrincipal'; UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel})
+    return [PSCustomObject]@{UserId=$UserId; LogonType=$LogonType; RunLevel=$RunLevel}
 }
 function Get-ScheduledTask {
     [CmdletBinding()]
@@ -100,13 +101,13 @@ function Get-ScheduledTask {
 function Set-ScheduledTask {
     [CmdletBinding()]
     param([string]$TaskName,$Action,$Trigger,$Settings,$Principal)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName})
+    [void]$Global:MockCalls.Add(@{Cmdlet='Set-ScheduledTask'; TaskName=$TaskName; Principal=$Principal})
     return $null
 }
 function Register-ScheduledTask {
     [CmdletBinding()]
     param([string]$TaskName,$Action,$Trigger,$Settings,[string]$Description,[switch]$Force,$Principal)
-    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description})
+    [void]$Global:MockCalls.Add(@{Cmdlet='Register-ScheduledTask'; TaskName=$TaskName; Description=$Description; Principal=$Principal})
     return $null
 }
 function Unregister-ScheduledTask {
@@ -403,6 +404,62 @@ def test_apply_without_existing_task_registers_it_with_correct_action(tmp_path: 
     # Hicbir gercek/mock Unregister/Start/Stop/schtasks cagrisi olmamali.
     other_forbidden = [c for c in calls if c.get("Cmdlet") in ("Unregister-ScheduledTask", "Start-ScheduledTask", "Stop-ScheduledTask", "schtasks")]
     assert other_forbidden == []
+
+
+def test_apply_without_existing_task_uses_explicit_system_service_account_principal(tmp_path: Path) -> None:
+    """BYS360 DEFECT Y: without an explicit Principal, Register-ScheduledTask
+    defaults to the CURRENT INTERACTIVE caller's identity/logon type -- wrong
+    for a canli, port-80-serving AtStartup task that must run unattended,
+    whether or not anyone is logged on. The installer must build an explicit
+    SYSTEM / ServiceAccount / Highest principal and pass it through to
+    Register-ScheduledTask."""
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=False,
+    )
+
+    assert harness_result["success"] is True, f"Apply basarisiz oldu: {harness_result.get('error')}"
+
+    calls = harness_result["mock_calls"]
+    principal_calls = [c for c in calls if c.get("Cmdlet") == "New-ScheduledTaskPrincipal"]
+    register_calls = [c for c in calls if c.get("Cmdlet") == "Register-ScheduledTask"]
+
+    assert len(principal_calls) == 1, "Apply modu tam olarak bir New-ScheduledTaskPrincipal cagirmali."
+    principal = principal_calls[0]
+    assert principal["UserId"] == "SYSTEM"
+    assert principal["LogonType"] == "ServiceAccount"
+    assert principal["RunLevel"] == "Highest"
+
+    assert len(register_calls) == 1
+    passed_principal = register_calls[0].get("Principal") or {}
+    assert passed_principal.get("UserId") == "SYSTEM", (
+        "Register-ScheduledTask'a acikca kurulmus SYSTEM principal'i gecilmeli, "
+        f"varsayilan/None degil. Gecen deger: {passed_principal!r}"
+    )
+    assert passed_principal.get("LogonType") == "ServiceAccount"
+    assert passed_principal.get("RunLevel") == "Highest"
+
+
+def test_apply_with_existing_task_and_confirm_replace_uses_explicit_system_service_account_principal(tmp_path: Path) -> None:
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=True, confirm_replace=True,
+    )
+
+    assert harness_result["success"] is True, f"ConfirmReplace ile apply basarisiz oldu: {harness_result.get('error')}"
+
+    calls = harness_result["mock_calls"]
+    set_calls = [c for c in calls if c.get("Cmdlet") == "Set-ScheduledTask"]
+    assert len(set_calls) == 1
+    passed_principal = set_calls[0].get("Principal") or {}
+    assert passed_principal.get("UserId") == "SYSTEM", (
+        "Mevcut gorev guncellenirken de acikca kurulmus SYSTEM principal'i "
+        f"gecilmeli. Gecen deger: {passed_principal!r}"
+    )
+    assert passed_principal.get("LogonType") == "ServiceAccount"
+    assert passed_principal.get("RunLevel") == "Highest"
 
 
 def test_apply_with_custom_port_is_reflected_in_action_command(tmp_path: Path) -> None:

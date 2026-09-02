@@ -95,6 +95,7 @@ Write-Host "LogPath           : $LogPath"
 Write-Host "Action Execute    : powershell.exe"
 Write-Host "Action Argument   : $ActionArgument"
 Write-Host "Trigger           : Sistem baslangicinda (AtStartup)"
+Write-Host "Principal         : SYSTEM (LogonType=ServiceAccount, RunLevel=Highest)"
 Write-Host ""
 
 if ($Apply) {
@@ -123,12 +124,20 @@ if ($Apply) {
     $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $ActionArgument -WorkingDirectory $WorkingDirectory
     $Trigger = New-ScheduledTaskTrigger -AtStartup
     $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+    # BYS360 DEFECT Y: explicit unattended-service principal. Without this,
+    # Register-ScheduledTask/Set-ScheduledTask default to the CURRENT
+    # INTERACTIVE caller's identity with an interactive logon type -- a
+    # canli, port-80-serving AtStartup task must run whether or not anyone
+    # is logged on, so it needs the well-known SYSTEM service identity with
+    # an explicit ServiceAccount logon type (no stored credential needed) and
+    # Highest run level (required to bind to a privileged port at boot).
+    $Principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
     if ($Existing) {
-        Set-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings | Out-Null
+        Set-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal | Out-Null
         Write-Host "Mevcut gorev guncellendi: $TaskName"
     } else {
-        Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Description "BYS360 canli Waitress web sunucusu (port $Port), run_server.py uzerinden calisir." | Out-Null
+        Register-ScheduledTask -TaskName $TaskName -Action $Action -Trigger $Trigger -Settings $Settings -Principal $Principal -Description "BYS360 canli Waitress web sunucusu (port $Port), run_server.py uzerinden calisir." | Out-Null
         Write-Host "Yeni gorev olusturuldu: $TaskName"
     }
 

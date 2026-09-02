@@ -15,11 +15,16 @@ if (!(Test-Path $Script)) { throw "Script bulunamadi: $Script" }
 $action = New-ScheduledTaskAction -Execute $Python -Argument "`"$Script`" >> `"$Log`" 2>&1" -WorkingDirectory $ProjectRoot
 $trigger = New-ScheduledTaskTrigger -Daily -At ([datetime]::Today.AddHours($Hour).AddMinutes($Minute))
 $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+# BYS360 DEFECT Y: explicit unattended-service principal -- without this,
+# Register-ScheduledTask/Set-ScheduledTask default to the current
+# interactive caller's identity/logon type, which this daily mail task
+# cannot depend on.
+$principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 if (Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue) {
-    Set-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings | Out-Null
+    Set-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal | Out-Null
     Write-Host "Mevcut gorev guncellendi: $TaskName"
 } else {
-    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Description "BYS360 gun ortasi pilot yoklama maili" | Out-Null
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Description "BYS360 gun ortasi pilot yoklama maili" | Out-Null
     Write-Host "Yeni gorev kuruldu: $TaskName"
 }
 Write-Host "BYS360_DAILY_PULSE_MAIL_TASK_OK"

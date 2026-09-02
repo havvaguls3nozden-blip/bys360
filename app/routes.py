@@ -127,15 +127,41 @@ def bys360_profile_photo_file(filename: str):
 # BYS360_PROFILE_PHOTO_VISIBILITY_V2_17_73_END
 
 
+def _bys360_release_identity() -> dict[str, str | None]:
+    """BYS360 DEFECT Z: reads THIS running process's own bundled
+    CANDIDATE_READY.json (written by prepare_bys360_candidate.ps1, verified
+    and carried across promotion by cutover_bys360_candidate.ps1) to expose
+    the release this specific process was actually promoted from. Every
+    promoted version lives at the same fixed C:\\bys360\\project path, so
+    process/PID/path metadata alone can never distinguish WHICH release's
+    code is currently loaded -- this is the one place that can. Absent in
+    local/dev environments not managed by that pipeline; never raises."""
+    import json
+    from pathlib import Path
+
+    receipt_path = Path(current_app.root_path).parent / "CANDIDATE_READY.json"
+    try:
+        data = json.loads(receipt_path.read_text(encoding="utf-8"))
+    except Exception:
+        return {"source_sha": None, "migration_head": None}
+    return {
+        "source_sha": data.get("SOURCE_SHA"),
+        "migration_head": data.get("MIGRATION_HEAD"),
+    }
+
+
 @main_bp.get("/versionz")
 def versionz():
     runtime_manifest = current_app.extensions.get("runtime_route_manifest") or {}
     schema_errors = list(current_app.extensions.get("schema_check_errors", []) or [])
+    release = _bys360_release_identity()
     return jsonify({
         "service": "bys360",
         "app_env": current_app.config.get("APP_ENV", "development"),
         "route_count": len(runtime_manifest) if isinstance(runtime_manifest, dict) else 0,
         "schema_error_count": len(schema_errors),
+        "source_sha": release["source_sha"],
+        "migration_head": release["migration_head"],
     }), 200
 
 
