@@ -28,6 +28,7 @@ from app.models.communication_phase3_models import (
     CommunicationSupportSlaPolicy,
     CommunicationSurveyReminderLog,
 )
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -319,6 +320,7 @@ def get_survey_for_user(survey_id: int, user: Any) -> dict[str, Any]:
         "answers_map": answers_map,
         "is_open": _survey_is_open(survey),
         "question_type_labels": SURVEY_QUESTION_TYPE_LABELS,
+        "status_labels": SURVEY_STATUS_LABELS,
     }
 
 

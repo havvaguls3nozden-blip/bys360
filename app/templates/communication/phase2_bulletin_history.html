@@ -9,7 +9,7 @@
     <div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-body p-4">
       <h5 class="fw-bold mb-3">Mevcut Duyuru</h5>
       <div class="mb-2"><strong>{{ payload.bulletin.title }}</strong></div>
-      <div class="text-muted small">Durum: {{ status_labels.get(payload.bulletin.status, payload.bulletin.status) }} · Öncelik: {{ priority_labels.get(payload.bulletin.priority, payload.bulletin.priority) }}</div>
+      <div class="text-muted small">Durum: {{ status_labels.get(payload.bulletin.status, 'Bilinmiyor') }} · Öncelik: {{ priority_labels.get(payload.bulletin.priority, 'Bilinmiyor') }}</div>
       <div class="mt-3 small text-muted">Hedef kayıt sayısı: {{ payload.audiences|length }} · Teslim kayıt sayısı: {{ payload.receipts|length }}</div>
       <div class="d-grid gap-2 mt-4">
         <a class="btn btn-danger" href="{{ url_for('main.communication_phase2_bulletin_edit', bulletin_id=payload.bulletin.id) }}">Duyuruyu Düzenle</a>
@@ -31,7 +31,7 @@
             <tr>
               <td><span class="badge text-bg-dark">V{{ row.version_no }}</span></td>
               <td>{{ row.title }}</td>
-              <td>{{ status_labels.get(row.status, row.status) }}</td>
+              <td>{{ status_labels.get(row.status, 'Bilinmiyor') }}</td>
               <td>{{ row.change_note or '-' }}</td>
               <td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td>
             </tr>

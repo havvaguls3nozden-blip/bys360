@@ -17,6 +17,7 @@ from app.models.communication_phase5_models import (
     CommunicationRetentionPolicy,
 )
 from app.models.support_models import SupportTicketStatusHistory
+from app.services.communication_gate_status_labels import gate_status_label
 
 MANAGER_ROLES = {
     "admin",
@@ -295,6 +296,7 @@ def automation_center_snapshot() -> dict[str, Any]:
     enabled_weekly = CommunicationNotificationPreference.query.filter_by(weekly_digest_enabled=True).count()
     quiet_hours = CommunicationNotificationPreference.query.filter_by(quiet_hours_enabled=True).count()
     recent_failures = CommunicationAutomationLog.query.filter_by(status="failed").order_by(CommunicationAutomationLog.executed_at.desc()).limit(10).all()
+    recent_jobs = CommunicationDigestJob.query.order_by(CommunicationDigestJob.executed_at.desc().nullslast(), CommunicationDigestJob.created_at.desc()).limit(12).all()
     coverage_rate = round((prefs_total / active_users) * 100, 1) if active_users else 0.0
     return {
         "summary": {
@@ -310,8 +312,25 @@ def automation_center_snapshot() -> dict[str, Any]:
             "weekly_enabled_count": enabled_weekly,
             "quiet_hours_count": quiet_hours,
         },
-        "recent_logs": logs,
-        "recent_jobs": CommunicationDigestJob.query.order_by(CommunicationDigestJob.executed_at.desc().nullslast(), CommunicationDigestJob.created_at.desc()).limit(12).all(),
+        "recent_logs": [
+            {
+                "action_type": row.action_type,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "executed_at": row.executed_at,
+            }
+            for row in logs
+        ],
+        "recent_jobs": [
+            {
+                "user_id": row.user_id,
+                "digest_type": row.digest_type,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "result_summary": row.result_summary,
+            }
+            for row in recent_jobs
+        ],
         "recent_failures": recent_failures,
         "rules": rules,
         "policies": policies,

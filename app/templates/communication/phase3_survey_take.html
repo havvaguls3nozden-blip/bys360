@@ -6,7 +6,7 @@
 <div class="card border-0 shadow-sm rounded-4">
   <div class="card-body p-4">
     <div class="mb-4">
-      <div class="text-muted small">{{ payload.survey.survey_type }} · Durum: {{ payload.survey.status }}</div>
+      <div class="text-muted small">{{ payload.survey.survey_type }} · Durum: {{ payload.status_labels.get(payload.survey.status, 'Bilinmiyor') }}</div>
       <div>{{ payload.survey.description or 'Anket açıklaması girilmemiş.' }}</div>
     </div>
 
@@ -22,7 +22,7 @@
         <div class="d-flex justify-content-between gap-3 mb-3">
           <div>
             <div class="fw-bold">{{ loop.index }}. {{ question.question_text }}</div>
-            <div class="small text-muted">{{ payload.question_type_labels.get(question.question_type, question.question_type) }}{% if question.is_required %} · Zorunlu{% endif %}</div>
+            <div class="small text-muted">{{ payload.question_type_labels.get(question.question_type, 'Bilinmiyor') }}{% if question.is_required %} · Zorunlu{% endif %}</div>
           </div>
         </div>
 

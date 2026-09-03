@@ -873,4 +873,7 @@ def phase2_dashboard_snapshot() -> dict[str, Any]:
         "latest_surveys": survey_rows,
         "latest_templates": CommunicationSurveyTemplate.query.order_by(CommunicationSurveyTemplate.updated_at.desc()).limit(6).all(),
         "latest_revisions": CommunicationBulletinRevision.query.order_by(CommunicationBulletinRevision.created_at.desc()).limit(8).all(),
+        "survey_status_labels": SURVEY_STATUS_LABELS,
+        "bulletin_status_labels": BULLETIN_STATUS_LABELS,
+        "bulletin_priority_labels": BULLETIN_PRIORITY_LABELS,
     }

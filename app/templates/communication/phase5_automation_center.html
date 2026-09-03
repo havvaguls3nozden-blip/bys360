@@ -30,7 +30,7 @@
           <thead><tr><th>Kullanıcı</th><th>Tür</th><th>Durum</th><th>Özet</th></tr></thead>
           <tbody>
           {% for row in payload.recent_jobs %}
-          <tr><td>{{ row.user_id }}</td><td>{{ row.digest_type }}</td><td>{{ row.status }}</td><td>{{ row.result_summary or '-' }}</td></tr>
+          <tr><td>{{ row.user_id }}</td><td>{{ row.digest_type }}</td><td>{{ row.status_label }}</td><td>{{ row.result_summary or '-' }}</td></tr>
           {% else %}
           <tr><td colspan="4" class="text-muted">Kayıt bulunamadı.</td></tr>
           {% endfor %}

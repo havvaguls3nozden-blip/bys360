@@ -133,7 +133,7 @@ Bekleyen talepleri, yaklaşan görüşmeleri ve sıkışan randevu yükünü tek
                                 <h4 class="item-title">{{ req.employee.ad }} {{ req.employee.soyad }}</h4>
                                 <div class="item-meta">{{ req.period.title if req.period else 'Dönem bilgisi yok' }} · {{ req.requested_at.strftime('%d.%m.%Y %H:%M') if req.requested_at else '-' }}</div>
                             </div>
-                            <span class="tone-pill critical">{{ status_labels.get(req.status, req.status) }}</span>
+                            <span class="tone-pill critical">{{ status_labels.get(req.status, 'Bilinmiyor') }}</span>
                         </div>
                         <div class="item-text">{{ (req.reason or '-')[:180] }}{% if req.reason and req.reason|length > 180 %}...{% endif %}</div>
                         <div class="item-actions">
@@ -176,7 +176,7 @@ Bekleyen talepleri, yaklaşan görüşmeleri ve sıkışan randevu yükünü tek
                                 <h4 class="item-title">{{ meeting.employee.ad }} {{ meeting.employee.soyad }}</h4>
                                 <div class="item-meta">{{ meeting.manager.ad }} {{ meeting.manager.soyad }} · {{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }}</div>
                             </div>
-                            <span class="tone-pill watch">{{ status_labels.get(meeting.status, meeting.status) }}</span>
+                            <span class="tone-pill watch">{{ status_labels.get(meeting.status, 'Bilinmiyor') }}</span>
                         </div>
                         <div class="item-text">{{ meeting.location or 'Konum girilmedi' }} · {{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div>
                         <div class="item-actions">

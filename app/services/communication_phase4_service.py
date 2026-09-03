@@ -28,6 +28,9 @@ from app.models.communication_phase4_models import (
     CommunicationGovernanceReview,
     CommunicationReportExportLog,
 )
+from app.services.communication_phase1_service import BULLETIN_PRIORITY_LABELS
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS
+from app.services.communication_phase3_service import SUPPORT_STATUS_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -50,6 +53,16 @@ REPORT_STATUS_LABELS = {
     "approved": "Onaylandı",
     "revision": "Revizyon İstendi",
     "rejected": "Reddedildi",
+}
+
+# Phase 4 analytics rows also see the legacy ASCII-Turkish "yayinda" and the
+# generic "active" values (see SURVEY_ACTIVE_STATUSES/BULLETIN_PUBLISHED_STATUSES
+# above) alongside the standard Survey.status vocabulary -- extend the shared
+# phase2 dict rather than duplicating it.
+SURVEY_ANALYTICS_STATUS_LABELS = {
+    **SURVEY_STATUS_LABELS,
+    "active": "Aktif",
+    "yayinda": "Yayında",
 }
 
 
@@ -340,6 +353,7 @@ def executive_summary_snapshot(days: int = 30) -> dict[str, Any]:
         },
         "survey_metrics": survey_metrics[:8],
         "risk_surveys": low_completion_rows[:5],
+        "survey_status_labels": SURVEY_ANALYTICS_STATUS_LABELS,
         "support_rows": support_rows[:10],
         "risk_support_rows": support_rows[:5],
         "support_status_breakdown": dict(support_status_counter),
@@ -422,6 +436,7 @@ def survey_analytics_snapshot(days: int = 180) -> dict[str, Any]:
         "fastest_rows": fastest_rows,
         "slowest_rows": slowest_rows,
         "rows": sorted(surveys, key=lambda item: (-item["completion_rate"], -item["responses"], item["title"].lower())),
+        "survey_status_labels": SURVEY_ANALYTICS_STATUS_LABELS,
     }
 
 
@@ -491,6 +506,8 @@ def support_analytics_snapshot(days: int = 180) -> dict[str, Any]:
         "risk_rows": risk_rows,
         "oldest_rows": oldest_rows,
         "rows": detailed_rows,
+        "status_labels": SUPPORT_STATUS_LABELS,
+        "priority_labels": BULLETIN_PRIORITY_LABELS,
     }
 
 

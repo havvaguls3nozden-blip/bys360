@@ -9,7 +9,11 @@ from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db
-from app.models.communication_phase1_models import CommunicationBulletin
+from app.models.communication_phase1_models import (
+    CommunicationBulletin,
+    CommunicationBulletinAudience,
+    CommunicationBulletinReceipt,
+)
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
 from app.services.communication_phase1_service import (
@@ -104,7 +108,7 @@ def communication_phase1_bulletin_new():
 @menu_key_required("announcements")
 def communication_phase1_bulletin_detail(bulletin_id: int):
     bulletin = CommunicationBulletin.query.get_or_404(bulletin_id)
-    audiences = bulletin.audiences.order_by("id").all()
+    audiences = bulletin.audiences.order_by(CommunicationBulletinAudience.id).all()
 
     my_receipt = None
     try:
@@ -117,7 +121,7 @@ def communication_phase1_bulletin_detail(bulletin_id: int):
         db.session.rollback()
         my_receipt = get_bulletin_receipt(bulletin.id, current_user.id, create_if_missing=False)
 
-    receipts = bulletin.receipts.order_by("created_at desc").all()
+    receipts = bulletin.receipts.order_by(CommunicationBulletinReceipt.created_at.desc()).all()
     receipt_summary = bulletin_receipt_summary(bulletin)
     return safe_render(
         "communication/phase1_bulletin_detail.html",

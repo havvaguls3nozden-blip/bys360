@@ -7,7 +7,7 @@
   <div class="col-lg-8">
     <div class="card border-0 shadow-sm rounded-4 mb-4">
       <div class="card-body p-4">
-        <div class="small text-muted mb-2">{{ payload.ticket.module_name }} · {{ payload.ticket.priority|upper }} · {{ status_labels.get(payload.ticket.status, payload.ticket.status) }}</div>
+        <div class="small text-muted mb-2">{{ payload.ticket.module_name }} · {{ priority_labels.get(payload.ticket.priority, 'Bilinmiyor') }} · {{ status_labels.get(payload.ticket.status, 'Bilinmiyor') }}</div>
         <div>{{ payload.ticket.description }}</div>
       </div>
     </div>

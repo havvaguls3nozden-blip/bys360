@@ -620,7 +620,7 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
                                 <td>{{ unit.unit_code or unit.code or '-' }}</td>
 
                                 <td>
-                                    <span class="pill type">{{ unit_type_labels.get(unit.unit_type or unit.type or 'diger', unit.unit_type or unit.type or 'Birim') }}</span>
+                                    <span class="pill type">{{ unit_type_labels.get(unit.unit_type or unit.type or 'diger', 'Diğer') }}</span>
                                 </td>
 
                                 <td>

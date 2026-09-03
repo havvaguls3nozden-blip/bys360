@@ -247,7 +247,7 @@
                             <h3 class="notification-title">{{ notification.title }}</h3>
                             {% if not notification.is_read %}<span class="notification-pill unread">Yeni</span>{% endif %}
                             {% if notification.notification_type %}<span class="notification-pill">{{ notification.notification_type }}</span>{% endif %}
-                            {% set priority_key = (notification.priority or '')|lower %}{% if priority_key in ['high', 'urgent', 'warning', 'critical'] %}<span class="notification-pill priority">{{ priority_label_map.get(priority_key, notification.priority) }}</span>{% endif %}
+                            {% set priority_key = (notification.priority or '')|lower %}{% if priority_key in ['high', 'urgent', 'warning', 'critical'] %}<span class="notification-pill priority">{{ priority_label_map.get(priority_key, 'Bilinmiyor') }}</span>{% endif %}
                         </div>
                         <p class="notification-body">{{ notification.body or 'Bu kayıt için açıklama bulunmuyor.' }}</p>
                         <div class="notification-meta">

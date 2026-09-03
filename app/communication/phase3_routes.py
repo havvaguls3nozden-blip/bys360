@@ -11,6 +11,7 @@ from flask_login import current_user, login_required
 from app.models import Notification
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
+from app.services.communication_phase1_service import BULLETIN_PRIORITY_LABELS
 from app.services.communication_phase3_service import (
     SUPPORT_STATUS_LABELS,
     CommunicationPhase3Error,
@@ -162,7 +163,12 @@ def communication_phase3_support_detail(ticket_id: int):
         flash(str(exc), "warning")
         return redirect(url_for("main.communication_phase3_support_queue"))
 
-    return safe_render("communication/phase3_support_detail.html", payload=payload, status_labels=SUPPORT_STATUS_LABELS)
+    return safe_render(
+        "communication/phase3_support_detail.html",
+        payload=payload,
+        status_labels=SUPPORT_STATUS_LABELS,
+        priority_labels=BULLETIN_PRIORITY_LABELS,
+    )
 
 
 @main_bp.route("/communication/faz3/support/<int:ticket_id>/assign", methods=["POST"])

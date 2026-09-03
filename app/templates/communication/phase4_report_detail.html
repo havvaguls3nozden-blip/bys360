@@ -10,7 +10,7 @@
   <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-3">
     <div>
       <h2 class="mb-1">{{ row.title }}</h2>
-      <div class="text-muted">{{ row.period_label }} · Durum: {{ status_labels.get(row.status, row.status) }}</div>
+      <div class="text-muted">{{ row.period_label }} · Durum: {{ status_labels.get(row.status, 'Bilinmiyor') }}</div>
     </div>
     <form method="post" action="{{ url_for('main.communication_phase4_submit_review', report_id=row.id) }}" class="d-flex gap-2">
       <input type="text" name="note" class="form-control" placeholder="İnceleme notu">

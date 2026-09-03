@@ -36,6 +36,9 @@ GATE_STATUS_LABELS: dict[str, str] = {
     "approved": "Onaylandı",
     "blocked": "Engellendi",
     "paused": "Duraklatıldı",
+    "queued": "Sırada",
+    "completed": "Tamamlandı",
+    "failed": "Başarısız",
 }
 
 

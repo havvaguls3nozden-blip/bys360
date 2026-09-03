@@ -13,7 +13,7 @@
 
 <div class="card shadow-sm border-0 rounded-4"><div class="card-body p-4">
   <h5 class="fw-bold mb-1">{{ payload.survey.title }}</h5>
-  <div class="text-muted small mb-4">Durum: {{ status_labels.get(payload.survey.status, payload.survey.status) }} · Tür: {{ payload.survey.survey_type }} · Tamamlanma: %{{ payload.completion_rate }}</div>
+  <div class="text-muted small mb-4">Durum: {{ status_labels.get(payload.survey.status, 'Bilinmiyor') }} · Tür: {{ payload.survey.survey_type }} · Tamamlanma: %{{ payload.completion_rate }}</div>
   <div class="accordion" id="surveyResultsAccordion">
     {% for row in payload.question_summaries %}
     <div class="accordion-item rounded-4 border mb-3 overflow-hidden">
@@ -24,7 +24,7 @@
       </h2>
       <div id="collapse{{ loop.index }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}" data-bs-parent="#surveyResultsAccordion">
         <div class="accordion-body">
-          <div class="small text-muted mb-3">Tür: {{ question_type_labels.get(row.question.question_type, row.question.question_type) }} · Yanıt sayısı: {{ row.answer_count }}</div>
+          <div class="small text-muted mb-3">Tür: {{ question_type_labels.get(row.question.question_type, 'Bilinmiyor') }} · Yanıt sayısı: {{ row.answer_count }}</div>
           <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Seçenek / Değer</th><th>Adet</th></tr></thead><tbody>
             {% for label, count in row.distribution %}
             <tr><td>{{ label }}</td><td>{{ count }}</td></tr>

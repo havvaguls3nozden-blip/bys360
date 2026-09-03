@@ -49,8 +49,8 @@
                             <div class="meta">{{ row.summary or 'Özet girilmemiş.' }}</div>
                         </td>
                         <td>{{ row.bulletin_type }}</td>
-                        <td><span class="badge-soft">{{ priority_labels.get(row.priority, row.priority) }}</span></td>
-                        <td>{{ status_labels.get(row.status, row.status) }}</td>
+                        <td><span class="badge-soft">{{ priority_labels.get(row.priority, 'Bilinmiyor') }}</span></td>
+                        <td>{{ status_labels.get(row.status, 'Bilinmiyor') }}</td>
                         <td>{{ row.audiences.count() if row.audiences is defined else 0 }} kayıt</td>
                         <td>
                             {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}

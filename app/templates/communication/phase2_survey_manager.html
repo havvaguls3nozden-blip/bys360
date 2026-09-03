@@ -28,7 +28,7 @@
             <div class="fw-bold">{{ row.survey.title }}</div>
             <div class="small text-muted">{{ row.survey.description or '-' }}</div>
           </td>
-          <td>{{ status_labels.get(row.survey.status, row.survey.status) }}</td>
+          <td>{{ status_labels.get(row.survey.status, 'Bilinmiyor') }}</td>
           <td>
             <div class="small">Soru: {{ row.question_count }} · Hedef: {{ row.summary.target_total }}</div>
             <div class="small text-muted">Yanıt: {{ row.response_count }} · Bekleyen: {{ row.summary.pending_total }}</div>

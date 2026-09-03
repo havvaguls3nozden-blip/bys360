@@ -20,6 +20,7 @@ from app.models.communication_phase1_models import (
     CommunicationBulletinAudience,
     CommunicationBulletinReceipt,
 )
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS
 
 MANAGER_ROLES = {
     "admin",
@@ -293,6 +294,9 @@ def communication_phase1_dashboard(user: Any) -> dict[str, Any]:
             "open_support": open_support_count,
             "help_articles": SupportHelpArticle.query.filter_by(is_published=True).count() if hasattr(SupportHelpArticle, "is_published") else SupportHelpArticle.query.count(),
         },
+        "bulletin_status_labels": BULLETIN_STATUS_LABELS,
+        "bulletin_priority_labels": BULLETIN_PRIORITY_LABELS,
+        "survey_status_labels": SURVEY_STATUS_LABELS,
     }
 
 
