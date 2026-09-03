@@ -29,7 +29,7 @@
               {% for row in payload.gates %}
               <tr>
                 <td>{{ row.label }}</td>
-                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status_label }}</span></td>
                 <td>{{ row.owner }}</td>
                 <td>{{ row.detail }}</td>
                 <td class="small text-muted">{{ row.action or '-' }}</td>
@@ -52,10 +52,10 @@
           <div>
             <label class="form-label">Durum</label>
             <select class="form-select" name="status">
-              <option value="pass">pass</option>
-              <option value="warn">warn</option>
-              <option value="fail">fail</option>
-              <option value="pending" selected>pending</option>
+              <option value="pass">Geçti</option>
+              <option value="warn">Uyarı</option>
+              <option value="fail">Başarısız</option>
+              <option value="pending" selected>Bekliyor</option>
             </select>
           </div>
           <div>
@@ -117,7 +117,7 @@
             <thead><tr><th>İşlem</th><th>Durum</th><th>Zaman</th></tr></thead>
             <tbody>
               {% for row in payload.recent_logs %}
-              <tr><td>{{ row.summary or row.action_type }}</td><td>{{ row.status }}</td><td>{{ row.executed_at }}</td></tr>
+              <tr><td>{{ row.summary or row.action_type }}</td><td>{{ row.status_label }}</td><td>{{ row.executed_at }}</td></tr>
               {% else %}
               <tr><td colspan="3" class="text-muted">Henüz Kontrol 9B kaydı yok.</td></tr>
               {% endfor %}

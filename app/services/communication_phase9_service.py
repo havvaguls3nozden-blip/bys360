@@ -7,6 +7,7 @@ from typing import Any
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import (
     audit_logs_snapshot,
     automation_center_snapshot,
@@ -68,6 +69,7 @@ def _gate(key: str, label: str, status: str, detail: str, owner: str, action: st
         'key': key,
         'label': label,
         'status': status,
+        'status_label': gate_status_label(status),
         'detail': detail,
         'owner': owner,
         'action': action,
@@ -140,7 +142,16 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
     escalations = escalation_snapshot()
     retention = retention_snapshot()
     phase8 = _try_phase8_snapshot()
-    recent_logs = _recent_phase9_logs(40)
+    recent_logs = [
+        {
+            'action_type': row.action_type,
+            'status': row.status,
+            'status_label': gate_status_label(row.status),
+            'summary': row.summary,
+            'executed_at': row.executed_at,
+        }
+        for row in _recent_phase9_logs(40)
+    ]
 
     risk_score = int(health.get('summary', {}).get('risk_score', 0) or 0)
     blockers = len(go_live.get('blockers') or [])
@@ -214,6 +225,7 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
             'title': '9A | Yayın öncesi teknik kilit',
             'summary': 'Kod freeze, env doğrulama, servis başlangıç betikleri ve erişim sınırlarının sabitlenmesi.',
             'status': gates[0]['status'],
+            'status_label': gates[0]['status_label'],
             'items': [
                 'APP_ENV, cookie ve proxy ayarları üretim görünümünde olmalı.',
                 'Kritik route yapısı değişmeden bırakılmalı.',
@@ -224,6 +236,7 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
             'title': '9B | Veri ve güvenlik geçişi',
             'summary': 'Yedek, rollback, log, KVKK ve denetim izi doğrulaması.',
             'status': gates[1]['status'],
+            'status_label': gates[1]['status_label'],
             'items': [
                 'Son yedek dosyası fiziksel olarak doğrulansın.',
                 'Rollback adımları yazılı ve uygulanabilir olsun.',
@@ -234,6 +247,7 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
             'title': '9C | Pilot canlı açılış',
             'summary': 'Kontrollü kullanıcı grubuyla ilk açılış, karar kaydı ve onay akışı.',
             'status': gates[2]['status'],
+            'status_label': gates[2]['status_label'],
             'items': [
                 'Pilot kullanıcı listesi sabitlensin.',
                 'Destek kişisi ve geri bildirim kanalı tek adreste toplansın.',
@@ -244,6 +258,7 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
             'title': '9D | İlk 72 saat stabilizasyon',
             'summary': 'CSRF, redirect, export ve destek kuyruğunun yakın izlenmesi.',
             'status': gates[3]['status'],
+            'status_label': gates[3]['status_label'],
             'items': [
                 'Operasyon sağlığı ekranı düzenli yenilensin.',
                 'İhlal ve atanmamış talepler aynı gün kapatılsın.',
@@ -352,15 +367,7 @@ def phase9_release_payload() -> dict[str, Any]:
         'workstreams': release['workstreams'],
         'smoke_rows': first72['smoke_rows'],
         'handoff_rows': first72['handoff_rows'],
-        'recent_logs': [
-            {
-                'action_type': row.action_type,
-                'status': row.status,
-                'summary': row.summary,
-                'executed_at': row.executed_at,
-            }
-            for row in release['recent_logs']
-        ],
+        'recent_logs': release['recent_logs'],
     }
 
 
@@ -379,13 +386,13 @@ def build_phase9_release_markdown() -> str:
         '',
     ]
     for row in payload['gates']:
-        lines.append(f"- [{row['status']}] {row['label']} — {row['detail']} ({row['owner']})")
+        lines.append(f"- [{row['status_label']}] {row['label']} — {row['detail']} ({row['owner']})")
         if row.get('action'):
             lines.append(f"  - Aksiyon: {row['action']}")
 
     lines.extend(['', '## İş akışları', ''])
     for item in payload['workstreams']:
-        lines.append(f"### {item['title']} [{item['status']}]")
+        lines.append(f"### {item['title']} [{item['status_label']}]")
         lines.append(item['summary'])
         for sub in item['items']:
             lines.append(f"- {sub}")
@@ -401,7 +408,7 @@ def build_phase9_release_markdown() -> str:
 
     lines.extend(['', '## Son canlı kayıtları', ''])
     for row in payload['recent_logs']:
-        lines.append(f"- {row['executed_at']} | {row['action_type']} | {row['status']} | {row['summary']}")
+        lines.append(f"- {row['executed_at']} | {row['action_type']} | {row['status_label']} | {row['summary']}")
 
     return "\n".join(lines).strip() + "\n"
 

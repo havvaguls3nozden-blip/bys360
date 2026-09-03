@@ -24,7 +24,7 @@
             <tr>
               <td>{{ task.label }}</td>
               <td>{{ task.owner }}</td>
-              <td><span class="badge text-bg-{{ 'success' if task.status == 'done' else 'warning' }}">{{ task.status }}</span></td>
+              <td><span class="badge text-bg-{{ 'success' if task.status == 'done' else 'warning' }}">{{ task.status_label }}</span></td>
               <td>{{ task.detail }}</td>
             </tr>
             {% endfor %}
@@ -51,9 +51,9 @@
           <div class="col-md-4">
             <label class="form-label">Durum</label>
             <select class="form-select" name="status">
-              <option value="done">done</option>
-              <option value="pending">pending</option>
-              <option value="hold">hold</option>
+              <option value="done">Tamamlandı</option>
+              <option value="pending">Bekliyor</option>
+              <option value="hold">Beklemede</option>
             </select>
           </div>
           <div class="col-md-8">

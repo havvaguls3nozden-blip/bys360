@@ -8,6 +8,7 @@ from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import Notification, SupportTicket, SurveyAssignment
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import (
     OPEN_TICKET_STATUSES,
     log_action,
@@ -43,6 +44,7 @@ def _gate(key: str, label: str, status: str, detail: str, owner: str, action: st
         'key': key,
         'label': label,
         'status': status,
+        'status_label': gate_status_label(status),
         'detail': detail,
         'owner': owner,
         'action': action,
@@ -130,7 +132,7 @@ def _pending_feedback_summary() -> dict[str, int]:
 
 def _pilot_wave_rows(release: dict[str, Any], support: dict[str, int], feedback: dict[str, int]) -> list[dict[str, Any]]:
     blockers = int((release.get('gate_counts') or {}).get('fail', 0) or 0)
-    return [
+    rows: list[dict[str, Any]] = [
         {
             'title': 'Dalga 1 | Çekirdek pilot grup',
             'status': 'ready' if blockers == 0 else 'hold',
@@ -165,6 +167,9 @@ def _pilot_wave_rows(release: dict[str, Any], support: dict[str, int], feedback:
             ],
         },
     ]
+    for row in rows:
+        row['status_label'] = gate_status_label(row['status'])
+    return rows
 
 
 def phase9c_pilot_opening_snapshot() -> dict[str, Any]:
@@ -174,7 +179,7 @@ def phase9c_pilot_opening_snapshot() -> dict[str, Any]:
     first72 = phase9_first72_snapshot()
     support = _support_summary()
     feedback = _pending_feedback_summary()
-    recent_logs = _recent_phase9c_logs(40)
+    raw_recent_logs = _recent_phase9c_logs(40)
 
     recent_checkpoint_logs = len(cutover.get('checkpoint_logs', []) or [])
     release_blockers = int((release.get('gate_counts') or {}).get('fail', 0) or 0)
@@ -238,20 +243,34 @@ def phase9c_pilot_opening_snapshot() -> dict[str, Any]:
         {'label': 'Pilot kararı', 'value': 'Hazır' if counts['fail'] == 0 else 'Bloke', 'suffix': ''},
         {'label': 'Açık destek', 'value': support['open_total'], 'suffix': ''},
         {'label': 'Bekleyen atama', 'value': feedback['pending_assignments'], 'suffix': ''},
-        {'label': 'Pilot kayıt', 'value': len(recent_logs), 'suffix': ''},
+        {'label': 'Pilot kayıt', 'value': len(raw_recent_logs), 'suffix': ''},
     ]
 
     wave_rows = _pilot_wave_rows(release, support, feedback)
-    incident_rows = [
-        {
+    incident_rows = []
+    for row in raw_recent_logs:
+        if row.action_type != 'phase9c_incident':
+            continue
+        raw_severity = safe_str((row.payload_json or {}).get('severity', row.status)).lower() or row.status
+        incident_rows.append({
             'title': row.summary or row.action_type,
-            'severity': safe_str((row.payload_json or {}).get('severity', row.status)).lower() or row.status,
+            'severity': raw_severity,
+            'severity_label': INCIDENT_SEVERITY_LABELS.get(raw_severity, 'Bilinmiyor'),
             'note': safe_str((row.payload_json or {}).get('note', '')),
             'executed_at': row.executed_at,
+        })
+    incident_rows = incident_rows[:15]
+
+    recent_logs = [
+        {
+            'action_type': row.action_type,
+            'status': row.status,
+            'status_label': gate_status_label(row.status),
+            'summary': row.summary,
+            'executed_at': row.executed_at,
         }
-        for row in recent_logs
-        if row.action_type == 'phase9c_incident'
-    ][:15]
+        for row in raw_recent_logs
+    ]
 
     focus_rows = [
         {
@@ -308,21 +327,21 @@ def build_phase9c_markdown() -> str:
         '',
     ]
     for row in payload['gates']:
-        lines.append(f"- [{row['status']}] {row['label']} — {row['detail']}")
+        lines.append(f"- [{row['status_label']}] {row['label']} — {row['detail']}")
     lines.extend([
         '',
         '## Açılış dalgaları',
         '',
     ])
     for row in payload['wave_rows']:
-        lines.append(f"- [{row['status']}] {row['title']} — {row['scope']}")
+        lines.append(f"- [{row['status_label']}] {row['title']} — {row['scope']}")
     lines.extend([
         '',
         '## Son olay kayıtları',
         '',
     ])
     for row in payload['incident_rows'][:10]:
-        lines.append(f"- {row['executed_at']} | {row['severity']} | {row['title']}")
+        lines.append(f"- {row['executed_at']} | {row['severity_label']} | {row['title']}")
     if not payload['incident_rows']:
         lines.append('- Henüz olay kaydı yok.')
     return '\n'.join(lines) + '\n'

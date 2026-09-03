@@ -11,6 +11,7 @@ from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import Survey, SurveyAssignment, SurveyResponse
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import (
     automation_center_snapshot,
     escalation_snapshot,
@@ -44,6 +45,7 @@ def _pilot_gate(label: str, status: str, detail: str, owner: str, action: str | 
     return {
         'label': label,
         'status': status,
+        'status_label': gate_status_label(status),
         'detail': detail,
         'owner': owner,
         'action': action or '',
@@ -256,6 +258,9 @@ def cutover_snapshot() -> dict[str, Any]:
             'detail': 'Veritabanı dönüş, config geri alma ve erişim daraltma adımları hazır olmalı.',
         },
     ]
+
+    for _task in tasks:
+        _task['status_label'] = gate_status_label(_task['status'])
 
     handoff_rows = [
         {'title': 'Pilot kapsamı', 'body': 'Önce performans, izin-vekalet, bildirim ve yönetici görünürlüğü alanlarını açın.'},
