@@ -71,7 +71,32 @@ class BYS360Copy {
     return text.isEmpty ? genericEmpty : text;
   }
 
-  static String error(Object? value) => clean(value);
+  static String error(Object? value) {
+    final cleaned = clean(value);
+    if (_looksLikeUntranslatedExceptionText(cleaned)) return genericUnavailable;
+    return cleaned;
+  }
+
+  /// clean() already recognizes the exception shapes this app produces
+  /// today; anything left over that both (a) has no Turkish character and
+  /// (b) still reads like a raw exception message is an unmapped/unknown
+  /// case that must not reach the user untranslated.
+  static bool _looksLikeUntranslatedExceptionText(String text) {
+    if (RegExp(r'[çğıöşüÇĞİÖŞÜ]').hasMatch(text)) return false;
+    final lower = text.toLowerCase();
+    const englishExceptionMarkers = [
+      'exception',
+      'error',
+      'unexpected',
+      'invalid',
+      'failed',
+      'cannot',
+      'unable',
+      'null',
+      'undefined',
+    ];
+    return englishExceptionMarkers.any(lower.contains);
+  }
 
   static String title(String value) => clean(value);
 

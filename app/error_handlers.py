@@ -304,6 +304,10 @@ def register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(HTTPException)
     def handle_http_exception(error: HTTPException):
+        # Werkzeug'un kendi .name / .description alanları (ör. 409, 422 gibi
+        # ayrı bir errors/<kod>.html şablonu bulunmayan kodlarda) İngilizce
+        # varsayılan metin taşır; kullanıcıya asla ham haliyle gösterilmez.
+        # Operatör için gerçek ad/detay aşağıdaki log satırında korunur.
         current_app.logger.warning(
             "HTTP hata yakalandi | kod=%s | ad=%s | detay=%s",
             getattr(error, "code", 500),
@@ -312,8 +316,8 @@ def register_error_handlers(app: Flask) -> None:
         )
         return render_error_page(
             getattr(error, "code", 500) or 500,
-            getattr(error, "name", "HTTP Hatası"),
-            getattr(error, "description", "İstek işlenemedi."),
+            "İşlem Tamamlanamadı",
+            "İsteğiniz işlenirken bir sorun oluştu. Lütfen tekrar deneyin.",
         )
 
     @app.errorhandler(Exception)
