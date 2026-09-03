@@ -92,8 +92,11 @@ Koordinatör, `docs/current_state/` altındaki tüm belgeleri (19 belge + facts 
 | Üç-SHA belge tutarsızlığı (`873e6d3`/`7d73ff4`/`cb2e57c`) | DOC-07 §13, DOC-08 §8, DOC-09 §3, ledger — dördü de aynı üç SHA'yı tutarlı biçimde raporluyor | UYUMLU |
 | PRIMARY_INSTITUTIONAL_COLOR / WATERMARK kanıtı | DOC-16 §11a, DOC-20 §2-3 — aynı dosya:satır referanslarıyla tutarlı | UYUMLU |
 | Puantaj grup/soru sayımı (7/22) | DOC-18 §3 (kaynak), ledger, README — üçü de 7 grup/22 soru olarak tutarlı | UYUMLU |
+| KYS_SYSTEM_TYPE | DOC-01 §3, DOC-17, ledger ("Kurumsal Konumlandırma" bölümü) — üçü de KYS'yi "mevcut kurumsal ERP / Kurumsal Yönetim Sistemi" olarak tanımlıyor, "Kalite Yönetim Sistemi" ifadesi hiçbirinde geçmiyor (bu fazda düzeltildi) | UYUMLU |
+| KYS_BYS360_RELATIONSHIP | DOC-01 §3, DOC-17, ledger — üçü de "tamamlayıcı, ikame edici değil" ilişkisini ve KYS'nin herhangi bir yeteneği yerine getiremediği yönünde iddia edilmediğini tutarlı biçimde ifade ediyor | UYUMLU |
+| DOC-01 başlık numaralandırması (1-11) | DOC-01 — bu fazda düzeltildi, tekrarlanan/atlanan bölüm numarası kalmadı | UYUMLU |
 
 ## Sonuç
 
-**CROSS_DOCUMENT_CONSISTENCY_RESULT: PASS.** 1 çelişki önceki fazda (coordinator-only review), 14 bulgu bu fazda (literal peer-review) tespit edilmiş; tümü (15/15) kaynağında düzeltilmiş ve bu matriste kayıt altına alınmıştır.
+**CROSS_DOCUMENT_CONSISTENCY_RESULT: PASS.** 1 çelişki önceki fazda (coordinator-only review), 14 bulgu bir sonraki fazda (literal peer-review), 1 kurumsal olgu düzeltmesi (KYS) + 1 numaralandırma kusuru (DOC-01) bu fazda tespit edilmiş; tümü (17/17) kaynağında düzeltilmiş ve bu matriste kayıt altına alınmıştır. KYS düzeltmesi, kullanıcının doğrudan yetkili beyanına dayanır (kod/repo içinden bağımsız doğrulanabilir bir olgu değildir); diğer tüm düzeltmeler bu oturumda mekanik olarak (kod/script okuma veya başlık numarası tarama) doğrulanmıştır.
 **DESIGN_CONSISTENCY_RESULT: PASS.** DOC-20 ile diğer belgeler arasında (ana renk, filigran, teknik dil politikası, Puantaj tasarım sözleşmesi, native mobil sınırı) çelişki tespit edilmemiştir.

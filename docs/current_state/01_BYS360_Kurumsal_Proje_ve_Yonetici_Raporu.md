@@ -25,9 +25,9 @@ BYS360, Başkanlığın personel, performans değerlendirme, kurum içi iletişi
 - **Sınırlı ve denetlenebilir erişim:** Kullanıcılar, kurumun gerçek organizasyon hiyerarşisini yansıtan roller üzerinden, yalnızca görmesi gereken bilgiye erişir; bu erişim kararı hem ekranda hem sistemin arka planında aynı kaynaktan uygulanır — yalnızca ekranda gizlemekle sınırlı değildir.
 - **Kurumsal hafıza:** Geçmiş dönem performans kayıtları, personel süreç geçmişi ve iletişim kayıtları arşivlenir ve erişilebilir kalır.
 
-## 3. Kalite Yönetim Sistemi (KYS) ile ilişki
+## 3. KYS ile ilişki
 
-BYS360, kurumun mevcut Kalite Yönetim Sistemi'nin yerine geçen bir belge/prosedür kontrol sistemi **değildir**. Kapsamı, operasyonel insan kaynağı, performans değerlendirme, iç iletişim ve dosya paylaşım süreçlerinin dijitalleştirilmesidir. Bu nedenle BYS360, KYS'nin rakibi değil, onu tamamlayan, örtüşmeyen bir operasyonel yönetim katmanı olarak konumlandırılmalıdır.
+KYS, Başkanlıkta hâlihazırda kullanılan kurumsal ERP / Kurumsal Yönetim Sistemi'dir. BYS360, KYS'nin yerine geçmek üzere geliştirilmemiştir; KYS'de bulunmayan veya kurumun ihtiyacına özel olarak BYS360 içinde ele alınan performans değerlendirme, personel iş akışları, iç iletişim, anket/geri bildirim, destek ve karar destek gibi operasyonel yönetim süreçlerini tamamlayıcı biçimde ele alır. BYS360, KYS'nin herhangi bir yeteneği yerine getiremediği yönünde bir iddiada bulunmaz; yalnızca kurumun bugün BYS360 üzerinden yürüttüğü süreçleri tarif eder.
 
 ## 4. Başlıca modüller
 
@@ -55,21 +55,21 @@ BYS360, tüm modüllerde tutarlı biçimde uygulanan, kurumun kendi koyu kırmı
 
 Sistemdeki her erişim kararı, kurumun kendi belirlediği rol ve birim yetkilerine dayanır; bu kurallar merkezi bir yerden yönetilir ve değişiklikleri kendisi de kayıt altına alınır — kim, ne zaman, hangi yetkiyi değiştirdi bilgisi geri alınabilir biçimde saklanır. Yapay zekâ destekli paneller yalnızca özet ve öneri üretir; hiçbir idari karar sistemin kendisi tarafından otomatik olarak verilmez veya uygulanmaz — nihai karar her zaman yetkili bir kişiye aittir. Bu ilke, sistemin tasarımına doğrudan işlenmiştir.
 
-## 6. Mevcut proje olgunluğu
+## 7. Mevcut proje olgunluğu
 
 BYS360, kurum bünyesinde canlı olarak kullanılan, sürüm kontrolü altında geliştirilen, geniş bir otomatik test tabanına (binlerce test) sahip bir sistemdir. Veritabanı değişiklikleri tek, tutarlı bir zincirle yönetilir; dağıtım paketleri bütünlük doğrulamalıdır. Sistemin teknik ve operasyonel devir dokümantasyonu ayrı bir belge setinde (`docs/current_state/`, işbu raporun teknik ekleri) hazırlanmıştır.
 
-Bu olgunluk seviyesi, mutlak bir "tamamlandı" ifadesi olarak sunulmamaktadır — bilinen, kayıt altına alınmış açık teknik maddeler bulunmaktadır (bkz. Bölüm 8). Bu, normal bir yazılım yaşam döngüsünün parçasıdır; önemli olan bu maddelerin görünür ve izlenebilir olmasıdır.
+Bu olgunluk seviyesi, mutlak bir "tamamlandı" ifadesi olarak sunulmamaktadır. Bilinen ve kayıt altına alınmış teknik maddeler iç teknik finalizasyon defterinde izlenmekte olup, Puantaj geliştirmesi sonrasında yürütülecek final teknik kapanış aşamasında ele alınacaktır. Bu, normal bir yazılım yaşam döngüsünün parçasıdır; önemli olan bu maddelerin görünür ve izlenebilir olmasıdır.
 
-## 7. Bu belgenin hazırlandığı aşama
+## 8. Bu belgenin hazırlandığı aşama
 
 Bu belge seti, **Puantaj öncesi mevcut durum dokümantasyonu** aşamasında hazırlanmıştır. Bu, projenin nihai kapanışı, uzak sunucuda sonuçlanmış (CI) bir doğrulama turu veya nihai üretim kabulü **değildir**. Bu aşamanın amacı, bir sonraki kurumsal geliştirme adımına (Puantaj) geçmeden önce sistemin mevcut durumunu dürüst, kanıta dayalı biçimde kayıt altına almaktır.
 
-## 8. Puantaj — onaylanmış bir sonraki kurumsal geliştirme
+## 9. Puantaj — onaylanmış bir sonraki kurumsal geliştirme
 
 Kurumun onayladığı proje sırasına göre, bu dokümantasyon aşamasından sonra **Puantaj (personel devam/mesai takibi)** modülünün geliştirilmesine geçilecektir. Bu modül şu anda **planlanmış ve onaylanmış bir sonraki geliştirme adımıdır**; mevcut sistemde uygulanmış bir özellik değildir. Kapsamı (aylık çizelge, normal/vardiyalı çalışma, resmî tatil, izin türleri, fazla mesai, 4/A ve 4/D istihdam statüleri, HR ve Grup Başkanı onay zinciri gibi kalemler) ayrı bir gereksinim ekinde kayıt altına alınmıştır; bazı noktalar (mevcut çizelge şablonu, vardiya saatleri, mesai ödeme kuralları gibi) kurumun kendisinden netleştirme beklemektedir.
 
-## 9. Final kurumsal kapanıştan önce kalan adımlar
+## 10. Final kurumsal kapanıştan önce kalan adımlar
 
 Aşağıdaki adımlar, kurumun onayladığı sıraya göre bu dokümantasyon aşamasından sonra izlenecektir:
 
@@ -84,6 +84,6 @@ Aşağıdaki adımlar, kurumun onayladığı sıraya göre bu dokümantasyon aş
 
 Bu sıralama, üst yönetimin daha önce onayladığı sıradır ve bu belge setinin tamamında tutarlı biçimde yansıtılmıştır.
 
-## 10. Sonuç
+## 11. Sonuç
 
 BYS360, kurumun günlük insan kaynağı, performans ve iç iletişim işlerini dağınık araçlardan tek, denetlenebilir bir sisteme taşıyan, canlı ve kullanılmakta olan bir kurumsal yatırımdır. Mevcut aşamada bu yatırımın durumu dürüstçe belgelenmiş, bir sonraki geliştirme adımı (Puantaj) ve final kurumsal kapanışa giden yol net biçimde tanımlanmıştır.

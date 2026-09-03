@@ -38,6 +38,18 @@ Son Güncelleme: 2026-09-02 (v2 — koordinatör final birleştirmesi)
 
 ---
 
+## Kurumsal Konumlandırma — KYS İlişkisi (kullanıcı düzeltmesi, bu fazda eklendi)
+
+| Alan | Değer | Kanıt |
+|---|---|---|
+| KYS_SYSTEM_TYPE | Kurumun hâlihazırda kullandığı **mevcut kurumsal ERP / Kurumsal Yönetim Sistemi**. **KYS "Kalite Yönetim Sistemi" DEĞİLDİR** — bu, önceki belge taslaklarında (DOC-01, DOC-17) hatalı biçimde kullanılmış bir açılımdı, kullanıcı tarafından düzeltilmiştir | PRODUCTION_HISTORICAL (kullanıcı beyanı — kurumsal bir olgu, kod/repo içinden doğrulanabilir değildir) |
+| BYS360_KYS_RELATION | **Tamamlayıcı, ikame edici değil.** BYS360, KYS'nin yerine geçmek üzere geliştirilmemiştir; KYS'de bulunmayan veya kurumun ihtiyacına özel olarak BYS360 içinde ele alınan performans değerlendirme, personel iş akışları, iç iletişim, anket/geri bildirim, destek ve karar destek gibi operasyonel yönetim süreçlerini ele alır | Kullanıcı beyanı (kesin talimat) |
+| KYS_CAPABILITY_CLAIMS_POLICY | BYS360, KYS'nin herhangi bir yeteneği yerine getiremediği yönünde bir iddiada bulunmaz — yalnızca kurumun bugün BYS360 üzerinden yürüttüğü süreçleri tarif eder; desteklenmeyen rekabetçi/karşılaştırmalı ifadeler kullanılmaz | Kullanıcı talimatı |
+
+**Düzeltme kaydı:** Bu fazdan önce DOC-01 §3 ve DOC-17'nin açılış paragrafı, KYS'yi hatalı biçimde "Kalite Yönetim Sistemi" olarak tanımlıyor ve BYS360'ı bu (var olmayan) sisteme göre konumlandırıyordu. Kullanıcının doğrudan, yetkili düzeltmesi üzerine her iki belge de yukarıdaki kanonik tanıma göre güncellenmiştir. Repo genelinde tarama, bu iki belge dışında KYS'ye atıfta bulunan başka hiçbir current-state belgesi bulunmadığını doğrulamıştır.
+
+---
+
 ## Uygulama Yığını (Application Stack)
 
 | Alan | Değer | Kanıt |
@@ -159,3 +171,8 @@ Eski `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md` §26.1, **SHA `
 ## Ajan Katkı Özeti
 
 Üç specialist ajan (Architecture/Data/Modules; Install/Ops/Release; Security/Handover/Governance) 15 teknik belgeyi tamamladı; koordinatör tüm belgeleri okuyup çapraz doğruladı, bir gerçek hata buldu ve düzeltti (DOC-10/DOC-16 — `postgresql-x64-15` servis kontrolünün yanlış dosyaya atfedilmesi), bu ledger'ı v2 olarak birleştirdi.
+
+## Düzeltme Kaydı — KYS Olgu Düzeltmesi + DOC-01 Numaralandırma (bu faz)
+
+1. **KYS olgu düzeltmesi:** DOC-01 §3 ve DOC-17'nin açılış paragrafı, KYS'yi hatalı biçimde "Kalite Yönetim Sistemi" olarak tanımlıyordu. Kullanıcının yetkili düzeltmesi üzerine kanonik tanım (KYS = mevcut kurumsal ERP) uygulandı — bkz. yukarıdaki "Kurumsal Konumlandırma" bölümü.
+2. **DOC-01 başlık numaralandırma düzeltmesi:** Önceki görsel kabul incelemesinde tespit edilen, iki bölümün "6." numarasını paylaştığı (ve sonrasındaki tüm bölümlerin bir kayık olduğu) kusur düzeltildi — bölümler artık 1'den 11'e kesintisiz ve tekrarsızdır.

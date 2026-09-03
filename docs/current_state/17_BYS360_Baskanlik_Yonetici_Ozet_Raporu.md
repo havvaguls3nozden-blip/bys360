@@ -12,7 +12,7 @@ Son Güncelleme: 2026-09-02
 
 ## BYS360 nedir?
 
-BYS360, Başkanlığın personel, performans değerlendirme, kurum içi iletişim, anket, destek ve güvenli dosya paylaşımı işlerini tek bir web tabanlı sistemde toplayan kurumsal yönetim platformudur. Amacı, önceden dağınık araçlarla (tablolar, e-posta, kağıt onay) yürütülen bu işleri tek, tutarlı ve denetlenebilir bir sisteme taşımaktır. BYS360, kurumun mevcut Kalite Yönetim Sistemi'nin yerine geçmez; onu tamamlayan bir operasyonel yönetim katmanıdır.
+BYS360, Başkanlığın personel, performans değerlendirme, kurum içi iletişim, anket, destek ve güvenli dosya paylaşımı işlerini tek bir web tabanlı sistemde toplayan kurumsal yönetim platformudur. Amacı, önceden dağınık araçlarla (tablolar, e-posta, kağıt onay) yürütülen bu işleri tek, tutarlı ve denetlenebilir bir sisteme taşımaktır. KYS, Başkanlıkta hâlihazırda kullanılan kurumsal ERP sistemidir. BYS360, KYS'nin yerine geçmek üzere değil; kurumun ihtiyaçlarına özgü yönetim, performans, personel, iletişim, raporlama ve karar destek süreçlerini tamamlayacak şekilde geliştirilmiştir.
 
 ## Kurumsal değer
 
