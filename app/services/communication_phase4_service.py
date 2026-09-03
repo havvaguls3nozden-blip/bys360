@@ -44,6 +44,14 @@ SUPPORT_OPEN_STATUSES = {"open", "reviewing", "waiting_info", "assigned", "plann
 BULLETIN_PUBLISHED_STATUSES = {"published", "yayinda"}
 SURVEY_ACTIVE_STATUSES = {"published", "active", "yayinda"}
 
+REPORT_STATUS_LABELS = {
+    "draft": "Taslak",
+    "review": "İncelemede",
+    "approved": "Onaylandı",
+    "revision": "Revizyon İstendi",
+    "rejected": "Reddedildi",
+}
+
 
 class CommunicationPhase4Error(RuntimeError):
     pass
@@ -518,6 +526,7 @@ def report_history_snapshot(limit: int = 25) -> dict[str, Any]:
             "report_type": safe_str(getattr(row, "report_type", "")),
             "period_label": safe_str(getattr(row, "period_label", "")),
             "status": safe_str(getattr(row, "status", "draft")) or "draft",
+            "status_label": REPORT_STATUS_LABELS.get(safe_str(getattr(row, "status", "draft")) or "draft", safe_str(getattr(row, "status", "draft"))),
             "created_by": user_display_name(getattr(row, "created_by", None)),
             "approved_by": user_display_name(getattr(row, "approved_by", None)),
             "approved_at": getattr(row, "approved_at", None),

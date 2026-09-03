@@ -968,6 +968,7 @@ def support_detail(ticket_id: int):
         ticket=ticket,
         categories=categories,
         status_choices=SUPPORT_STATUS_CHOICES,
+        status_labels=_status_map(),
         assignable_users=assignable_users,
         can_manage=_can_use_all_support_view(),
     )

@@ -185,7 +185,7 @@ def phase9c_pilot_opening_snapshot() -> dict[str, Any]:
             'pilot_decision',
             'Pilot açılış kararı ve kapsamı',
             'pass' if recent_checkpoint_logs >= 2 else 'warn',
-            f'Faz 8 checkpoint/not kaydı: {recent_checkpoint_logs}',
+            f'Faz 8 kontrol noktası/not kaydı: {recent_checkpoint_logs}',
             'Proje / Yönetim',
             'Pilot listesi ve açılış kararı yazılı kayıt altında olmalı.',
         ),

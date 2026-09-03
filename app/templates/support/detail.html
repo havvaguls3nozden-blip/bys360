@@ -46,7 +46,7 @@
                     {% for row in ticket.status_history %}
                     <div class="timeline-item">
                         <div class="timeline-top"><span>{{ row.changed_by.full_name if row.changed_by else 'Sistem' }}</span><span>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</span></div>
-                        <div class="timeline-text">{{ row.old_status or 'İlk kayıt' }} → {{ row.new_status }}{% if row.note %}<br><span class="muted">{{ row.note }}</span>{% endif %}</div>
+                        <div class="timeline-text">{{ status_labels.get(row.old_status, row.old_status) if row.old_status else 'İlk kayıt' }} → {{ status_labels.get(row.new_status, row.new_status) }}{% if row.note %}<br><span class="muted">{{ row.note }}</span>{% endif %}</div>
                     </div>
                     {% else %}
                     <div class="timeline-item">Durum geçmişi bulunmuyor.</div>

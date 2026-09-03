@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -105,7 +106,7 @@ class _PerformanceScoringScreenState extends State<PerformanceScoringScreen> {
       await _refresh();
       if (completed && mounted) Navigator.of(context).pop(true);
     } catch (error) {
-      _message(error.toString());
+      _message(BYS360Copy.error(error));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -122,7 +123,7 @@ class _PerformanceScoringScreenState extends State<PerformanceScoringScreen> {
       _message(_text(map, ['message'], isReturn ? 'Değerlendirme iade edildi.' : 'Değerlendirme geri çekildi.'));
       if (mounted) Navigator.of(context).pop(true);
     } catch (error) {
-      _message(error.toString());
+      _message(BYS360Copy.error(error));
     } finally {
       if (mounted) setState(() => _actionRunning = false);
     }

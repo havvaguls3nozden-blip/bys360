@@ -13,6 +13,7 @@ from flask_login import current_user, login_required
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
 from app.services.communication_phase4_service import (
+    REPORT_STATUS_LABELS,
     CommunicationPhase4Error,
     create_executive_report,
     decide_governance,
@@ -108,7 +109,7 @@ def communication_phase4_report_detail(report_id: int):
     from app.models.communication_phase4_models import CommunicationExecutiveReport
 
     row = CommunicationExecutiveReport.query.get_or_404(report_id)
-    return safe_render("communication/phase4_report_detail.html", row=row)
+    return safe_render("communication/phase4_report_detail.html", row=row, status_labels=REPORT_STATUS_LABELS)
 
 
 @main_bp.route("/communication/faz4/reports/<int:report_id>/submit-review", methods=["POST"])

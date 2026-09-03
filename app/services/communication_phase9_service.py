@@ -102,7 +102,7 @@ def _smoke_rows() -> list[dict[str, Any]]:
         {
             'label': 'Pilot cutover merkezi',
             'path': '/communication/faz8/cutover',
-            'expected': 'Checkpoint ve pilot notu formu açılmalı.',
+            'expected': 'Kontrol noktası ve pilot notu formu açılmalı.',
             'owner': 'BT / Proje',
         },
         {
@@ -176,7 +176,7 @@ def phase9_release_center_snapshot() -> dict[str, Any]:
             'phase9_9c',
             '9C | Pilot karar kaydı ve cutover izi',
             'pass' if phase8_logs >= 2 else 'warn',
-            f'Faz 8 checkpoint/not kaydı: {phase8_logs}',
+            f'Faz 8 kontrol noktası/not kaydı: {phase8_logs}',
             'Proje / Yönetim',
             'Pilot kararı yazılı kayıt altına alınmalı.',
         ),
@@ -410,7 +410,7 @@ def record_phase9_checkpoint(actor: Any, checkpoint_key: str, status: str, note:
     checkpoint_key = safe_str(checkpoint_key)[:80] or 'genel'
     status = safe_str(status).lower()[:20] or 'pending'
     note = safe_str(note)[:600]
-    summary = f'Faz 9 checkpoint | {checkpoint_key} | {status}'
+    summary = f'Faz 9 kontrol noktası | {checkpoint_key} | {status}'
     row = log_action(
         'phase9_checkpoint',
         actor,

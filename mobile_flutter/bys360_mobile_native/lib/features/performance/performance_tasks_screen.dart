@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
+import 'performance_mobile_p1_models.dart';
 import 'performance_scoring_screen.dart';
 
 class PerformanceTasksScreen extends StatefulWidget {
@@ -392,24 +393,10 @@ IconData _metricIcon(String value) {
 
 String _performanceTaskStatusLabel(String value) {
   final raw = value.trim();
-  final key = raw.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
-  const labels = <String, String>{
-    'pending': 'Bekliyor',
-    'waiting': 'Bekliyor',
-    'assigned': 'Atandı',
-    'open': 'Açık',
-    'draft': 'Taslak',
-    'in_progress': 'Devam Ediyor',
-    'completed': 'Tamamlandı',
-    'done': 'Tamamlandı',
-    'tamamlandi': 'Tamamlandı',
-    'tamamlandı': 'Tamamlandı',
-    'returned': 'İade Edildi',
-    'rejected': 'İade Edildi',
-    'withdrawn': 'Geri Çekildi',
-    'president_pending': 'Başkan Onayı Bekliyor',
-    'blocked_president_pending': 'Başkan Onayı Yayın Kilidi',
-  };
-  if (labels.containsKey(key)) return labels[key]!;
-  return raw.isEmpty ? 'Değerlendirme Bekliyor' : raw;
+  if (raw.isEmpty) return 'Değerlendirme Bekliyor';
+  // Delegates to the canonical, more complete status dictionary
+  // (bys360PerformanceStatusLabel) instead of keeping a second,
+  // narrower copy that silently fell behind on newer backend status
+  // codes (e.g. hr_precheck, scorecard_pending) and returned them raw.
+  return bys360PerformanceStatusLabel(raw);
 }

@@ -108,13 +108,14 @@ String bys360PerformanceStatusLabel(String value) {
   };
   if (labels.containsKey(key)) return labels[key]!;
   if (raw.isEmpty) return 'Takipte';
-  if (raw.contains('_') || raw.contains('-')) {
-    return raw.split(RegExp(r'[_\-]+')).where((part) => part.isNotEmpty).map((part) {
-      if (part.length == 1) return part.toUpperCase();
-      return part[0].toUpperCase() + part.substring(1).toLowerCase();
-    }).join(' ');
-  }
-  return raw;
+  // Any status code not yet in the dictionary above (e.g. a newly added
+  // backend value) is at least title-cased instead of shown as a raw
+  // lowercase/underscored machine value -- applies to single-word codes
+  // too, not only underscore/dash-separated ones.
+  return raw.split(RegExp(r'[_\-]+')).where((part) => part.isNotEmpty).map((part) {
+    if (part.length == 1) return part.toUpperCase();
+    return part[0].toUpperCase() + part.substring(1).toLowerCase();
+  }).join(' ');
 }
 
 String bys360Text(Map<String, dynamic> data, List<String> keys, [String fallback = '']) {

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
 
 class CommunicationScreen extends StatefulWidget {
   const CommunicationScreen({super.key, required this.apiClient});
@@ -734,7 +735,7 @@ class _NewThreadSheetState extends State<_NewThreadSheet> {
                 margin: const EdgeInsets.only(top: 8),
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(color: BYS360Colors.softRed, borderRadius: BorderRadius.circular(16)),
-                child: const Text('Alıcı listesi otomatik yüklenir. Görünmüyorsa Yenile/Search ikonuna basın veya ad-soyad yazarak arayın.', style: TextStyle(fontWeight: FontWeight.w700)),
+                child: const Text('Alıcı listesi otomatik yüklenir. Görünmüyorsa Yenile/Ara ikonuna basın veya ad-soyad yazarak arayın.', style: TextStyle(fontWeight: FontWeight.w700)),
               ),
             if (_selectedUser != null)
               Container(
@@ -830,11 +831,6 @@ String _subtitle(Map<String, dynamic> row) => _text(row['subtitle'] ?? row['meta
 String _lastBody(Map<String, dynamic> row) => _text(row['last_message_body'] ?? row['body'] ?? row['preview']);
 String _initial(String text) => text.trim().isEmpty ? '?' : text.trim().substring(0, 1).toUpperCase();
 
-String _friendlyError(Object error) {
-  final text = error.toString().replaceFirst('İşlem tamamlanamadı: ', '').trim();
-  if (text.isEmpty) return 'İşlem şu anda tamamlanamadı. Lütfen tekrar deneyin.';
-  if (text.length > 160) return 'İşlem şu anda tamamlanamadı. Oturum veya yetki bilgisi kontrol edilmelidir.';
-  return text;
-}
+String _friendlyError(Object error) => BYS360Copy.error(error);
 
 // BYS360_MOBILE_V2_8_68_QUALITY_CLEANUP

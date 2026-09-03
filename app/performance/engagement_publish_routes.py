@@ -15,7 +15,7 @@ from app.services.performance.hardening_service import (
     build_period_download_name,
     humanize_export_exception,
 )
-from app.services.performance_admin_service import create_publish_log
+from app.services.performance_admin_service import create_publish_log, humanize_publish_log_action
 from app.services.performance_snapshot_service import (
     backfill_snapshots_for_published_periods,
     create_snapshot_for_evaluation,
@@ -300,7 +300,7 @@ def performance_publish_logs_export_excel():
             period_title = log.period.title if log.period else "-"
             excel_rows.append([
                 log.created_at.strftime("%d.%m.%Y %H:%M") if log.created_at else "-",
-                log.action_type or "-",
+                humanize_publish_log_action(log.action_type),
                 period_title,
                 employee_name,
                 employee_sicil,

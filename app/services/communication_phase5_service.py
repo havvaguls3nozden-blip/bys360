@@ -211,6 +211,9 @@ def _ticket_owner_snapshot(ticket: Any) -> str:
 
 
 def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
+    from app.support.routes import SUPPORT_STATUS_CHOICES
+
+    status_labels = dict(SUPPORT_STATUS_CHOICES)
     now = _now()
     tickets = SupportTicket.query.order_by(SupportTicket.created_at.desc()).limit(limit).all()
     open_rows = []
@@ -274,6 +277,7 @@ def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
         "unassigned_rows": unassigned_rows[:20],
         "assignee_load": assignee_load[:20],
         "recent_history": recent_history,
+        "status_labels": status_labels,
     }
 
 

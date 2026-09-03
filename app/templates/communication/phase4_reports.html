@@ -63,7 +63,7 @@
               {% for row in history.rows %}
               <tr>
                 <td>{{ row.title }}</td>
-                <td>{{ row.status }}</td>
+                <td>{{ row.status_label }}</td>
                 <td>{{ row.created_by }}</td>
                 <td>{{ row.created_at }}</td>
                 <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.communication_phase4_report_detail', report_id=row.id) }}">Aç</a></td>
