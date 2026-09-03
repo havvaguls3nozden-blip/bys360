@@ -86,7 +86,7 @@
               <thead><tr><th>İşlem</th><th>Özet</th><th>Zaman</th></tr></thead>
               <tbody>
                 {% for row in payload.cutover.checkpoint_logs[:10] %}
-                <tr><td>{{ row.action_type }}</td><td>{{ row.summary }}</td><td>{{ row.executed_at }}</td></tr>
+                <tr><td>{{ 'Kontrol noktası' if row.action_type == 'phase8_checkpoint' else ('Not' if row.action_type == 'phase8_note' else row.action_type) }}</td><td>{{ row.summary }}</td><td>{{ row.executed_at }}</td></tr>
                 {% else %}
                 <tr><td colspan="3" class="text-muted">Henüz pilot kaydı yok.</td></tr>
                 {% endfor %}

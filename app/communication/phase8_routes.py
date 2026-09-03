@@ -58,7 +58,7 @@ def communication_phase8_cutover():
 def communication_phase8_checkpoint_create():
     submitted = request.form.get('checkpoint_token')
     if not consume_form_token('communication_phase8_checkpoint', submitted, scope=str(current_user.id)):
-        flash('Faz 8 checkpoint formu geçersiz veya süresi dolmuş.', 'danger')
+        flash('Faz 8 kontrol noktası formu geçersiz veya süresi dolmuş.', 'danger')
         return redirect(url_for('main.communication_phase8_cutover'))
 
     checkpoint_key = (request.form.get('checkpoint_key') or '').strip()
@@ -66,10 +66,10 @@ def communication_phase8_checkpoint_create():
     note = (request.form.get('note') or '').strip()
     try:
         record_phase8_checkpoint(current_user, checkpoint_key, status, note)
-        flash('Pilot checkpoint kaydedildi.', 'success')
+        flash('Pilot kontrol noktası kaydedildi.', 'success')
     except Exception as exc:
         logger.exception("BYS360 V6C guarded exception | file=app/communication/phase8_routes.py | line=68")
-        flash(f'Checkpoint kaydı oluşturulamadı: {exc}', 'danger')
+        flash(f'Kontrol noktası kaydı oluşturulamadı: {exc}', 'danger')
     return redirect(url_for('main.communication_phase8_cutover'))
 
 

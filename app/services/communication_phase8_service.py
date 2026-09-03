@@ -154,11 +154,11 @@ def pilot_readiness_snapshot() -> dict[str, Any]:
             'Gürültüyü azaltın, sessiz saat ve özet kullanımını teşvik edin.',
         ),
         _pilot_gate(
-            'Pilot checkpoint kaydı',
+            'Pilot kontrol noktası kaydı',
             'pass' if recent_logs >= 1 else 'warn',
             f"Son 72 saatte faz 8 kaydı: {recent_logs}",
             'Proje Ofisi',
-            'Açılış öncesi en az bir checkpoint ve bir karar notu bırakın.',
+            'Açılış öncesi en az bir kontrol noktası ve bir karar notu bırakın.',
         ),
     ]
 
@@ -282,7 +282,7 @@ def phase8_dashboard_snapshot() -> dict[str, Any]:
             {'label': 'Hazırlık skoru', 'value': readiness['go_live']['readiness_score'], 'suffix': '/100'},
             {'label': 'Kritik blokaj', 'value': len(readiness['go_live']['blockers']), 'suffix': ''},
             {'label': 'Uyarı', 'value': readiness['counts']['warn'], 'suffix': ''},
-            {'label': 'Checkpoint kaydı', 'value': len(cutover['checkpoint_logs']), 'suffix': ''},
+            {'label': 'Kontrol noktası kaydı', 'value': len(cutover['checkpoint_logs']), 'suffix': ''},
         ],
     }
 
@@ -291,7 +291,7 @@ def record_phase8_checkpoint(actor: Any, checkpoint_key: str, status: str, note:
     checkpoint_key = safe_str(checkpoint_key)[:80] or 'genel'
     status = safe_str(status).lower()[:20] or 'pending'
     note = safe_str(note)[:500]
-    summary = f'Faz 8 checkpoint | {checkpoint_key} | {status}'
+    summary = f'Faz 8 kontrol noktası | {checkpoint_key} | {status}'
     payload = {'checkpoint_key': checkpoint_key, 'status': status, 'note': note}
     row = log_action('phase8_checkpoint', actor, 'communication_phase8', None, summary, payload, status='success')
     db.session.commit()
