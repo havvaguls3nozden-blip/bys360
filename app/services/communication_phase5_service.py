@@ -448,7 +448,7 @@ def create_or_update_retention_policy(actor: Any, form: Any) -> CommunicationRet
 
 
 def health_snapshot() -> dict[str, Any]:
-    unread_total = Notification.query.filter_by(is_read=False, is_hidden=False).count()
+    unread_total = Notification.query.filter_by(is_read=False).count()
     tickets_open = SupportTicket.query.filter(SupportTicket.status.in_(list(OPEN_TICKET_STATUSES))).count()
     survey_active = Survey.query.filter(Survey.status.in_(["published", "active", "yayinda"])).count()
     failed_logs = CommunicationAutomationLog.query.filter_by(status="failed").count()

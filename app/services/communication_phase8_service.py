@@ -9,7 +9,7 @@ from flask import current_app
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import Survey, SurveyAssignment
+from app.models import Survey, SurveyAssignment, SurveyResponse
 from app.models.communication_phase5_models import CommunicationAutomationLog
 from app.services.communication_phase5_service import (
     automation_center_snapshot,
@@ -77,7 +77,8 @@ def pilot_readiness_snapshot() -> dict[str, Any]:
     recent_logs = _count_phase8_logs(72)
     pending_surveys = (
         SurveyAssignment.query
-        .filter(SurveyAssignment.status.in_(['assigned', 'atandi', 'started', 'basladi']))
+        .outerjoin(SurveyResponse, SurveyResponse.assignment_id == SurveyAssignment.id)
+        .filter(db.or_(SurveyResponse.id.is_(None), SurveyResponse.is_completed.is_(False)))
         .count()
     )
     active_surveys = Survey.query.filter(Survey.status.in_(['published', 'active', 'yayinda'])).count()
