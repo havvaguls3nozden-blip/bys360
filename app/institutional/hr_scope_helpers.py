@@ -107,6 +107,38 @@ def _attendance_type_label(value: Any) -> str:
     return dict(ATTENDANCE_TYPE_CHOICES).get(raw, "Bilinmiyor" if raw else "-")
 
 
+def _delegation_status_label(value: Any) -> str:
+    raw = _safe_text(value).lower()
+    return dict(DELEGATION_STATUS_CHOICES).get(raw, "Bilinmiyor" if raw else "-")
+
+
+def _leave_status_label(value: Any) -> str:
+    raw = _safe_text(value).lower()
+    return dict(LEAVE_STATUS_CHOICES).get(raw, "Bilinmiyor" if raw else "-")
+
+
+def _leave_date_range_label(row: Any) -> str:
+    start = getattr(row, "start_date", None)
+    end = getattr(row, "end_date", None)
+    if not start and not end:
+        return "-"
+    start_text = start.strftime("%d.%m.%Y") if start else "-"
+    end_text = end.strftime("%d.%m.%Y") if end else "-"
+    if start and end and start == end:
+        return start_text
+    return f"{start_text} - {end_text}"
+
+
+def _leave_duration_label(row: Any) -> str:
+    count = getattr(row, "approved_day_count", None)
+    if count is None:
+        start = getattr(row, "start_date", None)
+        end = getattr(row, "end_date", None)
+        count = _date_range_weekday_count(start, end) if start and end else 0.0
+    text = f"{float(count or 0.0):g}".replace(".", ",")
+    return f"{text} gün"
+
+
 def _performance_mode_label(value: Any) -> str:
     raw = _safe_text(value, "partial").lower()
     return PERFORMANCE_MODE_LABELS.get(raw, "Bilinmiyor")
@@ -483,6 +515,10 @@ __all__ = [
     "_scope_label",
     "_leave_type_label",
     "_attendance_type_label",
+    "_delegation_status_label",
+    "_leave_status_label",
+    "_leave_date_range_label",
+    "_leave_duration_label",
     "_performance_mode_label",
     "_full_name",
     "_unit_name",

@@ -329,7 +329,7 @@
                 <tr>
                     <td><strong>{{ row.delegator.full_name if row.delegator is defined and row.delegator else (row.delegator_name if row.delegator_name is defined else '-') }}</strong></td>
                     <td>{{ row.delegate.full_name if row.delegate is defined and row.delegate else (row.delegate_name if row.delegate_name is defined else '-') }}</td>
-                    <td>{{ row.scope_type if row.scope_type is defined else 'performance' }}</td>
+                    <td>{{ delegation_scope_label(row.scope_type if row.scope_type is defined else 'performance') }}</td>
                     <td>
                         {% if row.applies_level_1 is defined or row.applies_level_2 is defined or row.applies_level_3 is defined %}
                             {% if row.applies_level_1 %}<span class="level-badge">1</span>{% endif %}
@@ -344,7 +344,7 @@
                         {% endif %}
                     </td>
                     <td>{{ row.start_date if row.start_date is defined else '-' }} → {{ row.end_date if row.end_date is defined else '-' }}</td>
-                    <td><span class="status ok">{{ row.status|default('aktif')|replace('_',' ')|title }}</span></td>
+                    <td><span class="status ok">{{ delegation_status_label(row.status|default('aktif')) }}</span></td>
                 </tr>
                 {% else %}
                 <tr><td colspan="6" class="muted">Aktif vekâlet kaydı görünmüyor. Yönetici izninde görev boşa düşmemesi için aktif kapsayıcı vekâlet tanımlı olmalı.</td></tr>
@@ -622,7 +622,7 @@
                         <td>{{ 'Evet' if row.blocks_manager_duties else 'Hayır' }}</td>
                         <td>
                             <span class="status {% if row.status == 'onaylandi' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">
-                                {{ row.status|replace('_', ' ')|title }}
+                                {{ leave_status_label(row.status) }}
                             </span>
                         </td>
                         <td>

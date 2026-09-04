@@ -110,6 +110,7 @@ LEAVE_STATUS_CHOICES = [
     ("bekliyor", "Bekliyor"),
     ("reddedildi", "Reddedildi"),
     ("taslak", "Taslak"),
+    ("aktif", "Aktif"),
 ]
 
 ATTENDANCE_TYPE_CHOICES = [

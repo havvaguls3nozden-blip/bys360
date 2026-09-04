@@ -498,7 +498,7 @@ Devamsızlık ve vekâlet kayıtlarını bu ekranda yönetebilir, kapsama etkile
                         <td>{{ 'Evet' if row.blocks_manager_duties else 'Hayır' }}</td>
                         <td>
                             <span class="status {% if row.status == 'onaylandi' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">
-                                {{ row.status|replace('_', ' ')|title }}
+                                {{ leave_status_label(row.status) }}
                             </span>
                         </td>
                         <td>
@@ -556,7 +556,7 @@ Devamsızlık ve vekâlet kayıtlarını bu ekranda yönetebilir, kapsama etkile
                         <td>{{ row.delegator.full_name if row.delegator else '-' }}</td>
                         <td>{{ row.delegate.full_name if row.delegate else '-' }}</td>
                         <td>{{ row.start_date }} → {{ row.end_date }}</td>
-                        <td>{{ scope_label(row.scope_type) }}</td>
+                        <td>{{ delegation_scope_label(row.scope_type) }}</td>
                         <td>
                             {% if row.applies_level_1 %}L1 {% endif %}
                             {% if row.applies_level_2 %}L2 {% endif %}
@@ -573,7 +573,7 @@ Devamsızlık ve vekâlet kayıtlarını bu ekranda yönetebilir, kapsama etkile
                         </td>
                         <td>
                             <span class="status {% if row.status == 'aktif' %}ok{% elif row.status == 'bekliyor' %}warn{% else %}bad{% endif %}">
-                                {{ row.status|replace('_', ' ')|title }}
+                                {{ delegation_status_label(row.status) }}
                             </span>
                         </td>
                         <td>

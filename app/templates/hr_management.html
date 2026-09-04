@@ -167,7 +167,7 @@ Personel ana başlıklarını tek panelde toplayan, riskleri ve aksiyon öncelik
                             <td>{{ row.delegate.full_name if row.delegate else '-' }}</td>
                             <td>{{ scope_label(row.scope_type) }}</td>
                             <td>{{ row.end_date }}</td>
-                            <td><span class="status {% if row.status == 'aktif' %}ok{% else %}warn-pill{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                            <td><span class="status {% if row.status == 'aktif' %}ok{% else %}warn-pill{% endif %}">{{ delegation_status_label(row.status) }}</span></td>
                         </tr>
                         {% else %}
                         <tr><td colspan="5">Önümüzdeki 7 gün içinde bitecek vekâlet bulunmuyor.</td></tr>
@@ -188,7 +188,7 @@ Personel ana başlıklarını tek panelde toplayan, riskleri ve aksiyon öncelik
                             <td>{{ row.delegate.full_name if row.delegate else '-' }}</td>
                             <td>{{ scope_label(row.scope_type) }}</td>
                             <td>{{ row.start_date }} → {{ row.end_date }}</td>
-                            <td><span class="status {% if row.status == 'aktif' %}ok{% elif row.status == 'bekliyor' %}warn-pill{% else %}bad{% endif %}">{{ row.status|replace('_',' ')|title }}</span></td>
+                            <td><span class="status {% if row.status == 'aktif' %}ok{% elif row.status == 'bekliyor' %}warn-pill{% else %}bad{% endif %}">{{ delegation_status_label(row.status) }}</span></td>
                         </tr>
                         {% else %}
                         <tr><td colspan="5">Henüz vekâlet kaydı yok.</td></tr>
