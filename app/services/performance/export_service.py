@@ -9,6 +9,9 @@ from flask import Response, send_file
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 
+from app.services.performance.phase5_4_status_language import phase5_4_status_label
+from app.services.performance_admin_service import humanize_publish_log_action
+
 """Performans export / download yardimcilari.
 
 Faz D notu:
@@ -105,7 +108,7 @@ def build_publish_log_export_response(logs: Iterable[Any], *, download_name: str
         created_at = getattr(log, "created_at", None)
         excel_rows.append([
             created_at.strftime("%d.%m.%Y %H:%M") if created_at else "-",
-            getattr(log, "action_type", None) or "-",
+            humanize_publish_log_action(getattr(log, "action_type", None)),
             getattr(getattr(log, "period", None), "title", None) or "-",
             _full_name(employee),
             getattr(employee, "sicil_no", None) or "-",
@@ -162,7 +165,7 @@ def build_performance_report_excel_download_response(evaluations: Iterable[Any],
             float(getattr(item, "level_2_total_100", 0) or 0),
             float(getattr(item, "level_3_total_100", 0) or 0),
             float(getattr(item, "report_final_score", 0) or 0),
-            getattr(item, "status", None) or "-",
+            phase5_4_status_label(getattr(item, "status", None)),
             "Evet" if bool(getattr(period, "results_published", False)) else "Hayır",
         ])
 

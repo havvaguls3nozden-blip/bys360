@@ -143,7 +143,9 @@ PUBLISH_LOG_ACTION_LABELS = {
 
 def humanize_publish_log_action(action_type: str | None) -> str:
     clean = (action_type or "").strip()
-    return PUBLISH_LOG_ACTION_LABELS.get(clean, clean or "-")
+    if not clean:
+        return "-"
+    return PUBLISH_LOG_ACTION_LABELS.get(clean, "Bilinmiyor")
 
 
 def create_publish_log(period_id, actor_user_id, action_type, evaluation_id=None, employee_id=None, note=None):

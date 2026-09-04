@@ -91,7 +91,7 @@
                         <td>{{ '%.2f'|format(item.level_2_total_100 or 0) }}</td>
                         {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}<td>{{ '%.2f'|format(item.level_3_total_100 or 0) }}</td>{% endif %}
                         <td><strong>{{ '%.2f'|format(item.report_final_score if item.report_final_score is defined else (item.final_total_100 or 0)) }}</strong></td>
-                        <td>{{ item.status or '-'|phase5_4_status_label }}</td>
+                        <td>{{ (item.status or '-')|phase5_4_status_label }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
