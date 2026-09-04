@@ -130,9 +130,12 @@ def test_humanize_publish_log_action_safe_fallback_for_unknown_or_empty() -> Non
 
     assert humanize_publish_log_action(None) == "-"
     assert humanize_publish_log_action("") == "-"
-    # An unrecognized future value is returned as-is rather than crashing --
-    # this is not a claim that it is translated, only that it fails safe.
-    assert humanize_publish_log_action("some_new_action") == "some_new_action"
+    # BYS360 H1E-I tightened this: an unrecognized future value used to be
+    # returned as-is ("some_new_action" unchanged) -- that was itself the
+    # raw-machine-value leak this repo-wide initiative closes, not a safe
+    # fallback. It now maps to the same generic "Bilinmiyor" every other
+    # H1E-fixed label function uses for an unmapped value.
+    assert humanize_publish_log_action("some_new_action") == "Bilinmiyor"
 
 
 # ---------------------------------------------------------------------------
