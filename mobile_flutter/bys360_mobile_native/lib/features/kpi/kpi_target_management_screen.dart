@@ -139,7 +139,7 @@ class _KpiTargetManagementScreenState extends State<KpiTargetManagementScreen> {
             badge: 'KPI Hedef V2.8.53',
             onRefresh: _refresh,
             children: <Widget>[
-              ApiEmptyState(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _loadTargets())),
+              ApiEmptyState(message: BYS360Copy.error(snapshot.error), onRetry: () => setState(() => _future = _loadTargets())),
             ],
           );
         }

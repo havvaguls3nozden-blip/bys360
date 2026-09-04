@@ -171,9 +171,10 @@ def send_file_center_email(
         log.status = "sent"
         log.sent_at = utc_now()
         return log
-    except Exception as exc:  # local mail logu için kullanıcıya gösterilecek kontrollü hata
+    except Exception:  # local mail logu için kullanıcıya gösterilecek kontrollü hata
+        current_app.logger.exception("BYS360 Dosya Merkezi e-posta gönderimi başarısız oldu.")
         log.status = "failed"
-        log.error_message = str(exc)
+        log.error_message = "E-posta gönderilemedi. Sunucu logları kontrol edilmelidir."
         return log
 
 

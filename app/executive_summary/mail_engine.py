@@ -59,9 +59,9 @@ def send_executive_summary_email(report_type: str = "morning", manual: bool = Fa
                     smtp.login(username, password)
                 smtp.sendmail(sender, recipients, msg.as_string())
         return _log_result(True, report_type, recipients, "Gönderim başarılı.")
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/executive_summary/mail_engine.py | line=62")
-        return _log_result(False, report_type, recipients, f"Gönderim hatası: {exc}")
+        return _log_result(False, report_type, recipients, "Gönderim hatası: e-posta sunucusuna ulaşılamadı. Sistem loglarını kontrol edin.")
 
 
 def _subject(report_type: str, payload: dict) -> str:

@@ -149,10 +149,10 @@ def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, de
             'include': include,
         })
         db.session.commit()
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
-        return jsonify({'message': f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}'}), 500
+        return jsonify({'message': 'Dönem içi not kaydedilemedi. Lütfen tekrar deneyin.'}), 500
     return jsonify({'source': 'real_api', 'ok': True, 'message': 'Dönem içi not kaydedildi.'})
 
 

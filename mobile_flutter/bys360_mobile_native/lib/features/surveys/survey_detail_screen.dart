@@ -120,7 +120,7 @@ class _SurveyDetailScreenState extends State<SurveyDetailScreen> {
             subtitle: 'Anket detayı alınamadı.',
             badge: 'Anket',
             onRefresh: _refresh,
-            children: [ApiEmptyState(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _load()))],
+            children: [ApiEmptyState(message: BYS360Copy.error(snapshot.error), onRetry: () => setState(() => _future = _load()))],
           );
         }
 

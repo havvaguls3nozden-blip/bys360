@@ -194,9 +194,10 @@ def _bys360_legacy_mobile_kpi_target_create_v2853(user: User):
         db.session.add(target)
         db.session.commit()
         return jsonify({'source': 'real_api', 'ok': True, 'message': 'KPI hedef kartı oluşturuldu.', 'id': getattr(target, 'id', None)})
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return jsonify({'message': f'KPI hedef kartı oluşturulamadı: {exc.__class__.__name__}'}), 500
+        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: KPI hedef kartı oluşturma hatası (app/api/mobile/domains/kpi_target_management.py:196)")
+        return jsonify({'message': 'KPI hedef kartı oluşturulamadı. Lütfen bilgileri kontrol edip tekrar deneyin.'}), 500
 
 
 @mobile_api_bp.post('/kpi/target-management/<int:target_id>/progress')
@@ -231,7 +232,8 @@ def _bys360_legacy_mobile_kpi_target_progress_v2853(user: User, target_id: int):
             target.status = 'completed' if rate >= 100 else 'ongoing'
         db.session.commit()
         return jsonify({'source': 'real_api', 'ok': True, 'message': 'KPI gerçekleşme değeri güncellendi.', 'completion_rate': rate})
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
-        return jsonify({'message': f'KPI gerçekleşme değeri güncellenemedi: {exc.__class__.__name__}'}), 500
+        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: KPI gerçekleşme değeri güncelleme hatası (app/api/mobile/domains/kpi_target_management.py:233)")
+        return jsonify({'message': 'KPI gerçekleşme değeri güncellenemedi. Lütfen tekrar deneyin.'}), 500
 
