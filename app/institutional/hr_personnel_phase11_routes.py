@@ -78,22 +78,22 @@ def _table_exists(table_name: str) -> bool:
 
 def _type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return LIFECYCLE_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return LIFECYCLE_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return LIFECYCLE_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return LIFECYCLE_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _task_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return TASK_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return TASK_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _reason_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return SEPARATION_REASON_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return SEPARATION_REASON_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _case_in_scope(case_id: int | None, scope_user_ids: set[int]) -> PersonnelLifecycleCase:

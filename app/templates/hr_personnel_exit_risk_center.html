@@ -41,7 +41,7 @@
         <div class="btn-row"><button class="btn-soft primary" type="submit">{{ 'Risk kartını güncelle' if selected_assessment else 'Risk kartı oluştur' }}</button></div>
       </form>
       {% if selected_assessment %}
-      <div class="label">Toplam skor: {{ selected_assessment.risk_score }} · Seviye: {{ selected_assessment.risk_level }}</div>
+      <div class="label">Toplam skor: {{ selected_assessment.risk_score }} · Seviye: {{ selected_assessment.risk_level_label }}</div>
       {% endif %}
     </div>
   </div>

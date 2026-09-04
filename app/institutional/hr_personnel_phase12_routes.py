@@ -67,17 +67,17 @@ def _table_exists(table_name: str) -> bool:
 
 def _operation_type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return OPERATION_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return OPERATION_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _handover_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return HANDOVER_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return HANDOVER_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _item_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return ITEM_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return ITEM_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _handover_in_scope(handover_id: int | None, scope_user_ids: set[int]) -> PersonnelHandoverRecord:

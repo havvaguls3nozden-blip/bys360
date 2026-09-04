@@ -94,22 +94,22 @@ def _status_label(value: Any) -> str:
 
 def _scope_label(value: Any) -> str:
     raw = _safe_text(value, "performance").lower()
-    return dict(DELEGATION_SCOPE_CHOICES).get(raw, raw.replace("_", " ").title())
+    return dict(DELEGATION_SCOPE_CHOICES).get(raw, "Bilinmiyor")
 
 
 def _leave_type_label(value: Any) -> str:
     raw = _safe_text(value).lower()
-    return dict(LEAVE_TYPE_CHOICES).get(raw, raw.replace("_", " ").title() if raw else "-")
+    return dict(LEAVE_TYPE_CHOICES).get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _attendance_type_label(value: Any) -> str:
     raw = _safe_text(value).lower()
-    return dict(ATTENDANCE_TYPE_CHOICES).get(raw, raw.replace("_", " ").title() if raw else "-")
+    return dict(ATTENDANCE_TYPE_CHOICES).get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _performance_mode_label(value: Any) -> str:
     raw = _safe_text(value, "partial").lower()
-    return PERFORMANCE_MODE_LABELS.get(raw, raw.replace("_", " ").title())
+    return PERFORMANCE_MODE_LABELS.get(raw, "Bilinmiyor")
 
 
 def _full_name(user: Any) -> str:

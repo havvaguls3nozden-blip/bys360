@@ -60,6 +60,11 @@ RISK_LEVEL_LABELS = {
     "yuksek": "Yüksek",
     "kritik": "Kritik",
 }
+DOCUMENT_TYPE_LABELS = {
+    "devir_teslim": "Devir teslim",
+    "ilisik_kesme": "İlişik kesme",
+    "teslim_tutanagi": "Teslim tutanağı",
+}
 
 
 def _table_exists(table_name: str) -> bool:
@@ -108,17 +113,22 @@ def _risk_in_scope(assessment_id: int | None, scope_user_ids: set[int]) -> Perso
 
 def _approval_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return APPROVAL_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return APPROVAL_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _doc_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return DOC_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return DOC_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _risk_level_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return RISK_LEVEL_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return RISK_LEVEL_LABELS.get(raw, "Bilinmiyor" if raw else "-")
+
+
+def _document_type_label(value: str | None) -> str:
+    raw = (value or "").strip().lower()
+    return DOCUMENT_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _calculate_risk_level(score: int) -> str:
@@ -307,6 +317,7 @@ def hr_personnel_digital_handover_documents():
                 "user_name": _full_name(getattr(row, "user", None)),
                 "title": row.title,
                 "document_type": row.document_type or "devir_teslim",
+                "document_type_label": _document_type_label(row.document_type or "devir_teslim"),
                 "document_no": row.document_no or "-",
                 "status": status,
                 "status_label": _doc_status_label(status),
@@ -419,6 +430,7 @@ def hr_personnel_exit_risk_center():
         edit_assessment_id = _safe_int(request.args.get("assessment_id"))
         if edit_assessment_id:
             selected_assessment = _risk_in_scope(edit_assessment_id, scope_user_ids)
+            selected_assessment.risk_level_label = _risk_level_label(selected_assessment.risk_level)
             selected_user = db.session.get(User, int(selected_assessment.user_id)) or selected_user
         q = PersonnelExitRiskAssessment.query.filter(PersonnelExitRiskAssessment.user_id.in_(list(scope_user_ids)))
         if selected_user:

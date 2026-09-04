@@ -99,7 +99,7 @@ def _require_user_in_scope(user_id: int | None, scope_user_ids: set[int]) -> Use
 
 def _transfer_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return TRANSFER_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return TRANSFER_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _document_category_label(value: str | None) -> str:

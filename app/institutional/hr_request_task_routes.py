@@ -47,7 +47,7 @@ TASK_STATUS_LABELS = {
 
 def _task_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return TASK_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return TASK_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _manager_pool(scope_users: list[User]) -> list[User]:

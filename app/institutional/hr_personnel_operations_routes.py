@@ -117,17 +117,17 @@ def _full_name(user: User | None) -> str:
 
 def _request_type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return REQUEST_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return REQUEST_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _request_priority_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return REQUEST_PRIORITY_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return REQUEST_PRIORITY_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _request_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return REQUEST_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return REQUEST_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _table_exists(table_name: str) -> bool:
