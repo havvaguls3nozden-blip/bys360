@@ -55,6 +55,17 @@ REPORT_STATUS_LABELS = {
     "rejected": "Reddedildi",
 }
 
+# app/communication/phase4_routes.py'nin `report_type` form alanı yalnızca bu
+# üç değeri gönderir (bkz. app/templates/communication/phase4_reports.html'in
+# <select name="report_type"> seçenekleri) -- kapalı bir sözlük olduğu için
+# etiketler burada sabit tutulur, `.replace('_', ' ').title()` gibi ham
+# değeri yansıtan bir dönüştürme kullanılmaz.
+REPORT_TYPE_LABELS = {
+    "weekly_summary": "Haftalık Özet",
+    "executive_brief": "Yönetici Brifi",
+    "scorecard": "Skor Kartı",
+}
+
 # Phase 4 analytics rows also see the legacy ASCII-Turkish "yayinda" and the
 # generic "active" values (see SURVEY_ACTIVE_STATUSES/BULLETIN_PUBLISHED_STATUSES
 # above) alongside the standard Survey.status vocabulary -- extend the shared
@@ -569,7 +580,7 @@ def create_executive_report(actor_user: Any, report_type: str = "weekly_summary"
     survey_payload = survey_analytics_snapshot(max(clean_days, 30))
     support_payload = support_analytics_snapshot(max(clean_days, 30))
     today = _now().date().isoformat()
-    title = f"İletişim ve Anket Yönetimi {report_type.replace('_', ' ').title()} Raporu"
+    title = f"İletişim ve Anket Yönetimi {REPORT_TYPE_LABELS.get(report_type, 'Bilinmiyor')} Raporu"
     summary_text = (
         f"{today} itibarıyla son {clean_days} gün görünümünde {payload['headline']['published_bulletins']} yayımlanmış duyuru, "
         f"{payload['headline']['survey_count']} anket ve {payload['headline']['open_tickets']} açık destek talebi bulunmaktadır. "

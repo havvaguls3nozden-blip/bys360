@@ -4,6 +4,7 @@ import logging
 
 from app import db
 from app.models import User
+from app.services.role_display import ROLE_DISPLAY_LABELS, UNKNOWN_ROLE_DISPLAY_LABEL
 
 from .dto import ChainIssue, ChainLevel, ResolvedChain
 from .rules import (
@@ -35,17 +36,7 @@ def _humanize_role(role_token: str | None, manager) -> str | None:
     if not role_token:
         text = (getattr(manager, "unvan", None) or getattr(manager, "role_label", None) or getattr(manager, "role", None) or "").strip()
         return text or None
-    mapping = {
-        "baskan": "Başkan",
-        "baskan_yardimcisi": "Başkan Yardımcısı",
-        "grup_baskani": "Grup Başkanı",
-        "mali_musavir": "Mali Müşavir",
-        "koordinator": "Koordinatör",
-        "birim_sorumlusu": "Birim Sorumlusu",
-        "hukuk_musaviri": "Hukuk Müşaviri",
-        "personel": "Personel",
-    }
-    return mapping.get(role_token, role_token.replace("_", " ").title())
+    return ROLE_DISPLAY_LABELS.get(role_token, UNKNOWN_ROLE_DISPLAY_LABEL)
 
 
 def _collect_candidates(employee) -> list[dict[str, object]]:

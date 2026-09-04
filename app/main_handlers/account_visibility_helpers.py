@@ -491,7 +491,7 @@ def _list_settings_template_archives(flat_menu_items) -> list[dict]:
         visible_keys = _normalize_visible_keys(payload.get("visible_keys") or [], flat_menu_items)
         if not visible_keys and isinstance(payload.get("effective_rule_map"), dict):
             visible_keys = sorted({key for key, visible in payload.get("effective_rule_map", {}).items() if visible and key in label_map})
-        preview_labels = [label_map.get(key, key) for key in visible_keys[:4]]
+        preview_labels = [label_map.get(key, "Bilinmiyor") for key in visible_keys[:4]]
         archives.append({
             "setting_key": row.setting_key,
             "archive_name": payload.get("archive_name") or row.label,
@@ -538,7 +538,7 @@ def _save_settings_template_archive(
         "target_role": (target_role or "").strip(),
         "target_birim": (target_birim or "").strip(),
         "visible_keys": visible_key_list,
-        "labels": {key: label_map.get(key, key) for key in visible_key_list},
+        "labels": {key: label_map.get(key, "Bilinmiyor") for key in visible_key_list},
         "source_user": {
             "id": getattr(source_user, "id", None),
             "sicil_no": getattr(source_user, "sicil_no", None),
@@ -627,7 +627,7 @@ def _build_visibility_template_payload(user, flat_menu_items, selected_profile_r
         },
         "visible_keys": visible_keys,
         "effective_rule_map": effective_rule_map,
-        "labels": {key: label_map.get(key, key) for key in effective_rule_map},
+        "labels": {key: label_map.get(key, "Bilinmiyor") for key in effective_rule_map},
     }
 
 
@@ -668,7 +668,7 @@ def _build_user_visibility_diff(selected_user, compare_user, flat_menu_items) ->
             continue
         rows.append({
             "key": key,
-            "label": label_map.get(key, key),
+            "label": label_map.get(key, "Bilinmiyor"),
             "group_name": grouped_labels.get(key, "Genel"),
             "selected_visible": selected_visible,
             "compare_visible": compare_visible,

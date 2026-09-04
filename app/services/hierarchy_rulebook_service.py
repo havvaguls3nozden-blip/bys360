@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.services.personnel_sync_service import canonical_role_value
+from app.services.role_display import ROLE_DISPLAY_LABELS, UNKNOWN_ROLE_DISPLAY_LABEL
 
 # --- BYS360 third-manager Excel import compatibility patch ---
 
@@ -225,17 +226,9 @@ def is_direct_title(title: str) -> bool:
 
 
 def role_label(value: str) -> str:
-    labels = {
-        'admin': 'Admin',
-        'baskan': 'Başkan',
-        'baskan_yardimcisi': 'Başkan Yardımcısı',
-        'grup_baskani': 'Grup Başkanı',
-        'mali_musavir': 'Mali Müşavir',
-        'birim_sorumlusu': 'Birim Sorumlusu',
-        'koordinator': 'Koordinatör',
-        'personel': 'Personel',
-    }
-    return labels.get(value, value.replace('_', ' ').title())
+    if not value:
+        return ''
+    return ROLE_DISPLAY_LABELS.get(value, UNKNOWN_ROLE_DISPLAY_LABEL)
 
 
 def build_lookup(users: Iterable[Any]) -> Lookup:
