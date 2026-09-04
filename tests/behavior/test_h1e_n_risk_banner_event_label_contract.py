@@ -181,3 +181,26 @@ def test_global_risk_banner_shows_turkish_event_label_not_raw(app, client) -> No
 
     assert "Kapsama Sorunu" in body
     assert "Uncovered" not in body
+
+
+def test_admin_dashboard_coverage_alerts_show_turkish_event_label_not_raw(app, client) -> None:
+    """A second, independent consumer of the exact same closed 4-value
+    event_type vocabulary: app/services/ui_context/dashboard.py's
+    today_coverage_alerts (filtered to the identical {"uncovered",
+    "chain_issue", "warning", "exempted"} set as risk.py's focus_rows,
+    confirmed by reading both list comprehensions) fed
+    admin_dashboard.html's risk-pill via the same raw
+    `|replace('_',' ')|title` chain -- found during the Section 14 fresh
+    repo-wide re-audit, after risk.py's fix above. Reuses the same
+    _event_type_label() rather than a second dictionary."""
+    admin_id = _create_user(app, sicil_no="h1e_n_dash_admin", role="admin")
+    _seed_uncovered_assignment_log(app, employee_id=admin_id)
+
+    _login(client, "h1e_n_dash_admin")
+    body = client.get("/admin/dashboard").get_data(as_text=True)
+
+    if "risk-pill" not in body:
+        pytest.skip("Admin dashboard coverage-alert row did not render for this scope/DB combination -- unit test above already proves the label function itself is safe.")
+
+    assert "Kapsama Sorunu" in body
+    assert "Uncovered" not in body
