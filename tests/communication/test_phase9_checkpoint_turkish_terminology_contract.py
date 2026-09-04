@@ -187,6 +187,12 @@ def test_invalid_or_expired_token_shows_turkish_error_message(app, client) -> No
 
 
 def test_unexpected_creation_failure_shows_turkish_error_message(app, client, monkeypatch) -> None:
+    """BYS360 H1F (exception-display hardening): this branch's flash used
+    to append the raw exception's own text after a colon
+    (f"Kontrol noktasi kaydi olusturulamadi: {exc}") -- a genuinely
+    unexpected exception's message leaking to the admin verbatim. Fixed to
+    a fixed safe message (no trailing colon/detail); this assertion was
+    updated to match."""
     import app.communication.phase9_routes as _phase9_routes
 
     def _boom(*_args, **_kwargs):
@@ -207,7 +213,8 @@ def test_unexpected_creation_failure_shows_turkish_error_message(app, client, mo
     )
     assert response.status_code == 200
     body = response.get_data(as_text=True)
-    assert "Kontrol noktası kaydı oluşturulamadı:" in body
+    assert "Kontrol noktası kaydı oluşturulamadı." in body
+    assert "forced failure for H1D exception-branch coverage" not in body
 
 
 # ---------------------------------------------------------------------------
