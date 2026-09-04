@@ -42,4 +42,4 @@ def humanize_export_exception(exc: Exception) -> str:
         return "Dışa aktarma akışı hazırlanırken geçici dosya belleği kurulamadı."
     if "none" in lowered or "attributeerror" in lowered:
         return "Eksik veri nedeniyle dışa aktarma dosyası hazırlanamadı."
-    return raw
+    return "Dışa aktarma sırasında beklenmeyen bir hata oluştu."

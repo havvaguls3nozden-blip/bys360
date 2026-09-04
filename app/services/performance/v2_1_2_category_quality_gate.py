@@ -39,7 +39,7 @@ def run_v2_1_2_category_quality_gate() -> dict[str, Any]:
         checks.append(_check("import_helper", inferred == "temizlik", "Import kategori yardımcı fonksiyonu çalışıyor."))
         summary = category_scope_summary()
         checks.append(_check("summary", summary.get("category_count", 0) >= len(DEFAULT_CATEGORIES), "Kategori özet servisi çalışıyor."))
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        checks.append(_check("exception", False, str(exc)))
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
     return {"ok": all(item.get("ok") for item in checks), "checks": checks, "rule_version": RULE_VERSION}

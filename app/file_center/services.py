@@ -6,6 +6,7 @@ transfer paketleri ve denetim kayıtları için kullanılır.
 from __future__ import annotations
 
 import hashlib
+import logging
 import os
 import shlex
 import shutil
@@ -39,6 +40,8 @@ from app.models.file_center_models import (
     FileUploadChunk,
     FileUploadSession,
 )
+
+logger = logging.getLogger(__name__)
 
 BLOCKED_DEFAULT = ".exe,.bat,.cmd,.ps1,.vbs,.scr,.dll,.msi,.js,.jar,.com,.pif"
 
@@ -467,9 +470,10 @@ def _move_file_to_area(item: FileStorageItem, area: str) -> None:
         if current.resolve() != target.resolve():
             shutil.move(str(current), str(target))
             item.storage_path = str(target.resolve())
-    except Exception as exc:
+    except Exception:
         # Dosya taşıma hatası güvenlik statüsünü bozmasın; denetim kaydına düşsün.
-        log_audit("file_security_move_failed", file_id=item.id, message=f"Dosya taşıma hatası: {exc}")
+        logger.exception("BYS360 Dosya Merkezi dosya taşıma hatası: file_id=%s", getattr(item, "id", None))
+        log_audit("file_security_move_failed", file_id=item.id, message="Dosya taşıma sırasında bir hata oluştu.")
 
 
 def _set_latest_scan(item: FileStorageItem, *, status: str, scanner: str, message: str) -> FileSecurityScan:
@@ -608,8 +612,9 @@ def release_quarantined_file(item: FileStorageItem, *, actor_user_id: int | None
                 target = target_dir / f"{utc_now().strftime('%Y%m%d_%H%M%S')}_{token_urlsafe(6)}_{item.stored_filename}"
             shutil.move(str(current), str(target))
             item.storage_path = str(target.resolve())
-    except Exception as exc:
-        log_audit("file_security_release_move_failed", file_id=item.id, message=f"Karantinadan çıkarma taşıma hatası: {exc}", actor_user_id=actor_user_id)
+    except Exception:
+        logger.exception("BYS360 Dosya Merkezi karantinadan çıkarma taşıma hatası: file_id=%s", getattr(item, "id", None))
+        log_audit("file_security_release_move_failed", file_id=item.id, message="Karantinadan çıkarma sırasında bir taşıma hatası oluştu.", actor_user_id=actor_user_id)
     message = reason or "Dosya manuel inceleme sonrası güvenli kabul edildi."
     _set_latest_scan(item, status="clean", scanner="file_center_manual", message=message)
     log_audit("file_released_from_quarantine", file_id=item.id, message=message, actor_user_id=actor_user_id)
@@ -1079,8 +1084,9 @@ def cancel_chunk_upload_session(session_id: int, actor_user_id: int) -> FileUplo
     try:
         if session.temp_dir:
             shutil.rmtree(session.temp_dir, ignore_errors=True)
-    except Exception as exc:
-        log_audit("chunk_upload_cleanup_failed", message=f"Parçalı yükleme temp temizliği yapılamadı: {exc}", actor_user_id=actor_user_id)
+    except Exception:
+        logger.exception("BYS360 Dosya Merkezi parçalı yükleme temp temizliği hatası: session_id=%s", session_id)
+        log_audit("chunk_upload_cleanup_failed", message="Parçalı yükleme geçici dosyaları temizlenirken bir hata oluştu.", actor_user_id=actor_user_id)
     log_audit("chunk_upload_session_cancelled", message=f"Parçalı yükleme oturumu iptal edildi: {session.original_filename}", actor_user_id=actor_user_id)
     return session
 
@@ -1271,6 +1277,7 @@ def finalize_chunk_upload_session(*, session_id: int, owner_user_id: int) -> Fil
     try:
         if session.temp_dir:
             shutil.rmtree(session.temp_dir, ignore_errors=True)
-    except Exception as exc:
-        log_audit("chunk_upload_cleanup_failed", file_id=item.id, message=f"Parça klasörü temizlenemedi: {exc}", actor_user_id=owner_user_id)
+    except Exception:
+        logger.exception("BYS360 Dosya Merkezi parça klasörü temizleme hatası: file_id=%s", getattr(item, "id", None))
+        log_audit("chunk_upload_cleanup_failed", file_id=item.id, message="Parça klasörü temizlenirken bir hata oluştu.", actor_user_id=owner_user_id)
     return item

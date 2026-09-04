@@ -46,9 +46,9 @@ def run_v2_1_6_category_period_integration_gate() -> dict[str, Any]:
         after_assignments = int(_db().session.execute(text("SELECT COUNT(*) FROM evaluation_assignments")).scalar() or 0) if inspector.has_table("evaluation_assignments") else 0
         checks.append(_check("assignment_safe", before_assignments == after_assignments, "Gate sırasında evaluation_assignments tablosuna görev yazılmadı."))
         checks.append(_check("summary", "integration_count" in summary, "V2.1.6 entegrasyon özeti çalışıyor."))
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        schema = {"ok": False, "error": str(exc)}
+        schema = {"ok": False, "error": "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."}
         summary = {}
-        checks.append(_check("exception", False, str(exc)))
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
     return {"ok": all(c["ok"] for c in checks), "schema": schema, "summary": summary, "checks": checks, "rule_version": RULE_VERSION}

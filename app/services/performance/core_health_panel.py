@@ -174,9 +174,9 @@ def _compact_task_health(period: Any | None) -> tuple[list[CoreFinding], dict[st
         return [CoreFinding("Aktif dönem yok", "Görev ve yayın kontrolleri dönem üzerinden okunur.", "warning", "period", "Aktif performans dönemi seçin veya oluşturun.")], {}
     try:
         report = build_performance_task_health_report(period, None) or {}
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        return [CoreFinding("Görev sağlık raporu okunamadı", str(exc), "warning", "task_health")], {}
+        return [CoreFinding("Görev sağlık raporu okunamadı", "Görev sağlık raporu şu anda okunamadı. Lütfen daha sonra tekrar deneyin.", "warning", "task_health")], {}
     summary = report.get("summary") or {}
     critical = (
         _safe_int(summary.get("duplicate_level_count"))
@@ -194,9 +194,9 @@ def _compact_task_health(period: Any | None) -> tuple[list[CoreFinding], dict[st
 def _compact_publish_preflight(period: Any | None) -> tuple[list[CoreFinding], dict[str, Any]]:
     try:
         report = build_publish_preflight_report(period=period) or {}
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        return [CoreFinding("Yayın ön kontrol okunamadı", str(exc), "warning", "publish")], {}
+        return [CoreFinding("Yayın ön kontrol okunamadı", "Yayın ön kontrol raporu şu anda okunamadı. Lütfen daha sonra tekrar deneyin.", "warning", "publish")], {}
     findings: list[CoreFinding] = []
     for row in report.get("blockers") or []:
         findings.append(CoreFinding(_safe_text(row.get("title"), "Yayın blokajı"), _safe_text(row.get("detail")), "blocker", "publish", "Yayın Ön Kontrol ekranında kapatın."))

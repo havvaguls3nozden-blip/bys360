@@ -1247,7 +1247,8 @@ def _legacy_build_ai_agent_reply_fulltutor(user, question):
             question,
             legacy_builder=_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_TUTOR_V5,
         )
-    except Exception as exc:
+    except Exception:
+        __import__("logging").getLogger(__name__).exception("BYS360 Asistanı tam öğretici rehber motoru güvenli yedek moda geçti.")
         previous = globals().get("_BYS360_ASSISTANT_PREV_BUILD_REPLY_FULL_TUTOR_V5")
         if callable(previous):
             try:
@@ -1267,7 +1268,7 @@ def _legacy_build_ai_agent_reply_fulltutor(user, question):
             ],
             "quick_replies": ["Performans dönemi nasıl oluşturulur?", "Personel nasıl eklenir?", "Menü görünmüyor ne yapmalıyım?"],
             "notice": "BYS360 Asistanı idari karar vermez, performans puanı belirlemez ve yetki dışı hassas veri göstermez.",
-            "error_note": str(exc),
+            "error_note": "Asistan geçici olarak güvenli yedek modda çalışıyor.",
         }
 # BYS360_ASSISTANT_FULL_STEPWISE_TUTOR_V5_END
 

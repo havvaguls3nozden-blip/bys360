@@ -114,7 +114,12 @@ def collect_item_payloads(criteria_list, form_data):
         if raw_score in (None, ""):
             continue
         try:
-            score_value = validate_score_value(float(raw_score))
+            raw_score_value = float(raw_score)
+        except (TypeError, ValueError):
+            flash("Puan değeri sayısal olmalıdır.", "warning")
+            return None
+        try:
+            score_value = validate_score_value(raw_score_value)
         except ValueError as exc:
             flash(str(exc), "warning")
             return None

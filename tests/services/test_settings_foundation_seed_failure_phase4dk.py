@@ -48,13 +48,20 @@ def test_seed_failure_result_keeps_ok_false():
         )
     )
 
+    # BYS360 H1F: the raw exception text ("seed failure") must never reach
+    # the caller -- app/main_handlers/account_settings_helpers.py flashes
+    # this "error" value verbatim on the live Ayarlar (Settings) admin
+    # screen. ensure_settings_phase1_seeded_handler now returns a fixed
+    # safe Turkish message instead; operator diagnosis still happens via
+    # logger.exception(...) inside the handler.
     assert result == {
         "ok": False,
         "seeded_role_defaults": 0,
         "seeded_system_settings": 0,
         "seeded_module_settings": 0,
-        "error": "seed failure",
+        "error": "Ayarlar omurgası hazırlanırken beklenmeyen bir hata oluştu.",
     }
+    assert "seed failure" not in result["error"]
 
     assert rollback_calls == [
         "rollback"
