@@ -10,6 +10,7 @@ from app.extensions import db
 from app.models import Survey, SurveyAssignment, SurveyQuestion, SurveyResponse, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, menu_key_required, safe_render
+from app.services.communication_phase2_service import SURVEY_TARGET_TYPE_LABELS, SURVEY_TYPE_LABELS
 from app.services.message_service import (
     notify_user as _notify_user,
     survey_manager_allowed as _service_survey_manager_allowed,
@@ -104,6 +105,8 @@ def _render_survey_take(*, survey, questions, matched_assignment):
         questions=questions,
         matched_assignment=matched_assignment,
         submit_token=submit_token,
+        survey_type_label=SURVEY_TYPE_LABELS.get(getattr(survey, "survey_type", None) or "kurum_ici", "Bilinmiyor"),
+        target_type_label=SURVEY_TARGET_TYPE_LABELS.get(getattr(matched_assignment, "target_type", None) or "", "Genel atama") if matched_assignment else "Genel atama",
     )
 
 

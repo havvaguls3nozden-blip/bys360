@@ -714,7 +714,7 @@ def update_support_status(ticket_id: int, new_status: str, actor_user_id: int, n
             Notification(
                 user_id=user_id,
                 title=f"Destek talebi durumu güncellendi: {ticket.ticket_no}",
-                body=SUPPORT_STATUS_LABELS.get(new_status, new_status),
+                body=SUPPORT_STATUS_LABELS.get(new_status, "Bilinmiyor"),
                 notification_type="support",
                 source_type="support_ticket",
                 source_id=ticket.id,

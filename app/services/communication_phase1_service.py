@@ -20,7 +20,7 @@ from app.models.communication_phase1_models import (
     CommunicationBulletinAudience,
     CommunicationBulletinReceipt,
 )
-from app.services.communication_phase2_service import SURVEY_STATUS_LABELS
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS, SURVEY_TYPE_LABELS
 
 MANAGER_ROLES = {
     "admin",
@@ -297,6 +297,7 @@ def communication_phase1_dashboard(user: Any) -> dict[str, Any]:
         "bulletin_status_labels": BULLETIN_STATUS_LABELS,
         "bulletin_priority_labels": BULLETIN_PRIORITY_LABELS,
         "survey_status_labels": SURVEY_STATUS_LABELS,
+        "survey_type_labels": SURVEY_TYPE_LABELS,
     }
 
 

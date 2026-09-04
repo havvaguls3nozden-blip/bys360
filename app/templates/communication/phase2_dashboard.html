@@ -41,7 +41,7 @@
           {% for row in payload.latest_surveys %}
           <div class="f2-item">
             <div class="f2-title">{{ row.title }}</div>
-            <div class="f2-meta">Durum: {{ payload.survey_status_labels.get(row.status, 'Bilinmiyor') }} · Tür: {{ row.survey_type }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+            <div class="f2-meta">Durum: {{ payload.survey_status_labels.get(row.status, 'Bilinmiyor') }} · Tür: {{ payload.survey_type_labels.get(row.survey_type, 'Bilinmiyor') }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
           </div>
           {% else %}
           <div class="f2-item"><div class="f2-meta">Henüz anket kaydı bulunmuyor.</div></div>
