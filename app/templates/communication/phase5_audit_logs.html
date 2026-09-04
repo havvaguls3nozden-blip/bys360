@@ -9,7 +9,7 @@
 
   <div class="card border-0 shadow-sm mb-4"><div class="card-body">
     <form method="get" class="row g-3 align-items-end">
-      <div class="col-md-4"><label class="form-label">Durum</label><select class="form-select" name="status"><option value="">Tümü</option><option value="success" {% if payload.filters.status == 'success' %}selected{% endif %}>success</option><option value="failed" {% if payload.filters.status == 'failed' %}selected{% endif %}>failed</option></select></div>
+      <div class="col-md-4"><label class="form-label">Durum</label><select class="form-select" name="status"><option value="">Tümü</option><option value="success" {% if payload.filters.status == 'success' %}selected{% endif %}>Başarılı</option><option value="failed" {% if payload.filters.status == 'failed' %}selected{% endif %}>Başarısız</option></select></div>
       <div class="col-md-4"><label class="form-label">İşlem tipi</label><select class="form-select" name="action"><option value="">Tümü</option>{% for action in payload.actions %}<option value="{{ action }}" {% if payload.filters.action == action %}selected{% endif %}>{{ action }}</option>{% endfor %}</select></div>
       <div class="col-md-4 d-flex gap-2"><button class="btn btn-danger">Filtrele</button><a class="btn btn-outline-secondary" href="{{ url_for('main.communication_phase5_audit_logs') }}">Temizle</a></div>
     </form>
@@ -30,7 +30,7 @@
       <div class="card border-0 shadow-sm"><div class="card-body">
         <h5>Durum dağılımı</h5>
         <ul class="list-group list-group-flush">
-          {% for key, value in payload.status_breakdown.items() %}
+          {% for key, value in payload.status_label_breakdown.items() %}
           <li class="list-group-item d-flex justify-content-between"><span>{{ key }}</span><strong>{{ value }}</strong></li>
           {% else %}
           <li class="list-group-item text-muted">Kayıt bulunamadı.</li>
@@ -43,7 +43,7 @@
         <h5>Son log kayıtları</h5>
         <div class="table-responsive"><table class="table table-striped align-middle"><thead><tr><th>İşlem</th><th>Durum</th><th>Hedef</th><th>Özet</th><th>Zaman</th></tr></thead><tbody>
           {% for row in payload.rows %}
-          <tr><td>{{ row.action_type }}</td><td>{{ row.status }}</td><td>{{ row.target_table or '-' }}{% if row.target_id %} #{{ row.target_id }}{% endif %}</td><td>{{ row.summary or '-' }}</td><td>{{ row.executed_at }}</td></tr>
+          <tr><td>{{ row.action_type }}</td><td>{{ row.status_label }}</td><td>{{ row.target_table or '-' }}{% if row.target_id %} #{{ row.target_id }}{% endif %}</td><td>{{ row.summary or '-' }}</td><td>{{ row.executed_at }}</td></tr>
           {% else %}
           <tr><td colspan="5" class="text-muted">Kayıt bulunamadı.</td></tr>
           {% endfor %}

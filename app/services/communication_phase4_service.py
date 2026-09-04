@@ -128,6 +128,15 @@ def _safe_attr(row: Any, *names: str, default=None):
     return default
 
 
+def _labeled_counter(raw_counter: Counter, label_map: dict[str, str]) -> Counter:
+    """Re-key a raw-value Counter through a display-label map, merging counts
+    for any raw values that share the same label instead of dropping one."""
+    labeled: Counter[str] = Counter()
+    for raw_value, count in raw_counter.items():
+        labeled[label_map.get(raw_value, "Bilinmiyor")] += count
+    return labeled
+
+
 def _period_range(days: int = 30) -> tuple[datetime, datetime]:
     clean_days = sanitize_days(days)
     end = _now()
@@ -430,6 +439,7 @@ def survey_analytics_snapshot(days: int = 180) -> dict[str, Any]:
             "average_submit_minutes": round(sum(submit_durations) / len(submit_durations), 1) if submit_durations else 0.0,
         },
         "status_breakdown": dict(status_counter),
+        "status_label_breakdown": dict(_labeled_counter(status_counter, SURVEY_ANALYTICS_STATUS_LABELS)),
         "type_breakdown": dict(type_counter),
         "band_breakdown": dict(band_counter),
         "low_completion_rows": low_completion_rows,
@@ -500,6 +510,7 @@ def support_analytics_snapshot(days: int = 180) -> dict[str, Any]:
             "average_age_days": round(total_age / len(detailed_rows), 1) if detailed_rows else 0.0,
         },
         "status_breakdown": dict(status_counter),
+        "status_label_breakdown": dict(_labeled_counter(status_counter, SUPPORT_STATUS_LABELS)),
         "priority_breakdown": dict(priority_counter),
         "age_buckets": age_buckets,
         "top_assignees": [{"name": name, "count": count} for name, count in assignee_counter.most_common(5)],

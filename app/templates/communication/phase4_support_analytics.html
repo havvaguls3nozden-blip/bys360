@@ -94,7 +94,7 @@
   if (statusEl) {
     new Chart(statusEl, {
       type: 'bar',
-      data: { labels: {{ payload.status_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      data: { labels: {{ payload.status_label_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_label_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
   }
