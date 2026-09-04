@@ -226,7 +226,7 @@ def phase3c_mobile_performance_note_scorecard_v2863a_service(user: Any, deps: di
             type_label = _v2853_note_type_label(row.get('note_type'))
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            type_label = str(row.get('note_type') or 'Not').replace('_', ' ').title()
+            type_label = 'Not' if not row.get('note_type') else 'Bilinmiyor'
         title = str(row.get('title') or type_label or 'Karne Notu').strip()
         body = str(row.get('note') or row.get('note_body') or '').strip()
         meta = []

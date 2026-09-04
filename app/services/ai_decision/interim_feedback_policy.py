@@ -191,7 +191,9 @@ def summarize_interim_notes(
     return {
         "total_notes": total,
         "counts": counts,
-        "counts_labelled": {NOTE_TYPE_LABELS.get(k, k): v for k, v in counts.items() if v},
+        "counts_labelled": {
+            NOTE_TYPE_LABELS.get(k, f"Bilinmiyor ({k})"): v for k, v in counts.items() if v
+        },
         "positive_total": positive_total,
         "negative_total": negative_total,
         "development_need_total": counts.get("development_need", 0),

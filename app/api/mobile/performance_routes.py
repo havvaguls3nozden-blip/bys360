@@ -1009,7 +1009,7 @@ def _bys360_legacy__v2853_note_type_label(value):
         'genel_gozlem': 'Genel Gözlem',
     }
     key = str(value or 'genel_gozlem').strip().lower()
-    return mapping.get(key, key.replace('_', ' ').title())
+    return mapping.get(key, 'Bilinmiyor')
 
 def _v2853_note_type_label(value):
     from app.api.mobile.services import performance_period_service as _bys360_performance_period_service  # noqa: I001 - kept single-line for route-file line budget
