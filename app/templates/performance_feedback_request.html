@@ -217,7 +217,7 @@ Performans değerlendirmenizle ilgili görüşme talebinizi daha anlaşılır, g
               <div class="info-row-label">Değerlendirme durumu</div>
               <div class="info-row-value">
                 {% if evaluation and evaluation.status %}
-                  {{ evaluation.status|replace('_', ' ')|title }}
+                  {{ evaluation.status|phase5_4_status_label }}
                 {% else %}
                   Kayıt hazır
                 {% endif %}
