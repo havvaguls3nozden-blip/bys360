@@ -49,13 +49,13 @@ def humanize_workflow_status(status: str | None) -> str:
     clean = (status or "").strip()
     if not clean:
         return "-"
-    return STATUS_LABELS.get(clean, clean.replace("_", " ").strip())
+    return STATUS_LABELS.get(clean, "Süreç Durumu")
 
 def humanize_action_type(action_type: str | None) -> str:
     clean = (action_type or "").strip()
     if not clean:
         return "-"
-    return ACTION_LABELS.get(clean, clean.replace("_", " ").title())
+    return ACTION_LABELS.get(clean, "Süreç işlemi")
 
 def humanize_actor_level(level: int | None) -> str:
     if level is None:

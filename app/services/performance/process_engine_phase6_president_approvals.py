@@ -679,7 +679,7 @@ def _scoring_history(evaluation_id: int | None) -> list[dict[str, Any]]:
                             "scorer_name": scorer_name,
                             "manager_level": row.get("manager_level") or row.get("scorer_level") or "-",
                             "score": _safe_score(score_value),
-                            "status": _public_text(row.get("action_status"), "Puanlama kaydedildi"),
+                            "status": _public_status_label(row.get("action_status"), "Puanlama kaydedildi"),
                             "next_stage": _public_text(row.get("next_stage"), "-"),
                             "next_owner_name": row.get("next_owner_name") or "-",
                             "action_at": _safe_date(row.get("action_at") or row.get("created_at")),

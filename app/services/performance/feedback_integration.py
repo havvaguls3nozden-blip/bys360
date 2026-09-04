@@ -13,6 +13,7 @@ from typing import Any
 from sqlalchemy import inspect, text
 
 from app.extensions import db
+from app.services.performance.history import humanize_workflow_status
 
 logger = logging.getLogger(__name__)
 
@@ -289,6 +290,7 @@ def scorecard_rows(employee_id: int | None = None, period_id: int | None = None,
             score_float = 0.0
         row["score_band"] = "low" if score_float < 70 and score is not None else ("high" if score_float > 90 else "mid")
         row["score_label"] = "70 Altı İzlem" if row["score_band"] == "low" else ("90 Üstü Başarı" if row["score_band"] == "high" else "Denge Bandı")
+        row["status"] = humanize_workflow_status(row.get("status"))
     return rows
 
 
@@ -354,7 +356,7 @@ def interim_note_rows(employee_id: int | None = None, period_id: int | None = No
         if not rows and "NULLS LAST" in sql:
             rows = _rows(sql.replace(" DESC NULLS LAST", " DESC"), params)
         for row in rows:
-            row["note_type_label"] = NOTE_TYPE_LABELS.get(str(row.get("note_type") or ""), row.get("note_type") or "Genel Not")
+            row["note_type_label"] = NOTE_TYPE_LABELS.get(str(row.get("note_type") or ""), "Genel Not")
             out.append(row)
     return sorted(out, key=lambda r: str(r.get("created_at") or ""), reverse=True)[:limit]
 
@@ -438,7 +440,7 @@ def aftercare_rows(employee_id: int | None = None, period_id: int | None = None,
         rows = _rows(sql.replace(" DESC NULLS LAST", " DESC"), params)
     for row in rows:
         status = row.get("closure_status") or row.get("status") or ""
-        row["status_label"] = AFTERCARE_STATUS_LABELS.get(str(status), status or "Kayıt")
+        row["status_label"] = AFTERCARE_STATUS_LABELS.get(str(status), "Bilinmiyor" if status else "Kayıt")
         row["is_prepared"] = bool(int(row.get("has_preparation") or 0))
         row["is_closed"] = bool(int(row.get("has_after_note") or 0))
     return rows
@@ -492,7 +494,7 @@ def action_rows(employee_id: int | None = None, period_id: int | None = None, pe
     sql += " ORDER BY CASE WHEN a.target_date IS NULL THEN 1 ELSE 0 END, a.target_date ASC, a.id DESC LIMIT :limit"
     rows = _rows(sql, params)
     for row in rows:
-        row["status_label"] = ACTION_STATUS_LABELS.get(str(row.get("status") or ""), row.get("status") or "-")
+        row["status_label"] = ACTION_STATUS_LABELS.get(str(row.get("status") or ""), "Bilinmiyor" if row.get("status") else "-")
     return rows
 
 

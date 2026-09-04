@@ -15,6 +15,7 @@ from app.services.performance.assignments import (
     get_latest_assignment_generation_logs,
     is_informational_special_case,
 )
+from app.services.performance.history import humanize_workflow_status
 
 LEVEL_TO_EVALUATION_FIELD = {
     1: "level_1_evaluator_id",
@@ -171,7 +172,7 @@ def _build_orphan_rows(
             "employee_name": _name(employee),
             "employee_unit": _unit(employee),
             "status": _clean_text(getattr(evaluation, "status", None)) or "bekliyor",
-            "workflow_status": _clean_text(getattr(evaluation, "workflow_status", None)) or "-",
+            "workflow_status": humanize_workflow_status(getattr(evaluation, "workflow_status", None)),
             "exempted": bool(getattr(evaluation, "evaluation_exempted", False)),
         })
 

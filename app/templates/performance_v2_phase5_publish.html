@@ -459,7 +459,7 @@
             <td>{{ row.display_name }}<div class="performance-subtext">{{ row.sicil_no }}</div></td>
             <td>{{ row.unit_name }}</td>
             <td><strong>{{ row.final_total }}</strong><div class="performance-subtext">{{ row.score_band_label }}</div></td>
-            <td>{{ row.status }}<div class="performance-subtext">{{ row.workflow_status }}</div></td>
+            <td>{{ row.status_label }}<div class="performance-subtext">{{ row.workflow_status_label }}</div></td>
             <td>
               <span class="single-publish-status {{ row.publish_action_class }}">
                 {% if row.published %}<i class="fa-solid fa-eye"></i>{% elif row.publish_allowed %}<i class="fa-solid fa-circle-check"></i>{% else %}<i class="fa-solid fa-lock"></i>{% endif %}

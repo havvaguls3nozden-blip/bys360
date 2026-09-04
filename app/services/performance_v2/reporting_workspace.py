@@ -11,6 +11,7 @@ from app.core.datetime_utils import utc_now
 from app.models import EvaluationAssignment, PerformanceEvaluation
 from app.security.sql_identifiers import quote_sql_identifier
 from app.services.performance.category_stats import build_category_average_for_evaluation
+from app.services.performance.history import humanize_workflow_status
 from app.services.publish_service import (
     get_evaluation_visibility_state,
     is_evaluation_publish_exempt,
@@ -491,7 +492,9 @@ def build_period_scorecard_context(period, viewer=None, allowed_employee_ids: It
             "publish_action_label": publish_action_label,
             "publish_action_class": publish_action_class,
             "status": status,
+            "status_label": "Tamamlandı" if is_completed else ("Bekliyor" if status.lower() == "bekliyor" else humanize_workflow_status(status)),
             "workflow_status": workflow_status,
+            "workflow_status_label": humanize_workflow_status(workflow_status),
             "final_total": round(final_total, 2),
             "score_band_label": band_label,
             "score_band_class": band_class,

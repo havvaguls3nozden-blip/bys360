@@ -58,7 +58,7 @@ def status_label(value: Any, fallback: str = "Süreç takipte") -> str:
         return "Başkan onayı bekliyor"
     if "baskan" in normalized and "bek" in normalized:
         return "Başkan onayı bekliyor"
-    return raw.replace("_", " ").strip().capitalize()
+    return fallback
 
 
 def table_exists(table_name: str) -> bool:
