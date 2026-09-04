@@ -351,7 +351,7 @@ def feedback_executive_summary_run_digest():
         db.session.commit()
         flash(
             (
-                f"{SUMMARY_PRESET_LABELS.get(preset, preset)} yönetici özeti çalıştırıldı. "
+                f"{SUMMARY_PRESET_LABELS.get(preset, 'Bilinmiyor')} yönetici özeti çalıştırıldı. "
                 f"Bildirim: {result['notification_sent']}, atlanan mevcut bildirim: {result['notification_skipped']}, "
                 f"e-posta başarılı: {result['mail_success_count']}."
             ),

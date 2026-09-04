@@ -222,7 +222,7 @@ def _notes(people, employee_id=None, period_id=None, note_type=None, query=None)
     for r in rows:
         d = dict(r)
         key = d.get('note_type') or 'genel_gozlem'
-        d['note_type_label'] = NOTE_LABELS.get(key, key)
+        d['note_type_label'] = NOTE_LABELS.get(key, 'Bilinmiyor')
         d['note_type_icon'] = NOTE_ICONS.get(key, 'fa-regular fa-note-sticky')
         out.append(d)
     return out

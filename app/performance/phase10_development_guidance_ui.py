@@ -642,7 +642,7 @@ def normalize_recommendation(row: dict[str, Any]) -> dict[str, Any]:
         "follow_frequency": _safe(row.get("follow_frequency"), "monthly"),
         "follow_frequency_label": FOLLOW_FREQUENCY_LABELS.get(_safe(row.get("follow_frequency"), "monthly"), "Aylık"),
         "publication_status": publication_status,
-        "publication_label": STATUS_LABELS.get(publication_status, publication_status.replace("_", " ").title()),
+        "publication_label": STATUS_LABELS.get(publication_status, "Taslak"),
         "visibility_label": visibility_label,
         "visibility_badge": visibility_badge,
         "show_on_scorecard": show_on_scorecard,

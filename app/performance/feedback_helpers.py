@@ -195,7 +195,7 @@ def _record_feedback_digest_audit(
         entity_id=source_id,
         action="feedback_digest_sent",
         actor_user_id=actor_user_id,
-        summary=f"{SUMMARY_PRESET_LABELS.get(preset, preset)} yönetici özeti {recipient_count} alıcı için çalıştırıldı.",
+        summary=f"{SUMMARY_PRESET_LABELS.get(preset, 'Bilinmiyor')} yönetici özeti {recipient_count} alıcı için çalıştırıldı.",
         new_data={
             "preset": preset,
             "recipient_count": recipient_count,

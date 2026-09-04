@@ -173,7 +173,7 @@ def upsert_category_scope_draft(category_key: str, scope_name: str | None = None
     categories = {cat.category_key: cat.display_name for cat in list_categories(include_inactive=True)}
     if key not in categories:
         key = "diger"
-    name = (scope_name or f"{categories.get(key, key)} Kategori Kapsamı").strip()
+    name = (scope_name or f"{categories.get(key, 'Diğer')} Kategori Kapsamı").strip()
     scope_key = make_scope_key(key)
     vm = visibility_mode if visibility_mode in {"summary_only", "detail_allowed"} else "summary_only"
     existing = _db().session.execute(text(f"SELECT id FROM {SCOPE_DRAFT_TABLE} WHERE scope_key=:scope_key"), {"scope_key": scope_key}).mappings().first()
