@@ -264,7 +264,7 @@ def hr_personnel_handover_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
 
 
@@ -300,7 +300,7 @@ def hr_personnel_handover_item_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(handover_id=_safe_int(request.form.get("handover_id")), scope_mode=selected_scope_mode)
 
 
@@ -325,7 +325,7 @@ def hr_personnel_handover_item_status():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(scope_mode=selected_scope_mode)
 
 

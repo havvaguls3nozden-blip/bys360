@@ -93,8 +93,8 @@ def communication_phase1_bulletin_new():
         except CommunicationPhase1Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=90")
-            flash(f"Duyuru oluşturulamadı: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=90 | exc=%s", exc)
+            flash("Duyuru oluşturulamadı.", "danger")
 
     return safe_render(
         "communication/phase1_bulletin_form.html",
@@ -116,8 +116,8 @@ def communication_phase1_bulletin_detail(bulletin_id: int):
         if my_receipt is not None:
             db.session.add(my_receipt)
             db.session.commit()
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=113")
+    except Exception as exc:
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=113 | exc=%s", exc)
         db.session.rollback()
         my_receipt = get_bulletin_receipt(bulletin.id, current_user.id, create_if_missing=False)
 
@@ -153,8 +153,8 @@ def communication_phase1_bulletin_publish(bulletin_id: int):
     except CommunicationPhase1Error as exc:
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=148")
-        flash(f"Duyuru yayımlanamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=148 | exc=%s", exc)
+        flash("Duyuru yayımlanamadı.", "danger")
 
     return redirect(url_for("main.communication_phase1_bulletin_detail", bulletin_id=bulletin_id))
 
@@ -192,7 +192,7 @@ def communication_phase1_bulletin_acknowledge(bulletin_id: int):
         db.session.rollback()
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=186")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=186 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Duyuru onayı kaydedilemedi: {exc}", "danger")
+        flash("Duyuru onayı kaydedilemedi.", "danger")
     return redirect(url_for("main.communication_phase1_bulletin_detail", bulletin_id=bulletin_id))

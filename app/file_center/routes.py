@@ -230,7 +230,7 @@ def file_center_upload():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        log_audit("file_upload_failed", message=f"Dosya yükleme teknik hatası: {exc}", actor_user_id=int(current_user.id))
+        log_audit("file_upload_failed", message="Dosya yükleme sırasında teknik bir hata oluştu.", actor_user_id=int(current_user.id))
         flash("Dosya yükleme sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.file_center_home"))
 
@@ -256,7 +256,7 @@ def file_center_download(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        log_audit("file_download_failed", file_id=item.id, message=f"Dosya indirme teknik hatası: {exc}", actor_user_id=int(current_user.id))
+        log_audit("file_download_failed", file_id=item.id, message="Dosya indirme sırasında teknik bir hata oluştu.", actor_user_id=int(current_user.id))
         flash("Dosya indirilemedi. Lütfen daha sonra tekrar deneyin veya sistem yöneticisine başvurun.", "danger")
         return redirect(url_for("main.file_center_home"))
 
@@ -276,7 +276,7 @@ def file_center_delete(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya silinemedi: {exc}", "danger")
+        flash("Dosya silinemedi.", "danger")
     return redirect(url_for("main.file_center_home"))
 
 
@@ -307,7 +307,7 @@ def file_center_create_guest_link(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Misafir bağlantısı oluşturulamadı: {exc}", "danger")
+        flash("Misafir bağlantısı oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_home"))
 
 
@@ -372,7 +372,7 @@ def file_center_create_transfer():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Transfer paketi oluşturulamadı: {exc}", "danger")
+        flash("Transfer paketi oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_transfers"))
 
 
@@ -441,7 +441,7 @@ def file_center_create_request():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya isteği oluşturulamadı: {exc}", "danger")
+        flash("Dosya isteği oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_requests"))
 
 
@@ -543,7 +543,7 @@ def file_center_send_request_email_route(request_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"E-posta işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("E-posta işlemi sırasında hata oluştu.", "danger")
     return redirect(url_for("main.file_center_requests"))
 
 
@@ -595,7 +595,7 @@ def file_center_security_scan_pending():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Güvenlik taraması tamamlanamadı: {exc}", "danger")
+        flash("Güvenlik taraması tamamlanamadı.", "danger")
     return redirect(url_for("main.file_center_security"))
 
 
@@ -614,7 +614,7 @@ def file_center_security_scan_file(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya taranamadı: {exc}", "danger")
+        flash("Dosya taranamadı.", "danger")
     return redirect(url_for("main.file_center_security"))
 
 
@@ -634,7 +634,7 @@ def file_center_security_quarantine_file(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya karantinaya alınamadı: {exc}", "danger")
+        flash("Dosya karantinaya alınamadı.", "danger")
     return redirect(url_for("main.file_center_security"))
 
 
@@ -654,7 +654,7 @@ def file_center_security_release_file(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya karantinadan çıkarılamadı: {exc}", "danger")
+        flash("Dosya karantinadan çıkarılamadı.", "danger")
     return redirect(url_for("main.file_center_security"))
 
 
@@ -674,7 +674,7 @@ def file_center_security_block_file(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya engellenemedi: {exc}", "danger")
+        flash("Dosya engellenemedi.", "danger")
     return redirect(url_for("main.file_center_security"))
 
 
@@ -741,7 +741,7 @@ def file_center_maintenance_recalculate_quotas():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kota güncelleme işlemi tamamlanamadı: {exc}", "danger")
+        flash("Kota güncelleme işlemi tamamlanamadı.", "danger")
     return redirect(url_for("main.file_center_maintenance"))
 
 
@@ -759,7 +759,7 @@ def file_center_maintenance_expire():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Bakım işlemi tamamlanamadı: {exc}", "danger")
+        flash("Bakım işlemi tamamlanamadı.", "danger")
     return redirect(url_for("main.file_center_maintenance"))
 
 
@@ -808,7 +808,7 @@ def file_center_quota_policy_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kota politikası kaydedilemedi: {exc}", "danger")
+        flash("Kota politikası kaydedilemedi.", "danger")
     return redirect(url_for("main.file_center_quota"))
 
 
@@ -826,7 +826,7 @@ def file_center_quota_policy_deactivate(policy_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kota politikası pasifleştirilemedi: {exc}", "danger")
+        flash("Kota politikası pasifleştirilemedi.", "danger")
     return redirect(url_for("main.file_center_quota"))
 
 
@@ -870,7 +870,7 @@ def file_center_chunk_upload_session_create():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Parçalı yükleme oturumu oluşturulamadı: {exc}", "danger")
+        flash("Parçalı yükleme oturumu oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_chunk_upload"))
 
 
@@ -889,7 +889,7 @@ def file_center_chunk_upload_session_cancel(session_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Parçalı yükleme oturumu iptal edilemedi: {exc}", "danger")
+        flash("Parçalı yükleme oturumu iptal edilemedi.", "danger")
     return redirect(url_for("main.file_center_chunk_upload"))
 
 
@@ -914,8 +914,9 @@ def file_center_chunk_upload_session_create_json():
         db.session.commit()
         return jsonify({"ok": True, "session": chunk_upload_session_to_dict(session)})
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "message": str(exc)}), 400
+        return jsonify({"ok": False, "message": "Parçalı yükleme oturumu oluşturulamadı."}), 400
 
 
 @main_bp.get("/file-center/chunk-upload/session/<int:session_id>/status")
@@ -941,8 +942,9 @@ def file_center_chunk_upload_part(session_id: int, chunk_index: int):
         session = FileUploadSession.query.get_or_404(session_id)
         return jsonify({"ok": True, "session": chunk_upload_session_to_dict(session)})
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "message": str(exc)}), 400
+        return jsonify({"ok": False, "message": "Parça yüklenemedi."}), 400
 
 
 @main_bp.post("/file-center/chunk-upload/session/<int:session_id>/finalize")
@@ -955,8 +957,9 @@ def file_center_chunk_upload_finalize(session_id: int):
         db.session.commit()
         return jsonify({"ok": True, "file_id": item.id, "message": "Dosya başarıyla birleştirildi ve doğrulandı."})
     except Exception as exc:
+        logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "message": str(exc)}), 400
+        return jsonify({"ok": False, "message": "Dosya birleştirme ve doğrulama tamamlanamadı."}), 400
 
 
 
@@ -994,7 +997,7 @@ def file_center_settings_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Dosya Merkezi ayarları kaydedilemedi: {exc}", "danger")
+        flash("Dosya Merkezi ayarları kaydedilemedi.", "danger")
     return redirect(url_for("main.file_center_settings"))
 
 
@@ -1013,7 +1016,7 @@ def file_center_settings_defaults():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Varsayılan ayarlar oluşturulamadı: {exc}", "danger")
+        flash("Varsayılan ayarlar oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_settings"))
 
 
@@ -1042,8 +1045,9 @@ def file_center_guest_download(token: str):
             db.session.commit()
             return send_file(str(path), as_attachment=True, download_name=link.file.original_filename, mimetype=link.file.content_type or "application/octet-stream")
         except Exception as exc:
+            logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
-            log_audit("guest_file_download_failed", file_id=link.file_id, message=f"Misafir indirme teknik hatası: {exc}", actor_user_id=None)
+            log_audit("guest_file_download_failed", file_id=link.file_id, message="Misafir indirme sırasında teknik bir hata oluştu.", actor_user_id=None)
             return safe_render("file_center/guest_download.html", error="Dosya şu anda indirilemedi. Lütfen bağlantıyı gönderen birimle iletişime geçin.", link=None, format_bytes=format_bytes)
     return safe_render("file_center/guest_download.html", error=None, link=link, format_bytes=format_bytes)
 
@@ -1077,7 +1081,7 @@ def file_center_guest_upload(token: str):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
-            log_audit("guest_file_upload_failed", message=f"Misafir yükleme teknik hatası: {exc}", actor_user_id=None)
+            log_audit("guest_file_upload_failed", message="Misafir yükleme sırasında teknik bir hata oluştu.", actor_user_id=None)
             flash("Dosya şu anda yüklenemedi. Lütfen tekrar deneyin veya bağlantıyı gönderen birimle iletişime geçin.", "danger")
             return safe_render("file_center/guest_upload.html", error=None, request_row=row, uploaded=False, format_bytes=format_bytes, request_max_bytes=request_max_bytes)
     return safe_render("file_center/guest_upload.html", error=None, request_row=row, uploaded=False, format_bytes=format_bytes, request_max_bytes=request_max_bytes)
@@ -1125,7 +1129,7 @@ def file_center_role_matrix_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Rol matrisi kaydedilemedi: {exc}", "danger")
+        flash("Rol matrisi kaydedilemedi.", "danger")
     return redirect(url_for("main.file_center_role_matrix"))
 
 
@@ -1148,7 +1152,7 @@ def file_center_role_matrix_defaults():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Varsayılan rol matrisi oluşturulamadı: {exc}", "danger")
+        flash("Varsayılan rol matrisi oluşturulamadı.", "danger")
     return redirect(url_for("main.file_center_role_matrix"))
 # BYS360_FILE_CENTER_ROLE_MATRIX_V1KD_END
 

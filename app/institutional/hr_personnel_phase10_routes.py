@@ -414,5 +414,5 @@ def hr_personnel_asset_transfer_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_asset_transfer_center", scope=request.form.get("scope") or "personal", user_id=request.form.get("to_user_id") or request.form.get("from_user_id")))

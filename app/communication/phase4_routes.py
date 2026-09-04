@@ -97,8 +97,8 @@ def communication_phase4_report_create():
         flash("Yönetici özeti oluşturuldu.", "success")
         return redirect(url_for("main.communication_phase4_report_detail", report_id=row.id))
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=96")
-        flash(f"Rapor oluşturulamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=96 | exc=%s", exc)
+        flash("Rapor oluşturulamadı.", "danger")
         return redirect(url_for("main.communication_phase4_reports_view", days=days))
 
 
@@ -120,8 +120,8 @@ def communication_phase4_submit_review(report_id: int):
         submit_report_for_review(report_id, current_user, note=request.form.get("note") or "")
         flash("Rapor incelemeye gönderildi.", "success")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=118")
-        flash(f"İncelemeye gönderilemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=118 | exc=%s", exc)
+        flash("İncelemeye gönderilemedi.", "danger")
     return redirect(url_for("main.communication_phase4_report_detail", report_id=report_id))
 
 
@@ -176,8 +176,8 @@ def communication_phase4_export():
     except CommunicationPhase4Error as exc:
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=173")
-        flash(f"Dışa aktarma üretilemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=173 | exc=%s", exc)
+        flash("Dışa aktarma üretilemedi.", "danger")
     return redirect(url_for("main.communication_phase4_export_center", days=days))
 
 
@@ -206,8 +206,8 @@ def communication_phase4_governance_decide(review_id: int):
         )
         flash("Yönetişim kararı kaydedildi.", "success")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=202")
-        flash(f"Karar kaydedilemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=202 | exc=%s", exc)
+        flash("Karar kaydedilemedi.", "danger")
     return redirect(url_for("main.communication_phase4_governance"))
 
 
@@ -219,6 +219,6 @@ def communication_phase4_metrics_refresh():
         changed = refresh_daily_metrics(current_user)
         flash(f"{changed} günlük metrik kaydı güncellendi.", "success")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=214")
-        flash(f"Metrikler güncellenemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase4_routes.py | line=214 | exc=%s", exc)
+        flash("Metrikler güncellenemedi.", "danger")
     return redirect(request.referrer or url_for("main.communication_phase4_dashboard_view"))

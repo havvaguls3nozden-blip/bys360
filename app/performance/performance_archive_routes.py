@@ -114,9 +114,9 @@ def performance_archive_import():
                 if not result.get("created", 0) and not result.get("skipped", 0):
                     flash("Excel dosyasında aktarılacak satır bulunamadı.", "info")
             except Exception as exc:
-                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
                 db.session.rollback()
-                flash(f"Excel aktarımı yapılamadı: {exc}", "danger")
+                flash("Excel aktarımı yapılamadı.", "danger")
 
     return safe_render(
         "performance/archive/import.html",

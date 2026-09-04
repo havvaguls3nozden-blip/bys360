@@ -92,7 +92,7 @@ def publication_upload():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kurumsal yayın yüklenemedi: {exc}", "danger")
+        flash("Kurumsal yayın yüklenemedi.", "danger")
     return redirect(url_for("main.publication_library"))
 
 
@@ -176,7 +176,7 @@ def publication_toggle_featured(publication_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"İşlem tamamlanamadı: {exc}", "danger")
+        flash("İşlem tamamlanamadı.", "danger")
         return redirect(url_for("main.publication_library"))
 
 
@@ -196,7 +196,7 @@ def publication_set_status(publication_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Durum güncellenemedi: {exc}", "danger")
+        flash("Durum güncellenemedi.", "danger")
         return redirect(url_for("main.publication_library"))
 
 
@@ -211,7 +211,7 @@ def publication_archive(publication_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Arşivleme yapılamadı: {exc}", "danger")
+        flash("Arşivleme yapılamadı.", "danger")
     return redirect(url_for("main.publication_library"))
 
 @main_bp.route("/publications/<int:publication_id>/delete", methods=["POST"])
@@ -225,5 +225,5 @@ def publication_delete(publication_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Yayın silinemedi: {exc}", "danger")
+        flash("Yayın silinemedi.", "danger")
     return redirect(url_for("main.publication_library"))

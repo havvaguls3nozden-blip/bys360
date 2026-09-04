@@ -34,8 +34,8 @@ try:
         build_phase7_context,
         create_meeting_from_feedback_request,
     )
-except Exception:
-    logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=29")
+except Exception as exc:
+    logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=29 | exc=%s", exc)
     build_phase7_context = None
     create_meeting_from_feedback_request = None
 # /BYS360_FEEDBACK_AFTERCARE_PHASE7_USABILITY_IMPORTS
@@ -49,8 +49,8 @@ try:
         build_phase7_1_context,
         create_person_period_meeting,
     )
-except Exception:
-    logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=41")
+except Exception as exc:
+    logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=41 | exc=%s", exc)
     build_phase7_1_context = None
     create_person_period_meeting = None
 # /BYS360_FEEDBACK_AFTERCARE_PHASE7_1_PERSON_PERIOD_IMPORTS
@@ -87,8 +87,8 @@ def _context(selected_meeting_id: int | None = None):
                 is_admin=_is_admin(),
                 is_superuser=_is_superuser(),
             ))
-        except Exception:
-            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=78")
+        except Exception as exc:
+            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=78 | exc=%s", exc)
             ctx.update({
                 "phase7_usage_steps": [],
                 "phase7_detail_map": [],
@@ -108,8 +108,8 @@ def _context(selected_meeting_id: int | None = None):
                 is_admin=_is_admin(),
                 is_superuser=_is_superuser(),
             ))
-        except Exception:
-            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=98")
+        except Exception as exc:
+            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=98 | exc=%s", exc)
             ctx.update({
                 "person_options": [],
                 "period_options": [],
@@ -129,8 +129,8 @@ def _context(selected_meeting_id: int | None = None):
                 is_admin=_is_admin(),
                 is_superuser=_is_superuser(),
             ))
-        except Exception:
-            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=118")
+        except Exception as exc:
+            logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=118 | exc=%s", exc)
             ctx.update({
                 "person_options": [],
                 "period_options": [],
@@ -195,8 +195,8 @@ def performance_feedback_aftercare_create():
         flash("Görüşme kaydı oluşturuldu. Notlar bu görüşme detayının içine yazılabilir.", "success")
         return redirect(url_for("main.performance_feedback_aftercare_detail", meeting_id=meeting_id))
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=171")
-        flash(str(exc), "warning")
+        logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=171 | exc=%s", exc)
+        flash("Görüşme kaydı oluşturulamadı.", "warning")
         return redirect(url_for("main.performance_feedback_aftercare"))
 # /BYS360_FEEDBACK_AFTERCARE_PHASE7_USABILITY_CREATE_ROUTE
 
@@ -219,8 +219,8 @@ def performance_feedback_aftercare_create_person_period():
         flash("Personel ve dönem görüşmesi oluşturuldu. Görüşme notları bu kaydın içine yazılabilir.", "success")
         return redirect(url_for("main.performance_feedback_aftercare_detail", meeting_id=meeting_id))
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=194")
-        flash(str(exc), "warning")
+        logger.exception("BYS360 V6C guarded exception | file=app/performance/feedback_aftercare_routes.py | line=194 | exc=%s", exc)
+        flash("Personel ve dönem görüşmesi oluşturulamadı.", "warning")
         return redirect(url_for("main.performance_feedback_aftercare"))
 # /BYS360_FEEDBACK_AFTERCARE_PHASE7_1_PERSON_PERIOD_CREATE_ROUTE
 

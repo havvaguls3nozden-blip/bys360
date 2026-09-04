@@ -673,7 +673,7 @@ def hr_self_service_request_save():
         safe_db_rollback()
         for path in saved_paths:
             _remove_file(path)
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_self_service_requests(_safe_int(request.form.get("request_id")))
 
 
@@ -696,7 +696,7 @@ def hr_self_service_request_delete(request_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_self_service_requests()
 
 
@@ -711,7 +711,7 @@ def hr_self_service_request_attachment_download(request_id: int, attachment_id: 
         return send_file(path, as_attachment=True, download_name=getattr(row, "original_filename", None) or os.path.basename(path))
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_self_service_requests(request_id)
 
 
@@ -733,7 +733,7 @@ def hr_self_service_request_attachment_delete(request_id: int, attachment_id: in
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_self_service_requests(request_id)
 
 
@@ -794,7 +794,7 @@ def hr_personnel_request_review(request_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_request_review(hr_scope=hr_scope, request_id=request_id)
 
 
@@ -812,7 +812,7 @@ def hr_personnel_request_attachment_download(request_id: int, attachment_id: int
         return send_file(path, as_attachment=True, download_name=getattr(row, "original_filename", None) or os.path.basename(path))
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_request_review(hr_scope=hr_scope, request_id=request_id)
 
 
@@ -866,7 +866,7 @@ def hr_personnel_document_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
 
 
@@ -937,8 +937,11 @@ def hr_personnel_document_bulk_upload():
                 )
                 db.session.add(row)
                 success_count += 1
-            except Exception as exc:
+            except ValueError as exc:
                 skipped.append(str(exc))
+            except Exception as exc:
+                logger.exception("Toplu belge yükleme sırasında beklenmeyen hata: %s", exc)
+                skipped.append("Dosya işlenirken beklenmeyen bir hata oluştu.")
 
         if success_count <= 0:
             raise ValueError(skipped[0] if skipped else "Hiçbir dosya işlenemedi.")
@@ -962,7 +965,7 @@ def hr_personnel_document_bulk_upload():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
 
 
@@ -987,7 +990,7 @@ def hr_personnel_document_delete(document_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         user_id = int(request.form.get("user_id") or 0) or None
     return _redirect_operations(hr_scope=hr_scope, user_id=user_id)
 
@@ -1006,7 +1009,7 @@ def hr_personnel_document_download(document_id: int):
         return send_file(path, as_attachment=True, download_name=(getattr(row, "original_filename", None) or "personel-belgesi"))
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return redirect(url_for("main.hr_personnel_operations", user_id=int(request.args.get("user_id") or 0) or None, scope=(request.args.get("scope") or "").strip() or None))
 
 
@@ -1044,7 +1047,7 @@ def hr_personnel_note_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
 
 
@@ -1075,7 +1078,7 @@ def hr_personnel_note_toggle(note_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         user_id = int(request.form.get("user_id") or 0) or None
     return _redirect_operations(hr_scope=hr_scope, user_id=user_id)
 
@@ -1099,7 +1102,7 @@ def hr_personnel_note_delete(note_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         user_id = int(request.form.get("user_id") or 0) or None
     return _redirect_operations(hr_scope=hr_scope, user_id=user_id)
 
@@ -1135,7 +1138,7 @@ def hr_personnel_status_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=int(request.form.get("user_id") or 0) or None)
 
 
@@ -1158,7 +1161,7 @@ def hr_personnel_status_delete(status_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         user_id = int(request.form.get("user_id") or 0) or None
     return _redirect_operations(hr_scope=hr_scope, user_id=user_id)
 
@@ -1246,7 +1249,7 @@ def hr_personnel_position_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=_safe_int(request.form.get("user_id")))
 
 
@@ -1272,5 +1275,5 @@ def hr_personnel_position_delete(position_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return _redirect_operations(hr_scope=hr_scope, user_id=_safe_int(request.form.get("user_id")))

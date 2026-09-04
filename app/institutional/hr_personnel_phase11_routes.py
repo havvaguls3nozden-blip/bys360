@@ -274,7 +274,7 @@ def hr_personnel_lifecycle_case_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), 'danger')
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", 'danger')
         return _redirect_center(user_id=_safe_int(request.form.get('user_id')), scope_mode=selected_scope_mode)
 
 
@@ -309,7 +309,7 @@ def hr_personnel_lifecycle_task_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), 'danger')
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", 'danger')
         return _redirect_center(case_id=_safe_int(request.form.get('case_id')), scope_mode=selected_scope_mode)
 
 
@@ -333,7 +333,7 @@ def hr_personnel_lifecycle_task_status():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), 'danger')
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", 'danger')
         return _redirect_center(scope_mode=selected_scope_mode)
 
 
@@ -458,5 +458,5 @@ def hr_personnel_exit_interview_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), 'danger')
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", 'danger')
         return redirect(url_for('main.hr_personnel_exit_interviews', scope=selected_scope_mode, user_id=_safe_int(request.form.get('user_id'))))

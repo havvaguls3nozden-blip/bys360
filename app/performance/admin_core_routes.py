@@ -134,9 +134,9 @@ def performance_criteria():
             db.session.commit()
             flash("Kriter eklendi.", "success")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            flash(f"Kriter eklenirken hata oluştu: {exc}", "danger")
+            flash("Kriter eklenirken hata oluştu.", "danger")
 
         return redirect(url_for("main.performance_criteria"))
 
@@ -198,9 +198,9 @@ def performance_criteria_edit(criteria_id):
         db.session.commit()
         flash("Kriter güncellendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Kriter güncellenirken hata oluştu: {exc}", "danger")
+        flash("Kriter güncellenirken hata oluştu.", "danger")
     return redirect(url_for("main.performance_criteria"))
 
 @main_bp.route("/performance/criteria/<int:criteria_id>/toggle-active", methods=["POST"])
@@ -218,9 +218,9 @@ def performance_criteria_toggle_active(criteria_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Kriter durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Kriter durumu güncellenirken hata oluştu.", "danger")
     return redirect(url_for("main.performance_criteria"))
 
 @main_bp.route("/performance/criteria/<int:criteria_id>/delete", methods=["POST"])
@@ -243,9 +243,9 @@ def performance_criteria_delete(criteria_id):
         db.session.commit()
         flash("Kriter silindi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Kriter silinirken hata oluştu: {exc}", "danger")
+        flash("Kriter silinirken hata oluştu.", "danger")
     return redirect(url_for("main.performance_criteria"))
 
 @main_bp.route("/performance/criteria/seed-defaults", methods=["POST"])
@@ -263,9 +263,9 @@ def performance_criteria_seed_defaults():
         else:
             flash("Varsayılan performans kriterleri zaten mevcut.", "info")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Kriterler eklenirken hata oluştu: {exc}", "danger")
+        flash("Kriterler eklenirken hata oluştu.", "danger")
     return redirect(url_for("main.performance_criteria"))
 
 @main_bp.route("/performance/periods")
@@ -404,9 +404,9 @@ def _scalar_distinct(model_column) -> list[str]:
             .all()
         )
         return [row[0] for row in rows]
-    except Exception:
+    except Exception as exc:
         db.session.rollback()
-        current_app.logger.exception("Dönem kapsam seçim listesi okunamadı.")
+        current_app.logger.exception("Dönem kapsam seçim listesi okunamadı. | exc=%s", exc)
         return []
 
 
@@ -447,9 +447,9 @@ def _build_period_create_scope_options() -> dict[str, list]:
                 "ust_birim": getattr(user, "ust_birim", "") or "",
                 "category": category,
             })
-    except Exception:
+    except Exception as exc:
         db.session.rollback()
-        current_app.logger.exception("Yeni dönem personel seçim listesi hazırlanamadı.")
+        current_app.logger.exception("Yeni dönem personel seçim listesi hazırlanamadı. | exc=%s", exc)
 
     unit_labels_from_users = _scalar_distinct(User.birim)
     upper_unit_labels_from_users = _scalar_distinct(User.ust_birim)
@@ -466,9 +466,9 @@ def _build_period_create_scope_options() -> dict[str, list]:
         )
         org_unit_labels = [unit.name for unit in org_units if getattr(unit, "name", None)]
         org_upper_unit_labels = [unit.name for unit in org_units if getattr(unit, "name", None) and not getattr(unit, "parent_id", None)]
-    except Exception:
+    except Exception as exc:
         db.session.rollback()
-        current_app.logger.exception("Organizasyon birim seçim listesi hazırlanamadı.")
+        current_app.logger.exception("Organizasyon birim seçim listesi hazırlanamadı. | exc=%s", exc)
 
     category_labels_from_users = _scalar_distinct(User.personnel_category)
     category_labels_from_table: list[str] = []
@@ -482,9 +482,9 @@ def _build_period_create_scope_options() -> dict[str, list]:
             )
             if getattr(category, "name", None)
         ]
-    except Exception:
+    except Exception as exc:
         db.session.rollback()
-        current_app.logger.exception("Personel kategori seçim listesi hazırlanamadı.")
+        current_app.logger.exception("Personel kategori seçim listesi hazırlanamadı. | exc=%s", exc)
 
     return {
         "personnel_scope_options": personnel_options,
@@ -512,9 +512,9 @@ def performance_period_create():
             flash("Dönem oluşturuldu.", "success")
             return redirect(url_for("main.performance_periods"))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            flash(f"Dönem oluşturulurken hata oluştu: {exc}", "danger")
+            flash("Dönem oluşturulurken hata oluştu.", "danger")
             return redirect(url_for("main.performance_period_create"))
 
     return safe_render(
@@ -542,9 +542,9 @@ def performance_period_edit(period_id):
             flash("Dönem güncellendi.", "success")
             return redirect(url_for("main.performance_periods"))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            flash(f"Dönem güncellenirken hata oluştu: {exc}", "danger")
+            flash("Dönem güncellenirken hata oluştu.", "danger")
             return redirect(url_for("main.performance_period_edit", period_id=period.id))
 
     return safe_render("period_edit.html", "<h3>Dönem Düzenle</h3>", period=period, ai_period_form_panel=build_period_form_ai_panel(period))
@@ -573,9 +573,9 @@ def performance_period_toggle_active(period_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Dönem aktiflik durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Dönem aktiflik durumu güncellenirken hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_periods"))
 
@@ -600,9 +600,9 @@ def performance_period_toggle_lock(period_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Dönem kilit durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Dönem kilit durumu güncellenirken hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_periods"))
 
@@ -622,9 +622,9 @@ def performance_period_toggle_publish(period_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Dönem yayın durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Dönem yayın durumu güncellenirken hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_periods"))
 
@@ -639,9 +639,9 @@ def performance_period_delete(period_id):
         else:
             flash(result.message or "Dönem bulunamadı.", "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Dönem silinirken hata oluştu: {exc}", "danger")
+        flash("Dönem silinirken hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_periods"))
 
@@ -665,9 +665,9 @@ def performance_generate_assignments():
         try:
             preflight = build_assignment_generation_preflight(period_id=period.id)
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            flash(f"Görev üretimi ön kontrolü sırasında hata oluştu: {exc}", "danger")
+            flash("Görev üretimi ön kontrolü sırasında hata oluştu.", "danger")
             return redirect(url_for("main.performance_generate_assignments"))
 
         if not preflight.get("can_auto_repair", False):
@@ -688,9 +688,9 @@ def performance_generate_assignments():
         try:
             result = generate_assignments_for_active_period(period_id=period.id)
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            flash(f"Görev üretimi sırasında hata oluştu: {exc}", "danger")
+            flash("Görev üretimi sırasında hata oluştu.", "danger")
             return redirect(url_for("main.performance_generate_assignments"))
 
         if not result.get("ok"):

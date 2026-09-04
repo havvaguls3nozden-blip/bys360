@@ -346,7 +346,7 @@ def hr_personnel_request_sla_policy_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_request_sla_policies", scope=(hr_scope or {}).get("scope_mode")))
 
 
@@ -416,5 +416,5 @@ def hr_personnel_request_escalate(request_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_request_analytics", scope=(hr_scope or {}).get("scope_mode")))

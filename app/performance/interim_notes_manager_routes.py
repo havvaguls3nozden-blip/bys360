@@ -493,8 +493,9 @@ def performance_interim_notes_create():
         db.session.commit()
         flash('Dönem içi not kaydedildi. Bu kayıt puan üretmez; değerlendirme döneminde hatırlatma ve süreç hafızası için kullanılır.', 'success')
     except SQLAlchemyError as exc:
+        logger.exception("Dönem içi not kaydedilirken veritabanı hatası: %s", exc)
         db.session.rollback()
-        flash(f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}', 'danger')
+        flash('Dönem içi not kaydedilemedi.', 'danger')
     return redirect(url_for('main.performance_interim_notes', employee_id=emp or '', period_id=per or ''))
 
 # BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND

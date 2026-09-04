@@ -268,7 +268,7 @@ def hr_personnel_request_task_assign(request_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_request_tasks", scope=(hr_scope or {}).get("scope_mode"), request_id=request_id))
 
 
@@ -311,7 +311,7 @@ def hr_personnel_request_task_complete(task_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_request_tasks", scope=(hr_scope or {}).get("scope_mode"), request_id=_safe_int(request.form.get("request_id"))))
 
 

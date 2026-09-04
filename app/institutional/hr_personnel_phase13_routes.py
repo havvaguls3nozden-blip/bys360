@@ -251,7 +251,7 @@ def hr_personnel_approval_station_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_phase13("main.hr_personnel_approval_station_center", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
 
 
@@ -277,7 +277,7 @@ def hr_personnel_approval_station_decide():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_phase13("main.hr_personnel_approval_station_center", scope_mode=selected_scope_mode)
 
 
@@ -378,7 +378,7 @@ def hr_personnel_digital_document_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
 
 
@@ -411,7 +411,7 @@ def hr_personnel_digital_document_status():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_phase13("main.hr_personnel_digital_handover_documents", scope_mode=selected_scope_mode)
 
 
@@ -506,5 +506,5 @@ def hr_personnel_exit_risk_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_phase13("main.hr_personnel_exit_risk_center", user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)

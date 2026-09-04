@@ -145,8 +145,8 @@ def communication_phase2_bulletin_edit(bulletin_id: int):
         except CommunicationPhase2Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=146")
-            flash(f"Duyuru güncellenemedi: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=146 | exc=%s", exc)
+            flash("Duyuru güncellenemedi.", "danger")
 
     return safe_render(
         "communication/phase2_bulletin_edit.html",
@@ -183,8 +183,8 @@ def communication_phase2_bulletin_archive(bulletin_id: int):
         archive_bulletin(bulletin_id, current_user.id, request.form.get("note"))
         flash("Duyuru arşive alındı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=183")
-        flash(f"Duyuru arşive alınamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=183 | exc=%s", exc)
+        flash("Duyuru arşive alınamadı.", "danger")
     return redirect(url_for("main.communication_phase2_bulletin_history", bulletin_id=bulletin_id))
 
 
@@ -236,8 +236,8 @@ def communication_phase2_survey_new():
         except CommunicationPhase2Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=235")
-            flash(f"Anket oluşturulamadı: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=235 | exc=%s", exc)
+            flash("Anket oluşturulamadı.", "danger")
 
     return safe_render(
         "communication/phase2_survey_builder.html",
@@ -288,8 +288,8 @@ def communication_phase2_survey_edit(survey_id: int):
         except CommunicationPhase2Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=286")
-            flash(f"Anket güncellenemedi: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=286 | exc=%s", exc)
+            flash("Anket güncellenemedi.", "danger")
 
     return safe_render(
         "communication/phase2_survey_builder.html",
@@ -317,8 +317,8 @@ def communication_phase2_survey_duplicate(survey_id: int):
         flash("Anket kopyası taslak olarak oluşturuldu.", "success")
         return redirect(url_for("main.communication_phase2_survey_edit", survey_id=survey.id))
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=314")
-        flash(f"Anket kopyalanamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=314 | exc=%s", exc)
+        flash("Anket kopyalanamadı.", "danger")
         return redirect(url_for("main.communication_phase2_survey_detail", survey_id=survey_id))
 
 
@@ -333,8 +333,8 @@ def communication_phase2_survey_archive(survey_id: int):
         archive_survey(survey_id)
         flash("Anket arşive alındı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=329")
-        flash(f"Anket arşive alınamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=329 | exc=%s", exc)
+        flash("Anket arşive alınamadı.", "danger")
     return redirect(url_for("main.communication_phase2_survey_detail", survey_id=survey_id))
 
 
@@ -349,8 +349,8 @@ def communication_phase2_survey_reopen(survey_id: int):
         reopen_survey(survey_id)
         flash("Anket taslak durumuna geri alındı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=344")
-        flash(f"Anket geri alınamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=344 | exc=%s", exc)
+        flash("Anket geri alınamadı.", "danger")
     return redirect(url_for("main.communication_phase2_survey_detail", survey_id=survey_id))
 
 
@@ -378,8 +378,8 @@ def communication_phase2_survey_publish(survey_id: int):
         publish_survey(survey_id, current_user.id)
         flash("Anket yayımlandı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=372")
-        flash(f"Anket yayımlanamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=372 | exc=%s", exc)
+        flash("Anket yayımlanamadı.", "danger")
     return redirect(url_for("main.communication_phase2_survey_detail", survey_id=survey_id))
 
 
@@ -394,8 +394,8 @@ def communication_phase2_survey_close(survey_id: int):
         close_survey(survey_id)
         flash("Anket kapatıldı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=387")
-        flash(f"Anket kapatılamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=387 | exc=%s", exc)
+        flash("Anket kapatılamadı.", "danger")
     return redirect(url_for("main.communication_phase2_survey_detail", survey_id=survey_id))
 
 
@@ -444,8 +444,8 @@ def communication_phase2_survey_template_new():
         except CommunicationPhase2Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=436")
-            flash(f"Anket şablonu oluşturulamadı: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=436 | exc=%s", exc)
+            flash("Anket şablonu oluşturulamadı.", "danger")
 
     return safe_render(
         "communication/phase2_survey_template_form.html",
@@ -480,8 +480,8 @@ def communication_phase2_survey_template_edit(template_id: int):
         except CommunicationPhase2Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=471")
-            flash(f"Anket şablonu güncellenemedi: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase2_routes.py | line=471 | exc=%s", exc)
+            flash("Anket şablonu güncellenemedi.", "danger")
 
     return safe_render(
         "communication/phase2_survey_template_form.html",

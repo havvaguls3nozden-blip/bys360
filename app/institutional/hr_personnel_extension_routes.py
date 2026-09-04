@@ -283,7 +283,7 @@ def hr_personnel_asset_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -306,7 +306,7 @@ def hr_personnel_asset_return(asset_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -327,7 +327,7 @@ def hr_personnel_asset_delete(asset_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -448,7 +448,7 @@ def hr_personnel_checklist_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -469,7 +469,7 @@ def hr_personnel_checklist_delete(review_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -582,7 +582,7 @@ def hr_personnel_reminder_run():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))
 
 
@@ -629,5 +629,5 @@ def hr_personnel_reminder_bulk():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))
