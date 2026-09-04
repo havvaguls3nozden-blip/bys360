@@ -444,7 +444,7 @@ def _notify_feedback_meeting_updated(meeting):
         "iptal_edildi": "İptal edildi",
     }
     meeting_status_value = str(getattr(meeting, "status", "") or "")
-    status_label = status_label_map.get(meeting_status_value, meeting_status_value or "Güncellendi")
+    status_label = status_label_map.get(meeting_status_value, "Güncellendi")
 
     recipient_ids: set[int] = set()
     employee_id = getattr(employee, "id", None)

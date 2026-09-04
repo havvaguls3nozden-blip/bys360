@@ -121,7 +121,7 @@ def _as_score(value: Any) -> float | None:
 
 def phase7_status_label(status: Any) -> str:
     text = _as_text(status)
-    return STATUS_LABELS.get(text, text or "Arşiv Durumu Belirtilmedi")
+    return STATUS_LABELS.get(text, "Arşiv Durumu Belirtilmedi")
 
 
 def phase7_score_band(score: Any) -> str:
