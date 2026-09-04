@@ -74,8 +74,8 @@ def communication_phase9d_checkin_create():
         record_phase9d_checkin(current_user, window_key, status, note)
         flash('Faz 9D check-in kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=75")
-        flash(f'Check-in kaydedilemedi: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=75 | exc=%s", exc)
+        flash('Check-in kaydedilemedi.', 'danger')
     return redirect(url_for('main.communication_phase9d_stabilization_center'))
 
 
@@ -95,8 +95,8 @@ def communication_phase9d_hotfix_create():
         record_phase9d_hotfix(current_user, title, severity, note)
         flash('Faz 9D hotfix kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=95")
-        flash(f'Hotfix kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=95 | exc=%s", exc)
+        flash('Hotfix kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9d_stabilization_center'))
 
 
@@ -116,8 +116,8 @@ def communication_phase9d_signal_create():
         record_phase9d_signal(current_user, signal_type, status, note)
         flash('Faz 9D izleme sinyali kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=115")
-        flash(f'İzleme sinyali kaydedilemedi: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9d_routes.py | line=115 | exc=%s", exc)
+        flash('İzleme sinyali kaydedilemedi.', 'danger')
     return redirect(url_for('main.communication_phase9d_stabilization_center'))
 
 

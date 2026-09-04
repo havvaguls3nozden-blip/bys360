@@ -279,7 +279,7 @@ def _set_status(model: Any, row_id: int, status: str, redirect_endpoint: str) ->
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Durum güncellenemedi: {exc}", "danger")
+        flash("Durum güncellenemedi.", "danger")
     return redirect(url_for(redirect_endpoint, scope=request.form.get("scope") or request.args.get("scope") or "personal"))
 
 
@@ -298,7 +298,7 @@ def _delete_row(model: Any, row_id: int, redirect_endpoint: str) -> Any:
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kayıt silinemedi: {exc}", "danger")
+        flash("Kayıt silinemedi.", "danger")
     return redirect(url_for(redirect_endpoint, scope=request.form.get("scope") or request.args.get("scope") or "personal"))
 
 

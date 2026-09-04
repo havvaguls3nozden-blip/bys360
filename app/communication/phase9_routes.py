@@ -72,8 +72,8 @@ def communication_phase9_checkpoint_create():
         record_phase9_checkpoint(current_user, checkpoint_key, status, note)
         flash('Faz 9 kontrol noktası kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9_routes.py | line=73")
-        flash(f'Kontrol noktası kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9_routes.py | line=73 | exc=%s", exc)
+        flash('Kontrol noktası kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9_release_center'))
 
 
@@ -93,8 +93,8 @@ def communication_phase9_decision_create():
         record_phase9_decision(current_user, decision, status, note)
         flash('Canlıya geçiş kararı kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9_routes.py | line=93")
-        flash(f'Karar kaydedilemedi: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9_routes.py | line=93 | exc=%s", exc)
+        flash('Karar kaydedilemedi.', 'danger')
     return redirect(url_for('main.communication_phase9_release_center'))
 
 

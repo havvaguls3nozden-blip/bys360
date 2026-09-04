@@ -117,9 +117,9 @@ def safe_render(template_name: str, fallback_html: str = "", **context: Any):
     try:
         return flask_render_template(template_name, **context)
     except Exception as exc:  # pragma: no cover
-        current_app.logger.exception("Template patladi: %s", template_name)
-        flash(f"{template_name} şablonunda hata var: {exc}", "danger")
-        return fallback_html or f"<h3>{template_name} şablonu hatalı</h3><p>{exc}</p>"
+        current_app.logger.exception("Template patladi: %s | exc=%s", template_name, exc)
+        flash("Bu sayfa gösterilirken bir hata oluştu.", "danger")
+        return fallback_html or "<h3>Sayfa gösterilirken bir hata oluştu.</h3>"
 
 # BYS360_PHASE3_VISIBILITY_PERMISSION_ACCESS_DENIED_RENDERER
 PHASE3_ACCESS_DENIED_MESSAGE = "Bu sayfaya erişim yetkiniz bulunmamaktadır."

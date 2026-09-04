@@ -132,7 +132,7 @@ def admin_org_unit_create():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
-            flash(f"Birim oluşturulurken hata oluştu: {exc}", "danger")
+            flash("Birim oluşturulurken hata oluştu.", "danger")
             return redirect(url_for("main.admin_org_unit_create"))
 
     return safe_render(
@@ -227,7 +227,7 @@ def admin_org_unit_edit(unit_id: int):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
-            flash(f"Birim güncellenirken hata oluştu: {exc}", "danger")
+            flash("Birim güncellenirken hata oluştu.", "danger")
             return redirect(url_for("main.admin_org_unit_edit", unit_id=unit.id))
 
     return safe_render(
@@ -259,7 +259,7 @@ def admin_org_unit_toggle_active(unit_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Birim durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Birim durumu güncellenirken hata oluştu.", "danger")
 
     return redirect(url_for("main.admin_org_units"))
 
@@ -406,7 +406,7 @@ def org_unit_add():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Birim ekleme sırasında hata oluştu: {exc}", "danger")
+            flash("Birim ekleme sırasında hata oluştu.", "danger")
 
     return safe_render(
         "org_unit_form.html",
@@ -468,7 +468,7 @@ def org_unit_edit(unit_id: int):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Birim güncelleme sırasında hata oluştu: {exc}", "danger")
+            flash("Birim güncelleme sırasında hata oluştu.", "danger")
 
     return safe_render(
         "org_unit_form.html",
@@ -507,7 +507,7 @@ def org_unit_delete(unit_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Silme işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Silme işlemi sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.org_units_list"))
 

@@ -61,7 +61,7 @@ def account_change_photo():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Profil fotoğrafı güncellenirken hata oluştu: {exc}", "danger")
+        flash("Profil fotoğrafı güncellenirken hata oluştu.", "danger")
         return redirect(redirect_target)
 
 

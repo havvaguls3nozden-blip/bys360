@@ -68,8 +68,8 @@ def communication_phase8_checkpoint_create():
         record_phase8_checkpoint(current_user, checkpoint_key, status, note)
         flash('Pilot kontrol noktası kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase8_routes.py | line=68")
-        flash(f'Kontrol noktası kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase8_routes.py | line=68 | exc=%s", exc)
+        flash('Kontrol noktası kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase8_cutover'))
 
 
@@ -88,6 +88,6 @@ def communication_phase8_note_create():
         record_phase8_note(current_user, title, note)
         flash('Pilot açılış notu kaydedildi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase8_routes.py | line=87")
-        flash(f'Pilot notu kaydedilemedi: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase8_routes.py | line=87 | exc=%s", exc)
+        flash('Pilot notu kaydedilemedi.', 'danger')
     return redirect(url_for('main.communication_phase8_cutover'))

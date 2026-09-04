@@ -268,8 +268,8 @@ def _fallback_personnel_operations():
         return safe_render("hr_personnel_operations.html", **payload)
     except Exception as exc:
         safe_db_rollback()
-        current_app.logger.exception("Personel özlük fallback ekranı açılamadı")
-        flash(f"Personel özlük ekranı geçici olarak açılamadı: {exc}", "warning")
+        current_app.logger.exception("Personel özlük fallback ekranı açılamadı | exc=%s", exc)
+        flash("Personel özlük ekranı geçici olarak açılamadı.", "warning")
         return redirect(_url_or_hash("main.personnel_list"))
 
 

@@ -378,7 +378,15 @@ def test_admin_user_delete_blocks_deleting_another_admin_via_safe_delete_guard(a
     without allow_admin=True, so this ValueError -- a real production
     exception from a real production guard, no mocking -- falls into the
     generic `except Exception as exc:` branch (NOT the IntegrityError
-    branch) and is surfaced as a clean, rolled-back failure."""
+    branch) and is surfaced as a clean, rolled-back failure.
+
+    BYS360 H1F (exception-display hardening): this branch's flash used to
+    append the raw exception's own text after a colon
+    (f"Bu kullanici silinemedi: {exc}") -- a real production ValueError
+    message leaking to the admin verbatim. Fixed to a fixed safe message;
+    this assertion was updated to match (see
+    tests/behavior/test_h1f_final_audit_second_pass_exception_leak_contract.py
+    for the sentinel-injection proof)."""
     actor_id = _create_user(app, role="admin", sicil_no="del_blkadm_actor")
     target_admin_id = _create_user(app, role="admin", sicil_no="del_blkadm_target")
     _login(client, "del_blkadm_actor")
@@ -388,10 +396,7 @@ def test_admin_user_delete_blocks_deleting_another_admin_via_safe_delete_guard(a
 
     assert response.status_code == 302
     flashes = _flashes(client)
-    assert flashes[-1] == (
-        "danger",
-        "Bu kullanıcı silinemedi: Admin kullanıcı güvenli silme servisiyle silinemez.",
-    )
+    assert flashes[-1] == ("danger", "Bu kullanıcı silinemedi.")
     assert _user_count(app) == before
     survivor = _get_user(app, target_admin_id)
     assert survivor is not None and survivor.role == "admin"
@@ -917,6 +922,14 @@ def test_admin_users_reset_all_admin_success_invokes_cascade_exactly_once(app, c
 
 
 def test_admin_users_reset_all_exception_from_cascade_is_rolled_back_not_a_raw_500(app, client, monkeypatch):
+    """BYS360 H1F (exception-display hardening): this branch's flash used to
+    append the raw exception's own text after a colon
+    (f"Sifirlama islemi sirasinda hata olustu: {exc}") -- a genuinely
+    unexpected RuntimeError's message leaking to the admin verbatim. Fixed
+    to a fixed safe message; this assertion was updated to match (see
+    tests/behavior/test_h1f_final_audit_second_pass_exception_leak_contract.py
+    for the sentinel-injection proof)."""
+
     def _boom():
         raise RuntimeError("simulated cascade failure")
 
@@ -932,7 +945,7 @@ def test_admin_users_reset_all_exception_from_cascade_is_rolled_back_not_a_raw_5
     assert response.status_code == 302
     assert response.headers.get("Location", "").endswith("/admin/users")
     flashes = _flashes(client)
-    assert flashes[-1] == ("danger", "Sıfırlama işlemi sırasında hata oluştu: simulated cascade failure")
+    assert flashes[-1] == ("danger", "Sıfırlama işlemi sırasında hata oluştu.")
 
     # Session-health proof after rollback: the acting admin's own row is
     # still readable and consistent, not corrupted by the failed cascade.

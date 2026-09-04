@@ -94,10 +94,14 @@ def admin_user_change_photo_impl(user_id: int):
         flash("Profil fotoğrafı güncellendi.", "success")
         return redirect(url_for("main.admin_user_edit", user_id=user.id))
 
+    except ValueError as exc:
+        db.session.rollback()
+        flash(f"Profil fotoğrafı güncellenirken hata oluştu: {exc}", "danger")
+        return redirect(url_for("main.admin_user_edit", user_id=user.id))
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Profil fotoğrafı güncellenirken hata oluştu: {exc}", "danger")
+        flash("Profil fotoğrafı güncellenirken hata oluştu.", "danger")
         return redirect(url_for("main.admin_user_edit", user_id=user.id))
 
 def admin_user_archive_impl(user_id: int):
@@ -123,7 +127,7 @@ def admin_user_archive_impl(user_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Arşivleme sırasında hata oluştu: {exc}", "danger")
+        flash("Arşivleme sırasında hata oluştu.", "danger")
     return redirect(url_for("main.admin_users"))
 
 def admin_users_bulk_archive_impl():
@@ -169,7 +173,7 @@ def admin_user_delete_impl(user_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Bu kullanıcı silinemedi: {exc}", "danger")
+        flash("Bu kullanıcı silinemedi.", "danger")
     return redirect(url_for("main.admin_users"))
 
 def admin_users_bulk_passive_impl():
@@ -207,7 +211,7 @@ def admin_user_toggle_active_impl(user_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Kullanıcı durumu güncellenirken hata oluştu: {exc}", "danger")
+        flash("Kullanıcı durumu güncellenirken hata oluştu.", "danger")
     return redirect(url_for("main.admin_users"))
 
 def admin_users_reset_all_impl():
@@ -218,6 +222,6 @@ def admin_users_reset_all_impl():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Sıfırlama işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Sıfırlama işlemi sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.admin_users"))

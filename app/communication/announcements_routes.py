@@ -443,7 +443,7 @@ def announcements_new():
             flash(f"Duyuru {len(recipient_users)} kullanıcıya gönderildi. Okunma takibi birazdan duyurular ekranına düşer.", "success")
             return redirect(url_for("main.messages_inbox", thread_id=announcement_thread.id))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/announcements_routes.py | line=435")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/announcements_routes.py | line=435 | exc=%s", exc)
             db.session.rollback()
             _log_communication_exception(
                 "announcements_new",
@@ -452,7 +452,7 @@ def announcements_new():
                 target_type=target_type,
                 user_id=getattr(current_user, "id", None),
             )
-            flash(f"Duyuru gönderilirken hata oluştu: {exc}", "danger")
+            flash("Duyuru gönderilirken hata oluştu.", "danger")
             return _render_announcement_form(
                 subject=subject,
                 body=body,

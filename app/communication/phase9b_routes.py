@@ -69,8 +69,8 @@ def communication_phase9b_gate_create():
         record_phase9b_gate(current_user, gate_key, status, note)
         flash('Faz 9B kapı kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9b_routes.py | line=70")
-        flash(f'Kapı kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9b_routes.py | line=70 | exc=%s", exc)
+        flash('Kapı kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9b_transition_center'))
 
 
@@ -89,8 +89,8 @@ def communication_phase9b_decision_create():
         record_phase9b_decision(current_user, decision, note)
         flash('Faz 9B karar kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9b_routes.py | line=89")
-        flash(f'Karar kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9b_routes.py | line=89 | exc=%s", exc)
+        flash('Karar kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9b_transition_center'))
 
 

@@ -371,7 +371,7 @@ def _handle_save_system_foundation():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Genel sistem ayarları kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Genel sistem ayarları kaydedilirken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
 
@@ -383,7 +383,7 @@ def _handle_save_module_foundation():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Modül ayarları kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Modül ayarları kaydedilirken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
 
@@ -414,7 +414,7 @@ def _handle_save_role_matrix_group(form_action, grouped_menu_definitions, flat_m
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Rol matrisi kaydedilirken hata oluştu.", "danger")
         section_id = "module-role-matrices"
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section=section_id) if keep_user_id else url_for("main.settings_page", section=section_id))
@@ -438,7 +438,7 @@ def _handle_reset_role_matrix_group(form_action, grouped_menu_definitions, flat_
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
+        flash("Rol matrisi sıfırlanırken hata oluştu.", "danger")
         section_id = "module-role-matrices"
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section=section_id) if keep_user_id else url_for("main.settings_page", section=section_id))
@@ -462,7 +462,7 @@ def _handle_save_communication_role_matrix(grouped_menu_definitions, flat_menu_i
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"İletişim ve anket rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
+        flash("İletişim ve anket rol matrisi kaydedilirken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section="communication-role-policy") if keep_user_id else url_for("main.settings_page", section="communication-role-policy"))
 
@@ -481,7 +481,7 @@ def _handle_reset_communication_role_matrix(grouped_menu_definitions, flat_menu_
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
+        flash("Rol matrisi sıfırlanırken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section="communication-role-policy") if keep_user_id else url_for("main.settings_page", section="communication-role-policy"))
 
@@ -493,7 +493,7 @@ def _handle_save_assistant_role_matrix():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Sanal Asistan rol matrisi kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Sanal Asistan rol matrisi kaydedilirken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section="assistant-role-policy") if keep_user_id else url_for("main.settings_page", section="assistant-role-policy"))
 
@@ -505,7 +505,7 @@ def _handle_reset_assistant_role_matrix():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Sanal Asistan rol matrisi sıfırlanırken hata oluştu: {exc}", "danger")
+        flash("Sanal Asistan rol matrisi sıfırlanırken hata oluştu.", "danger")
     keep_user_id = request.form.get("keep_user_id", type=int)
     return redirect(url_for("main.settings_page", user_id=keep_user_id, section="assistant-role-policy") if keep_user_id else url_for("main.settings_page", section="assistant-role-policy"))
 
@@ -522,7 +522,7 @@ def _handle_rollback_settings_change_entry():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Ayar geçmişi geri alınırken hata oluştu: {exc}", "danger")
+            flash("Ayar geçmişi geri alınırken hata oluştu.", "danger")
     return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
 
 
@@ -573,7 +573,7 @@ def _handle_bulk_apply_profile(users, grouped_menu_definitions, flat_menu_items)
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Toplu profil uygulanırken hata oluştu: {exc}", "danger")
+        flash("Toplu profil uygulanırken hata oluştu.", "danger")
         return redirect(url_for("main.settings_page", user_id=keep_user_id) if keep_user_id else url_for("main.settings_page"))
 
 
@@ -614,7 +614,7 @@ def _handle_import_visibility_template(flat_menu_items):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Yetki şablonu içe aktarılırken hata oluştu: {exc}", "danger")
+        flash("Yetki şablonu içe aktarılırken hata oluştu.", "danger")
     return redirect(url_for("main.settings_page", user_id=import_user.id))
 
 
@@ -649,7 +649,7 @@ def _handle_save_named_archive(flat_menu_items):
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
         archive_redirect_key = (request.form.get('archive_key') or "").strip()
-        flash(f"Şablon arşivi kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Şablon arşivi kaydedilirken hata oluştu.", "danger")
     return redirect(url_for("main.settings_page", user_id=selected_user.id, archive_key=archive_redirect_key))
 
 
@@ -685,7 +685,7 @@ def _handle_apply_named_archive(all_menu_keys, flat_menu_items):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Arşiv uygulanırken hata oluştu: {exc}", "danger")
+        flash("Arşiv uygulanırken hata oluştu.", "danger")
     return redirect(url_for("main.settings_page", user_id=selected_user.id if selected_user else None, archive_key=archive_key) if selected_user else url_for("main.settings_page", archive_key=archive_key))
 
 
@@ -699,7 +699,7 @@ def _handle_delete_named_archive():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Şablon arşivi silinirken hata oluştu: {exc}", "danger")
+        flash("Şablon arşivi silinirken hata oluştu.", "danger")
     return redirect(url_for("main.settings_page", user_id=selected_user_id) if selected_user_id else url_for("main.settings_page"))
 
 
@@ -734,7 +734,7 @@ def _handle_user_scoped_profile_action(form_action, flat_menu_items, all_menu_ke
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Ayarlar kaydedilirken hata oluştu: {exc}", "danger")
+        flash("Ayarlar kaydedilirken hata oluştu.", "danger")
         return redirect(url_for("main.settings_page", user_id=keep_user_id))
 
 

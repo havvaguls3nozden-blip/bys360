@@ -226,8 +226,8 @@ def _safe_commit(success_message: str, *, danger_prefix: str = "İşlem tamamlan
         return True
     except Exception as exc:
         safe_db_rollback()
-        current_app.logger.exception("Personel kayıt işlemi tamamlanamadı")
-        flash(f"{danger_prefix}: {exc}", "danger")
+        current_app.logger.exception("Personel kayıt işlemi tamamlanamadı | exc=%s", exc)
+        flash(f"{danger_prefix}.", "danger")
         return False
 
 

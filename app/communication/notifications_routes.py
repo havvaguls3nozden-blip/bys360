@@ -267,9 +267,9 @@ def notifications_mark_all_read_impl():
         _invalidate_user_notification_cache(current_user.id)
         flash("Tüm bildirimler okundu olarak işaretlendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=266")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=266 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Bildirimler güncellenirken hata oluştu: {exc}", "danger")
+        flash("Bildirimler güncellenirken hata oluştu.", "danger")
 
     return _redirect_notifications_view()
 
@@ -294,9 +294,9 @@ def notifications_bulk_mark_read_impl():
         else:
             flash("Seçilen bildirimler bulunamadı.", "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=292")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=292 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Bildirimler güncellenirken hata oluştu: {exc}", "danger")
+        flash("Bildirimler güncellenirken hata oluştu.", "danger")
 
     return _redirect_notifications_view()
 
@@ -321,9 +321,9 @@ def notifications_bulk_mark_unread_impl():
         else:
             flash("Seçilen bildirimler bulunamadı.", "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=318")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=318 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Bildirimler güncellenirken hata oluştu: {exc}", "danger")
+        flash("Bildirimler güncellenirken hata oluştu.", "danger")
 
     return _redirect_notifications_view()
 
@@ -348,9 +348,9 @@ def notifications_bulk_delete_impl():
         else:
             flash("Seçilen bildirimler bulunamadı.", "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=344")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/notifications_routes.py | line=344 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Bildirimler silinirken hata oluştu: {exc}", "danger")
+        flash("Bildirimler silinirken hata oluştu.", "danger")
 
     return _redirect_notifications_view()
 

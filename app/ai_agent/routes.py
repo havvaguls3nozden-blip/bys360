@@ -240,8 +240,9 @@ def ag5_knowledge_center():
             except Exception:
                 __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/ai_agent/routes.py)")
         except Exception as exc:
+            __import__("logging").getLogger(__name__).exception("BYS360 Asistan bilgi kaydı oluşturulamadı | exc=%s", exc)
             try:
-                flash(f'Bilgi kaydı oluşturulamadı: {exc}', 'danger')
+                flash('Bilgi kaydı oluşturulamadı.', 'danger')
             except Exception:
                 __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/ai_agent/routes.py)")
         return redirect(url_for('.ag5_knowledge_center'))
