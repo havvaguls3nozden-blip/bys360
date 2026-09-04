@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_status_labels.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -206,7 +207,7 @@ class _PerformanceP1DetailScreenState extends State<PerformanceP1DetailScreen> {
         }
         final data = snapshot.data ?? widget.seed?.raw ?? <String, dynamic>{};
         final title = bys360Text(data, ['title', 'name', 'employee_name', 'employeeName', 'period_name', 'periodName'], widget.title);
-        final status = bys360PerformanceStatusLabel(bys360Text(data, ['status_label', 'statusLabel', 'state_label', 'stateLabel', 'status'], widget.seed?.status ?? 'Takipte'));
+        final status = bys360GenericStatusLabel(bys360Text(data, ['status_label', 'statusLabel', 'state_label', 'stateLabel', 'status'], widget.seed?.status ?? 'Takipte'));
         final score = bys360Text(data, ['final_score', 'finalScore', 'score', 'value'], widget.seed?.value ?? '');
         final period = bys360Text(data, ['period', 'period_name', 'periodName', 'date_range', 'dateRange'], widget.seed?.meta ?? '');
         final description = bys360Text(data, ['description', 'summary', 'general_comment', 'generalComment', 'note'], widget.subtitle);
@@ -228,7 +229,7 @@ class _PerformanceP1DetailScreenState extends State<PerformanceP1DetailScreen> {
                 final map = Map<String, dynamic>.from(item);
                 final itemTitle = bys360Text(map, ['title', 'name', 'criterion', 'criterion_name', 'criterionName'], 'Değerlendirme kriteri');
                 final itemValue = bys360Text(map, ['score', 'value', 'point', 'rate'], '');
-                final itemStatus = bys360Text(map, ['comment', 'description', 'status'], 'Kayıtlı değerlendirme detayı');
+                final itemStatus = bys360GenericStatusLabel(bys360Text(map, ['comment', 'description', 'status'], 'Kayıtlı değerlendirme detayı'));
                 return _InfoLineCard(icon: Icons.rule_folder_outlined, title: itemTitle, value: itemValue.isEmpty ? itemStatus : '$itemValue • $itemStatus', tone: BYS360Colors.corporateRed);
               }),
             ],
@@ -238,7 +239,7 @@ class _PerformanceP1DetailScreenState extends State<PerformanceP1DetailScreen> {
                 final map = Map<String, dynamic>.from(item);
                 return _InfoLineCard(
                   icon: Icons.history_outlined,
-                  title: bys360PerformanceStatusLabel(bys360Text(map, ['title', 'action', 'status', 'state'], 'Süreç kaydı')),
+                  title: bys360GenericStatusLabel(bys360Text(map, ['title', 'action', 'status', 'state'], 'Süreç kaydı')),
                   value: bys360Text(map, ['description', 'note', 'created_at', 'createdAt', 'date'], 'Kayıt bilgisi'),
                   tone: BYS360Colors.info,
                 );

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/mobile_record.dart';
 import '../theme/app_theme.dart';
 import '../utils/bys360_copy.dart';
+import '../utils/bys360_status_labels.dart';
 
 class StatusPill extends StatelessWidget {
   const StatusPill({super.key, required this.text, this.tone = BYS360Colors.corporateRed});
@@ -12,7 +13,7 @@ class StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final label = BYS360Copy.clean(text);
+    final label = bys360GenericStatusLabel(BYS360Copy.clean(text));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(

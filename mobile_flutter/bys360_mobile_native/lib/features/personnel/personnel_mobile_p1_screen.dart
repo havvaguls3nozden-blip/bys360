@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../core/api/mobile_api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/bys360_copy.dart';
+import '../../core/utils/bys360_status_labels.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -304,7 +305,19 @@ class _PersonnelMobileP1ScreenState extends State<PersonnelMobileP1Screen> {
   String _duty(Map<String, dynamic> row) => _value(row, const ['duty_name', 'gorev', 'duty', 'role_name', 'position']);
   String _manager(Map<String, dynamic> row) => _value(row, const ['manager_name', 'yonetici', 'supervisor_name', 'first_manager_name', 'amir', 'amir_adi']);
   String _category(Map<String, dynamic> row) => _value(row, const ['personnel_category', 'category', 'kategori']);
-  String _status(Map<String, dynamic> row) => _value(row, const ['status_label', 'status', 'aktiflik', 'is_active', 'active']);
+  String _status(Map<String, dynamic> row) {
+    final text = _value(row, const ['status_label', 'status', 'aktiflik']);
+    if (text.isNotEmpty) return bys360GenericStatusLabel(text);
+    // No status/aktiflik text field at all -- fall back to the boolean
+    // active flag. Reading it via the generic _value()/toString() picker
+    // above would show the raw English literal "true"/"false" to the
+    // user, so it is handled separately here instead.
+    for (final key in const ['is_active', 'active']) {
+      final label = bys360ActiveFlagLabel(row[key]);
+      if (label != null) return label;
+    }
+    return '';
+  }
 
   String _stablePersonKey(Map<String, dynamic> row) {
     final key = _value(row, const ['id', 'user_id', 'personnel_id', 'employee_id', 'registry_no', 'sicil_no', 'sicil']);

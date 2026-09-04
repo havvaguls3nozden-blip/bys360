@@ -1,3 +1,5 @@
+import '../../core/utils/bys360_status_labels.dart';
+
 class MobilePerformanceRecord {
   const MobilePerformanceRecord({
     required this.id,
@@ -39,7 +41,7 @@ class MobilePerformanceRecord {
       id: pick(['id', 'assignment_id', 'assignmentId', 'period_id', 'periodId', 'scorecard_id', 'scorecardId', 'uuid'], ''),
       title: pick(['title', 'name', 'period_name', 'periodName', 'employee_name', 'employeeName', 'display_name', 'displayName', 'label'], fallbackTitle),
       subtitle: pick(['subtitle', 'description', 'summary', 'unit', 'unit_name', 'period_label', 'periodLabel'], 'Yetkiniz dahilindeki performans kaydı'),
-      status: bys360PerformanceStatusLabel(pick(['status_label', 'statusLabel', 'state_label', 'stateLabel', 'status', 'state'], 'Takipte')),
+      status: bys360GenericStatusLabel(pick(['status_label', 'statusLabel', 'state_label', 'stateLabel', 'status', 'state'], 'Takipte')),
       value: pick(['value', 'score', 'final_score', 'finalScore', 'count', 'task_count', 'taskCount'], ''),
       meta: pick(['meta', 'date_range', 'dateRange', 'period', 'role', 'manager_level', 'managerLevel'], ''),
       progress: progressValue,
@@ -74,49 +76,9 @@ Map<String, dynamic> bys360ExtractMap(dynamic payload) {
 }
 
 
-
-String bys360PerformanceStatusLabel(String value) {
-  final raw = value.trim();
-  final key = raw.toLowerCase().replaceAll(' ', '_').replaceAll('-', '_');
-  const labels = <String, String>{
-    'pending': 'Bekliyor',
-    'waiting': 'Bekliyor',
-    'assigned': 'Atandı',
-    'open': 'Açık',
-    'draft': 'Taslak',
-    'in_progress': 'Devam Ediyor',
-    'ongoing': 'Devam Ediyor',
-    'devam': 'Devam Ediyor',
-    'devam_ediyor': 'Devam Ediyor',
-    'completed': 'Tamamlandı',
-    'done': 'Tamamlandı',
-    'tamamlandi': 'Tamamlandı',
-    'tamamlandı': 'Tamamlandı',
-    'returned': 'İade Edildi',
-    'rejected': 'İade Edildi',
-    'withdrawn': 'Geri Çekildi',
-    'president_pending': 'Başkan Onayı Bekliyor',
-    'blocked_president_pending': 'Başkan Onayı Yayın Kilidi',
-    'hr_precheck': 'İK/Admin Ön Kontrolünde',
-    'first_low_warning': 'Düşük Performans Uyarısı Oluşturuldu',
-    'second_low_repeat': 'Tekrarlayan Düşük Performans Süreci',
-    'approved_by_president': 'Başkan Tarafından Onaylandı',
-    'rejected_by_president': 'Başkan Tarafından İade Edildi',
-    'scorecard_pending': 'Karne Yayın Bekliyor',
-    'published': 'Yayınlandı',
-    'locked': 'Yayın Kilidi',
-  };
-  if (labels.containsKey(key)) return labels[key]!;
-  if (raw.isEmpty) return 'Takipte';
-  // Any status code not yet in the dictionary above (e.g. a newly added
-  // backend value) is at least title-cased instead of shown as a raw
-  // lowercase/underscored machine value -- applies to single-word codes
-  // too, not only underscore/dash-separated ones.
-  return raw.split(RegExp(r'[_\-]+')).where((part) => part.isNotEmpty).map((part) {
-    if (part.length == 1) return part.toUpperCase();
-    return part[0].toUpperCase() + part.substring(1).toLowerCase();
-  }).join(' ');
-}
+// bys360PerformanceStatusLabel moved to core/utils/bys360_status_labels.dart
+// as bys360GenericStatusLabel(value, {fallback}) -- same dictionary and
+// fallback behaviour, now reusable outside the performance module.
 
 String bys360Text(Map<String, dynamic> data, List<String> keys, [String fallback = '']) {
   for (final key in keys) {

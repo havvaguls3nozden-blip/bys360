@@ -1,3 +1,5 @@
+import '../../core/utils/bys360_status_labels.dart';
+
 class SupportTicketDetail {
   const SupportTicketDetail({
     required this.ticket,
@@ -84,9 +86,9 @@ class SupportTicketInfo {
       title: json['title']?.toString() ?? 'Destek talebi',
       description: json['description']?.toString() ?? '',
       status: json['status']?.toString() ?? '',
-      statusLabel: json['status_label']?.toString() ?? json['status']?.toString() ?? '-',
+      statusLabel: json['status_label']?.toString() ?? bys360GenericStatusLabel(json['status']?.toString(), fallback: '-'),
       priority: json['priority']?.toString() ?? '',
-      priorityLabel: json['priority_label']?.toString() ?? json['priority']?.toString() ?? '-',
+      priorityLabel: json['priority_label']?.toString() ?? bys360GenericStatusLabel(json['priority']?.toString(), fallback: '-'),
       moduleName: json['module_name']?.toString() ?? 'Genel',
       ticketType: json['ticket_type']?.toString() ?? '-',
       requesterName: json['requester_name']?.toString() ?? '-',
@@ -136,8 +138,8 @@ class SupportStatusHistoryItem {
     return SupportStatusHistoryItem(
       id: json['id']?.toString() ?? '',
       changedBy: json['changed_by']?.toString() ?? 'Sistem',
-      oldStatus: json['old_status']?.toString() ?? 'İlk kayıt',
-      newStatus: json['new_status']?.toString() ?? '-',
+      oldStatus: bys360GenericStatusLabel(json['old_status']?.toString(), fallback: 'İlk kayıt'),
+      newStatus: bys360GenericStatusLabel(json['new_status']?.toString(), fallback: '-'),
       note: json['note']?.toString() ?? '',
       createdAt: json['created_at']?.toString() ?? '-',
     );

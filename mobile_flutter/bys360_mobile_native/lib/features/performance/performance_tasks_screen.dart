@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_status_labels.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
-import 'performance_mobile_p1_models.dart';
 import 'performance_scoring_screen.dart';
 
 class PerformanceTasksScreen extends StatefulWidget {
@@ -394,9 +394,9 @@ IconData _metricIcon(String value) {
 String _performanceTaskStatusLabel(String value) {
   final raw = value.trim();
   if (raw.isEmpty) return 'Değerlendirme Bekliyor';
-  // Delegates to the canonical, more complete status dictionary
-  // (bys360PerformanceStatusLabel) instead of keeping a second,
-  // narrower copy that silently fell behind on newer backend status
-  // codes (e.g. hr_precheck, scorecard_pending) and returned them raw.
-  return bys360PerformanceStatusLabel(raw);
+  // Delegates to the canonical, shared status dictionary
+  // (bys360GenericStatusLabel) instead of keeping a second, narrower
+  // copy that silently fell behind on newer backend status codes (e.g.
+  // hr_precheck, scorecard_pending) and returned them raw.
+  return bys360GenericStatusLabel(raw);
 }

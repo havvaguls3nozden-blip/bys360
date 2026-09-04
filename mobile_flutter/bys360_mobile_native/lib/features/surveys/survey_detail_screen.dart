@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/bys360_copy.dart';
+import '../../core/utils/bys360_status_labels.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/record_widgets.dart';
@@ -411,7 +412,7 @@ class SurveyHeader {
       id: json['id']?.toString() ?? '',
       title: json['title']?.toString() ?? 'Anket',
       description: json['description']?.toString() ?? '',
-      statusLabel: json['status_label']?.toString() ?? json['status']?.toString() ?? '-',
+      statusLabel: json['status_label']?.toString() ?? bys360GenericStatusLabel(json['status']?.toString(), fallback: '-'),
       isAnonymous: json['is_anonymous'] == true,
       allowMultipleSubmissions: json['allow_multiple_submissions'] == true,
       questionCount: int.tryParse(json['question_count']?.toString() ?? '') ?? 0,
