@@ -29,8 +29,8 @@ def run_v2_1_1_quality_gate() -> dict[str, Any]:
         add("low_score_comment", bool(validate_score_comment_rules(score_100=69, general_comment="")), "70 altı genel görüş kontrolü çalışıyor.")
         add("status_label", status_label("president_pending") == "Başkan Onayı Bekliyor", "Teknik statü Türkçe etikete çevriliyor.")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        add("rule_engine_import", False, f"Kural motoru hatası: {exc}")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+        add("rule_engine_import", False, "Kural motoru kontrolü sırasında beklenmeyen bir hata oluştu.")
 
     try:
         from sqlalchemy import inspect
@@ -39,7 +39,7 @@ def run_v2_1_1_quality_gate() -> dict[str, Any]:
         has_table = inspect(db.engine).has_table("module_settings")
         add("module_settings_table", has_table, "module_settings tablosu mevcut." if has_table else "module_settings tablosu bulunamadı.")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        add("module_settings_table", False, f"module_settings kontrol hatası: {exc}")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+        add("module_settings_table", False, "module_settings kontrolü sırasında beklenmeyen bir hata oluştu.")
 
     return result

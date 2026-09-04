@@ -300,9 +300,9 @@ def performance_hierarchy_assignments_alias():
             flash("Amir atamaları explicit zincir kaynağı olarak kaydedildi.", "success")
             return redirect(url_for("main.hierarchy_assignments", user_id=target_user.id, q=q, birim=birim, period_id=period_id))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Amir atamaları kaydedilirken hata oluştu: {exc}", "danger")
+            flash("Amir atamaları kaydedilirken hata oluştu.", "danger")
             return redirect(url_for("main.hierarchy_assignments", user_id=target_user_id, q=q, birim=birim, period_id=period_id))
 
     analysis_rows = analyze_hierarchy_rows(period_id)
@@ -430,9 +430,9 @@ def performance_hierarchy_settings():
                 )
             return redirect(url_for("main.performance_hierarchy_settings", period_id=selected_period_id, scope=selected_scope))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Otomatik amir zinciri kurulurken hata oluştu: {exc}", "danger")
+            flash("Otomatik amir zinciri kurulurken hata oluştu.", "danger")
             return redirect(url_for("main.performance_hierarchy_settings", period_id=selected_period_id, scope=selected_scope))
 
     if request.method == "POST" and request.form.get("action") == "save_weights":
@@ -474,9 +474,9 @@ def performance_hierarchy_settings():
             flash(f"Seçili dönem için {recalculated_count} değerlendirme toplamı yeni 3. amir ayarına göre yeniden hesaplandı.", "info")
             return redirect(url_for("main.performance_hierarchy_settings", period_id=selected_period.id, scope=selected_scope))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Ağırlık ayarları kaydedilirken hata oluştu: {exc}", "danger")
+            flash("Ağırlık ayarları kaydedilirken hata oluştu.", "danger")
 
     analysis_rows = analyze_hierarchy_rows(selected_period.id if selected_period else None)
     # Admin kullanıcıların amir zinciri olmaz — servisten gelseler bile listeden çıkar.
@@ -676,9 +676,9 @@ def performance_hierarchy_assignment_edit(user_id):
                 flash(assignment_result.get("message", "Görevler yeniden senkronlanamadı."), "warning")
             return redirect(url_for("main.performance_hierarchy_settings", period_id=selected_period_id, scope=selected_scope))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Amir zinciri kaydedilirken hata oluştu: {exc}", "danger")
+            flash("Amir zinciri kaydedilirken hata oluştu.", "danger")
 
     return safe_render(
         "hierarchy_assignment_edit.html",

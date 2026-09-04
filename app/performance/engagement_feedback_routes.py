@@ -279,7 +279,7 @@ def feedback_watch_run_alerts():
     except Exception as exc:
         db.session.rollback()
         current_app.logger.exception("Faz 6 takip uyarıları çalıştırılamadı: %s", exc)
-        flash(f"Takip uyarıları çalıştırılırken hata oluştu: {exc}", "danger")
+        flash("Takip uyarıları çalıştırılırken hata oluştu.", "danger")
     return redirect(url_for("main.feedback_watch_dashboard", scope=selected_scope))
 
 
@@ -362,7 +362,7 @@ def feedback_executive_summary_run_digest():
     except Exception as exc:
         db.session.rollback()
         current_app.logger.exception("Performans yönetici özeti çalıştırılamadı: %s", exc)
-        flash(f"Yönetici özeti çalıştırılırken hata oluştu: {exc}", "danger")
+        flash("Yönetici özeti çalıştırılırken hata oluştu.", "danger")
     return redirect(url_for("main.feedback_executive_summary_dashboard", scope=selected_scope, preset=preset))
 
 
@@ -820,9 +820,9 @@ def manager_feedback_request_schedule(request_id):
                 flash("Randevu oluşturuldu ve bildirimler gönderildi.", "success")
             return redirect(url_for("main.manager_feedback_request_detail", request_id=req.id, scope=scope_ctx.get("selected_scope")))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/performance/engagement_feedback_routes.py | line=819")
+            logger.exception("BYS360 V6C guarded exception | file=app/performance/engagement_feedback_routes.py | line=819 | exc=%s", exc)
             db.session.rollback()
-            flash(f"Randevu oluşturulurken hata oluştu: {exc}", "danger")
+            flash("Randevu oluşturulurken hata oluştu.", "danger")
             return redirect(request.url)
 
     return safe_render(

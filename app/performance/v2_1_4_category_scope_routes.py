@@ -69,8 +69,8 @@ def performance_v2_1_4_category_scope():
                 result = seed_default_categories(overwrite=False)
                 flash(f"Kategori listesi kontrol edildi. Yeni: {result.get('created', 0)}, mevcut: {result.get('unchanged', 0)}", "success")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            flash(f"Kategori kapsam işlemi tamamlanamadı: {exc}", "danger")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+            flash("Kategori kapsam işlemi tamamlanamadı.", "danger")
         return redirect(url_for("main.performance_v2_1_4_category_scope"))
 
     policy = category_visibility_policy_for_user(current_user)

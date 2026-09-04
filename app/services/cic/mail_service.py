@@ -216,11 +216,11 @@ def _cic_v11_send_email_direct(to_email, subject, body):
             server.sendmail(sender, [target], msg.as_string())
         return True, "Mail başarıyla gönderildi."
     except Exception as exc:
-        detail = f"{type(exc).__name__}: {exc}"
+        detail = "Mail gönderilemedi."
         try:
             current_app.logger.warning(
-                "Kurumsal Bilgilendirme mail gönderim hatası | to=%s | server=%s:%s | detail=%s",
-                target, settings.get("server"), settings.get("port"), detail,
+                "Kurumsal Bilgilendirme mail gönderim hatası | to=%s | server=%s:%s | exc=%s",
+                target, settings.get("server"), settings.get("port"), exc,
             )
         except Exception:
             __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:1453")

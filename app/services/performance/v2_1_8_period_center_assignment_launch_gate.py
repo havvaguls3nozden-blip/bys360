@@ -43,13 +43,13 @@ def run_v2_1_8_period_center_assignment_launch_gate() -> dict[str, Any]:
         checks.append(_check("fast_open_policy", True, "Sayfa açılışında ağır görev üretimi kontrolü çalıştırılmaz."))
         checks.append(_check("safe_launch_policy", True, "Görev üretimi yalnızca bağlantılı dönem ve temiz ön kontrol ile başlatılır."))
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         try:
             _db().session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
-        checks.append(_check("exception", False, str(exc)))
-        schema = {"ok": False, "error": str(exc)}
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
+        schema = {"ok": False, "error": "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."}
     # Kolon eksikleri sayfanın açılmasını engellemesin; güvenlik ilkeleri geçtiyse gate gösterilir.
     return {"ok": all(item.get("ok") for item in checks if not str(item.get("name", "")).startswith("column_")), "checks": checks, "schema": schema, "rule_version": RULE_VERSION}

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Iterable
 
 # BYS360 SP-1D KPI/Hedef Kayıt ve Listeleme Servisi
@@ -243,8 +244,9 @@ def create_target_from_form(form: Any, current_user: Any) -> tuple[bool, str]:
         db.session.commit()
         return True, "KPI / hedef kaydı oluşturuldu."
     except Exception as exc:
+        logging.getLogger(__name__).exception("BYS360 SP1D hedef kaydı oluşturulamadı | exc=%s", exc)
         db.session.rollback()
-        return False, f"Kayıt oluşturulamadı: {exc}"
+        return False, "Kayıt oluşturulamadı."
 
 
 def update_target_from_form(target_id: int, form: Any, current_user: Any) -> tuple[bool, str]:
@@ -284,5 +286,6 @@ def update_target_from_form(target_id: int, form: Any, current_user: Any) -> tup
         db.session.commit()
         return True, "KPI / hedef kaydı güncellendi."
     except Exception as exc:
+        logging.getLogger(__name__).exception("BYS360 SP1D hedef güncellenemedi | exc=%s", exc)
         db.session.rollback()
-        return False, f"Güncelleme tamamlanamadı: {exc}"
+        return False, "Güncelleme tamamlanamadı."

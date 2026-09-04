@@ -148,9 +148,9 @@ def ensure_archive_table() -> tuple[bool, list[str]]:
         db.session.rollback()
         warnings.append(f"Geçmiş karne arşiv tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Geçmiş karne arşiv tablosu oluşturulamadı: {exc}")
+        warnings.append("Geçmiş karne arşiv tablosu oluşturulamadı.")
     return _has_table(P2_ARCHIVE_TABLE), warnings
 
 
@@ -173,9 +173,9 @@ def ensure_interim_notes_table() -> tuple[bool, list[str]]:
         db.session.rollback()
         warnings.append(f"Ara dönem not tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Ara dönem not tablosu oluşturulamadı: {exc}")
+        warnings.append("Ara dönem not tablosu oluşturulamadı.")
     return _has_table(P2_INTERIM_NOTES_TABLE), warnings
 
 
@@ -226,9 +226,9 @@ def run_p2_archive_notes(actor_user_id: int | None = None) -> P2ArchiveNotesResu
         warnings.extend(interim_warnings)
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"P2 arşiv/ara not hazırlığı tamamlanamadı: {exc}")
+        warnings.append("P2 arşiv/ara not hazırlığı tamamlanamadı.")
     checks = p2_status_checks()
     passed = sum(1 for item in checks if item["ok"])
     tables_ready = int(_has_table(P2_ARCHIVE_TABLE)) + int(_has_table(P2_INTERIM_NOTES_TABLE))

@@ -186,7 +186,7 @@ def performance_task_management_generate():
 
     except Exception as exc:
         current_app.logger.exception("Görev üretimi route hatası: %s", exc)
-        flash(f"Görev üretimi sırasında hata oluştu: {exc}", "danger")
+        flash("Görev üretimi sırasında hata oluştu.", "danger")
         return redirect(url_for("main.performance_task_management", **redirect_args))
 
 
@@ -441,8 +441,8 @@ def performance_task_management_clear(period_id):
         db.session.commit()
         flash("Seçili dönemin görevleri ve değerlendirme kayıtları temizlendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Görevler temizlenirken hata oluştu: {exc}", "danger")
+        flash("Görevler temizlenirken hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_task_management", period_id=period.id, scope=selected_scope or None))

@@ -52,8 +52,8 @@ def performance_v2_1_6_category_period_integration():
                 else:
                     flash(result.get("message") or "Ön kontrol tamamlanamadı.", "warning")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            flash(f"Dönem entegrasyonu tamamlanamadı: {exc}", "danger")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+            flash("Dönem entegrasyonu tamamlanamadı.", "danger")
         return redirect(url_for("main.performance_v2_1_6_category_period_integration", plan=plan_key))
 
     selected_plan = request.args.get("plan") or ""

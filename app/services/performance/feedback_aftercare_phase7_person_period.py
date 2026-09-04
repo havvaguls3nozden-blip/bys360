@@ -326,9 +326,9 @@ def create_person_period_meeting(
             ({"rid": feedback_request_id} if feedback_request_id else {"employee_id": employee_id}),
         )
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        raise ValueError(f"Görüşme kaydı oluşturulamadı: {exc}") from exc
+        raise ValueError("Görüşme kaydı oluşturulamadı.") from exc
     if feedback_request_id and _has_table("feedback_requests"):
         fr_cols = _columns("feedback_requests")
         updates: list[str] = []

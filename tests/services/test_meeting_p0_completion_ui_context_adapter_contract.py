@@ -347,11 +347,44 @@ def test_no_new_css_file_control_c_catches_a_second_stylesheet_reference_in_an_o
 # ---------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("relative_path", [ROUTE_FILE, CONTEXT_BUILDER_FILE])
+@pytest.mark.parametrize("relative_path", [ROUTE_FILE])
 def test_p0_backend_files_are_untouched_by_this_wave(relative_path: str) -> None:
     current = _normalize_line_endings((REPO_ROOT / relative_path).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, relative_path))
     assert current == pre_wave, f"{relative_path}: byte content changed since pre-wave ref -- backend must be untouched."
+
+
+# A later, legitimate wave (BYS360 H1F -- user-visible technical exception
+# leak hardening) made a narrow, documented change to CONTEXT_BUILDER_FILE:
+# `ensure_p0_foundation()` and `run_p0_completion()` used to append the raw
+# `str(exc)` of an unexpected internal exception straight into a `warnings`
+# list that this same P0 workflow route flashes verbatim to a real manager
+# (see tests/behavior/test_h1f_final_audit_route_layer_exception_leak_
+# contract.py::test_meeting_p0_completion_apply_failure_never_leaks_raw_
+# exception). Both call sites now append a fixed, safe Turkish message
+# instead and log the original exception server-side. This is the same
+# "later wave makes a narrow, substitution-verified change" pattern already
+# established below for the other 6 meeting templates' stale-endpoint fix.
+_H1F_EXCEPTION_SAFETY_FIX_SUBSTITUTIONS: tuple[tuple[bytes, bytes], ...] = (
+    (
+        b'logger.exception("BYS360 performans mod\xc3\xbcl\xc3\xbcnde beklenmeyen hata yakaland\xc4\xb1.")\n        db.session.rollback()\n        warnings.append(f"P0 temel veri haz\xc4\xb1rl\xc4\xb1\xc4\x9f\xc4\xb1 tamamlanamad\xc4\xb1: {exc}")',
+        b'logger.exception("BYS360 performans mod\xc3\xbcl\xc3\xbcnde beklenmeyen hata yakaland\xc4\xb1. | exc=%s", exc)\n        db.session.rollback()\n        warnings.append("P0 temel veri haz\xc4\xb1rl\xc4\xb1\xc4\x9f\xc4\xb1 tamamlanamad\xc4\xb1.")',
+    ),
+    (
+        b'logger.exception("BYS360 performans mod\xc3\xbcl\xc3\xbcnde beklenmeyen hata yakaland\xc4\xb1.")\n        warnings.append(f"Kural uygulama servisi \xc3\xa7al\xc4\xb1\xc5\x9ft\xc4\xb1r\xc4\xb1lamad\xc4\xb1: {exc}")',
+        b'logger.exception("BYS360 performans mod\xc3\xbcl\xc3\xbcnde beklenmeyen hata yakaland\xc4\xb1. | exc=%s", exc)\n        warnings.append("Kural uygulama servisi \xc3\xa7al\xc4\xb1\xc5\x9ft\xc4\xb1r\xc4\xb1lamad\xc4\xb1.")',
+    ),
+)
+
+
+def test_p0_context_builder_file_only_has_the_h1f_exception_safety_fix() -> None:
+    current = _normalize_line_endings((REPO_ROOT / CONTEXT_BUILDER_FILE).read_bytes())
+    pre_wave = _normalize_line_endings(_git_show(PRE_WAVE_REF, CONTEXT_BUILDER_FILE))
+    expected = pre_wave
+    for old, new in _H1F_EXCEPTION_SAFETY_FIX_SUBSTITUTIONS:
+        assert old in expected, f"{CONTEXT_BUILDER_FILE}: expected pre-wave pattern {old!r} not found."
+        expected = expected.replace(old, new)
+    assert current == expected, f"{CONTEXT_BUILDER_FILE}: byte content changed beyond the known, tested H1F exception-safety fix."
 
 
 # 19) Other 6 meeting templates untouched (was 7 -- see

@@ -114,8 +114,8 @@ def performance_history_import():
         ws = wb.active
         rows = list(ws.iter_rows(values_only=True))
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        flash(f"Excel dosyası okunamadı: {exc}", "danger")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+        flash("Excel dosyası okunamadı.", "danger")
         return _render_history_import_page(periods, recent_batches)
 
     if not rows:
@@ -437,9 +437,9 @@ def performance_history_import_commit(batch_id):
             "success",
         )
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Aktarım sırasında hata oluştu: {exc}", "danger")
+        flash("Aktarım sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_history_import_detail", batch_id=batch.id))
 

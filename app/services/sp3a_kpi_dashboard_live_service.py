@@ -7,9 +7,12 @@ BYS360 SP-3A KPI Dashboard Live Service V2
 """
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import inspect, text
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -195,7 +198,8 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     try:
         rows = db.session.execute(text(sql)).mappings().all()  # type: ignore[union-attr]
     except Exception as exc:
-        return _empty_context(f"KPI verisi okunurken sorun oluştu: {exc}")
+        logger.exception("BYS360 SP3A KPI verisi okunamadı | exc=%s", exc)
+        return _empty_context("KPI verisi okunurken sorun oluştu.")
 
     targets: list[dict[str, Any]] = []
     total_rate = 0.0

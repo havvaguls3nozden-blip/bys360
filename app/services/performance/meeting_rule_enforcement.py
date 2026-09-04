@@ -413,15 +413,15 @@ def run_meeting_rule_enforcement(period_id: Any | None = None, actor_user_id: An
                 resolved_period_id = None
                 warnings.append("Aktif dönem bulunamadı; yalnızca ayar ve kategori omurgası kontrol edildi.")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             resolved_period_id = _safe_int(period_id)
-            warnings.append(f"Düşük performans süreç kontrolü uygulanamadı: {exc}")
+            warnings.append("Düşük performans süreç kontrolü uygulanamadı.")
         db.session.commit()
         return RuleEnforcementResult(True, RULE_ENFORCEMENT_VERSION, resolved_period_id, repaired, generated, seeded, "Toplantı kararları çalışan kural olarak uygulandı.", warnings)
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        return RuleEnforcementResult(False, RULE_ENFORCEMENT_VERSION, _safe_int(period_id), message=f"Kural uygulama sırasında hata oluştu: {exc}", warnings=warnings)
+        return RuleEnforcementResult(False, RULE_ENFORCEMENT_VERSION, _safe_int(period_id), message="Kural uygulama sırasında hata oluştu.", warnings=warnings)
 
 
 def build_rule_enforcement_context(period_id: Any | None = None, viewer: Any | None = None) -> dict[str, Any]:

@@ -218,9 +218,9 @@ def run_p1_scope(actor_user_id: int | None = None) -> P1ScopeResult:
         warnings.extend(column_warnings)
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"P1 geliştirme hazırlığı tamamlanamadı: {exc}")
+        warnings.append("P1 geliştirme hazırlığı tamamlanamadı.")
     checks = p1_status_checks()
     passed = sum(1 for item in checks if item["ok"])
     period_columns = _columns("performance_periods") if _has_table("performance_periods") else set()

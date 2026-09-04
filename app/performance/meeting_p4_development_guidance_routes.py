@@ -54,8 +54,8 @@ def performance_meeting_p4_development_guidance():
             save_phase10_recommendation_from_request()
             flash("Gelişim rehberi kaydı alındı.", "success")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            flash(f"Gelişim rehberi kaydı alınamadı: {exc}", "warning")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+            flash("Gelişim rehberi kaydı alınamadı.", "warning")
         return redirect(request.path)
 
     context = build_phase10_meeting_development_context()

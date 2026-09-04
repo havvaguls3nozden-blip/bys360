@@ -170,9 +170,9 @@ def ensure_p0_foundation() -> dict[str, Any]:
         seeded += ensure_p0_settings()
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"P0 temel veri hazırlığı tamamlanamadı: {exc}")
+        warnings.append("P0 temel veri hazırlığı tamamlanamadı.")
     return {
         "settings_seeded": seeded,
         "category_count": int(_scalar("SELECT COUNT(*) FROM performance_employee_categories", default=0) or 0) if _has_table("performance_employee_categories") else 0,
@@ -245,8 +245,8 @@ def run_p0_completion(actor_user_id: int | None = None) -> P0CompletionResult:
         repaired_low_score_locks = int(getattr(result, "repaired_low_score_locks", 0) or 0)
         warnings.extend(getattr(result, "warnings", None) or [])
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        warnings.append(f"Kural uygulama servisi çalıştırılamadı: {exc}")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+        warnings.append("Kural uygulama servisi çalıştırılamadı.")
 
     scenarios = p0_test_scenarios()
     passed = sum(1 for item in scenarios if item["ok"])

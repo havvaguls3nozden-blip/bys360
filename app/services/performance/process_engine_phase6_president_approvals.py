@@ -250,9 +250,9 @@ def delete_president_approval_record(approval_id: int, actor: Any) -> Phase6Acti
         )
         db.session.commit()
     except SQLAlchemyError as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        return Phase6ActionResult(False, f"Kayıt silinemedi: {exc}", approval_id)
+        return Phase6ActionResult(False, "Kayıt silinemedi.", approval_id)
 
     detail = f" Bağlı {deleted_steps} süreç adımı da temizlendi." if deleted_steps else ""
     return Phase6ActionResult(True, "Başkan onayı kaydı silindi." + detail, approval_id)

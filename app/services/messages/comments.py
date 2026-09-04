@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -12,6 +13,8 @@ from app.services.message_service import notify_user
 
 from .repository import orm_entity, participant_for_thread
 from .serialization import serialize_comment
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -91,7 +94,8 @@ def create_message_comment(message_id: int, body: str, *, now) -> tuple[dict[str
             "comment_count": _comment_count(message),
         }, 200
     except Exception as exc:  # pragma: no cover - canlı DB guard
+        logger.exception("BYS360 mesaj yorumu eklenirken hata | exc=%s", exc)
         db.session.rollback()
-        return {"ok": False, "error": "server_error", "message": f"Yorum eklenirken hata oluştu: {exc}"}, 500
+        return {"ok": False, "error": "server_error", "message": "Yorum eklenirken hata oluştu."}, 500
 
 # BYS360_MESSAGE_INTERACTIONS_V1_COMMENTS_SERVICE

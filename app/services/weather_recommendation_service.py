@@ -8,6 +8,7 @@ devam eder.
 from __future__ import annotations
 
 import json
+import logging
 import os
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -17,6 +18,8 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
 from flask import current_app
+
+logger = logging.getLogger(__name__)
 
 OPEN_METEO_FORECAST_URL = "https://api.open-meteo.com/v1/forecast"
 DEFAULT_LOCATION_NAME = "Gelibolu Tarihi Alan"
@@ -325,7 +328,8 @@ def get_home_weather_context(force_refresh: bool = False) -> dict[str, Any]:
             raise ValueError(f"Desteklenmeyen hava durumu sağlayıcısı: {settings.provider}")
         weather = _fetch_open_meteo(settings)
     except (HTTPError, URLError, TimeoutError, OSError, ValueError, json.JSONDecodeError) as exc:
-        weather = _fallback_weather(settings, f"Hava durumu servisi şu an yanıt vermedi: {exc}")
+        logger.exception("BYS360 hava durumu servisi yanıt vermedi | exc=%s", exc)
+        weather = _fallback_weather(settings, "Hava durumu servisi şu an yanıt vermedi.")
 
     weather["recommendations"] = build_weather_recommendations(weather)
     _CACHE[cache_key] = (now, dict(weather))
