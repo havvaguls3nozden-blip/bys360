@@ -252,7 +252,7 @@ def status_label(status_key: Any) -> str:
         return "Durum Bilgisi Yok"
     if not get_setting_bool("technical_status_localization_enabled", True):
         return raw
-    return STATUS_LABELS.get(raw, raw.replace("_", " ").strip().title())
+    return STATUS_LABELS.get(raw, "Bilinmiyor")
 
 
 def validate_score_comment_rules(raw_score: Any = None, score_100: Any = None, criterion_comment: str | None = None, general_comment: str | None = None) -> list[str]:

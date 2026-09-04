@@ -82,7 +82,7 @@ def translate_status(value: Any, default: str = "Süreç Durumu") -> str:
     if not raw:
         return default
     normalized = raw.lower().replace(" ", "_").replace("-", "_")
-    return TECHNICAL_STATUS_LABELS.get(normalized, raw)
+    return TECHNICAL_STATUS_LABELS.get(normalized, "Bilinmiyor")
 
 
 def sanitize_technical_text(text: Any) -> str:

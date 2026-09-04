@@ -163,12 +163,15 @@ def test_phase4t_status_humanizers_cover_known_and_unknown_values() -> None:
     assert "Başkan" in svc.humanize_process_status(None)
     assert "Başkan" in svc.humanize_process_status("president_approval_pending")
     assert "Tekrarlayan" in svc.humanize_process_status("second_low_repeat")
-    assert svc.humanize_process_status("custom_status") == "Custom Status"
+    # BYS360 H1E: a genuinely unmapped status must never leak the raw
+    # value back to the user (even title-cased) -- it now falls back to
+    # a safe generic label instead of echoing "Custom Status".
+    assert svc.humanize_process_status("custom_status") == "Bilinmiyor"
 
     assert "Süreç" in svc.humanize_low_score_status(None)
     assert "Başkan" in svc.humanize_low_score_status("president_approval_pending")
     assert "Tekrarlayan" in svc.humanize_low_score_status("second_low_score_process_started")
-    assert svc.humanize_low_score_status("custom_status") == "Custom Status"
+    assert svc.humanize_low_score_status("custom_status") == "Bilinmiyor"
 
 
 def test_phase4t_publish_block_reason_for_direct_process_states() -> None:

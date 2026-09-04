@@ -128,17 +128,17 @@ def _safe_text(value: Any, limit: int = 240) -> str:
 
 def _module_label(module_type: Any) -> str:
     key = _clean_key(module_type)
-    return MODULE_LABELS.get(key, key.replace("_", " ").title())
+    return MODULE_LABELS.get(key, "Bilinmiyor")
 
 
 def _severity_label(value: Any) -> str:
     key = _clean_key(value, "info")
-    return SEVERITY_LABELS.get(key, key.replace("_", " ").title())
+    return SEVERITY_LABELS.get(key, "Bilinmiyor")
 
 
 def _status_label(value: Any) -> str:
     key = _clean_key(value, "open")
-    return STATUS_LABELS.get(key, key.replace("_", " ").title())
+    return STATUS_LABELS.get(key, "Bilinmiyor")
 
 
 def _ratio(part: int, whole: int) -> int:

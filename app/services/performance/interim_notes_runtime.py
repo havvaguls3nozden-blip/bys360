@@ -206,7 +206,7 @@ def _row_to_note(row: Any) -> dict[str, Any]:
     title = str(
         mapping.get("title")
         or mapping.get("note_title")
-        or NOTE_TYPE_LABELS.get(raw_type, raw_type)
+        or NOTE_TYPE_LABELS.get(raw_type)
         or "Dönem İçi Not"
     ).strip()
     body = str(
@@ -226,7 +226,7 @@ def _row_to_note(row: Any) -> dict[str, Any]:
     return {
         "id": mapping.get("id"),
         "note_type": raw_type,
-        "note_type_label": NOTE_TYPE_LABELS.get(raw_type, raw_type.replace("_", " ").title()),
+        "note_type_label": NOTE_TYPE_LABELS.get(raw_type, "Bilinmiyor"),
         "title": title,
         "body": body,
         "note_body": body,

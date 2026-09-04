@@ -81,7 +81,7 @@ def status_label(status: Any) -> str:
     if not raw:
         return "Süreç Durumu"
     normalized = raw.lower().replace(" ", "_").replace("-", "_")
-    return STATUS_LABELS.get(normalized, raw)
+    return STATUS_LABELS.get(normalized, "Bilinmiyor")
 
 
 def is_low_score(score: Any, threshold: float = LOW_SCORE_THRESHOLD) -> bool:

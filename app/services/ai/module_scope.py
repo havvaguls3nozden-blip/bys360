@@ -214,7 +214,7 @@ def ai_module_label(value: Any) -> str:
     key = normalize_ai_module(value)
     if not key:
         return "Genel"
-    return AI_MODULE_LABELS.get(key, str(value or key).replace("_", " ").title())
+    return AI_MODULE_LABELS.get(key, "Bilinmiyor")
 
 
 def ai_module_focus(value: Any) -> str:

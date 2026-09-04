@@ -105,7 +105,7 @@ def _tone_from_score(score: int) -> str:
 
 def _module_label(module_type: Any) -> str:
     key = _lower(module_type)
-    return LIVE_MODULE_LABELS.get(key, key.replace("_", " ").title() if key else "Genel")
+    return LIVE_MODULE_LABELS.get(key, "Bilinmiyor" if key else "Genel")
 
 
 def _now() -> datetime:
