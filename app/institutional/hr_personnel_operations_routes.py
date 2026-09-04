@@ -483,6 +483,8 @@ def _request_review_payload(hr_scope: dict[str, Any], scope_user_ids: set[int]) 
         "selected_request_logs": log_rows,
         "selected_request_sla": _sla_payload(selected_request),
         "selected_request_attachment_rows": _request_attachment_rows(selected_request),
+        "selected_request_type_label": _request_type_label(getattr(selected_request, "request_type", None)),
+        "selected_request_priority_label": _request_priority_label(getattr(selected_request, "priority", None)),
         "request_review_token": issue_form_token("hr_personnel_request_review", scope="hr_personnel_operations"),
         "queue_summary": {
             "submitted": sum(1 for row in rows if row["status"] == "submitted"),
@@ -559,6 +561,8 @@ def _self_service_request_payload(user: User) -> dict[str, Any]:
         "request_log_rows": logs,
         "selected_request_sla": _sla_payload(selected_request),
         "selected_request_attachment_rows": _request_attachment_rows(selected_request),
+        "selected_request_type_label": _request_type_label(getattr(selected_request, "request_type", None)),
+        "selected_request_priority_label": _request_priority_label(getattr(selected_request, "priority", None) or "normal"),
         "queue_counts": {
             "submitted": sum(1 for row in rows if row["status"] == "submitted"),
             "in_review": sum(1 for row in rows if row["status"] == "in_review"),

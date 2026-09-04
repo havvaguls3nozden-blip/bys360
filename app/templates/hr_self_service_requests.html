@@ -117,7 +117,7 @@
         <strong>{{ selected_request.title }}</strong>
         <div class="badge-row" style="margin-top:10px">
           <span class="tag soft">{{ selected_request.template.title if selected_request.template else 'Serbest form' }}</span>
-          <span class="tag soft">{{ (selected_request.priority or 'normal')|replace('_',' ')|title }}</span>
+          <span class="tag soft">{{ selected_request_priority_label }}</span>
           {% if selected_request_sla %}<span class="tag {{ selected_request_sla.tone }}">{{ selected_request_sla.label }}</span>{% endif %}
         </div>
         <div class="muted" style="margin-top:10px">{{ selected_request.description }}</div>
