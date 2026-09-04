@@ -35,7 +35,7 @@
             <tr>
               <td><div style="font-weight:800;color:#111827;">{{ campaign.title }}</div><div class="small text-muted">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div></td>
               <td><span class="badge rounded-pill text-bg-light border">{{ get_campaign_type_label(campaign) }}</span></td>
-              <td><span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ campaign.status }}</span></td>
+              <td><span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ get_campaign_status_label(campaign) }}</span></td>
               <td>{% if campaign_includes_pulse(campaign) %}<i class="fa-solid fa-heart-pulse text-danger"></i>{% else %}<i class="fa-solid fa-minus text-muted"></i>{% endif %}</td>
               <td>{% if campaign.is_anonymous %}<i class="fa-solid fa-user-secret text-dark"></i>{% else %}<i class="fa-solid fa-id-badge text-muted"></i>{% endif %}</td>
               <td class="text-end">
@@ -61,7 +61,7 @@
           </div>
           <div class="small text-muted mb-2">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px;">
-            <span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ campaign.status }}</span>
+            <span class="badge rounded-pill {% if campaign.status == 'published' %}text-bg-success{% elif campaign.status == 'closed' %}text-bg-secondary{% else %}text-bg-warning{% endif %}">{{ get_campaign_status_label(campaign) }}</span>
             {% if campaign_includes_pulse(campaign) %}<span class="badge rounded-pill bg-danger-subtle text-danger-emphasis"><i class="fa-solid fa-heart-pulse me-1"></i>Nabız</span>{% endif %}
             {% if campaign.is_anonymous %}<span class="badge rounded-pill bg-dark-subtle text-dark-emphasis"><i class="fa-solid fa-user-secret me-1"></i>Anonim</span>{% endif %}
           </div>

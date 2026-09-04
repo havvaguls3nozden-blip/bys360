@@ -27,7 +27,7 @@
    {% if downloads %}
    <div class="table-responsive">
     <table class="table align-middle mb-0 fc-table"><thead class="table-light"><tr><th>Tarih</th><th>Dosya</th><th>Durum</th><th>IP</th><th>Kaynak</th></tr></thead><tbody>
-    {% for row in downloads %}<tr><td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td><td>{{ row.file.original_filename if row.file else '-' }}</td><td>{{ row.status }}</td><td>{{ row.ip_address or '-' }}</td><td>{{ row.guest_label or ('Kullanıcı #' ~ row.downloaded_by_user_id if row.downloaded_by_user_id else '-') }}</td></tr>{% endfor %}
+    {% for row in downloads %}<tr><td>{{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</td><td>{{ row.file.original_filename if row.file else '-' }}</td><td>{{ download_status_label(row.status) }}</td><td>{{ row.ip_address or '-' }}</td><td>{{ row.guest_label or ('Kullanıcı #' ~ row.downloaded_by_user_id if row.downloaded_by_user_id else '-') }}</td></tr>{% endfor %}
     </tbody></table>
    </div>
    {% else %}<div class="p-4 fc-muted">Henüz indirme kaydı yok.</div>{% endif %}

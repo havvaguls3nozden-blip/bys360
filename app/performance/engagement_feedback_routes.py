@@ -22,6 +22,8 @@ from app.services.feedback_service import (
     can_create_feedback_request,
     get_feedback_evaluation,
     get_feedback_meeting,
+    get_feedback_meeting_status_label,
+    get_feedback_request_status_label,
     get_feedback_response_text,
     get_open_feedback_request,
     persist_feedback_response,
@@ -857,6 +859,8 @@ def feedback_meeting_detail(meeting_id):
         response_text=response_text,
         meeting_timeline=meeting_timeline,
         can_manage_meeting=can_manage_meeting,
+        get_feedback_meeting_status_label=get_feedback_meeting_status_label,
+        get_feedback_request_status_label=get_feedback_request_status_label,
         **_scope_render_kwargs(scope_ctx),
     )
 

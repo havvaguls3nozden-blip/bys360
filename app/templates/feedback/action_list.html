@@ -64,7 +64,7 @@
               <span class="status-pill {{ action.status }}">{% if action.status == 'open' %}<i class="fa-regular fa-clock"></i>Açık{% elif action.status == 'in_progress' %}<i class="fa-solid fa-spinner"></i>Devam Ediyor{% elif action.status == 'resolved' %}<i class="fa-solid fa-circle-check"></i>Çözüldü{% else %}<i class="fa-solid fa-ban"></i>İptal{% endif %}</span>
             </div>
             <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px;">
-              <span class="priority-pill"><i class="fa-solid fa-flag"></i>{{ action.priority }}</span>
+              <span class="priority-pill"><i class="fa-solid fa-flag"></i>{{ get_action_priority_label(action) }}</span>
               <span style="font-size:.82rem;color:#6b7280;font-weight:700;"><i class="fa-solid fa-user-tie me-1"></i>{{ action.assigned_manager.full_name if action.assigned_manager else '-' }}</span>
             </div>
             <form method="post" class="row g-2 align-items-center">

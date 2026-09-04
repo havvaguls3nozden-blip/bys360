@@ -44,6 +44,7 @@ from app.file_center.services import (
     create_or_update_quota_policy,
     create_transfer_package,
     deactivate_quota_policy,
+    download_status_label,
     file_center_enabled,
     file_security_status_label,
     finalize_chunk_upload_session,
@@ -690,7 +691,7 @@ def file_center_logs():
         downloads = FileDownloadLog.query.filter(FileDownloadLog.file_id.in_(file_ids)).order_by(FileDownloadLog.created_at.desc()).limit(100).all()
         audits = FileAuditLog.query.filter(FileAuditLog.file_id.in_(file_ids)).order_by(FileAuditLog.created_at.desc()).limit(100).all()
         accesses = FileAccessLog.query.filter(FileAccessLog.file_id.in_(file_ids)).order_by(FileAccessLog.created_at.desc()).limit(100).all()
-    return safe_render("file_center/logs.html", downloads=downloads, audits=audits, accesses=accesses)
+    return safe_render("file_center/logs.html", downloads=downloads, audits=audits, accesses=accesses, download_status_label=download_status_label)
 
 
 @main_bp.get("/file-center/admin")

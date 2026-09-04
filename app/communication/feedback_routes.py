@@ -26,7 +26,9 @@ from app.services.feedback_service import (
     change_campaign_status,
     create_action_plan,
     create_campaign_from_form,
+    get_action_priority_label,
     get_campaign_or_404,
+    get_campaign_status_label,
     get_campaign_type_label,
     get_pulse_history,
     get_today_pulse_entry,
@@ -63,7 +65,13 @@ def _can_export_feedback_now() -> bool:
 @menu_key_required('feedback_dashboard')
 def feedback_dashboard():
     context = build_dashboard_data(current_user)
-    return safe_render('feedback/dashboard.html', '<h3>Kurumsal Geri Bildirim ekranı yüklenemedi</h3>', **context)
+    return safe_render(
+        'feedback/dashboard.html',
+        '<h3>Kurumsal Geri Bildirim ekranı yüklenemedi</h3>',
+        get_campaign_type_label=get_campaign_type_label,
+        get_campaign_status_label=get_campaign_status_label,
+        **context,
+    )
 
 
 @main_bp.route('/feedback/pulse', methods=['GET', 'POST'])
@@ -237,7 +245,14 @@ def feedback_actions():
     actions = list_action_plans_for_user(current_user)
     campaigns = list_manageable_campaigns()
     managers = User.query.order_by(User.ad.asc(), User.soyad.asc()).all()
-    return safe_render('feedback/action_list.html', '<h3>Aksiyon listesi yüklenemedi</h3>', actions=actions, campaigns=campaigns, managers=managers)
+    return safe_render(
+        'feedback/action_list.html',
+        '<h3>Aksiyon listesi yüklenemedi</h3>',
+        actions=actions,
+        campaigns=campaigns,
+        managers=managers,
+        get_action_priority_label=get_action_priority_label,
+    )
 
 
 @main_bp.route('/feedback/actions/new', methods=['POST'])
@@ -265,7 +280,13 @@ def feedback_manager():
 
     summary = build_manager_summary(current_user)
     ai_manager_support = build_manager_decision_support(summary)
-    return safe_render('feedback/manager_view.html', '<h3>Yönetici görünümü yüklenemedi</h3>', summary=summary, ai_manager_support=ai_manager_support)
+    return safe_render(
+        'feedback/manager_view.html',
+        '<h3>Yönetici görünümü yüklenemedi</h3>',
+        summary=summary,
+        ai_manager_support=ai_manager_support,
+        get_campaign_status_label=get_campaign_status_label,
+    )
 
 
 @main_bp.route('/feedback/admin/campaigns')
@@ -279,6 +300,7 @@ def feedback_campaign_manage():
         '<h3>Kampanya yönetimi yüklenemedi</h3>',
         campaigns=campaigns,
         get_campaign_type_label=get_campaign_type_label,
+        get_campaign_status_label=get_campaign_status_label,
         campaign_includes_pulse=campaign_includes_pulse,
     )
 

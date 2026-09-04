@@ -8,6 +8,7 @@ from sqlalchemy.orm import joinedload
 
 from app.extensions import db
 from app.models import EvaluationAssignment, FeedbackMeeting, FeedbackRequest, User
+from app.services.feedback_service import FEEDBACK_REQUEST_STATUS_LABELS
 from app.services.message_service import notify_user
 from app.services.performance.common import get_period
 from app.services.performance.feedback_audit_service import record_feedback_audit_event
@@ -344,18 +345,8 @@ def _notify_feedback_request_status_changed(feedback_request, *, actor_user=None
     if not employee_id:
         return
     actor_name = ((getattr(actor_user, "full_name", None) or f"{getattr(actor_user, 'ad', '')} {getattr(actor_user, 'soyad', '')}").strip() or "Yönetici")
-    status_label_map = {
-        "bekliyor": "Bekliyor",
-        "incelendi": "İncelendi",
-        "cevaplandi": "Cevaplandı",
-        "kapatildi": "Kapatıldı",
-        "randevulandi": "Randevulandı",
-        "gorusme_tamamlandi": "Görüşme tamamlandı",
-        "randevu_ertelendi": "Randevu ertelendi",
-        "randevu_iptal": "Randevu iptal edildi",
-    }
     status_value = str(getattr(feedback_request, "status", "") or "")
-    status_label = status_label_map.get(status_value, status_value or "Güncellendi")
+    status_label = FEEDBACK_REQUEST_STATUS_LABELS.get(status_value, "Güncellendi")
     detail_url = url_for("main.manager_feedback_request_detail", request_id=feedback_request.id, scope="mine")
     notify_user(
         int(employee_id),

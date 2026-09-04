@@ -78,7 +78,7 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
                 <h2 class="hero-title">{{ meeting.employee.ad }} {{ meeting.employee.soyad }} için geri bildirim görüşmesi</h2>
                 <div class="hero-sub">Yönetici: {{ meeting.manager.ad }} {{ meeting.manager.soyad }} · Randevu ID: #{{ meeting.id }}{% if meeting.feedback_request and meeting.feedback_request.period %} · Dönem: {{ meeting.feedback_request.period.title }}{% endif %}{% if meeting.employee.sicil_no %} · Sicil: {{ meeting.employee.sicil_no }}{% endif %}</div>
                 <div class="pill-row">
-                    <span class="status-pill {{ meeting.status }}"><i class="fa-solid fa-calendar-check"></i> {{ meeting.status }}</span>
+                    <span class="status-pill {{ meeting.status }}"><i class="fa-solid fa-calendar-check"></i> {{ get_feedback_meeting_status_label(meeting) }}</span>
                     <span class="soft-pill"><i class="fa-solid fa-user-group"></i> {{ meeting.meeting_type or 'Tür girilmedi' }}</span>
                     <span class="soft-pill"><i class="fa-solid fa-location-dot"></i> {{ meeting.location or 'Konum girilmedi' }}</span>
                 </div>
@@ -100,7 +100,7 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
     <div class="stats-grid">
         <div class="glass-card stat-card"><div class="stat-label">Tarih</div><div class="stat-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }}</div><div class="stat-sub">Planlanan gün.</div></div>
         <div class="glass-card stat-card"><div class="stat-label">Saat Aralığı</div><div class="stat-value">{{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div><div class="stat-sub">Toplantı penceresi.</div></div>
-        <div class="glass-card stat-card"><div class="stat-label">Talep Durumu</div><div class="stat-value">{{ meeting.feedback_request.status if meeting.feedback_request else 'Bağlı talep yok' }}</div><div class="stat-sub">Kaynağın şu anki durumu.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Talep Durumu</div><div class="stat-value">{{ get_feedback_request_status_label(meeting.feedback_request) if meeting.feedback_request else 'Bağlı talep yok' }}</div><div class="stat-sub">Kaynağın şu anki durumu.</div></div>
         <div class="glass-card stat-card"><div class="stat-label">Görüşme Tipi</div><div class="stat-value">{{ meeting.meeting_type or '-' }}</div><div class="stat-sub">Yüz yüze, online veya telefon.</div></div>
     </div>
 

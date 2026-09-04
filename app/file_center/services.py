@@ -227,6 +227,15 @@ def scan_label(status: str | None) -> str:
     return mapping.get(str(status or "").lower(), "Kontrol bekliyor")
 
 
+def download_status_label(status: str | None) -> str:
+    mapping = {
+        "success": "Başarılı",
+        "wrong_password": "Şifre hatalı",
+        "blocked_by_security": "Güvenlik tarafından engellendi",
+    }
+    return mapping.get(str(status or "").lower(), "Bilinmiyor")
+
+
 def link_status_label(link: FileShareLink) -> str:
     if not link.is_active:
         return "İptal edildi"
