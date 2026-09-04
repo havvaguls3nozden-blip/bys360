@@ -106,7 +106,8 @@ class _PersonnelMobileP1ScreenState extends State<PersonnelMobileP1Screen> {
         final total = _parseTotal(payload);
         if (parsed.isNotEmpty || total != null) {
           _totalCount = total ?? _totalCount;
-          _scopeLabel = _value(payload, const ['scope', 'scope_label', 'visibility_scope']);
+          final scopeText = _value(payload, const ['scope_label', 'scope', 'visibility_scope']);
+          _scopeLabel = scopeText.isEmpty ? scopeText : bys360GenericStatusLabel(scopeText);
           _canCreatePersonnel = _parseCanCreatePersonnel(payload);
           payloadHasMore = _parseHasMore(payload);
           break;
@@ -304,7 +305,10 @@ class _PersonnelMobileP1ScreenState extends State<PersonnelMobileP1Screen> {
   String _title(Map<String, dynamic> row) => _value(row, const ['title_name', 'unvan', 'title', 'position_title', 'job_title']);
   String _duty(Map<String, dynamic> row) => _value(row, const ['duty_name', 'gorev', 'duty', 'role_name', 'position']);
   String _manager(Map<String, dynamic> row) => _value(row, const ['manager_name', 'yonetici', 'supervisor_name', 'first_manager_name', 'amir', 'amir_adi']);
-  String _category(Map<String, dynamic> row) => _value(row, const ['personnel_category', 'category', 'kategori']);
+  String _category(Map<String, dynamic> row) {
+    final text = _value(row, const ['personnel_category', 'category', 'kategori']);
+    return text.isEmpty ? text : bys360GenericStatusLabel(text);
+  }
   String _status(Map<String, dynamic> row) {
     final text = _value(row, const ['status_label', 'status', 'aktiflik']);
     if (text.isNotEmpty) return bys360GenericStatusLabel(text);

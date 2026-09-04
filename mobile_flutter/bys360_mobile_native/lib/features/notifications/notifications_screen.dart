@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
+import '../../core/utils/bys360_status_labels.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -467,6 +469,7 @@ class _MiniMeta extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final label = bys360GenericStatusLabel(BYS360Copy.clean(text));
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
       decoration: BoxDecoration(color: BYS360Colors.surfaceSoft, borderRadius: BorderRadius.circular(999), border: Border.all(color: BYS360Colors.cardBorder)),
@@ -475,7 +478,7 @@ class _MiniMeta extends StatelessWidget {
         children: [
           Icon(icon, size: 14, color: BYS360Colors.mutedText),
           const SizedBox(width: 5),
-          Text(text, style: const TextStyle(color: BYS360Colors.mutedText, fontWeight: FontWeight.w800, fontSize: 11, decoration: TextDecoration.none)),
+          Text(label, style: const TextStyle(color: BYS360Colors.mutedText, fontWeight: FontWeight.w800, fontSize: 11, decoration: TextDecoration.none)),
         ],
       ),
     );
