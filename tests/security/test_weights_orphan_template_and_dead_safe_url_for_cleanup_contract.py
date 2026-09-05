@@ -291,10 +291,34 @@ def test_template_safety_pre_deletion_content_defined_safe_url_for() -> None:
 
 def test_route_support_safe_url_for_is_untouched() -> None:
     """This wave must not change route_support.safe_url_for's behavior or
-    registration -- byte-identical to pre-wave."""
+    registration -- byte-identical to pre-wave.
+
+    BYS360 H1F (exception-display hardening): a LATER, separate, authorized
+    wave made a narrow, documented change to a DIFFERENT function in this
+    same module -- safe_render()'s exception fallback used to flash a raw
+    exception string and return raw HTML containing the exception text as
+    the page body itself; both are now a fixed safe message. safe_url_for
+    itself (what this test actually protects) is unaffected. This uses the
+    same "later wave, substitution-verified" pattern already established in
+    tests/services/test_meeting_p0_completion_ui_context_adapter_contract.
+    py for its own later, narrower H1F fix."""
     current = _normalize_line_endings((REPO_ROOT / ROUTE_SUPPORT_MODULE).read_bytes())
     pre_wave = _normalize_line_endings(_git_show(PRE_DELETION_REF, ROUTE_SUPPORT_MODULE))
-    assert current == pre_wave, f"{ROUTE_SUPPORT_MODULE}: byte content changed since pre-wave ref -- must be untouched."
+    h1f_safe_render_fix = (
+        (
+            b'current_app.logger.exception("Template patladi: %s", template_name)\n'
+            b'        flash(f"{template_name} \xc5\x9fablonunda hata var: {exc}", "danger")\n'
+            b'        return fallback_html or f"<h3>{template_name} \xc5\x9fablonu hatal\xc4\xb1</h3><p>{exc}</p>"',
+            b'current_app.logger.exception("Template patladi: %s | exc=%s", template_name, exc)\n'
+            b'        flash("Bu sayfa g\xc3\xb6sterilirken bir hata olu\xc5\x9ftu.", "danger")\n'
+            b'        return fallback_html or "<h3>Sayfa g\xc3\xb6sterilirken bir hata olu\xc5\x9ftu.</h3>"',
+        ),
+    )
+    expected = pre_wave
+    for old, new in h1f_safe_render_fix:
+        assert old in expected, f"{ROUTE_SUPPORT_MODULE}: expected pre-wave safe_render pattern not found."
+        expected = expected.replace(old, new)
+    assert current == expected, f"{ROUTE_SUPPORT_MODULE}: byte content changed beyond the known, tested H1F safe_render fix."
 
 
 def test_route_support_safe_url_for_is_the_sole_remaining_safe_url_for_definition() -> None:
