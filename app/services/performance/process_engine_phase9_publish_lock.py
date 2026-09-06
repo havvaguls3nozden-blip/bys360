@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 
@@ -47,36 +47,20 @@ PENDING_STATUSES = {
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT 1
-              FROM information_schema.tables
-             WHERE table_schema = current_schema()
-               AND table_name = :table_name
-             LIMIT 1
-            """
-        ),
-        {"table_name": table_name},
-    ).first()
-    return row is not None
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query (filtered by the PostgreSQL-only ``current_schema()`` SQL
+    function) replaced with SQLAlchemy's ``inspect()``, which is
+    dialect-neutral by construction."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _column_exists(table_name: str, column_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT 1
-              FROM information_schema.columns
-             WHERE table_schema = current_schema()
-               AND table_name = :table_name
-               AND column_name = :column_name
-             LIMIT 1
-            """
-        ),
-        {"table_name": table_name, "column_name": column_name},
-    ).first()
-    return row is not None
+    if not _table_exists(table_name):
+        return False
+    return any(
+        column["name"] == column_name
+        for column in inspect(db.engine).get_columns(table_name)
+    )
 
 
 def _as_decimal(value: Any) -> Decimal | None:

@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import bindparam, text
+from sqlalchemy import bindparam, inspect, text
 
 from app.extensions import db
 
@@ -79,41 +79,16 @@ def _execute(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple
 def table_exists(table_name: str) -> bool:
     """Return whether a table exists for the active SQLAlchemy database.
 
-    Local development may run on SQLite, while live commonly runs on PostgreSQL.
-    The old implementation used PostgreSQL information_schema directly and caused
-    500 errors on SQLite pages such as /performance/process-tracking.
+    BYS360 DEFECT AL: the prior implementation hand-rolled a dialect branch
+    (raw ``sqlite_master`` vs. raw PostgreSQL-only ``information_schema``),
+    duplicating logic that SQLAlchemy's ``inspect()`` already provides
+    dialect-neutrally by construction -- the same proven pattern already
+    used elsewhere in this module family (process_engine_phase4_flow.py,
+    phase6_president_approvals.py, phase7_president_rule.py).
     """
     try:
         bind = db.session.get_bind()
-        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
-
-        if dialect_name == "sqlite":
-            return bool(
-                _scalar(
-                    """
-                    SELECT 1
-                    FROM sqlite_master
-                    WHERE type = 'table'
-                      AND name = :table_name
-                    LIMIT 1
-                    """,
-                    {"table_name": table_name},
-                )
-            )
-
-        return bool(
-            _scalar(
-                """
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = 'public'
-                      AND table_name = :table_name
-                )
-                """,
-                {"table_name": table_name},
-            )
-        )
+        return bool(inspect(bind).has_table(table_name))
     except Exception:
         logging.getLogger(__name__).exception(
             "BYS360 process tracking table_exists guvenli fallback | table=%s",
@@ -136,33 +111,17 @@ def column_exists(table_name: str, column_name: str) -> bool:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    """Return table column names for SQLite and PostgreSQL safely."""
+    """Return table column names for SQLite and PostgreSQL safely.
+
+    BYS360 DEFECT AL: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior hand-rolled sqlite_master/information_schema branch.
+    """
     try:
         bind = db.session.get_bind()
-        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
-
-        if dialect_name == "sqlite":
-            safe_table = "\"" + str(table_name).replace("\"", "\"\"") + "\""
-            columns: set[str] = set()
-            for row in _rows(f"PRAGMA table_info({safe_table})"):
-                row_data = dict(row)
-                name = row_data.get("name")
-                if name:
-                    columns.add(str(name))
-            return columns
-
-        return {
-            row["column_name"]
-            for row in _rows(
-                """
-                SELECT column_name
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                """,
-                {"table_name": table_name},
-            )
-        }
+        inspector = inspect(bind)
+        if not inspector.has_table(table_name):
+            return set()
+        return {str(column["name"]) for column in inspector.get_columns(table_name)}
     except Exception:
         logger.exception(
             "BYS360 process tracking _table_columns guvenli fallback | table=%s",

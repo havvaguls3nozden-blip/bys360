@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 
@@ -39,27 +39,19 @@ class ProcessReportRow:
 
 
 def _table_exists(table_name: str) -> bool:
-    return bool(
-        db.session.execute(
-            text("SELECT to_regclass(:table_name) IS NOT NULL"),
-            {"table_name": f"public.{table_name}"},
-        ).scalar()
-    )
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``to_regclass`` catalog lookup
+    replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral by
+    construction (``to_regclass`` has no SQLite equivalent at all)."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text(
-            """
-            SELECT column_name
-              FROM information_schema.columns
-             WHERE table_schema = 'public'
-               AND table_name = :table_name
-            """
-        ),
-        {"table_name": table_name},
-    ).fetchall()
-    return {str(row[0]) for row in rows}
+    """BYS360 DEFECT AL: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query."""
+    if not _table_exists(table_name):
+        return set()
+    return {str(column["name"]) for column in inspect(db.engine).get_columns(table_name)}
 
 
 def _col(cols: set[str], name: str, fallback_sql: str = "NULL") -> str:

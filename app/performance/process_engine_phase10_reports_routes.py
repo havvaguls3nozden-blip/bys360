@@ -32,49 +32,14 @@ def _bys360_process_reports_advanced_context(viewer=None, status_filter=None):
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return []
 
-    def _scalar(sql, params=None, default=0):
-        try:
-            value = db.session.execute(_sql_text(sql), params or {}).scalar()
-            return value if value is not None else default
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            return default
-
-    def _dialect_name():
-        try:
-            bind = db.session.get_bind()
-            return getattr(getattr(bind, "dialect", None), "name", "") or ""
-        except Exception:
-            logger.exception("BYS360 process reports dialect tespiti yapilamadi.")
-            return ""
-
     def _table_exists(table_name):
+        # BYS360 DEFECT AL: raw dialect-branched information_schema/sqlite_master
+        # query replaced with SQLAlchemy's inspect(), which is dialect-neutral
+        # by construction.
         try:
-            if _dialect_name() == "sqlite":
-                return bool(_scalar(
-                    """
-                    SELECT 1
-                    FROM sqlite_master
-                    WHERE type = 'table'
-                      AND name = :table_name
-                    LIMIT 1
-                    """,
-                    {"table_name": table_name},
-                    default=0,
-                ))
+            from sqlalchemy import inspect as _sa_inspect
 
-            return bool(_scalar(
-                """
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = current_schema()
-                      AND table_name = :table_name
-                )
-                """,
-                {"table_name": table_name},
-                default=False,
-            ))
+            return bool(_sa_inspect(db.session.get_bind()).has_table(table_name))
         except Exception:
             logger.exception(
                 "BYS360 process reports table_exists guvenli fallback | table=%s",

@@ -5,7 +5,7 @@ from typing import Any
 
 from flask import abort, render_template, render_template_string, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.routes import main
@@ -20,25 +20,16 @@ PHASE12_PRESIDENT_APPROVALS_MENU_CARD_ACCESS = True
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text("""
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = 'public' AND table_name = :table_name LIMIT 1
-        """),
-        {"table_name": table_name},
-    ).first()
-    return bool(row)
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text("""
-            SELECT column_name FROM information_schema.columns
-            WHERE table_schema = 'public' AND table_name = :table_name
-        """),
-        {"table_name": table_name},
-    ).all()
-    return {str(r[0]) for r in rows}
+    if not _table_exists(table_name):
+        return set()
+    return {str(column["name"]) for column in inspect(db.engine).get_columns(table_name)}
 
 
 def _display_name(user_id: Any) -> str:

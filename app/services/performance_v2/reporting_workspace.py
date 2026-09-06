@@ -201,21 +201,28 @@ _PROCESS_FLOW_ORDER_COLUMNS = (
 
 
 def _get_process_flow_columns() -> set[str]:
-    """Return available process-flow columns without making dashboard rendering fragile."""
+    """Return available process-flow columns without making dashboard rendering fragile.
+
+    BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.columns``
+    query (filtered by the PostgreSQL-only ``current_schemas(false)``
+    search-path function) replaced with SQLAlchemy's ``inspect()``, which
+    resolves the same default-schema semantics dialect-neutrally.
+    """
     global _FLOW_STATUS_COLUMN_CACHE
     if _FLOW_STATUS_COLUMN_CACHE is not None:
         return _FLOW_STATUS_COLUMN_CACHE
     try:
-        from sqlalchemy import text
+        from sqlalchemy import inspect
 
         from app.extensions import db
-        rows = db.session.execute(text("""
-            SELECT column_name
-              FROM information_schema.columns
-             WHERE table_schema = ANY (current_schemas(false))
-               AND table_name = 'performance_process_flows'
-        """)).fetchall()
-        _FLOW_STATUS_COLUMN_CACHE = {str(row[0]) for row in rows}
+        inspector = inspect(db.engine)
+        if inspector.has_table("performance_process_flows"):
+            _FLOW_STATUS_COLUMN_CACHE = {
+                str(column["name"])
+                for column in inspector.get_columns("performance_process_flows")
+            }
+        else:
+            _FLOW_STATUS_COLUMN_CACHE = set()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         _FLOW_STATUS_COLUMN_CACHE = set()

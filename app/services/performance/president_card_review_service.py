@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.services.performance.process_engine_phase6_president_approvals import (
@@ -62,36 +62,16 @@ def status_label(value: Any, fallback: str = "Süreç takipte") -> str:
 
 
 def table_exists(table_name: str) -> bool:
-    return bool(
-        db.session.execute(
-            text(
-                """
-                SELECT EXISTS (
-                    SELECT 1 FROM information_schema.tables
-                    WHERE table_schema = 'public' AND table_name = :table_name
-                )
-                """
-            ),
-            {"table_name": table_name},
-        ).scalar()
-    )
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def table_columns(table_name: str) -> set[str]:
     if not table_exists(table_name):
         return set()
-    return {
-        row["column_name"]
-        for row in db.session.execute(
-            text(
-                """
-                SELECT column_name FROM information_schema.columns
-                WHERE table_schema = 'public' AND table_name = :table_name
-                """
-            ),
-            {"table_name": table_name},
-        ).mappings()
-    }
+    return {str(row["name"]) for row in inspect(db.engine).get_columns(table_name)}
 
 
 def _rows(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:

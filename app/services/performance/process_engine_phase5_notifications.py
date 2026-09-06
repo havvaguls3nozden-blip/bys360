@@ -83,51 +83,25 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
 
 
 def table_exists(table_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-            )
-            """,
-            {"table_name": table_name},
-        )
-    )
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction (works identically against SQLite/PostgreSQL) -- the
+    same proven pattern already used elsewhere in this module family
+    (process_engine_phase4_flow.py, phase6_president_approvals.py)."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def column_exists(table_name: str, column_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                  AND column_name = :column_name
-            )
-            """,
-            {"table_name": table_name, "column_name": column_name},
-        )
-    )
+    return column_name in _table_columns(table_name)
 
 
 def _table_columns(table_name: str) -> set[str]:
-    return {
-        row["column_name"]
-        for row in _rows(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = :table_name
-            """,
-            {"table_name": table_name},
-        )
-    }
+    """BYS360 DEFECT AL: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query."""
+    if not table_exists(table_name):
+        return set()
+    return {str(column["name"]) for column in inspect(db.engine).get_columns(table_name)}
 
 
 class Phase5SchemaNotReadyError(RuntimeError):

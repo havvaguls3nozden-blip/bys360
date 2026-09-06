@@ -6,7 +6,7 @@ from typing import Any
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
@@ -53,12 +53,14 @@ def _int(v):
 
 @lru_cache(maxsize=32)
 def _cols(table):
+    # BYS360 DEFECT AL: raw dialect-branched information_schema/PRAGMA query
+    # replaced with SQLAlchemy's inspect(), which is dialect-neutral by
+    # construction.
     try:
-        if db.engine.dialect.name == 'postgresql':
-            rows = db.session.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name=:t"), {'t': table}).fetchall()
-            return {str(r[0]) for r in rows}
-        rows = db.session.execute(text(f'PRAGMA table_info({table})')).fetchall()
-        return {str(r[1]) for r in rows}
+        inspector = inspect(db.engine)
+        if not inspector.has_table(table):
+            return set()
+        return {str(col["name"]) for col in inspector.get_columns(table)}
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
