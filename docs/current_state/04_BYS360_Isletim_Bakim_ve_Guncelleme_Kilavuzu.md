@@ -28,15 +28,15 @@ Bu belge, `docs/handover/BYS360_BAKIM_RUNBOOK.md`'nin (kısa, madde işaretli bi
 ## 2. Haftalık kontroller
 
 - Yedek alınmış mı — bkz. Belge 06. **Not:** bu HEAD'de ayrı, zamanlanmış/bağımsız bir "haftalık DB backup" script'i **tespit edilmemiştir**; script tabanlı `pg_dump` yalnızca candidate hazırlığı (`Backup-SourceDatabase`, `prepare_bys360_candidate.ps1:1196-1226`) ve cutover'ın kendi akışı (`Backup-LiveDatabase`, `cutover_bys360_candidate.ps1:~742`) içinde tetiklenir — yani bir cutover/candidate-prep çalıştırılmadığı haftalarda otomatik bir DB yedeği **alınmaz** (SCRIPT_VERIFIED, negatif arama sonucu: `scripts/` altında bağımsız bir zamanlanmış backup script'i bulunamadı). Bu, **REQUIRES_INSTITUTIONAL_DECISION** olarak işaretlenir: kurumun düzenli (cutover'dan bağımsız) bir PostgreSQL yedekleme politikası ayrıca tanımlanmalıdır.
-- Disk doluluk oranı — özellikle `C:\bys360\storage`, `C:\bys360\local_storage`, `C:\bys360\backups`, `C:\bys360\releases`, `C:\bys360\logs`, `C:\bys360\deploy_logs`, `C:\bys360\previous`, `C:\bys360\candidate` altları (**düzeltme, peer-review/Agent 1**: DOC-03'te ayrı bir "Dizin Yapısı" bölümü yoktur — bu yollar DOC-04/06/13'e dağılmış script referanslarından derlenmiştir, tek bir merkezi envanter olarak henüz konsolide edilmemiştir).
+- Disk doluluk oranı — özellikle `C:\bys360\storage`, `C:\bys360\local_storage`, `C:\bys360\backups`, `C:\bys360\releases`, `C:\bys360\logs`, `C:\bys360\deploy_logs`, `C:\bys360\previous`, `C:\bys360\candidate` altları (DOC-03'te ayrı bir "Dizin Yapısı" bölümü yoktur — bu yollar DOC-04/06/13'e dağılmış script referanslarından derlenmiştir, tek bir merkezi envanter olarak henüz konsolide edilmemiştir).
 - Log rotasyonu çalışıyor mu — bu HEAD'de kod tabanında ayrı bir log-rotasyon mekanizması aranmış, `scripts/` altında bulunamamıştır (SCRIPT_VERIFIED, negatif); bu **REQUIRES_INSTITUTIONAL_DECISION** olarak işaretlenmelidir (Waitress log dosyası `*>>` ile append modunda büyümeye devam eder — `install_bys360_live_waitress_80_task_v1.ps1:82`).
 - Bekleyen migration var mı — `flask db current` vs `flask db heads` karşılaştırması (bkz. Belge 06/`DATABASE_MIGRATION.md`).
-- Kullanıcı/rol değişiklikleri audit log'a düşüyor mu — DOCUMENTATION_DERIVED, Agent 3'ün yetkilendirme/audit incelemesiyle çapraz okunmalı, bu belgenin kapsamı dışında derinlemesine doğrulanmamıştır.
+- Kullanıcı/rol değişiklikleri audit log'a düşüyor mu — DOCUMENTATION_DERIVED, ilgili yetkilendirme/audit belgeleriyle (Belge 05/11) çapraz okunmalı, bu belgenin kapsamı dışında derinlemesine doğrulanmamıştır.
 
 ## 3. Aylık kontroller
 
 - Güvenli release preflight çalıştırılır: `scripts/windows/check_bys360_release_zip_preflight_v1.ps1` ve/veya `scripts/release/build_bys360_safe_release.py --verify` (dosyaların varlığı CODE_VERIFIED; bu belgeyi yazarken içerikleri tek tek çalıştırılmadı).
-- Yetki matrisi örnek kullanıcılarla test edilir — Agent 3'ün kapsamı.
+- Yetki matrisi örnek kullanıcılarla test edilir — ayrıntı Belge 05/11 kapsamındadır.
 - Performans, personel, iletişim/anket ve destek kritik akışları gözden geçirilir.
 - Eski log ve geçici dosyalar temizlenir — manuel operatör işlemi; otomatik bir temizlik script'i bu inceleme sırasında `scripts/windows` altında tespit edilmemiştir.
 - Kalite kapısı taraması: `python scripts\quality\bys360_score100_quality_gate_v1.py --project-root . --mode audit --output-dir reports\quality\score100_quality_gate_v1` (dosya varlığı CODE_VERIFIED: `scripts/quality/bys360_score100_quality_gate_v1.py`).
@@ -86,7 +86,7 @@ Tam kod-değişikliği içeren bir dağıtım için Belge 14'teki candidate → 
 ## 10. Migration disiplini
 
 - Manuel şema değişikliği (canlı veritabanına elle `ALTER TABLE` vb.) bu deployment modelinin **dışındadır** ve `docs/handover/BYS360_BAKIM_RUNBOOK.md`'nin devamı olan `BYS360_RISK_VE_SUREKLILIK_PLANI.md` bunu açıkça yasaklamaktadır (DOCUMENTATION_DERIVED).
-- Her migration, adaylık aşamasında shadow veritabanı üzerinde prova edilmeden canlıya asla uygulanmaz (bkz. Belge 03 §8 "Veritabanı migration prosedürü" ve Belge 14 §4, Faz 10-13 — **düzeltme, peer-review/Agent 1**: önceki atıf "Belge 06 §Shadow Rehearsal" yanlıştı, DOC-06'da böyle bir bölüm yoktur).
+- Her migration, adaylık aşamasında shadow veritabanı üzerinde prova edilmeden canlıya asla uygulanmaz (bkz. Belge 03 §8 "Veritabanı migration prosedürü" ve Belge 14 §4, Faz 10-13).
 - `AUTO_REPAIR_SCHEMA` varsayılan olarak `False`'tur (`factory_bootstrap.py`, `prepare_bys360_candidate.ps1` script başlığı satır 109-113'te CODE_VERIFIED olarak alıntılanmıştır) — canlıda kendiliğinden şema onarımı **aktif değildir**, yalnızca salt-okunur şema kontrolü çalışır.
 
 ## 11. Güvenlik yaması (patching) süreci
@@ -95,7 +95,7 @@ Bu belgenin kapsamında ayrı bir OS/paket güvenlik yaması takvimi doğrulanma
 
 ## 12. Denetim (audit) kaydı gözden geçirme
 
-Uygulama içi audit modeli (durum değiştiren işlemler + erişim denemeleri) Agent 3'ün kapsamındadır; bu belge yalnızca operasyonel/deployment audit izini (deploy_logs altındaki makbuzlar) kapsar.
+Uygulama içi audit modeli (durum değiştiren işlemler + erişim denemeleri) Belge 05/11 kapsamındadır; bu belge yalnızca operasyonel/deployment audit izini (deploy_logs altındaki makbuzlar) kapsar.
 
 ## 13. Olay kayıt altına alma (incident recording)
 
@@ -117,4 +117,4 @@ Bu current-state fazında ayrı bir kapasite planlama süreci veya performans iz
 
 ## 16. Bakım sahipliği (ownership)
 
-Coordinator olgu defterindeki "Tek geliştirici bilgisi" riskiyle doğrudan bağlantılı olarak: bu belge setinin amacı, tek bir kişiye/firmaya bağlı kalmadan devredilebilir bir operasyon modeli sunmaktır (`docs/handover/BYS360_RISK_VE_SUREKLILIK_PLANI.md`, DOCUMENTATION_DERIVED). Bakım sorumluluğunun kurum içinde mi yoksa dış bir yüklenicide mi olacağı, bu current-state fazının kapsamı dışında bir kurumsal karardır — **REQUIRES_INSTITUTIONAL_DECISION**.
+"Tek geliştirici bilgisi" riskiyle doğrudan bağlantılı olarak: bu belge setinin amacı, tek bir kişiye/firmaya bağlı kalmadan devredilebilir bir operasyon modeli sunmaktır (`docs/handover/BYS360_RISK_VE_SUREKLILIK_PLANI.md`, DOCUMENTATION_DERIVED). Bakım sorumluluğunun kurum içinde mi yoksa dış bir yüklenicide mi olacağı, bu current-state fazının kapsamı dışında bir kurumsal karardır — **REQUIRES_INSTITUTIONAL_DECISION**.

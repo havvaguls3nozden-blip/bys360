@@ -69,7 +69,7 @@ Bir `pg_dump` yedeğini geri yüklemek için gereklidir:
 `rollback_bys360_candidate.ps1` (SCRIPT_VERIFIED, script başlığı ve receipt şeması, satır 1-181):
 
 - **Zorunlu, tahminsiz parametreler**: `-PreviousDir` ve `-ActiveDeploymentReceiptPath` — script "en son" bir önceki dizini veya makbuzu **otomatik keşfetmez**; operatör açıkça belirtmelidir (satır 79-81, 91-114 gerekçe).
-- **Aktif-dağıtım makbuz bağlama** (Faz 3a, coordinator eklentisi, 2026-08-26): mevcut `C:\bys360\project`'in `SOURCE_SHA`'sı, verilen `-ActiveDeploymentReceiptPath`'teki `DEPLOYMENT_RECEIPT.txt`'nin `CANDIDATE_SOURCE_SHA` alanıyla; `-PreviousDir`'in kendisi de aynı makbuzun `PREVIOUS_DIR`/`PREVIOUS_SOURCE_SHA` alanlarıyla eşleşmelidir — uyuşmazlıkta `Invoke-FailClosed`, hiçbir canlı adım (görev durdurma, ağaç taşıma) çalışmadan önce.
+- **Aktif-dağıtım makbuz bağlama** (Faz 3a, 2026-08-26 tarihinde eklenmiştir): mevcut `C:\bys360\project`'in `SOURCE_SHA`'sı, verilen `-ActiveDeploymentReceiptPath`'teki `DEPLOYMENT_RECEIPT.txt`'nin `CANDIDATE_SOURCE_SHA` alanıyla; `-PreviousDir`'in kendisi de aynı makbuzun `PREVIOUS_DIR`/`PREVIOUS_SOURCE_SHA` alanlarıyla eşleşmelidir — uyuşmazlıkta `Invoke-FailClosed`, hiçbir canlı adım (görev durdurma, ağaç taşıma) çalışmadan önce.
 - **Receipt alanları**: `PREVIOUS_DIR`, `PREVIOUS_SOURCE_SHA`, `CURRENT_SOURCE_SHA_BEFORE`, `DEPLOYMENT_BINDING`, `QUARANTINE_DIR`, `DB_REVISION_AWARENESS`, `ROLLBACK_PATH` (`PRE_MIGRATION` | `POST_MIGRATION_ATTESTED`), `SERVICE_RESULT`, `LOCAL_HEALTH`, `PUBLIC_HEALTH`, `ROLLBACK_EXIT_CODE` (satır 169-181, CODE_VERIFIED).
 - **Hiçbir şey silinmez**: geri dönülen mevcut ağaç karantinaya alınır (taşınır), geri yüklenen `-PreviousDir` **kopyalanır** (taşınmaz) — yeniden deneme/denetim için sağlam kalır (satır 74-77).
 

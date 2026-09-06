@@ -12,7 +12,7 @@ Son Güncelleme: 2026-09-02
 
 Bu belge, `docs/handover/CANDIDATE_PREPARATION.md`, `CUTOVER.md`, `ROLLBACK.md`, `RELEASE_VERIFICATION.md`'nin doğrudan halefidir ve o belgelerin defalarca tekrarladığı "bu, script'in kendisi değil, script'in yazıldığı spesifikasyondan üretildi — gerçek entegre script'e karşı doğrulayın" uyarısını **bu current-state fazında bizzat yerine getirir**: aşağıdaki her adım, bu HEAD'deki (`873e6d3`) gerçek `prepare_bys360_candidate.ps1`, `cutover_bys360_candidate.ps1`, `rollback_bys360_candidate.ps1` ve `scripts/release/build_bys360_safe_release.py` dosyaları doğrudan okunarak yazılmıştır. Kanıt sınıflandırma anahtarı Belge 03 ile aynıdır.
 
-**Genel durum:** Bu üç script artık bu HEAD'de **commit'lenmiş ve entegre** durumdadır (eski belge setinin "kardeş bir iş akışına ait, henüz görülemedi" notu artık geçerli değildir — bu doğrudan bir güncelleme/düzeltmedir). Ancak `reports/executive/BYS360_Kurumsal_Rapor_Kaynak.md` §14'ün belirttiği gibi bu mimari "izole bir test ortamında uçtan uca denenmiş" ama **gerçek üretim sunucusuna karşı hiç çalıştırılmamış** olarak nitelenmektedir; bu current-state incelemesi bu durumun değiştiğine dair bağımsız kanıt bulamamıştır — dolayısıyla PRODUCTION_HISTORICAL/NOT_YET_FINALIZED sınıflandırması korunur.
+**Genel durum:** Bu üç script artık bu HEAD'de **commit'lenmiş ve entegre** durumdadır (eski belge setinin "henüz görülemedi" notu artık geçerli değildir — bu doğrudan bir güncelleme/düzeltmedir). Ancak `reports/executive/BYS360_Kurumsal_Rapor_Kaynak.md` §14'ün belirttiği gibi bu mimari "izole bir test ortamında uçtan uca denenmiş" ama **gerçek üretim sunucusuna karşı hiç çalıştırılmamış** olarak nitelenmektedir; bu current-state incelemesi bu durumun değiştiğine dair bağımsız kanıt bulamamıştır — dolayısıyla PRODUCTION_HISTORICAL/NOT_YET_FINALIZED sınıflandırması korunur.
 
 ---
 
@@ -50,7 +50,7 @@ secret_scan_status, secret_scan_findings
 
 ## 3. `CANDIDATE_READY.json` — gerçek şema (bu HEAD'de doğrudan doğrulandı)
 
-Coordinator olgu defterinin bu alanı "gerçek script'ten teyit edilecek" olarak işaretlemişti. `prepare_bys360_candidate.ps1`'in `$Script:Receipt` ordered hashtable'ı (satır 199-222, CODE_VERIFIED) ve `Write-CandidateReadyReceipt` (Faz 14/16, satır 1830-1847) tarafından yazılan **gerçek alan listesi**:
+`prepare_bys360_candidate.ps1`'in `$Script:Receipt` ordered hashtable'ı (satır 199-222, CODE_VERIFIED) ve `Write-CandidateReadyReceipt` (Faz 14/16, satır 1830-1847) tarafından yazılan **gerçek alan listesi**:
 
 ```json
 {
@@ -154,4 +154,4 @@ Bkz. Belge 03 §6 — `requirements.lock` + `build/wheelhouse/` bu HEAD'de **mev
 
 ## 10. Nihai FULL model — bu current-state fazının sınırı
 
-Görev talimatı ve proje sıralaması gereği açıkça belirtilir: **bu current-state fazı bir "final FULL build" değildir.** Coordinator olgu defterindeki `FINALIZATION_SEQUENCE` alanı, sıralamayı şöyle tanımlar: AK kapanışı → CURRENT-STATE dokümantasyonu (bu faz) → Puantaj geliştirme → Puantaj entegrasyon/güvenlik/devir doğrulama → kalan teknik defter kapanışı → bilinmeyen defekt taraması → **final kaynak SHA** → uzak CI → **FINAL FULL** → final dokümantasyon yenilemesi → kurumsal teslim. Bu belge setindeki her SHA referansı (`873e6d3...`) bu ara aşamanın anlık görüntüsüdür; nihai FULL release paketi, Puantaj tamamlandıktan ve kaynak kilitlendikten **sonra** yeniden üretilecek ve bu belgeler o noktada tekrar güncellenecektir — bu, şimdiden vaat edilen ama henüz gerçekleşmemiş bir adımdır (**PLANNED_FUTURE**).
+Proje sıralaması gereği açıkça belirtilir: **bu current-state fazı bir "final FULL build" değildir.** Planlanan sıralama şöyledir: açık teknik maddelerin kapanışı → CURRENT-STATE dokümantasyonu (bu faz) → Puantaj geliştirme → Puantaj entegrasyon/güvenlik/devir doğrulama → kalan teknik defter kapanışı → bilinmeyen defekt taraması → **final kaynak SHA** → uzak CI → **FINAL FULL** → final dokümantasyon yenilemesi → kurumsal teslim. Bu belge setindeki her SHA referansı (`873e6d3...`) bu ara aşamanın anlık görüntüsüdür; nihai FULL release paketi, Puantaj tamamlandıktan ve kaynak kilitlendikten **sonra** yeniden üretilecek ve bu belgeler o noktada tekrar güncellenecektir — bu, şimdiden vaat edilen ama henüz gerçekleşmemiş bir adımdır (**PLANNED_FUTURE**).

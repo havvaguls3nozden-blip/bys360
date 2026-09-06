@@ -12,18 +12,18 @@ Son Güncelleme: 2026-09-02
 
 ## 1. Kapsam
 
-Bu doküman BYS360'ın veritabanı katmanını ve migration (şema geçişi) yönetim modelini, kod ve çalıştırılabilir doğrulama üzerinden tarif eder. Yedekleme prosedürünün adım adım işletimi ve cutover/rollback operasyonel akışı Agent 2'nin sahip olduğu dokümanların kapsamındadır; burada yalnızca ilişki ve mimari sözleşme düzeyinde referans verilir.
+Bu doküman BYS360'ın veritabanı katmanını ve migration (şema geçişi) yönetim modelini, kod ve çalıştırılabilir doğrulama üzerinden tarif eder. Yedekleme prosedürünün adım adım işletimi ve cutover/rollback operasyonel akışı Belge 06 ve Belge 14 kapsamındadır; burada yalnızca ilişki ve mimari sözleşme düzeyinde referans verilir.
 
 ## 2. PostgreSQL rolü ve SQLite ilişkisi
 
-- **Canlı ortam:** PostgreSQL 15, Windows servis adı `postgresql-x64-15` (`docs/handover/LIVE_INSTALLATION.md:62-65`, `DOCUMENTATION_DERIVED`). **Koordinatör düzeltmesi (çapraz doğrulama sırasında tespit edildi):** bu servis-adı kontrolü yalnızca eski/tarihsel `scripts/windows/deploy_bys360_ec4e56b_production_v1..v4.ps1` script'lerinde bulunur (`SCRIPT_VERIFIED`, `grep` ile doğrulandı) — bu script'ler bu current-state fazının kapsamı dışındaki, farklı bir SHA'ya (`ec4e56b`) ait, ayrı bir dalgadan kalan izlenmeyen (untracked) dosyalardır. Güncel `prepare_bys360_candidate.ps1`/`cutover_bys360_candidate.ps1` script'leri bu kontrolü **içermez** — bkz. Belge 03 §3 (Agent 2'nin doğrudan, negatif `grep` ile doğruladığı bulgu). Bu belgenin ilk taslağındaki "yeni script'ler de bu kontrolü içerir" iddiası hatalıydı ve bu düzeltmeyle giderilmiştir.
+- **Canlı ortam:** PostgreSQL 15, Windows servis adı `postgresql-x64-15` (`docs/handover/LIVE_INSTALLATION.md:62-65`, `DOCUMENTATION_DERIVED`). Bu servis-adı kontrolü yalnızca eski/tarihsel `scripts/windows/deploy_bys360_ec4e56b_production_v1..v4.ps1` script'lerinde bulunur (`SCRIPT_VERIFIED`, `grep` ile doğrulandı) — bu script'ler bu current-state fazının kapsamı dışındaki, farklı bir SHA'ya (`ec4e56b`) ait, izlenmeyen (untracked) dosyalardır. Güncel `prepare_bys360_candidate.ps1`/`cutover_bys360_candidate.ps1` script'leri bu kontrolü **içermez** (bkz. Belge 03 §3, negatif `grep` sonucu).
 - **Yerel geliştirme/test/CI varsayılanı:** SQLite. `config.py:544`: `_raw_database_url = (os.getenv("DATABASE_URL") or "").strip() or 'sqlite:///:memory:'` — `DATABASE_URL` tanımlı değilse uygulama **bellek içi SQLite**'a düşer (`CODE_VERIFIED`).
 - **Docker/pilot profili:** `docker-compose.yml` içinde `postgres:15-alpine` imajı kullanılır (`CODE_VERIFIED`).
 - SQLAlchemy 2.0.36 (`Flask-SQLAlchemy` 3.1.1 üzerinden), `psycopg2-binary` 2.9.9 PostgreSQL sürücüsü olarak `requirements.txt`'te sabitlenmiştir (`CODE_VERIFIED`).
 
 ## 3. Migration modeli: Flask-Migrate / Alembic, tek zincir
 
-- `migrations/versions/` altında **77 `.py` dosyası** bulunur (`CODE_VERIFIED`, bu oturumda yeniden sayıldı, koordinatör olgu defteriyle tutarlı).
+- `migrations/versions/` altında **77 `.py` dosyası** bulunur (`CODE_VERIFIED`, bu oturumda yeniden sayıldı).
 - Zincir, düz doğrusal revizyonların yanı sıra **birleştirme (merge) revizyonları** içerir; örneğin `migrations/versions/20260513_perf_live_gate_merge_sp1a_v58.py` dosyası `v58a1c2d3e4f` revizyonunu (kendisi `f3c8d2a6e501`'in devamıdır) ana zincire geri birleştirir (`CODE_VERIFIED` — dosya içi çapraz referans doğrulandı). Bu, tek-head sonucunun bir kazayla değil kasıtlı birleştirme noktalarıyla elde edildiğini gösterir.
 - **Güncel tek head:** `v1a2d3e4f5b6` (`migrations/versions/v1a2d3e4f5b6_add_performance_period_single_active_constraint.py`). Bu oturumda **doğrudan çalıştırılarak** iki kez doğrulandı:
   ```
@@ -65,13 +65,13 @@ Bu oturumda `flask db heads` boş bir SQLite veritabanına karşı çalıştır�
 - File Center 19 tablosu (`app/models/file_center_models.py` içinde `__tablename__` sayımıyla bu oturumda **doğrudan yeniden doğrulandı: 19**, `docs/handover/DATABASE_MIGRATION.md`'deki iddiayla tutarlı — `CODE_VERIFIED`), `migrations/versions/10858a18e9ac_adopt_file_center_schema_into_alembic_.py` migration'ı ile Alembic'e "adopt" edilmiştir (sıfırdan oluşturma değil, önceden var olan tabloları Alembic mülkiyetine alma) (`DOCUMENTATION_DERIVED`, migration dosya adı ve varlığı bu oturumda doğrulandı — içerik satır satır tekrar okunmadı).
 - Bu adoption deseni (var olan tabloyu koşullu `CREATE TABLE IF NOT EXISTS` + koşullu `ALTER`/`INDEX` ile "sahiplenme"), `schema_guard_core_repairs.py`/`TABLE_REPAIRS`'te de aynı prensiple tekrarlanır — hem migration hem runtime-repair katmanı, var olan üretim verisini bozmama ilkesini paylaşır (`CODE_VERIFIED`).
 
-## 7. Migration rollback politikası (özet — ayrıntı Agent 2 kapsamında)
+## 7. Migration rollback politikası (özet — ayrıntı Belge 06 kapsamında)
 
-`docs/handover/ROLLBACK.md` başlıkları: "PRE-MIGRATION rollback — trivial" / "POST-MIGRATION rollback — requires real verification, not a blanket assumption" / **"Alembic downgrade is never run automatically"** / "DB backups are never deleted by rollback" (`DOCUMENTATION_DERIVED` — başlıklar bu oturumda okundu, ayrıntı yeniden doğrulanmadı, Agent 2'nin ayrıntılı operasyonel dokümanına bırakılmıştır). Mimari düzeyde önemli olan tek nokta: **Alembic `downgrade` komutu hiçbir otomasyon tarafından otomatik tetiklenmez**; geri alma, migration sonrası bir yedekten geri yükleme ile ele alınır, ham `downgrade` çalıştırma ile değil.
+`docs/handover/ROLLBACK.md` başlıkları: "PRE-MIGRATION rollback — trivial" / "POST-MIGRATION rollback — requires real verification, not a blanket assumption" / **"Alembic downgrade is never run automatically"** / "DB backups are never deleted by rollback" (`DOCUMENTATION_DERIVED` — başlıklar bu oturumda okundu, ayrıntı yeniden doğrulanmadı; ayrıntılı operasyonel prosedür Belge 06'ya bırakılmıştır). Mimari düzeyde önemli olan tek nokta: **Alembic `downgrade` komutu hiçbir otomasyon tarafından otomatik tetiklenmez**; geri alma, migration sonrası bir yedekten geri yükleme ile ele alınır, ham `downgrade` çalıştırma ile değil.
 
 ## 8. Yedekleme öncesi kural (backup-before-migration) — çapraz referans
 
-`c51c29032d4f` gibi veri ekleyen (`ADD COLUMN ... NOT NULL DEFAULT ...`) migration'lar dahil, her canlı migration adımından önce `pg_dump` ile yedek alınması akışın bir parçasıdır (`SCRIPT_VERIFIED` — cutover script akışı, ayrıntı Agent 2'nin `BACKUP_RUNBOOK.md`/`DISASTER_RECOVERY.md` kapsamındaki dokümanlarındadır, burada tekrar edilmemiştir).
+`c51c29032d4f` gibi veri ekleyen (`ADD COLUMN ... NOT NULL DEFAULT ...`) migration'lar dahil, her canlı migration adımından önce `pg_dump` ile yedek alınması akışın bir parçasıdır (`SCRIPT_VERIFIED` — cutover script akışı, ayrıntı `BACKUP_RUNBOOK.md`/`DISASTER_RECOVERY.md` ile Belge 06 kapsamındadır, burada tekrar edilmemiştir).
 
 ## 9. Üretim revizyon durumu
 
@@ -83,7 +83,7 @@ Bu incelemenin kapsamında canlı sunucuya doğrudan erişim yoktur; canlıda fi
 
 ---
 
-## Ek — Bu belgede tespit edilen, koordinatöre bildirilmesi gereken bulgular
+## Ek — Bu belgede tespit edilen açık teknik bulgular
 
 1. `v1a2d3e4f5b6` (güncel tek head) doğrudan `c51c29032d4f`'nin (eski SHA'da doğrulanmış head) devamıdır — zincir kopmamış, dallanmamış. Bu bir **doğrulama**, bir tutarsızlık değildir.
 2. `build/wheelhouse/` + `requirements.lock` ikilisi **eski SHA `ec4e56b`**'ye karşı üretilmiştir; güncel HEAD `873e6d3` için yeniden üretilmemiştir. Puantaj öncesi/final release aşamasında bu ikilinin güncel HEAD'e karşı yeniden üretilip üretilmeyeceği netleştirilmelidir.

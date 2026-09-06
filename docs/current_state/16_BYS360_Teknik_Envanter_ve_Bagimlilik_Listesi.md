@@ -62,13 +62,13 @@ Bu worktree'de üç ayrı bağımlılık dosyası/kaynağı bulunmaktadır ve **
 3. **`build/wheelhouse/`** — 59 önceden indirilmiş `.whl` dosyası (çevrimdışı kurulum için, CPython 3.12 / win_amd64 hedefli). Bu, `requirements.lock` ile aynı (eski SHA'ya ait) çözümleme oturumunun ürünüdür — aynı 59 paket sayısı eşleşir (`CODE_VERIFIED` — dosya sayımı).
 4. **`requirements-dev.txt`** (CI/kalite araç zinciri, `requirements.txt`'ten ayrı tutulur, kendi başlığında bunu açıkça belirtir): `mypy==2.3.0`, `pip-audit==2.10.1`, `pytest==9.0.3`, `pytest-cov==7.1.0`, `ruff==0.16.0` — bu dosya **güncel** görünmektedir, eski SHA referansı taşımaz (`CODE_VERIFIED`).
 
-**Koordinatöre bildirilmesi gereken bulgu:** `requirements.lock` ve `build/wheelhouse/`, güncel HEAD `873e6d3`'e karşı **doğrulanmamış/güncellenmemiştir**; final release/Puantaj öncesi aşamada bu ikilinin (güncel `requirements.txt`'e karşı fark var mı diye) yeniden üretilip üretilmeyeceği netleştirilmelidir. (`requirements.txt`'in kendisi iki SHA arasında değişmiş olabilir ya da olmayabilir — bu oturumda `git log -p requirements.txt` ile tarihsel fark analizi yapılmadı, `NOT_YET_FINALIZED`.)
+**Açık teknik bulgu:** `requirements.lock` ve `build/wheelhouse/`, güncel HEAD `873e6d3`'e karşı **doğrulanmamış/güncellenmemiştir**; final release/Puantaj öncesi aşamada bu ikilinin (güncel `requirements.txt`'e karşı fark var mı diye) yeniden üretilip üretilmeyeceği netleştirilmelidir. (`requirements.txt`'in kendisi iki SHA arasında değişmiş olabilir ya da olmayabilir — bu oturumda `git log -p requirements.txt` ile tarihsel fark analizi yapılmadı, `NOT_YET_FINALIZED`.)
 
 ## 4. Veritabanı ve önbellek
 
 | Bileşen | Değer | Kanıt |
 |---|---|---|
-| Canlı veritabanı | PostgreSQL 15, Windows servis adı `postgresql-x64-15` | `DOCUMENTATION_DERIVED` — bu servis adı yalnızca eski/tarihsel, bu fazın kapsamı dışındaki `deploy_bys360_ec4e56b_production_v1..v4.ps1` script'lerinde geçer; güncel `prepare_bys360_candidate.ps1`/`cutover_bys360_candidate.ps1` bu kontrolü içermez (bkz. DOC-03 §3, koordinatör çapraz doğrulaması) |
+| Canlı veritabanı | PostgreSQL 15, Windows servis adı `postgresql-x64-15` | `DOCUMENTATION_DERIVED` — bu servis adı yalnızca eski/tarihsel, bu fazın kapsamı dışındaki `deploy_bys360_ec4e56b_production_v1..v4.ps1` script'lerinde geçer; güncel `prepare_bys360_candidate.ps1`/`cutover_bys360_candidate.ps1` bu kontrolü içermez (bkz. DOC-03 §3) |
 | Yerel/test/CI varsayılanı | SQLite (`DATABASE_URL` boşsa `sqlite:///:memory:`) | `CODE_VERIFIED` — `config.py:544` |
 | Yerel kalıcı geliştirme örneği | `sqlite:///instance/bys360_local_dev.sqlite3` | `CODE_VERIFIED` — `.env.example` |
 | Docker/pilot profili DB imajı | `postgres:15-alpine` | `CODE_VERIFIED` — `docker-compose.yml` |
@@ -119,7 +119,7 @@ Bu worktree'de üç ayrı bağımlılık dosyası/kaynağı bulunmaktadır ve **
 | Alan | Değer | Kanıt |
 |---|---|---|
 | Test çerçevesi | pytest 9.0.3 (`requirements-dev.txt`), `pytest.ini` içinde `minversion = 8.0` | `CODE_VERIFIED` |
-| Test dosya sayısı | `tests/` altında 384 `test_*.py` dosyası | `CODE_VERIFIED` — bu oturumda sayıldı (**dosya sayısıdır, ayrı test fonksiyon/senaryo sayısı değildir**; bu fazın brifinginde bildirilen "5684 passed" rakamıyla karıştırılmamalıdır — bkz. koordinatör olgu defteri) |
+| Test dosya sayısı | `tests/` altında 384 `test_*.py` dosyası | `CODE_VERIFIED` — bu oturumda sayıldı (**dosya sayısıdır, ayrı test fonksiyon/senaryo sayısı değildir**; diğer raporlarda bildirilen "5684 passed" rakamıyla karıştırılmamalıdır) |
 | Test işaretleyicileri (markers) | `ci_safe`, `legacy_integration`, `live`, `mobile`, `realdb`, `slow`, `source_smoke`, `uat` | `CODE_VERIFIED` — `pytest.ini` |
 | Kapsam (coverage) aracı | `pytest-cov` 7.1.0, `[tool.coverage.run]`/`[tool.coverage.report]` `pyproject.toml`'da tanımlı | `CODE_VERIFIED` |
 | Statik tip kontrolü | mypy 2.3.0, `[tool.mypy]` + çok sayıda `[[tool.mypy.overrides]]` bloğu `pyproject.toml`'da | `CODE_VERIFIED` |
@@ -180,7 +180,7 @@ Windows canlı görev, "Highest run level" (yükseltilmiş yetki) ile çalışac
 
 ---
 
-## Ek — Bu belgede tespit edilen, koordinatöre bildirilmesi gereken bulgular
+## Ek — Bu belgede tespit edilen açık teknik bulgular
 
 1. `requirements.lock` ve `build/wheelhouse/` **eski SHA (`ec4e56b`)**'ye karşı üretilmiştir, güncel HEAD `873e6d3`'e karşı yeniden üretilip doğrulanmamıştır — final release öncesi netleştirilmelidir.
 2. `pyproject.toml` içinde hem `[tool.black]`/`[tool.isort]` hem de `[tool.ruff.format]`/`[tool.ruff.lint.isort]` bölümleri bir arada tanımlıdır; fiilen hangi formatlayıcının CI'da otoriter kabul edildiği bu incelemenin kapsamında netleştirilmedi (`requirements-dev.txt` yalnızca `ruff`'ı listeler, `black` içermez — bu, ruff'ın fiilen kullanılan araç olduğuna işaret eder ama kesin değildir).

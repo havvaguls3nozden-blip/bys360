@@ -19,7 +19,7 @@ Kanıt sınıflandırma anahtarı Belge 03 ile aynıdır. Bu belge `docs/handove
 1. `Get-ScheduledTask -TaskName "BYS360 Live Waitress 80"` ile görev durumunu kontrol edin (Bölüm 2 ile devam).
 2. `Get-NetTCPConnection -LocalPort 80 -State Listen` ile port 80'de gerçekten bir dinleyici olup olmadığını doğrulayın.
 3. `C:\bys360\logs\bys360_live_waitress_80.log`'un son satırlarını inceleyin — `Traceback`, `UnicodeEncodeError`/`UnicodeDecodeError`, `sqlalchemy.exc.OperationalError` gibi gerçek hata desenlerine bakın (Belge 04 §1, `Test-LogForRealErrors` desenleriyle aynı mantık — bare "error" substring'i değil).
-4. Ağ/firewall/reverse-proxy katmanı ayrıca kontrol edilmelidir — **not (peer-review, Agent 1 bulgusu):** "varsa" ifadesi temkinli değil, gerçek bir kanıt zinciri mevcuttur: `config.py:655`'te `PROXY_FIX_ENABLED` production/staging'de varsayılan açıktır ve cutover script'i genel uç noktayı `https://` üzerinden kontrol eder — Waitress'in önünde bir TLS sonlandırıcı katmanın bulunduğuna dair güçlü işaret vardır (bkz. DOC-13 §1 düzeltmesi). Bu katmanın kendisi bu repo'nun kapsamı dışındadır; bu belge yalnızca uygulama/Windows Task katmanını kapsar.
+4. Ağ/firewall/reverse-proxy katmanı ayrıca kontrol edilmelidir — bu katmanın varlığına dair temkinli değil, somut bir kanıt zinciri mevcuttur: `config.py:655`'te `PROXY_FIX_ENABLED` production/staging'de varsayılan açıktır ve cutover script'i genel uç noktayı `https://` üzerinden kontrol eder — Waitress'in önünde bir TLS sonlandırıcı katmanın bulunduğuna dair güçlü işaret vardır (bkz. DOC-13 §1). Bu katmanın kendisi bu repo'nun kapsamı dışındadır; bu belge yalnızca uygulama/Windows Task katmanını kapsar.
 
 ## 2. Port 80'de dinleyici yok
 
@@ -29,7 +29,9 @@ Kanıt sınıflandırma anahtarı Belge 03 ile aynıdır. Bu belge `docs/handove
 
 ## 3. Scheduled Task durmuş / beklenmedik şekilde sonlanmış
 
-**Bilinen kök neden sınıfı (Belge 13 §5):** bu HEAD'deki `install_bys360_live_waitress_80_task_v1.ps1`, `RestartCount`/`RestartInterval` ayarlamaz — yani görev süreci çökerse **otomatik olarak yeniden başlamaz**, yalnızca bir sonraki sistem açılışında (`AtStartup`) tekrar tetiklenir. Bu, günlük kontrol listesinde (`/healthz` her gün kontrol edilmeli, Belge 04 §1) erken yakalanması gereken bir sınıf arızadır. Manuel müdahale:
+**Güncel durum (Belge 13 §5c):** canlı Scheduled Task, geçmişte yaşanan tekrarlayan 72 saatlik kesinti sorununun ardından sertleştirilmiştir — mekanik olarak doğrulanan güncel ayarlar `RestartCount=3`, `RestartInterval=PT1M`, `ExecutionTimeLimit=PT0S` (sınırsız). Yani görev süreci beklenmedik şekilde sonlanırsa, Task Scheduler artık **1 dakika arayla en fazla 3 kez otomatik olarak yeniden başlatmayı dener**. Repo'daki `install_bys360_live_waitress_80_task_v1.ps1` script'i bu parametreleri hâlâ geçirmediğinden (bkz. Belge 13 §5a), görev script'ten yeniden kaydedilirse bu otomatik yeniden başlatma davranışı kaybolabilir — böyle bir yeniden kayıttan sonra ayarların hâlâ yerinde olduğu ayrıca doğrulanmalıdır.
+
+3 otomatik denemenin tümü tükenirse (veya görev script'ten sertleştirme kaybolacak şekilde yeniden kaydedilmişse) görev **otomatik olarak yeniden başlamaz**, yalnızca bir sonraki sistem açılışında (`AtStartup`) tekrar tetiklenir. Bu durum, günlük kontrol listesinde (`/healthz` her gün kontrol edilmeli, Belge 04 §1) erken yakalanması gereken bir sınıf arızadır. Manuel müdahale:
 
 ```powershell
 Get-ScheduledTaskInfo -TaskName "BYS360 Live Waitress 80"
@@ -59,7 +61,7 @@ Ardından `/healthz` ile doğrulayın.
 
 ## 7. Redis erişilemez
 
-Redis mimari olarak **isteğe bağlıdır** (**güncelleme, peer-review/Agent 1**: bkz. DOC-02 §6, CODE_VERIFIED) — `REDIS_URL`/`CACHE_REDIS_URL` tanımlı değilse veya erişilemezse sistem dosya/JSON veya bellek-içi yedek moda düşer, açılışı engellemez. Redis bağlantı hatası şüphesinde: `redis-cli ping` ile bağlantıyı doğrudan test edin; uygulamanın yedek moda düşüp düşmediğini log'dan izleyin.
+Redis mimari olarak **isteğe bağlıdır** (bkz. DOC-02 §6, CODE_VERIFIED) — `REDIS_URL`/`CACHE_REDIS_URL` tanımlı değilse veya erişilemezse sistem dosya/JSON veya bellek-içi yedek moda düşer, açılışı engellemez. Redis bağlantı hatası şüphesinde: `redis-cli ping` ile bağlantıyı doğrudan test edin; uygulamanın yedek moda düşüp düşmediğini log'dan izleyin.
 
 ## 8. Migration uyumsuzluğu
 
@@ -69,11 +71,11 @@ Redis mimari olarak **isteğe bağlıdır** (**güncelleme, peer-review/Agent 1*
 
 ## 9. Login problemi
 
-`docs/handover/BYS360_KURULUM_REHBERI.md` §7 tablosuna göre (DOCUMENTATION_DERIVED, bu belgenin kapsamında yeniden doğrulanmadı): `DATABASE_URL`, port, app factory hatası kontrol edilmelidir. `/healthz` 200 dönüyorsa süreç ayaktadır; login'e özgü bir sorun muhtemelen kimlik doğrulama/oturum katmanına (Agent 3'ün kapsamı) ilişkindir.
+`docs/handover/BYS360_KURULUM_REHBERI.md` §7 tablosuna göre (DOCUMENTATION_DERIVED, bu belgenin kapsamında yeniden doğrulanmadı): `DATABASE_URL`, port, app factory hatası kontrol edilmelidir. `/healthz` 200 dönüyorsa süreç ayaktadır; login'e özgü bir sorun muhtemelen kimlik doğrulama/oturum katmanına (Belge 05/11 kapsamı) ilişkindir.
 
 ## 10. Yetki (authorization) problemi
 
-Rol/menü/yetki motoruna ilişkin ayrıntılı sorun giderme Agent 3'ün kapsamındadır (yetkilendirme modeli, menü görünürlüğü, backend guard). Bu belge yalnızca operasyon/deployment katmanını kapsar; "kullanıcı X, Y sayfasını görmeli ama görmüyor" türü sorunlar için ilgili yetkilendirme dokümantasyonuna bakın.
+Rol/menü/yetki motoruna ilişkin ayrıntılı sorun giderme Belge 05/11 kapsamındadır (yetkilendirme modeli, menü görünürlüğü, backend guard). Bu belge yalnızca operasyon/deployment katmanını kapsar; "kullanıcı X, Y sayfasını görmeli ama görmüyor" türü sorunlar için ilgili yetkilendirme dokümantasyonuna bakın.
 
 ## 11. Mail/e-posta gönderim hatası
 

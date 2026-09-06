@@ -15,7 +15,7 @@ Son Güncelleme: 2026-09-02
 `CODE_VERIFIED` (kod/script doğrudan bu belge yazılırken okundu) · `SCRIPT_VERIFIED` (release/ops script'i satır referansıyla okundu) ·
 `DOCUMENTATION_DERIVED` (önceki `docs/handover/` belgesinden alınmış, bu oturumda bağımsız yeniden doğrulanmış) ·
 `PRODUCTION_HISTORICAL` (geçmiş olay/operatör beyanına dayalı, bu oturumda doğrudan gözlemlenmedi) · `PLANNED_FUTURE` ·
-`NOT_YET_FINALIZED` (bu fazda netleştirilmemiş, gelecekte doğrulanacak bir olgu sorunu) · `REQUIRES_INSTITUTIONAL_DECISION` (bir olgu sorunu değil, kurumun kendisinin yazılı olarak karar vermesi gereken bir politika/tercih boşluğu — ör. yedekleme sıklığı, RPO/RTO hedefi; **taksonomi eklemesi, peer-review/Agent 1 bulgusu**: bu etiket DOC-04/06'da zaten kullanılıyordu, burada resmî olarak tanımlandı).
+`NOT_YET_FINALIZED` (bu fazda netleştirilmemiş, gelecekte doğrulanacak bir olgu sorunu) · `REQUIRES_INSTITUTIONAL_DECISION` (bir olgu sorunu değil, kurumun kendisinin yazılı olarak karar vermesi gereken bir politika/tercih boşluğu — ör. yedekleme sıklığı, RPO/RTO hedefi; bu etiket DOC-04/06'da da kullanılmaktadır).
 
 **Önemli çerçeve notu:** Bu belge iki farklı şeyi birbirinden özenle ayırır:
 
@@ -27,7 +27,7 @@ Son Güncelleme: 2026-09-02
 ## 1. Desteklenen işletim sistemi ve çalışma zamanı
 
 - **Hedef üretim ortamı**: Windows Server, canlı sunaklı bilgisayar adı `CATAB-BYS360` (SCRIPT_VERIFIED — `prepare_bys360_candidate.ps1:161` ve `cutover_bys360_candidate.ps1:111`, `$ExpectedHostName` parametresinin varsayılan değeri; her iki script de `Test-HostPrerequisites`/eşdeğeri içinde bu adla **tam eşleşme** ister, aksi halde `PRECHECK_FAILED` ile kapanır).
-- Genel kamuya açık ad (public hostname), `cutover_bys360_candidate.ps1:131`'de varsayılan parametre olarak `bys360.canakkaletarihialan.gov.tr` — SCRIPT_VERIFIED, ancak bu değerin bugün gerçekten DNS'te bu şekilde çözüldüğü bu oturumdan doğrulanamaz (LIVE_DOMAIN alanı coordinator olgu defterinde `NOT_YET_FINALIZED` olarak işaretli).
+- Genel kamuya açık ad (public hostname), `cutover_bys360_candidate.ps1:131`'de varsayılan parametre olarak `bys360.canakkaletarihialan.gov.tr` — SCRIPT_VERIFIED, ancak bu değerin bugün gerçekten DNS'te bu şekilde çözüldüğü bu oturumdan doğrulanamaz (LIVE_DOMAIN alanı bu belge setinde `NOT_YET_FINALIZED` olarak işaretlidir).
 - Operatör oturumunun **yükseltilmiş (Administrator)** olması gerekir; script'ler bunu açıkça kontrol etmez (yalnızca tarihsel V4 script'inin bu kontrolü yaptığı belgelenmiştir — `docs/handover/LIVE_INSTALLATION.md`), ancak `Register-ScheduledTask`/`Stop-ScheduledTask`/`Start-ScheduledTask` gibi çağrılar zaten yükseltilmiş oturum gerektirir; script pratikte yetkisiz bir oturumda ilgili adımda native hata ile durur.
 
 ## 2. Python 3.12
@@ -44,7 +44,7 @@ Son Güncelleme: 2026-09-02
 
 ## 4. Redis / arka plan iş kuyruğu
 
-`requirements.txt` içinde `redis==5.0.8`, `rq==2.3.3` pinleri mevcuttur (CODE_VERIFIED). **Güncelleme (peer-review, Agent 1 bulgusu — bu soru artık kapalıdır):** Redis mimari olarak **isteğe bağlıdır** — `REDIS_URL`/`CACHE_REDIS_URL` tanımlı değilse sistem dosya/JSON veya bellek-içi yedek moda düşer, açılışı engellemez. Bkz. DOC-02 §6 (CODE_VERIFIED, 5 dosyada doğrudan doğrulanmıştır: `app/core/healthcheck.py`, `async_job_queue.py`, `shared_cache_store.py`, `runtime_cache.py`, `app/security/rate_limit_store.py`). Kurulum sırasında Redis'in mevcut olmaması, açılışı engellemez ancak yedek moda düşürür.
+`requirements.txt` içinde `redis==5.0.8`, `rq==2.3.3` pinleri mevcuttur (CODE_VERIFIED). Redis mimari olarak **isteğe bağlıdır** — `REDIS_URL`/`CACHE_REDIS_URL` tanımlı değilse sistem dosya/JSON veya bellek-içi yedek moda düşer, açılışı engellemez. Bkz. DOC-02 §6 (CODE_VERIFIED, 5 dosyada doğrudan doğrulanmıştır: `app/core/healthcheck.py`, `async_job_queue.py`, `shared_cache_store.py`, `runtime_cache.py`, `app/security/rate_limit_store.py`). Kurulum sırasında Redis'in mevcut olmaması, açılışı engellemez ancak yedek moda düşürür.
 
 ## 5. Ortam değişkenleri ve secret yönetimi
 
@@ -54,11 +54,11 @@ Son Güncelleme: 2026-09-02
 
 ## 6. Bağımlılık kurulumu — çevrimdışı wheelhouse modeli
 
-Coordinator olgu defterinde bu alan "Agent 2 tarafından teyit edilecek" olarak işaretliydi. Bu incelemede **doğrudan bu worktree'de** kontrol edildi:
+Bu incelemede **doğrudan bu worktree'de** kontrol edildi:
 
 - `requirements.lock` — **MEVCUT** (kök dizinde, `ls requirements.lock` ile doğrulandı, CODE_VERIFIED).
 - `build/wheelhouse/` — **MEVCUT**, içinde gerçek `.whl` dosyaları var (örnek: `Flask_Limiter-3.5.0-py3-none-any.whl`, `SQLAlchemy-2.0.36-cp312-cp312-win_amd64.whl`, CODE_VERIFIED).
-- Bu, `docs/handover/LIVE_INSTALLATION.md` / `CANDIDATE_PREPARATION.md`'nin yazıldığı zamanki durumdan (o belgeler bu artefaktların "henüz bu worktree'de mevcut olmadığını, kardeş bir iş akışına ait olduğunu" belirtiyordu) **farklıdır — artık mevcutlar**. Bu, olumlu yönde bir güncelleme olarak coordinator olgu defterine işlenmelidir.
+- Bu, `docs/handover/LIVE_INSTALLATION.md` / `CANDIDATE_PREPARATION.md`'nin yazıldığı zamanki durumdan (o belgeler bu artefaktların "henüz bu worktree'de mevcut olmadığını" belirtiyordu) **farklıdır — artık mevcutlar**.
 - `scripts/release/build_bys360_wheelhouse.py` de kök `scripts/release/` altında mevcuttur (CODE_VERIFIED).
 - Kurulum komutu (`prepare_bys360_candidate.ps1:868`, `New-CandidateVirtualEnv` fonksiyonu, "REAL production path" olarak açıkça yorumlanmış):
   ```
@@ -75,7 +75,7 @@ Coordinator olgu defterinde bu alan "Agent 2 tarafından teyit edilecek" olarak 
 
 Ayrıntılı prosedür `06_...Yedekleme...` ve `14_...Release_Candidate_Cutover...` belgelerinde tekrarlanmayacak şekilde `docs/handover/DATABASE_MIGRATION.md`'ye dayanır; özet:
 
-- Migration zinciri **tek head**'e sahiptir; bu oturumda coordinator tarafından doğrudan çalıştırılmış (`flask db heads` → `v1a2d3e4f5b6 (head)`, boş SQLite üzerinde) — CODE_VERIFIED, coordinator olgu defterinde kayıtlı.
+- Migration zinciri **tek head**'e sahiptir; bu oturumda doğrudan çalıştırılmış (`flask db heads` → `v1a2d3e4f5b6 (head)`, boş SQLite üzerinde) — CODE_VERIFIED.
 - `migrations/versions` altında 77 `.py` dosyası mevcuttur (CODE_VERIFIED).
 - Aday hazırlığı sırasında migration, gerçek üretim verisinin bir kopyasının restore edildiği **tek kullanımlık shadow veritabanı** üzerinde, uygulamanın gerçek rolüyle, gerçek `.env` değerleriyle prova edilir (`Invoke-ShadowMigrationAsAppUser`, `prepare_bys360_candidate.ps1`). Canlı migration (cutover Faz 12/20) **aynı kod yolunu** gerçek veritabanına karşı çalıştırır (`flask db upgrade`, `cutover_bys360_candidate.ps1:1015-1041`, SCRIPT_VERIFIED).
 - Migration öncesi/sonrası şema-sözleşme kontrolü (`app.bootstrap.schema_contract.get_expected_schema()` / `validate_required_schema()`) hem shadow'da (`Test-ShadowSchemaContract`, prepare script) hem canlıda (`Test-LiveSchemaContract`, `cutover_bys360_candidate.ps1:950-1014`) **gerçek uygulama fonksiyonları** çağrılarak yapılır, yeniden implementasyon değildir.
@@ -85,7 +85,7 @@ Ayrıntılı prosedür `06_...Yedekleme...` ve `14_...Release_Candidate_Cutover.
 - Canlı görev adı: **`BYS360 Live Waitress 80`** (SCRIPT_VERIFIED, `scripts/windows/install_bys360_live_waitress_80_task_v1.ps1:40`, varsayılan `-TaskName` parametresi).
 - Bu installer script **plan/apply** modelindedir: `-Apply` verilmeden **hiçbir** `Register-ScheduledTask`/`Set-ScheduledTask`/`Start-ScheduledTask`/`Stop-ScheduledTask` çağrısı yapılmaz (satır 101-152); mevcut aynı isimli görev varsa `-ConfirmReplace` verilmeden sessizce üzerine yazılmaz (çarpışma koruması, satır 104-114).
 - Task; `Register-ScheduledTaskAction -Execute "powershell.exe"` ile, `$env:APP_PORT` atayan bir PowerShell katmanı üzerinden `.venv\Scripts\python.exe run_server.py`'yi çalıştırır; `AtStartup` tetikleyicisi ve `SYSTEM` / `ServiceAccount` / `RunLevel Highest` principal ile kurulur (satır 124-141, CODE_VERIFIED). `PYTHONUTF8`/`PYTHONIOENCODING` açıkça `utf-8` ayarlanır — Türkçe başlangıç mesajlarının Scheduled-Task-redirected konsolun varsayılan ANSI codepage'inde encode edilemediği, canlı sunucuda gerçekten yaşanmış bir arızanın (kök neden olarak doğrulanmış) doğrudan düzeltmesidir (satır 69-79 yorumu).
-- **Bilinen sertleştirme açığı (bkz. Belge 13):** bu installer, `New-ScheduledTaskSettingsSet` çağrısında (satır 126) yalnızca `-AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable` belirtir; `ExecutionTimeLimit`, `RestartCount`, `RestartInterval` parametreleri **açıkça geçirilmez**. Bu, PowerShell'in varsayılan `PT72H` (72 saat) execution time limit'inin ve varsayılan "otomatik yeniden başlatma yok" davranışının **hiç değiştirilmediği** anlamına gelir — bu belge setinde bu, "zaten düzeltilmiş" olarak değil, **açık/bekleyen operasyonel sertleştirme maddesi** olarak işaretlenir (bkz. Belge 13, §PT72H).
+- **Kurulum script'i ile canlı görev arasındaki fark (bkz. Belge 13 §5):** bu installer, `New-ScheduledTaskSettingsSet` çağrısında (satır 126) yalnızca `-AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable` belirtir; `ExecutionTimeLimit`, `RestartCount`, `RestartInterval` parametreleri script kaynağında **hâlâ açıkça geçirilmez** — yani bu script'ten sıfırdan bir görev kaydedilirse PowerShell'in varsayılan `PT72H` (72 saat) execution time limit'i ve varsayılan "otomatik yeniden başlatma yok" davranışı geçerli olur. **Canlı görevin kendisi ise bu açığa karşı ayrıca sertleştirilmiştir**: mekanik olarak doğrulanan güncel canlı ayarlar `ExecutionTimeLimit=PT0S` (sınırsız), `RestartCount=3`, `RestartInterval=PT1M`'dir (bkz. Belge 13 §5, ayrıntı ve geçmiş olay bağlamı). Bu sertleştirme, script dosyası değiştirilmeden, doğrudan canlı görev tanımı üzerinde yapılmıştır (değişiklik öncesi görev tanımı XML olarak yedeklenmiştir) — kaynak kodda, veritabanında bir değişiklik yapılmamış ve yeni bir uygulama release'i dağıtılmamıştır. Script'in kendisi bu ayarları geçirecek şekilde ayrıca güncellenmedikçe, görev script'ten yeniden kaydedilirse (`-Apply -ConfirmReplace`) mevcut sertleştirme kaybolur — bu, ayrı, düşük öncelikli bir takip maddesidir.
 
 ## 10. Sağlık doğrulama uç noktaları
 
