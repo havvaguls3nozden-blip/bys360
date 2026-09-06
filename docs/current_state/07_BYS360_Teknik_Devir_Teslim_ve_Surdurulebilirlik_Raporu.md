@@ -12,23 +12,23 @@ Son Güncelleme: 2026-09-02
 
 ## 1. Temel soru: BYS360'ı başka bir ekip devralabilir mi?
 
-**Kısa cevap:** Evet, kod tabanı, test otomasyonu, release/rollback disiplini ve mevcut `docs/handover/` operatör belgeleri bir devir için **yeterli teknik temeli** sağlıyor; ancak bu, tek bir "hazır/final" iddiası olarak sunulmamalıdır. `docs/handover/RELEASE_VERIFICATION.md` içindeki "Devredilebilirlik Gate" rubriği (8 kategori: Source/Dependency/Database/Operations/Deployment/Rollback/Documentation/Secret Separation), skorlamanın **kanıta dayalı ve kategori bazlı** yapılmasını, tek bir toplam sayı olarak iddia edilmemesini şart koşar (DOCUMENTATION_DERIVED, `docs/handover/RELEASE_VERIFICATION.md:116-247`) — bu ilke bu belgede de takip edilmiştir. Bilinen açık teknik maddelerin tam envanteri ayrı bir belgede (`19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md`, koordinatör tarafından yazılıyor) tutulacaktır; bu rapor yalnızca o defterin varlığına ve rolüne atıfta bulunur, içeriğini tekrarlamaz.
+**Kısa cevap:** Evet, kod tabanı, test otomasyonu, release/rollback disiplini ve mevcut `docs/handover/` operatör belgeleri bir devir için **yeterli teknik temeli** sağlıyor; ancak bu, tek bir "hazır/final" iddiası olarak sunulmamalıdır. `docs/handover/RELEASE_VERIFICATION.md` içindeki "Devredilebilirlik Gate" rubriği (8 kategori: Source/Dependency/Database/Operations/Deployment/Rollback/Documentation/Secret Separation), skorlamanın **kanıta dayalı ve kategori bazlı** yapılmasını, tek bir toplam sayı olarak iddia edilmemesini şart koşar (DOCUMENTATION_DERIVED, `docs/handover/RELEASE_VERIFICATION.md:116-247`) — bu ilke bu belgede de takip edilmiştir. Bilinen açık teknik maddelerin tam envanteri ayrı bir belgede (`19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md`) tutulur; bu rapor yalnızca o defterin varlığına ve rolüne atıfta bulunur, içeriğini tekrarlamaz.
 
 ## 2. Repo organizasyonu
 
-- Tek repo, `app/` altında 973 Python dosyası (CODE_VERIFIED — bu fazın koordinatör olgu defterinde de kayıtlı).
+- Tek repo, `app/` altında 973 Python dosyası (CODE_VERIFIED).
 - Üst düzey modül dizinleri: `about, account, admin, ai, ai_agent, api, assistant_training_bank, auth, communication, core, dashboard, executive_summary, file_center, institutional, main_handlers, modules, performance, portal, pwa, refactor, ...` (CODE_VERIFIED, `ls app`).
 - `migrations/versions/` altında 77 Alembic migration dosyası, tek head zinciri (CODE_VERIFIED — bkz. DOC-09 §4).
 - `tests/` altında 384 `test_*.py` dosyası, 13 üst-düzey test ailesi dizini (CODE_VERIFIED — bkz. DOC-09 §6).
 - `scripts/` altında release/quality/windows/security gibi operasyonel script aileleri; `scripts/release/build_bys360_safe_release.py` tek yetkili (canonical) release builder'dır — Git-tracked dosyalardan üretir, dosya sistemine fallback yapmaz, çalışma ağacı temiz değilse başarısız olur (fail-closed) (CODE_VERIFIED, `README.md:111-117`).
-- `build/wheelhouse/` — offline pip kurulumu için önceden indirilmiş wheel dosyaları (59 wheel, `reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json`: `ok: true`, deterministik SHA256 kimlik özeti) (CODE_VERIFIED/SCRIPT_VERIFIED, dosyalar mevcut ve rapor bu oturumda okunmuştur). **Açıklık notu (peer-review, Agent 2 bulgusu):** bu wheelhouse ve eşlik eden `requirements.lock`, kendi başlığına göre güncel HEAD (`873e6d3`) için değil, eski SHA `ec4e56bd9bab2ce59e9543fc647f55dffd37d94b` için üretilmiştir. `requirements.txt` iki SHA arasında bayt-bayt aynı olduğundan (`git diff` ile doğrulandı) pratik risk düşüktür, ancak lock/wheelhouse güncel HEAD'e karşı yeniden üretilip doğrulanmamıştır — bkz. DOC-16 §3.
+- `build/wheelhouse/` — offline pip kurulumu için önceden indirilmiş wheel dosyaları (59 wheel, `reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json`: `ok: true`, deterministik SHA256 kimlik özeti) (CODE_VERIFIED/SCRIPT_VERIFIED, dosyalar mevcut ve rapor bu oturumda okunmuştur). **Açıklık notu:** bu wheelhouse ve eşlik eden `requirements.lock`, kendi başlığına göre güncel HEAD (`873e6d3`) için değil, eski SHA `ec4e56bd9bab2ce59e9543fc647f55dffd37d94b` için üretilmiştir. `requirements.txt` iki SHA arasında bayt-bayt aynı olduğundan (`git diff` ile doğrulandı) pratik risk düşüktür, ancak lock/wheelhouse güncel HEAD'e karşı yeniden üretilip doğrulanmamıştır — bkz. DOC-16 §3.
 
 ## 3. Branch/release disiplini
 
 - Mevcut çalışma dalı: `phase5-critical-lint-clean-v1`, HEAD `873e6d3348e644c5384a33a99c517600a3346cfd` (CODE_VERIFIED, `git branch --show-current` + `git rev-parse HEAD`).
 - **Exact-head kuralı:** Bir CI workflow'unun "succeeded" görünmesi tek başına yeterli değildir; checkout log'undaki gerçek SHA, doğrulanmak istenen commit ile birebir eşleşmelidir (DOCUMENTATION_DERIVED, `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md:557-561`). Bu current-state fazı için, yerel HEAD (`873e6d3`) ile uzak doğrulanmış kontrol noktası (`7d73ff4`) **farklıdır** — bu fark açıkça belirtilir; final teslim öncesi HEAD'e özel taze CI kanıtı gereklidir (NOT_YET_FINALIZED).
 - Release paketleri üç birlikte üretilen artefaktla teslim edilir: `.zip`, `.manifest.json` (schema_version 2), `.sha256sums.txt` — ayrıntı DOC-05 §13'te.
-- Rollback modeli **iki nesil script** içerir (peer-review/Agent 2 netleştirmesi: bu, DOC-06/DOC-14'teki "migration-öncesi/migration-sonrası iki rollback yolu" ayrımından **farklı** bir "iki"dir — burada nesil/script kuşağı kastedilmektedir, karıştırılmamalıdır): yeni "candidate/cutover/rollback" script üçlüsü (`prepare_bys360_candidate.ps1`, `cutover_bys360_candidate.ps1`, `rollback_bys360_candidate.ps1`, canlıya dokunmadan aday hazırlama) ve eski/tekil model (`rollback_bys360_live_release_v1.ps1`, dry-run varsayılan) (CODE_VERIFIED, dosyalar bu HEAD'de mevcuttur).
+- Rollback modeli **iki nesil script** içerir (netleştirme: bu, DOC-06/DOC-14'teki "migration-öncesi/migration-sonrası iki rollback yolu" ayrımından **farklı** bir "iki"dir — burada nesil/script kuşağı kastedilmektedir, karıştırılmamalıdır): yeni "candidate/cutover/rollback" script üçlüsü (`prepare_bys360_candidate.ps1`, `cutover_bys360_candidate.ps1`, `rollback_bys360_candidate.ps1`, canlıya dokunmadan aday hazırlama) ve eski/tekil model (`rollback_bys360_live_release_v1.ps1`, dry-run varsayılan) (CODE_VERIFIED, dosyalar bu HEAD'de mevcuttur).
 
 ## 4. Ortam gereksinimleri
 
@@ -88,7 +88,7 @@ python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report= --cov-fail-u
 - **Quality** (`bys360-ci.yml`): secret/repo gate → safe-release audit → Ruff → compileall → Step1 → Step2 → gerçek PostgreSQL migration-integrity gate → coverage ratchet → mypy → operations audit → Quality9 CI contract gate → `pip-audit`.
 - **Score100** (`bys360-score100-quality-gate-v1.yml`): bağımlılık pinleme, git-tracked `.env` kontrolü, secret pattern taraması, TCKN şifreleme varlığı, duplicate endpoint/test skip, wildcard import, broad except, repo şekli kontrolleri.
 
-Bu fazda çapraz okunan mevcut rapor artefaktları (secret gate 0 finding, 973 dosya, coverage baseline %27,62) brifing rakamlarıyla tutarlıdır — ayrıntı DOC-09 §5.
+Bu fazda çapraz okunan mevcut rapor artefaktları (secret gate 0 finding, 973 dosya, coverage baseline %27,62) DOC-09'da bildirilen rakamlarla tutarlıdır — ayrıntı DOC-09 §5.
 
 ## 7. Migration yönetimi
 
@@ -117,15 +117,15 @@ Ayrıca yeni bir "candidate/cutover" modeli mevcuttur (`docs/handover/CANDIDATE_
 ## 12. Dokümantasyon haritası
 
 **Bu fazda (`docs/current_state/`) üretilen/üretilecek set:**
-- `BYS360_CURRENT_STATE_FACTS.md` — kanonik olgu defteri (koordinatör).
-- `05_...Guvenlik_Yetkilendirme_KVKK_ve_Denetim.md` (bu ajan).
+- `BYS360_CURRENT_STATE_FACTS.md` — kanonik olgu defteri.
+- `05_...Guvenlik_Yetkilendirme_KVKK_ve_Denetim.md`.
 - `07_...Teknik_Devir_Teslim_ve_Surdurulebilirlik_Raporu.md` (bu belge).
-- `08_...Devredilebilirlik_ve_Kurumsal_Bagimsizlik_Dokumani.md` (bu ajan).
-- `09_...Test_Kalite_Guvencesi_ve_Dogrulama_Raporu.md` (bu ajan).
-- `11_...Rol_Yetki_ve_Erisim_Kontrol_Modeli.md` (bu ajan).
-- `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md` — **koordinatör tarafından yazılıyor**, bilinen açık teknik/LOW/DRIFT/operasyon maddelerinin detaylı ledger'ı (AL ailesi, Dashboard LOW, M drift, mobil fail-open/drift, Dosya Merkezi izin/audit/rollback maddeleri, PT72H/RestartCount/AllowHardTerminate sertleştirme, PostgreSQL ROUND uyarısı vb.). Bu rapor o defterin **varlığını ve rolünü kabul eder**, içeriğini tekrarlamaz.
-- Diğer ajanların (Agent 1, Agent 2) ürettiği paralel current-state belgeleri (modül envanteri, operasyon/deployment detayı vb.) — bu oturumda içerikleri okunmadı, yalnızca varlıkları biliniyor.
-- `20_BYS360_Kurumsal_Tasarim_ve_Arayuz_Standardi.md` — **koordinatör tarafından eklendi (dokümantasyon sertleştirme fazı)**: BYS360'ın kurumsal görsel kimliği ve arayüz standardı; bir devralan ekibin kod düzeyinde tutarlı bir görsel dil sürdürebilmesi için gereken referanstır.
+- `08_...Devredilebilirlik_ve_Kurumsal_Bagimsizlik_Dokumani.md`.
+- `09_...Test_Kalite_Guvencesi_ve_Dogrulama_Raporu.md`.
+- `11_...Rol_Yetki_ve_Erisim_Kontrol_Modeli.md`.
+- `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md` — bilinen açık teknik/LOW/DRIFT/operasyon maddelerinin detaylı ledger'ı (AL ailesi, Dashboard LOW, M drift, mobil fail-open/drift, Dosya Merkezi izin/audit/rollback maddeleri, PT72H/RestartCount/AllowHardTerminate sertleştirme, PostgreSQL ROUND uyarısı vb.). Bu rapor o defterin **varlığını ve rolünü kabul eder**, içeriğini tekrarlamaz.
+- Bu doküman setindeki diğer paralel current-state belgeleri (modül envanteri, operasyon/deployment detayı vb.) — bu turda içerikleri okunmadı, yalnızca varlıkları biliniyor.
+- `20_BYS360_Kurumsal_Tasarim_ve_Arayuz_Standardi.md` — BYS360'ın kurumsal görsel kimliği ve arayüz standardı; bir devralan ekibin kod düzeyinde tutarlı bir görsel dil sürdürebilmesi için gereken referanstır.
 
 **Operasyonel temel olarak `docs/handover/` seti:**
 - `BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md` — en kapsamlı tekil kaynak (~4400 satır, 39+ bölüm), ancak **SHA `cb2e57c5d1829ea743c696ae78595a20755f3f07`'ye ait** (2026-08-24), mevcut HEAD (`873e6d3`) ile **birebir aynı değildir**. `docs/handover/README.md` bu dosyayı "CURRENT" olarak işaretler ve `BYS360_GUVENLIK_KVKK_NOTLARI.md`, `BYS360_RISK_VE_SUREKLILIK_PLANI.md`, `BYS360_MODUL_ENVANTERI.md`, `BYS360_BAKIM_RUNBOOK.md`, `BYS360_KURULUM_REHBERI.md`, `BYS360_CANLIYA_ALMA_REHBERI.md`, `BYS360_DEVIR_PAKETI_V1.md` dosyalarını "SUPERSEDED" (2026-06-24) olarak işaretler — bkz. §13 "Belge SHA tutarsızlığı".
@@ -140,10 +140,10 @@ Ayrıca yeni bir "candidate/cutover" modeli mevcuttur (`docs/handover/CANDIDATE_
 | SHA | Kaynak | Tarih |
 |---|---|---|
 | `873e6d3348e644c5384a33a99c517600a3346cfd` | Bu current-state fazının yerel HEAD'i | 2026-09-02 |
-| `7d73ff4d468cad11d78d2339ba770f70b5ec0baf` | Bu fazın brifinginde verilen "uzak doğrulanmış kontrol noktası" | belirtilmedi |
+| `7d73ff4d468cad11d78d2339ba770f70b5ec0baf` | Bu faz için referans alınan "uzak doğrulanmış kontrol noktası" | belirtilmedi |
 | `cb2e57c5d1829ea743c696ae78595a20755f3f07` | `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md` ve `BYS360_FEATURE_COVERAGE_MATRIX.md`'nin "Production SHA"sı; `docs/handover/README.md`'nin de referans aldığı SHA | 2026-08-24 |
 
-Bu, üç ayrı belge dalgasının farklı zamanlarda üretildiğinin doğal bir sonucudur, ancak yeni bir operatör için kafa karıştırıcı olabilir. **Öneri:** final dokümantasyon yenileme aşamasında, kanonik "aktif SHA" tek bir belgede (örn. güncellenmiş `docs/handover/README.md`) açıkça belirtilmeli ve diğer tüm belgeler bu tek kaynağa referans vermelidir.
+Bu, belgelerin üç farklı zamanda, üç farklı kontrol noktasına göre üretilmiş olmasının doğal bir sonucudur, ancak yeni bir operatör için kafa karıştırıcı olabilir. **Öneri:** final dokümantasyon yenileme aşamasında, kanonik "aktif SHA" tek bir belgede (örn. güncellenmiş `docs/handover/README.md`) açıkça belirtilmeli ve diğer tüm belgeler bu tek kaynağa referans vermelidir.
 
 ## 14. Operasyonel sahiplik ve bilgi aktarım gereksinimleri
 
@@ -157,7 +157,7 @@ Bu, üç ayrı belge dalgasının farklı zamanlarda üretildiğinin doğal bir 
 
 ## 16. Bilinen açık teknik madde ledger'ı — atıf
 
-Detaylı açık teknik/LOW/DRIFT/operasyon madde listesi bu raporun kapsamı dışındadır; `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md` (koordinatör) bu işlevi görecektir. Bu rapor yalnızca aşağıdaki, bu ajan tarafından bu turda **yeni tespit edilen** maddeleri işaretler — bunların ledger'a dahil edilmesi koordinatörün kararındadır:
+Detaylı açık teknik/LOW/DRIFT/operasyon madde listesi bu raporun kapsamı dışındadır; `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md` bu işlevi görecektir. Bu rapor yalnızca aşağıdaki, bu turda **yeni tespit edilen** maddeleri işaretler — bunların ledger'a dahil edilmesi ayrıca değerlendirilmelidir:
 
 - `/admin/role-matrix` salt-okunur ekranı ile canlı DB yetki durumu arasındaki drift riski (bkz. DOC-11 §7).
 - Audit log kapsamının (yalnız Dosya Merkezi + Performans delegasyon/dönem/geri bildirim akışları + bootstrap güvenlik olayları) blanket bir "her state-change audit'lenir" iddiasından daha dar olduğu (bkz. DOC-05 §8).
@@ -165,4 +165,4 @@ Detaylı açık teknik/LOW/DRIFT/operasyon madde listesi bu raporun kapsamı dı
 
 ## 17. Sonuç
 
-Kod tabanı; sürüm kontrolü, otomatik test paketi (brifing rakamlarıyla binlerce test), CI kalite kapıları (Ruff/mypy/secret-gate/coverage-ratchet), deterministik release paketleri (SHA256 doğrulanabilir) ve yazılı runbook'lara dayanıyor. Bu, bir devrin **teknik olarak mümkün** olduğunu gösterir. Ancak "handover-ready" tek bir onaylanmış boolean olarak iddia edilmemelidir (`docs/handover/RELEASE_VERIFICATION.md` §5) — her kategori kendi kanıtıyla ayrı değerlendirilmeli, mevcut HEAD için taze exact-head CI kanıtı ve §13'teki SHA tutarsızlığının çözümü final teslimin ön koşuludur.
+Kod tabanı; sürüm kontrolü, otomatik test paketi (bkz. DOC-09, binlerce test), CI kalite kapıları (Ruff/mypy/secret-gate/coverage-ratchet), deterministik release paketleri (SHA256 doğrulanabilir) ve yazılı runbook'lara dayanıyor. Bu, bir devrin **teknik olarak mümkün** olduğunu gösterir. Ancak "handover-ready" tek bir onaylanmış boolean olarak iddia edilmemelidir (`docs/handover/RELEASE_VERIFICATION.md` §5) — her kategori kendi kanıtıyla ayrı değerlendirilmeli, mevcut HEAD için taze exact-head CI kanıtı ve §13'teki SHA tutarsızlığının çözümü final teslimin ön koşuludur.

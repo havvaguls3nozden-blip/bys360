@@ -12,7 +12,7 @@ Son Güncelleme: 2026-09-02
 
 ## 1. Kapsam ve yöntem
 
-Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan dizin taraması ve kod okumasıyla envanterler (`CODE_VERIFIED`). Yetkilendirme ve denetim (audit) sütunları **yüksek düzeyde** tutulmuştur; derinlemesine yetkilendirme mimarisi Agent 3'ün sahip olduğu dokümanların kapsamındadır. Bu envanter, `docs/handover/BYS360_MODUL_ENVANTERI.md` (mevcut temel/baseline belge, iş alanı bazlı ve üst düzey) ile karşılaştırılmış; §12'de karşılaştırma notu yer alır.
+Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan dizin taraması ve kod okumasıyla envanterler (`CODE_VERIFIED`). Yetkilendirme ve denetim (audit) sütunları **yüksek düzeyde** tutulmuştur; derinlemesine yetkilendirme mimarisi `11_BYS360_Rol_Yetki_ve_Erisim_Kontrol_Modeli.md` belgesinin kapsamındadır. Bu envanter, `docs/handover/BYS360_MODUL_ENVANTERI.md` (mevcut temel/baseline belge, iş alanı bazlı ve üst düzey) ile karşılaştırılmış; §12'de karşılaştırma notu yer alır.
 
 **Önemli, öncelikli uyarı — Puantaj:** Personel devam/mesai (Puantaj) modülü **bu inceleme kapsamında koddan doğrulanabilir, uçtan uca çalışan bir özellik olarak bulunamamıştır.** Puantaj **PLANLANAN / ONAYLANAN BİR SONRAKİ GELİŞTİRME**dir, halihazırda uygulanmış değildir. Bkz. §11 için önemli bir netleştirme: personel modülünde **izin/devamsızlık istisnası (leave/attendance-exception) takibi** zaten mevcuttur, ancak bu, tam bir Puantaj (giriş-çıkış saat takibi/mesai) sistemiyle **karıştırılmamalıdır** — ayrıntı §11'dedir.
 
@@ -37,7 +37,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 | `app/main_handlers` | 11 | Ana sayfa/hesap/karşılaştırma iş mantığı yardımcıları |
 | `app/modules/strategic_performance` | — | Stratejik performans (KPI/hedef/yetkinlik) |
 | `app/modules/strategic_performance_dashboard` | — | Stratejik performans paneli (bkz. mimari doküman Ek §3) |
-| `app/performance` | 63 (59 üst düzey + `rules/`/`services/` alt paketlerinde 4 yardımcı dosya — **koordinatör düzeltmesi**, peer-review: tümü "route dosyası" değildir, bkz. §6.1) | Performans değerlendirme (en büyük modül) |
+| `app/performance` | 63 (59 üst düzey + `rules/`/`services/` alt paketlerinde 4 yardımcı dosya — tümü "route dosyası" değildir, bkz. §6.1) | Performans değerlendirme (en büyük modül) |
 | `app/portal` | 2 (+1005 satırlık routes.py) | Kurumsal sosyal portal (duvar/gönderi/grup) |
 | `app/pwa` | 2 | PWA (installable web app) desteği |
 | `app/refactor` | 19 | İç mimari/kalite sözleşme sabitleri (kullanıcıya yönelik özellik değil) |
@@ -53,7 +53,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 - **ÇEKİRDEK TABLOLAR:** `users` (`app/models/core_models.py`).
 - **ANA ROUTE'LAR:** `app.auth.routes` → `main_bp` üzerine eklenir (ayrı blueprint değildir, bkz. DOC-02 §4).
 - **YETKİLENDİRME SINIRI:** Girişsiz erişilebilen tek yüzey; sonrası tüm route'lar `@login_required`.
-- **DENETİM SINIRI:** Giriş denemeleri `failed_login_attempts` sayacı ve CAPTCHA/throttle mekanizmasıyla sınırlanır; ayrı bir `audit_logs` kaydına yazıldığına dair kod kanıtı bu turda bulunamadı (`app/main_handlers/auth_handlers.py` içinde `AuditLog`/`write_audit_log`/`record_security_event` referansı yok) — **koordinatör düzeltmesi** (peer-review, Agent 3 bulgusu): önceki ifade bunu yanlışlıkla kesinleşmiş/doğrulanmış gibi sunuyordu; doğru durum NOT_YET_FINALIZED'dir, bkz. DOC-05 §8.
+- **DENETİM SINIRI:** Giriş denemeleri `failed_login_attempts` sayacı ve CAPTCHA/throttle mekanizmasıyla sınırlanır; ayrı bir `audit_logs` kaydına yazıldığına dair kod kanıtı bu turda bulunamadı (`app/main_handlers/auth_handlers.py` içinde `AuditLog`/`write_audit_log`/`record_security_event` referansı yok) — doğru durum NOT_YET_FINALIZED'dir, bkz. DOC-05 §8.
 - **DURUM:** Uygulanmış, canlı.
 
 ### 3.2 `app/account` — Hesap Ayarları
@@ -77,7 +77,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 - **ANA ÖZELLİKLER:** Kullanıcı CRUD, Excel personel içe aktarma (`load_workbook` ile), rol matrisi (`role_matrix_routes.py`), hiyerarşi yönetişimi (`hierarchy_governance_routes.py`), canlıya geçiş yardımcıları (`go_live_routes.py`), Ops sağlık/içe aktarma/performans/personel/kullanıcı-eylem servisleri (`ops_*_services.py`, `ops_routes.py`), 12 ayrı AI karar desteği faz route dosyası (`ai_phase2/5/6/7/8/9/10/11/12_routes.py`) + 8 tematik AI karar desteği route dosyası (`ai_decision_advanced/dashboard/foundation/governance/logs/policy/quality/recommendation/reporting_routes.py`).
 - **BAĞIMLILIKLAR:** `app.route_registry.main_bp` (route'lar buraya eklenir — kendi `admin_bp`'si tanımlı ama canlıda **kayıtlı değildir**, bkz. DOC-02 Ek §1), `app/services/ai/*`, `app/services/auto_hierarchy_service.py`, `app/services/personnel/*`.
 - **ÇEKİRDEK TABLOLAR:** `users`, `personnel_categories`, `organization_units`, `role_menu_defaults`, `system_settings`, `module_settings`, `unit_menu_profiles`, `settings_change_logs` (`app/models/settings_models.py`), `ai_request_logs`, `ai_recommendations`, `ai_feedback_logs`, `ai_redaction_rules`, `ai_summary_cache` (`app/models/ai_models.py`).
-- **YETKİLENDİRME SINIRI:** `admin`/`super_admin`/`system_admin`/`sistem_yoneticisi` rol ailesi (ayrıntı Agent 3 kapsamında).
+- **YETKİLENDİRME SINIRI:** `admin`/`super_admin`/`system_admin`/`sistem_yoneticisi` rol ailesi (ayrıntı DOC-11'de).
 - **DENETİM SINIRI:** `audit_logs`, `settings_change_logs` (`app/models/audit_misc_models.py`, `app/models/settings_models.py`).
 - **DURUM:** Uygulanmış, canlı. AI karar desteği fazlarının bir kısmının canlı kapsamda (`app/live_scope.py`) görünürlüğü kısıtlı olabilir — bkz. DOC-02 §11.
 
@@ -85,7 +85,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 
 ### 5.1 `app/ai` (+ `app/services/ai`, `app/services/ai_decision`) — AI Karar Desteği
 
-- **AMAÇ:** Özetleme, önceliklendirme, risk farkındalığı, rapor yorumlama; **karar almaz**, öneri/özet üretir (kurumsal ilke — bkz. koordinatör olgu defteri `AI_GOVERNANCE_BOUNDARIES`).
+- **AMAÇ:** Özetleme, önceliklendirme, risk farkındalığı, rapor yorumlama; **karar almaz**, öneri/özet üretir (kurumsal ilke — bkz. `05_BYS360_Guvenlik_Yetkilendirme_KVKK_ve_Denetim.md` §6, §15).
 - **ANA ÖZELLİKLER:** Dashboard özet/brifing, HR izin brifingi, performans tutarlılık/özet analizleri, destek talebi triyajı, öneri uygulama/toplu uygulama, AI geri bildirim loglama (`app/ai/routes.py`), 11 "faz" route dosyası (`decision_support_faz1_ui_safe.py`, `faz3..faz12_routes.py`).
 - **BAĞIMLILIKLAR:** `app/services/ai/client.py` (sağlayıcı anlık görüntüsü — `get_provider_snapshot`), `app/services/ai/guardrails.py` (`AIAccessDenied`, `AIInputError`, `AIResourceNotFound`, `AIServiceDisabled` — erişim/girdi/servis-kapalı korumaları).
 - **ÇEKİRDEK TABLOLAR:** `ai_request_logs`, `ai_recommendations`, `ai_feedback_logs`, `ai_redaction_rules`, `ai_summary_cache`.
@@ -109,7 +109,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 - **STRATEJİK PERFORMANS ALT MODÜLÜ:** `app/modules/strategic_performance/` — `performance_target_periods`, `performance_targets`, `competency_library`, `role_competency_templates`, `self_reviews` tabloları (`CODE_VERIFIED`); ayrı bir `strategic_performance_bp` olarak `CORE_BLUEPRINT_SEQUENCE`'te **opsiyonel** kayıtlıdır. `app/modules/strategic_performance_dashboard/` ayrı bir panel Blueprint'i tanımlar; canlı kayıt durumu DOC-02 Ek §2'de netleştirilmemiş olarak işaretlenmiştir.
 - **BAĞIMLILIKLAR:** `app/institutional` (izin/devamsızlık verisi, değerlendirme muafiyeti hesaplarını besler), `app/communication` (geri bildirim toplantıları, e-posta hatırlatmaları), `app/services/mail_performance_sender.py`.
 - **ÇEKİRDEK TABLOLAR:** `performance_periods`, `performance_criteria`, `performance_weight_configs`, `performance_evaluations`, `performance_evaluation_items`, `evaluation_assignments`, `assignment_coverage_logs`, `performance_result_snapshots`, `performance_import_batches(_rows)`, `performance_publish_logs` (`app/models/performance_models.py`); ayrıca `performance_archived_results` (`performance_archive_models.py`), `performance_low_score_processes(_events)` (`performance_low_score_models.py`), `performance_process_flows(_steps)`, `performance_scoring_history`, `performance_president_approvals`, `performance_process_notifications`, `performance_feedback_pipeline_flows(_steps)` (`performance_process_engine_models.py`).
-- **YETKİLENDİRME SINIRI:** Rol ailesi + amir hiyerarşisi tabanlı çok katmanlı yetki (personel/1. amir/2. amir/3. amir opsiyonel/Başkan) — ayrıntı Agent 3 kapsamında.
+- **YETKİLENDİRME SINIRI:** Rol ailesi + amir hiyerarşisi tabanlı çok katmanlı yetki (personel/1. amir/2. amir/3. amir opsiyonel/Başkan) — ayrıntı DOC-11'de.
 - **DENETİM SINIRI:** `performance_evaluation_history` (`audit_misc_models.py`), `performance_publish_logs`, `performance_scoring_history`.
 - **ENTEGRASYONLAR:** E-posta (hatırlatma/yayın bildirimleri), AI karar desteği (özet/tutarlılık analizi), Sanal asistan (rehberlik kartları).
 - **DURUM:** Uygulanmış, canlı, en olgun ve en geniş kapsamlı modül. Puantaj'ın canlıya alınmasıyla bu modülün "devam/mazeret muafiyeti" hesaplama mantığının (`minimum_presence_days_for_evaluation`, `leave_skip_threshold_days`, `absence_skip_threshold_days`, `auto_skip_if_fully_absent`) Puantaj verisiyle bütünleşmesi **gelecekteki bir entegrasyon konusudur** (bkz. §11).
@@ -123,7 +123,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 - **ÇEKİRDEK TABLOLAR:** `organization_units`, `organization_unit_versions`, `employee_org_assignment_history` (`org_models.py`); `leave_balances`, `personnel_leaves`, `attendance_exceptions`, `delegation_assignments`, `personnel_document_categories(_documents)`, `personnel_self_service_request_*` (10 tablo — şablon/talep/ek/log/görev/SLA/eskalasyon), `personnel_position_histories`, `personnel_asset_assignments`, `personnel_checklist_*`, `personnel_lifecycle_cases(_tasks)`, `personnel_exit_interviews`, `personnel_handover_records(_items)`, `personnel_approval_stations`, `personnel_digital_handover_documents`, `personnel_exit_risk_assessments` (`hr_models.py` — toplam 30 tablo, İK en zengin ikinci tablo grubudur).
 - **BAĞIMLILIKLAR:** `performance_periods` (izin kayıtları dönem bazlı ilişkilendirilir), `app/services/personnel/*`.
 - **YETKİLENDİRME SINIRI:** `admin_users`, `org_units`, `hr_leave_tracking` canlı kapsam anahtarları; genişletilmiş İK ekranları (`hr_management`, `hr_reports`, `personnel_*`) `app/live_scope.py`'de zaman içinde daralıp genişletilmiş (bkz. §11).
-- **DENETİM SINIRI:** `personnel_status_history`, `personnel_process_notes`, `settings_change_logs` üzerinden dolaylı; ayrıntı Agent 3 kapsamında.
+- **DENETİM SINIRI:** `personnel_status_history`, `personnel_process_notes`, `settings_change_logs` üzerinden dolaylı; ayrıntı DOC-11'de.
 - **DURUM:** Uygulanmış, canlı — **ama Puantaj (devam/mesai saat takibi) bu modülün bir parçası değildir**, bkz. §11.
 
 ## 8. İletişim, Anket ve Geri Bildirim
@@ -151,7 +151,7 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 - **ANA ÖZELLİKLER:** `services.py`, `permissions.py` (izin modeli), `maintenance_service.py`, `settings_service.py`, `mail_service.py`.
 - **ÇEKİRDEK TABLOLAR:** 19 tablo — `file_storage_folders(_items)`, `file_transfers(_items)(_recipients)`, `file_share_links`, `file_requests(_uploads)`, `file_download_logs`, `file_access_logs`, `file_quota_usage(_policies)`, `file_security_scans`, `file_audit_logs`, `file_upload_sessions(_chunks)`, `file_center_mail_logs`, `file_center_role_permissions`, `file_center_settings` (bu oturumda doğrudan sayıldı, `docs/handover/DATABASE_MIGRATION.md`'deki 19 rakamıyla tutarlı — `CODE_VERIFIED`).
 - **DENETİM SINIRI:** `file_audit_logs`, `file_access_logs`, `file_download_logs` — dosya bazlı ayrıntılı denetim izi.
-- **DURUM:** Uygulanmış, canlı. Koordinatör olgu defteri (`KNOWN_OPEN_TECHNICAL_LEDGER_SUMMARY`), Dosya Merkezi izin/audit/rollback maddelerinde açık teknik defterin bulunduğunu belirtir — ayrıntı Agent 3 kapsamındadır, bu belge yalnızca modülün varlığını ve tablo sayısını doğrular.
+- **DURUM:** Uygulanmış, canlı. Dosya Merkezi izin/audit/rollback maddelerinde açık teknik defterin bulunduğu bilinmektedir — ayrıntı `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md` belgesindedir, bu belge yalnızca modülün varlığını ve tablo sayısını doğrular.
 
 ## 10. Portal, PWA, Dashboard, Yönetici Özeti
 
@@ -184,13 +184,13 @@ Bu doküman, `app/` dizini altındaki her üst düzey Python paketini doğrudan 
 
 ## 11. Puantaj — mevcut durum netleştirmesi (kritik bölüm)
 
-Bu incelemenin talimatı gereği, Puantaj'ın **halihazırda uygulanmış** gibi sunulması kesinlikle yasaktır. Kod taraması şu sonucu vermiştir:
+Puantaj'ın **halihazırda uygulanmış** bir özellikmiş gibi sunulması yanlış olur. Kod taraması şu sonucu vermiştir:
 
 - `app/` altında `"puantaj"` (case-insensitive) geçen **tek** dosya `app/services/ai_agent/assistant_full_live_usage_guide_v2.py`'dir; burada "puantaj" kelimesi, sanal asistanın arama anahtar kelimeleri listesinde **"Devamsızlık ve istisna kayıtları"** konusuna eşanlamlı bir arama terimi olarak geçer: `("devamsızlık", "devamsizlik", "puantaj", "attendance", "istisna", "mazeret", "geç kalma", "gec kalma")` (`CODE_VERIFIED` — satır 338). Yani sistemde "puantaj" yazıp arayan bir kullanıcı, asistan tarafından **mevcut** devamsızlık/istisna kayıtları ekranına yönlendirilir — bu, **gerçek bir Puantaj modülünün varlığı anlamına gelmez**, yalnızca terim eşleştirmesidir.
 - `"timesheet"` (İngilizce) hiçbir dosyada geçmemektedir (`CODE_VERIFIED`).
 - Personel modülünde (`app/models/hr_models.py`) gerçekten var olan ve bu terimle karıştırılabilecek modeller: `LeaveBalance` (`leave_balances`), `PersonnelLeave` (`personnel_leaves`), `AttendanceException` (`attendance_exceptions`), `DelegationAssignment` (`delegation_assignments`). Bunlar **izin bakiyesi, izin talebi, devamsızlık istisnası (mazeret/geç kalma vb. tek günlük/kısmi günlük kayıtlar) ve vekâlet** takibidir; her biri performans değerlendirmesini etkileyen alanlar taşır (`blocks_performance_evaluation`, `performance_mode`, `day_fraction`) — yani bu veri modelinin asıl amacı **performans değerlendirme muafiyeti hesaplamasını beslemektir**, bağımsız bir zaman/mesai (giriş-çıkış saat, fazla mesai, resmi tatil/vardiya) yönetim sistemi **değildir**.
 
-**Sonuç ve koordinatöre bildirim:** Puantaj (tam personel devam/mesai sistemi — giriş-çıkış saat kaydı, vardiya, fazla mesai, bordroya veri besleme vb.) bu incelemenin kapsamında **PLANLANAN / ONAYLANAN BİR SONRAKİ GELİŞTİRME** olarak doğrulanmıştır; herhangi bir kısmi/gömülü Puantaj alt sistemi bulunmamıştır. Var olan tek yakın kavram, izin/devamsızlık **istisna** kaydıdır ve bu zaten performans modülüyle entegredir — bu ayrım gelecekteki Puantaj tasarımında **çakışma/yeniden isimlendirme riski** taşıdığından (örn. "devamsızlık istisnası" ile "puantaj kaydı" kavramlarının kullanıcı arayüzünde birbirine karışması), Puantaj geliştirme fazına geçmeden önce ürün/iş analizi düzeyinde netleştirilmesi önerilir.
+**Sonuç:** Puantaj (tam personel devam/mesai sistemi — giriş-çıkış saat kaydı, vardiya, fazla mesai, bordroya veri besleme vb.) bu incelemenin kapsamında **PLANLANAN / ONAYLANAN BİR SONRAKİ GELİŞTİRME** olarak doğrulanmıştır; herhangi bir kısmi/gömülü Puantaj alt sistemi bulunmamıştır. Var olan tek yakın kavram, izin/devamsızlık **istisna** kaydıdır ve bu zaten performans modülüyle entegredir — bu ayrım gelecekteki Puantaj tasarımında **çakışma/yeniden isimlendirme riski** taşıdığından (örn. "devamsızlık istisnası" ile "puantaj kaydı" kavramlarının kullanıcı arayüzünde birbirine karışması), Puantaj geliştirme fazına geçmeden önce ürün/iş analizi düzeyinde netleştirilmesi önerilir.
 
 ## 12. `docs/handover/BYS360_MODUL_ENVANTERI.md` (baseline) ile karşılaştırma
 
@@ -206,7 +206,7 @@ Kullanıcıya doğrudan görünen bir "modül" olmayan, tüm modüllerin üzerin
 
 ---
 
-## Ek — Bu belgede tespit edilen, koordinatöre bildirilmesi gereken bulgular
+## Ek — Bu belgede tespit edilen, izlenmesi gereken bulgular
 
 1. **Puantaj bulunmamaktadır** — yalnızca asistan arama anahtar kelimesi olarak "puantaj" geçer, gerçek bir modül değildir (bkz. §11). Bu, yanlış anlaşılmaya çok açık bir nokta olduğundan kurumsal iletişimde özellikle vurgulanmalıdır.
 2. `admin_bp` (tanımlı, canlıda kayıtsız) ve `strategic_performance_dashboard_bp` (kayıt çağrısı bulunamadı) ile ilgili gözlemler DOC-02'de detaylandırılmıştır; modül envanteri açısından pratik etkisi, bu iki alt sistemin canlıda erişilebilirliğinin **ek doğrulama gerektirmesidir** (`NOT_YET_FINALIZED`).

@@ -18,7 +18,7 @@ Son Güncelleme: 2026-09-02
 
 ## 1. Onaylanmış/Talep Edilen Kapsam (İş Kalemleri)
 
-Aşağıdaki kalemler, bu fazın görev brifinginde Puantaj'ın onaylı/talep edilen kapsamı olarak belirtilmiştir:
+Aşağıdaki kalemler, kurum tarafından onaylanan/talep edilen Puantaj kapsamı olarak bu belgede kayıt altına alınmıştır:
 
 1. Aylık puantaj çizelgesi (monthly attendance sheet)
 2. Normal çalışma modeli
@@ -52,13 +52,13 @@ Aşağıdaki kalemler, bu fazın görev brifinginde Puantaj'ın onaylı/talep ed
 30. Yetkilendirme
 31. İzin/vekâlet/personel modülleriyle entegrasyon
 
-**Not:** Bu liste, brifingde verilen onaylı kapsamın birebir kaydıdır; bu current-state fazı bu kalemlerin hiçbirini genişletmemiş, yorumlamamış veya teknik tasarıma dökmemiştir.
+**Not:** Bu liste, kurum tarafından onaylanan kapsamın birebir kaydıdır; bu belge bu kalemlerin hiçbirini genişletmemiş, yorumlamamış veya teknik tasarıma dökmemiştir.
 
 ---
 
 ## 2. Mevcut Kod Tabanıyla İlişki (bu fazda yapılan tek doğrulama)
 
-Bu current-state fazı, Puantaj'a ait bir uygulamanın mevcut kod tabanında **hâlihazırda var olup olmadığını** yüzeysel biçimde kontrol etmiştir (derin bir tasarım/kapsam analizi değildir — bu, DOC-12'yi yazan Agent 1'in görevidir). Personel/İK modülünde izin (leave) ve devam (attendance) ile ilgili bazı temel kavramların zaten mevcut olabileceği not edilir (ör. personel izin kayıtları); ancak brifingde tarif edilen kapsamdaki (vardiya modeli, Ek-28, 4/A–4/D ayrımı, aylık kilit/onay zinciri, Excel içe/dışa aktarma önizlemesi gibi) **bütünleşik bir Puantaj modülünün** bu HEAD'de var olduğuna dair bir kanıt bulunmamıştır. Bu tespit DOC-12'de Agent 1 tarafından mekanik olarak (kod okuma yoluyla) teyit edilecek/detaylandırılacaktır; burada yalnızca ön uyarı olarak kayıt altına alınmıştır.
+Bu current-state fazı, Puantaj'a ait bir uygulamanın mevcut kod tabanında **hâlihazırda var olup olmadığını** yüzeysel biçimde kontrol etmiştir (derin bir tasarım/kapsam analizi değildir — bu, DOC-12 - Modül Envanteri belgesinin kapsamındadır). Personel/İK modülünde izin (leave) ve devam (attendance) ile ilgili bazı temel kavramların zaten mevcut olabileceği not edilir (ör. personel izin kayıtları); ancak onaylı kapsamda tarif edilen (vardiya modeli, Ek-28, 4/A–4/D ayrımı, aylık kilit/onay zinciri, Excel içe/dışa aktarma önizlemesi gibi) **bütünleşik bir Puantaj modülünün** bu HEAD'de var olduğuna dair bir kanıt bulunmamıştır. Bu tespit DOC-12'de kod okuması yoluyla ayrıca teyit edilip detaylandırılmıştır (bkz. DOC-12 §11); burada yalnızca ön uyarı olarak kayıt altına alınmıştır.
 
 ---
 
@@ -100,7 +100,7 @@ Bu current-state fazı, Puantaj'a ait bir uygulamanın mevcut kod tabanında **h
 
 ## 4. Bu Belgenin Kapsam Dışı Bıraktığı Konular
 
-Aşağıdakiler, görev tanımı gereği bu belgenin ve bu fazın kapsamı dışındadır ve burada ele alınmamıştır: veri modeli/tablo tasarımı, API/route tasarımı, ekran/arayüz tasarımı, iş kuralı motoru tasarımı, test planı, migration tasarımı, entegrasyon kodu, zaman/efor tasarımı, zaman/efor tahmini. Bunlar, Puantaj geliştirme fazının kendi kapsamındadır (bkz. proje sırası — DOC-19'daki finalizasyon sırası bölümü).
+Aşağıdakiler, bu belgenin ve bu fazın kapsamı dışındadır ve burada ele alınmamıştır: veri modeli/tablo tasarımı, API/route tasarımı, ekran/arayüz tasarımı, iş kuralı motoru tasarımı, test planı, migration tasarımı, entegrasyon kodu, zaman/efor tasarımı, zaman/efor tahmini. Bunlar, Puantaj geliştirme fazının kendi kapsamındadır (bkz. proje sırası — DOC-19'daki finalizasyon sırası bölümü).
 
 ## 5. Görsel Tasarım Standardıyla İlişki
 

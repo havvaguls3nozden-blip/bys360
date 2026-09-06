@@ -23,7 +23,7 @@ BYS360'ın mevcut geliştirme geçmişi (commit mesajları, tek `Git user: BYS36
 | Kaynak kontrolü altında tam commit geçmişi | CODE_VERIFIED (`git log`) |
 | Deterministik release üretimi (aynı commit → byte-birebir aynı zip) | DOCUMENTATION_DERIVED, `wheelhouse_identity_sha256` mekanizmasıyla tutarlı (CODE_VERIFIED: `reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json` deterministik SHA256 kimlik alanı içerir) |
 | Yazılı runbook seti (`docs/handover/`, kök `DEPLOYMENT.md`/`BACKUP_RUNBOOK.md`) | CODE_VERIFIED (dosyalar mevcut ve bu turda kısmen okunmuştur) |
-| Otomatik test paketi (brifing: TRUE FULL 5684 passed) | PRODUCTION_HISTORICAL — bkz. DOC-09 |
+| Otomatik test paketi (TRUE FULL 5684 passed) | PRODUCTION_HISTORICAL — bkz. DOC-09 |
 | CI kalite kapıları (Quality + Score100) | DOCUMENTATION_DERIVED, script dosyaları CODE_VERIFIED mevcut |
 | Migration zinciri tek head, tekrarlanabilir (`flask db heads`) | CODE_VERIFIED, bu oturumda fiilen çalıştırıldı |
 
@@ -38,7 +38,7 @@ BYS360'ın mevcut geliştirme geçmişi (commit mesajları, tek `Git user: BYS36
 
 ## 4. Çevrimdışı (offline) dağıtım yaklaşımı
 
-**Somut kanıt bulunmuştur:** `requirements.lock` (kilitli, tam sürümlü bağımlılık listesi) ve `build/wheelhouse/` (59 önceden indirilmiş `.whl` dosyası) bu HEAD'de mevcuttur (CODE_VERIFIED, dosyalar doğrudan listelenmiştir). **Açıklık notu (peer-review, Agent 2 bulgusu):** `requirements.lock`'ın kendi başlığı bunun güncel HEAD (`873e6d3`) için değil, **eski SHA `ec4e56bd9bab2ce59e9543fc647f55dffd37d94b`** için üretildiğini belirtir. Bunun pratik riski, `git diff ec4e56bd9bab2ce59e9543fc647f55dffd37d94b..HEAD -- requirements.txt` komutunun **boş** dönmesiyle (Agent 2 tarafından bu turda bağımsızca çalıştırılmıştır) düşük olarak değerlendirilir — doğrudan bağımlılık dosyası iki SHA arasında bayt-bayt aynıdır. Ancak bu, lock/wheelhouse'un güncel HEAD'e karşı **yeniden üretilip doğrulanmış olduğu** anlamına gelmez; bkz. DOC-16 §3, ledger `DEPENDENCY_LOCK_STATUS`. `reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json` (`generated_at: 2026-08-25T14:40:16`, `ok: true`, `wheel_count: 59`, hedef `python_version: 3.12, platform: win_amd64, abi: cp312`, deterministik `wheelhouse_identity_sha256`) bu wheelhouse'un başarıyla üretildiğini gösterir (SCRIPT_VERIFIED, rapor bu oturumda okunmuştur).
+**Somut kanıt bulunmuştur:** `requirements.lock` (kilitli, tam sürümlü bağımlılık listesi) ve `build/wheelhouse/` (59 önceden indirilmiş `.whl` dosyası) bu HEAD'de mevcuttur (CODE_VERIFIED, dosyalar doğrudan listelenmiştir). **Açıklık notu:** `requirements.lock`'ın kendi başlığı bunun güncel HEAD (`873e6d3`) için değil, **eski SHA `ec4e56bd9bab2ce59e9543fc647f55dffd37d94b`** için üretildiğini belirtir. Bunun pratik riski, `git diff ec4e56bd9bab2ce59e9543fc647f55dffd37d94b..HEAD -- requirements.txt` komutunun **boş** dönmesiyle (bu turda ayrıca çalıştırılıp doğrulanmıştır) düşük olarak değerlendirilir — doğrudan bağımlılık dosyası iki SHA arasında bayt-bayt aynıdır. Ancak bu, lock/wheelhouse'un güncel HEAD'e karşı **yeniden üretilip doğrulanmış olduğu** anlamına gelmez; bkz. DOC-16 §3, ledger `DEPENDENCY_LOCK_STATUS`. `reports/quality/BYS360_WHEELHOUSE_BUILD_REPORT.json` (`generated_at: 2026-08-25T14:40:16`, `ok: true`, `wheel_count: 59`, hedef `python_version: 3.12, platform: win_amd64, abi: cp312`, deterministik `wheelhouse_identity_sha256`) bu wheelhouse'un başarıyla üretildiğini gösterir (SCRIPT_VERIFIED, rapor bu oturumda okunmuştur).
 
 Bu, teoride `pip install --no-index --find-links build/wheelhouse -r requirements.lock` ile ağ erişimi olmadan bağımlılık kurulumunun mümkün olduğunu **destekler**. Ancak bu komutun bu HEAD'de fiilen (gerçek bir hedef makinede, sıfır ağ erişimiyle) çalıştırılıp `python -c "from app import create_app; create_app()"` ile doğrulandığına dair bu oturumda kanıt **üretilmemiştir** — `docs/handover/RELEASE_VERIFICATION.md`'nin "DEPENDENCY HANDOVER" kategorisi tam olarak bu koşulu (gerçek offline kurulum denemesi) "acceptable level" için şart koşar. Bu madde **NOT_YET_FINALIZED** olarak işaretlenir.
 
@@ -54,7 +54,7 @@ Tüm kaynak kod kurumun git deposunda, standart açık teknolojilerle (Flask/Pyt
 | ORM/Migration | SQLAlchemy 2.0.36 / Flask-Migrate (Alembic) | Standart, PostgreSQL dışına da taşınabilir |
 | Veritabanı | PostgreSQL 15 | Açık kaynak, kurulu tabanı geniş |
 | Sunucu | Waitress 3.0.1 (WSGI) | Saf Python, herhangi bir WSGI uyumlu ortamda çalışır |
-| Kuyruk | Redis + RQ | Açık kaynak; mimari olarak isteğe bağlıdır — **koordinatör düzeltmesi** (peer-review, Agent 2 bulgusu): bu satır bu belgenin ilk taslağında hâlâ REQUIRES_FINAL_REFRESH işaretliydi, ancak DOC-02 §6 (Agent 1) bunu bu fazda CODE_VERIFIED düzeyine yükseltmişti (5 dosyada doğrudan doğrulandı: `app/core/healthcheck.py`, `async_job_queue.py`, `shared_cache_store.py`, `runtime_cache.py`, `app/security/rate_limit_store.py`) — ledger v2 ile tutarlı hale getirildi, CODE_VERIFIED |
+| Kuyruk | Redis + RQ | Açık kaynak; mimari olarak isteğe bağlıdır — CODE_VERIFIED, 5 dosyada doğrudan doğrulandı: `app/core/healthcheck.py`, `async_job_queue.py`, `shared_cache_store.py`, `runtime_cache.py`, `app/security/rate_limit_store.py` (ayrıntı DOC-02 §6) |
 | AI sağlayıcı | Varsayılan "stub" (`internal_stub_plus`), dış servise bağımlı değil | CODE_VERIFIED, `config.py:722-724` — bkz. DOC-05 §6 |
 
 Bu teknoloji seçimi, kurumun tek bir bulut sağlayıcısına, tek bir SaaS AI sağlayıcısına veya kapalı bir platforma bağımlı kalmadan sistemi işletebilmesini destekler.
@@ -76,16 +76,16 @@ Aynı belge, bu puanın hesaplama mantığının (`waiver_active`, `scripts/qual
 **Bu current-state fazı için önemli sonuçlar:**
 1. Yukarıdaki `95/100` (TRANSFERABILITY_FINAL) rakamı, mevcut HEAD (`873e6d3348e644c5384a33a99c517600a3346cfd`) için **geçerli bir güncel puan değildir** — yalnızca **PRIOR/CHECKPOINT** bir tarihsel referans olarak, farklı bir SHA'ya (`cb2e57c`) ait olduğu açıkça belirtilerek anılabilir.
 2. `cb2e57c` ile mevcut HEAD arasında (kaynak kod, dokümantasyon-only olmayan commit'ler dahil) değişiklikler olmuş olabilir; bu current-state fazı bu farkı satır satır `git diff --stat` ile ayrıca doğrulamamıştır — NOT_YET_FINALIZED.
-3. Bu fazın görev tanımı, Puantaj öncesi bir "current-state" dokümantasyonu üretmektir, final/kapsamlı bir governance skorlama turu değildir ("NO FINAL FULL BUILD" talimatı).
-4. Dolayısıyla bu belge, mevcut HEAD için **yeni bir sayısal devredilebilirlik puanı üretmez veya iddia etmez**. Böyle bir puan, Puantaj entegrasyonu tamamlandıktan, kalan açık teknik madde defteri (`19_...`) kapatıldıktan ve final HEAD için taze exact-head CI kanıtı üretildikten **sonra**, ayrı ve açık bir governance turu ile hesaplanmalıdır (`FINALIZATION_SEQUENCE`, koordinatörün olgu defterinde tanımlıdır).
+3. Bu fazın amacı, Puantaj öncesi bir "current-state" dokümantasyonu üretmektir; final/kapsamlı bir governance skorlama turu değildir.
+4. Dolayısıyla bu belge, mevcut HEAD için **yeni bir sayısal devredilebilirlik puanı üretmez veya iddia etmez**. Böyle bir puan, Puantaj entegrasyonu tamamlandıktan, kalan açık teknik madde defteri (`19_...`) kapatıldıktan ve final HEAD için taze exact-head CI kanıtı üretildikten **sonra**, ayrı ve açık bir governance turu ile hesaplanmalıdır (final kapanış sırası için bkz. `19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md`).
 
 ## 9. Test otomasyonu — vendor/kişi bağımsızlığı açısından
 
-Otomatik test paketinin genişliği (brifing: TRUE FULL 5684 passed / 4 skipped / 0 failed / 0 errors, PRODUCTION_HISTORICAL — bkz. DOC-09), tek bir geliştiricinin zihinsel modeline değil, çalıştırılabilir/tekrarlanabilir doğrulamaya dayanan bir devir zeminini destekler. Migration testleri (`tests/migrations/`, gerçek Alembic `upgrade()`/`downgrade()` testleri, izole SQLite) migration'ların tekrarlanabilirliğini doğrudan hedefler (DOCUMENTATION_DERIVED, önceki devir belgesi test taksonomisi — bkz. DOC-09 §6).
+Otomatik test paketinin genişliği (TRUE FULL 5684 passed / 4 skipped / 0 failed / 0 errors, PRODUCTION_HISTORICAL — bkz. DOC-09), tek bir geliştiricinin zihinsel modeline değil, çalıştırılabilir/tekrarlanabilir doğrulamaya dayanan bir devir zeminini destekler. Migration testleri (`tests/migrations/`, gerçek Alembic `upgrade()`/`downgrade()` testleri, izole SQLite) migration'ların tekrarlanabilirliğini doğrudan hedefler (DOCUMENTATION_DERIVED, önceki devir belgesi test taksonomisi — bkz. DOC-09 §6).
 
 ## 10. Migration tekrarlanabilirliği
 
-Bu oturumda `flask db heads` fiilen çalıştırılmış ve tek head (`v1a2d3e4f5b6`) doğrulanmıştır (TEST_VERIFIED). Bu, migration zincirinin dallanmadığını ve sıfırdan bir ortamda deterministik biçimde uygulanabileceğini gösterir. Boş SQLite üzerinde beklenen, önceden bilinen bir `user_menu_permissions` guard-exception logu görülmüştür — bu savunmacı bir davranıştır, migration defekti değildir (CODE_VERIFIED/TEST_VERIFIED, koordinatörün olgu defterinde de kayıtlıdır).
+Bu oturumda `flask db heads` fiilen çalıştırılmış ve tek head (`v1a2d3e4f5b6`) doğrulanmıştır (TEST_VERIFIED). Bu, migration zincirinin dallanmadığını ve sıfırdan bir ortamda deterministik biçimde uygulanabileceğini gösterir. Boş SQLite üzerinde beklenen, önceden bilinen bir `user_menu_permissions` guard-exception logu görülmüştür — bu savunmacı bir davranıştır, migration defekti değildir (CODE_VERIFIED/TEST_VERIFIED).
 
 ## 11. Release doğrulama
 

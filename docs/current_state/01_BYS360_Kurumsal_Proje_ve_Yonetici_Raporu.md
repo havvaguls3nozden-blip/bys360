@@ -7,6 +7,7 @@ Durum: Puantaj Öncesi Mevcut Durum Dokümanı
 Kaynak Kod Referansı: 873e6d3348e644c5384a33a99c517600a3346cfd
 Uzak CI Referansı: 7d73ff4d468cad11d78d2339ba770f70b5ec0baf (uzaktan doğrulanmış tarihsel/mevcut kontrol noktası)
 Son Güncelleme: 2026-09-02
+Hazırlayan: Havva Gülsen Özden — Görevi: BYS360 Geliştiricisi
 
 ---
 

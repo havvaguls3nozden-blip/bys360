@@ -159,7 +159,7 @@ Tüm formlar şu unsurları tutarlı biçimde içermelidir: etiketler (labels), 
 
 Son kullanıcı ekranlarında şu türde ham geliştirici/sistem terimleri **gösterilmez**: faz (phase), sync, workflow state, endpoint, exception, traceback, ham JSON, `unauthorized_scope`, iç enum değerleri, veritabanı hatası, API hata payload'u.
 
-Bunların yerine kurumsal Türkçe karşılıkları kullanılır. Örnekler (görev tanımında verilen):
+Bunların yerine kurumsal Türkçe karşılıkları kullanılır. Örnekler:
 
 | Teknik/iç terim | Kullanıcıya gösterilen Türkçe karşılık |
 |---|---|
@@ -171,7 +171,7 @@ Bunların yerine kurumsal Türkçe karşılıkları kullanılır. Örnekler (gö
 
 İç hatalar (stack trace, SQL hatası, ham exception mesajı) kullanıcıya **asla sızdırılmaz**.
 
-**Not (dürüstlük kaydı):** Bu eşleme tablosu, görev tanımında verilen örnekleri birebir kayıt altına alır. Bu belge, mevcut her ekranın bu eşlemeye bugün zaten uyduğunu **iddia etmez** — bu, bundan sonraki geliştirme için bağlayıcı standarttır. Mevcut ekranlarda bu ilkeye aykırı örnekler bulunması durumunda, bu iç teknik defterde (`19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md`) ayrıca kayıt altına alınmalıdır — bu current-state fazı ekran ekran bir tarama yapmamıştır (`NOT_YET_FINALIZED`).
+**Not (dürüstlük kaydı):** Bu eşleme tablosu, seçilmiş örnekleri kayıt altına alır. Bu belge, mevcut her ekranın bu eşlemeye bugün zaten uyduğunu **iddia etmez** — bu, bundan sonraki geliştirme için bağlayıcı standarttır. Mevcut ekranlarda bu ilkeye aykırı örnekler bulunması durumunda, bu iç teknik defterde (`19_BYS360_Acik_Teknik_Madde_ve_Finalizasyon_Defteri.md`) ayrıca kayıt altına alınmalıdır — bu current-state fazı ekran ekran bir tarama yapmamıştır (`NOT_YET_FINALIZED`).
 
 ---
 
@@ -249,7 +249,7 @@ Tasarım sistemi değişiklikleri şunları gerektirir: etki incelemesi, etkilen
 
 ---
 
-## Ek — Bu belgede tespit edilen, koordinatöre kayıtlı bulgular
+## Ek — Bu belgede tespit edilen bulgular
 
 1. Ana renk (`#8B0000`), filigran (`ay_yildiz.png`, %6 opaklık), font ailesi (`Segoe UI, Arial, sans-serif`) ve `border-radius`/`backdrop-filter` kullanımı — dördü de doğrudan kod taramasıyla `CODE_VERIFIED` olarak doğrulanmıştır. Kurumun kendi `app/services/ui/brand_readiness_service.py` servisi, ana renk ve filigranın `base.html`'de varlığını **otomatik olarak** denetlemektedir — bu, kurumun bu kimliği zaten bilinçli/resmî bir sözleşme olarak ele aldığının güçlü bir göstergesidir.
 2. Ortak bileşen ailesi (§5) ve semantik renk paleti (§2.2) kesin HEX/dosya adı düzeyinde kod tabanında **henüz konsolide edilmemiştir** — bu belge bunları standart olarak koyar, mevcut envanter olarak sunmaz.
