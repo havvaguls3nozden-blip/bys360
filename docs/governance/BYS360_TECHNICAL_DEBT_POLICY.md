@@ -7,7 +7,7 @@ Tests: `tests/quality/test_bys360_technical_debt_registry_gate.py`
 ## Why this document exists
 
 Before this policy, BYS360 tracked technical debt informally, across
-conversation sessions and ad-hoc reports, using a working ledger
+ad-hoc notes and reports, using a working ledger
 (`P0=0, P1=0, P2=17, P3=21, TOTAL=38`) that could not be traced to any
 persisted, reconstructable set of individual items anywhere in this
 repository or its git history. That figure is preserved, unmodified, in
@@ -17,8 +17,8 @@ a target to fabricate items against.
 
 This policy exists so that a new maintainer, handed only this repository,
 can answer: how many debts are open, which are P0/P1/P2/P3, why, what
-closes them, and how to add or close one -- without reading any chat
-history.
+closes them, and how to add or close one -- without needing any unwritten
+context from earlier work.
 
 ## What counts as technical debt
 

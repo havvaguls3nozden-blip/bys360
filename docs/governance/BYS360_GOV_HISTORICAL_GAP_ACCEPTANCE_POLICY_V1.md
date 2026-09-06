@@ -6,7 +6,7 @@ policy_status             = APPROVED
 approval_mode             = HUMAN_EXPLICIT_TOKEN
 approval_summary          = "HUMAN_POLICY_APPROVAL = APPROVED / APPROVED_POLICY =
                              FORMAL_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1 / APPROVAL BASIS =
-                             READY_FOR_EXPLICIT_HUMAN_POLICY_APPROVAL", supplied in chat
+                             READY_FOR_EXPLICIT_HUMAN_POLICY_APPROVAL"
 approver_role             = HUMAN_PROJECT_OWNER
 approval_date             = 2026-08-22
 ratified_by               = BYS360 Historical Gap Acceptance Policy Design Ratification Wave
@@ -212,11 +212,11 @@ See the accompanying implementation reports (2026-08-22 and 2026-08-23) for full
 
 ## 10. Binding-Model Hardening Forensic Basis (2026-08-23)
 
-A subsequent read-only forensic wave, dispatching 3 independent specialist agents, examined
+A subsequent read-only forensic review, conducted in two independent passes, examined
 whether the original `target_scored_commit == scored_commit` design (Section 2 as it read on
-2026-08-22) was safe for a real future activation. One agent's initial read concluded no
+2026-08-22) was safe for a real future activation. The initial pass concluded no
 defect existed, reasoning that `_score100_evidence_verified()`'s exact `commit_sha ==
-scored_commit` match already prevented evidence substitution. A second, independent agent
+scored_commit` match already prevented evidence substitution. A second, independent pass
 identified a **critical gap that survives that check**: the evidence-manifest match constrains
 only which commit's *evidence* may be cited -- it says nothing about which commit's *registry
 content* is actually being read. Concretely: an operator could run the calculator with

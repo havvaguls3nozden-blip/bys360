@@ -237,8 +237,8 @@ prove it, and what would fail it.
 - **Evidence**: a clean (`ok: true`, zero findings) run of
   `scripts/release/scan_bys360_release_secrets.py` against the actual release ZIP's
   extracted contents, the actual `build/wheelhouse/` directory, and the actual
-  `docs/handover/` tree — see this wave's real test results for this repository's current
-  state, reported separately (in `AGENT3_REPORT.md`) rather than restated here as a
+  `docs/handover/` tree — see the relevant secret-scan report for this repository's current
+  state, reported separately rather than restated here as a
   permanent claim, since it must be re-run against every new release, not assumed to still
   hold.
 - **Fails if**: the scanner has never been run against the actual artifact being handed

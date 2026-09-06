@@ -42,7 +42,7 @@ Rol karşılaştırması normalize edilerek yapılır (`normalize_role_name` —
 
 ## 4. "Menü gizleme tek başına güvenlik değildir" ilkesi — doğrulanmış
 
-Bu, mission talebinde özellikle sorgulanan iddiadır. Kod düzeyinde doğrulama:
+Bu iddia, bu current-state incelemesinde özellikle sorgulanmıştır. Kod düzeyinde doğrulama:
 
 1. **Menünün kendisi bir yetki kaynağıdır, yalnızca UI kozmetiği değildir.** `menu_key_required` decorator'ı, sayfayı render etmeden ÖNCE `can_access_menu()` çağırır ve `False` dönerse `render_access_denied()` (403) döner (CODE_VERIFIED, `app/route_support.py:424-436`). Yani bir route `menu_key_required` ile korunuyorsa, menüde görünmeyen bir öğeye URL'i bilerek doğrudan gidilse dahi backend aynı görünürlük haritasına bakarak reddeder — **"menü gizli ama route açık"** senaryosu bu decorator için yapısal olarak mümkün değildir, çünkü ikisi aynı fonksiyonu (`build_menu_visibility_map`) kullanır.
 2. **Admin bypass'ı bilinçli olarak kaldırılmıştır.** Kod içi yorum: *"Admin/üst rol bypassı kaldırıldı. Bir route menu_key_required ile korunuyorsa son karar da Ayarlar > Rol Matrisi / kişi-birim görünürlüğünden gelen canlı menü haritasıdır."* (CODE_VERIFIED, `app/route_support.py:430-433`, etiket `BYS360_SETTINGS_LIVE_AUTHORITY_V2`).
@@ -78,7 +78,7 @@ Yazma katmanı (DB'ye kaydetme): `app/services/settings/menu_profile_access.py` 
 
 - `koordinator` rolü hem `MANAGER_FAMILY_ROLES` hem `PORTAL_EDITOR_ROLES` içindedir — birim yönetimi ve portal içerik editörlüğü yetkisini birlikte taşır (CODE_VERIFIED, §3).
 - `mali_musavir` (mali müşavir) rolü `ADMIN_FAMILY_ROLES` içinde sınıflandırılmıştır — bu, mali müşavirin admin-seviyesi genel yönetim yetkisiyle değil, aynı rol-ailesi menü/route kapısından geçtiği anlamına gelir; gerçek scope farkları (mali veriye özel filtreleme vb.) bu turda ayrıca aranmadı — NOT_YET_FINALIZED.
-- Performans modülünde vekalet (delegasyon) mekanizması `app/services/performance/delegation.py` üzerinden **`AssignmentAuditLog`**'a bağlıdır (CODE_VERIFIED, dosya `AssignmentAuditLog(` çağrısı içerir, satır 264 — **koordinatör düzeltmesi**, peer-review/Agent 2: önceki taslak bunu yanlışlıkla merkezi `AuditLog` modeliyle karıştırıyordu; `AssignmentAuditLog` ayrı bir model, `app/services/performance/models_phase5_template.py:44`'te tanımlı — bkz. DOC-05 §8 düzeltmesi); delegasyonun performans amir-onay zincirine tam entegrasyon detayı önceki devir belgesinde de "tek tek doğrulanmadı" olarak işaretlenmiştir (DOCUMENTATION_DERIVED, `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md:645`) — REQUIRES_FINAL_REFRESH.
+- Performans modülünde vekalet (delegasyon) mekanizması `app/services/performance/delegation.py` üzerinden **`AssignmentAuditLog`**'a bağlıdır (CODE_VERIFIED, dosya `AssignmentAuditLog(` çağrısı içerir, satır 264 — bu model merkezi `AuditLog` modeliyle karıştırılmamalıdır; `AssignmentAuditLog` ayrı bir model, `app/services/performance/models_phase5_template.py:44`'te tanımlı — bkz. DOC-05 §8); delegasyonun performans amir-onay zincirine tam entegrasyon detayı önceki devir belgesinde de "tek tek doğrulanmadı" olarak işaretlenmiştir (DOCUMENTATION_DERIVED, `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md:645`) — REQUIRES_FINAL_REFRESH.
 
 ## 9. Auditability ve delegasyon — yetki değişikliğinin kendisi izlenir
 

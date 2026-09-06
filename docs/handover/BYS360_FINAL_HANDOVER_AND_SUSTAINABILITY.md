@@ -153,19 +153,19 @@ Bunların HER BİRİ yalnız yukarıdaki tek satırla belgelenmiştir (PARTIAL k
 
 ### C:\bys360 — REPO-VERIFIED kısım (bu geliştirme/build makinesinden doğrudan gözlemlendi)
 
-Bu makine (Claude Code oturumunun çalıştığı geliştirme/build ortamı) `C:\bys360` altında şunları içeriyor:
+Bu makine (bu belgenin hazırlandığı geliştirme/build ortamı) `C:\bys360` altında şunları içeriyor:
 
 | Klasör | Ne işe yarar | Persistent mi | Silinebilir mi |
 |---|---|---|---|
 | `C:\bys360\project` | Kanonik ana git checkout — `.env.example`'daki `BYS360_PROJECT_ROOT` varsayılanı da bu yoldur; kurulum belgeleri (`BYS360_KURULUM_REHBERI.md`) release paketinin buraya extract edilmesini öngörür | Evet | Hayır — ana kod tabanı |
-| `C:\bys360\worktrees\*` | Bu oturumun kullandığı izole git worktree'leri (her biri ayrı bir branch/dalga için) | Hayır, geliştirme sırasında geçici | Kullanım bitince evet, `git worktree remove` ile |
+| `C:\bys360\worktrees\*` | Geliştirme sürecinde kullanılan izole git worktree'leri (her biri ayrı bir branch/çalışma için) | Hayır, geliştirme sırasında geçici | Kullanım bitince evet, `git worktree remove` ile |
 | `C:\bys360\backups` | `BACKUP_RUNBOOK.md`'de tanımlı kod/DB yedekleri (`predeploy_<timestamp>` alt klasörleri) | Evet | Hayır — retention politikasına göre yönetilir (bkz. §10) |
 | `C:\bys360\logs` | Uygulama/deployment logları | Evet | Log rotasyonu ile yönetilir, tamamen silinmez |
-| `C:\bys360\releases` | Bu oturumda üretilen release paketleri (zip + manifest + sha256sums) | Evet (bilinçli tutulur) | Eski paketler retention politikasına göre temizlenebilir |
+| `C:\bys360\releases` | Bu süreçte üretilen release paketleri (zip + manifest + sha256sums) | Evet (bilinçli tutulur) | Eski paketler retention politikasına göre temizlenebilir |
 | `C:\bys360\reports` | Kalite/audit raporları | Yarı-persistent | Evet, tekrar üretilebilir |
 | `C:\bys360\scratchpad`, `\tmp`, `\pytest-temp`, `\_pytest_tmp_phase12b`, `\audit_tmp`, `\release_out`, `\.pytest_cache` | Geliştirme/test/build sırasında oluşan geçici çalışma alanları | Hayır | Evet, güvenle silinebilir |
 
-**Önemli epistemik not:** Bu tablo, Claude Code'un ÇALIŞTIĞI geliştirme/build makinesinin gerçek `C:\bys360` yapısını yansıtır — bu, CANLI ÜRETİM Windows Server'ının dosya sistemi ile AYNI makine DEĞİLDİR. Bu devir dalgasının kendi talimatında adı geçen `overlays`, `archive`, `storage`, `local_storage`, `deploy_logs`, `staging` klasörleri bu geliştirme makinesinde **gözlemlenmedi** ve repository içindeki hiçbir belgede (DEPLOYMENT.md, BACKUP_RUNBOOK.md, docs/handover/*) bu isimlerle doğrulanmadı. Bunlar üretim sunucusunda gerçekten var olabilir (örn. `FILE_CENTER_STORAGE_ROOT` ortam değişkeni Dosya Merkezi için ayrı bir disk/volume yolu öngörür — `.env.example` örneği: `D:/bys360_storage/file_center`), ancak bu belge onları REPO-VERIFIED olarak sunmaz. **Yeni operatör: üretim sunucusunun gerçek dizin yapısını doğrudan RDP ile kontrol edip bu tabloyu güncellemelidir.**
+**Önemli epistemik not:** Bu tablo, bu belgenin hazırlandığı geliştirme/build makinesinin gerçek `C:\bys360` yapısını yansıtır — bu, CANLI ÜRETİM Windows Server'ının dosya sistemi ile AYNI makine DEĞİLDİR. Bu devir sürecinde adı geçen `overlays`, `archive`, `storage`, `local_storage`, `deploy_logs`, `staging` klasörleri bu geliştirme makinesinde **gözlemlenmedi** ve repository içindeki hiçbir belgede (DEPLOYMENT.md, BACKUP_RUNBOOK.md, docs/handover/*) bu isimlerle doğrulanmadı. Bunlar üretim sunucusunda gerçekten var olabilir (örn. `FILE_CENTER_STORAGE_ROOT` ortam değişkeni Dosya Merkezi için ayrı bir disk/volume yolu öngörür — `.env.example` örneği: `D:/bys360_storage/file_center`), ancak bu belge onları REPO-VERIFIED olarak sunmaz. **Yeni operatör: üretim sunucusunun gerçek dizin yapısını doğrudan RDP ile kontrol edip bu tabloyu güncellemelidir.**
 
 ### Uygulama kaynağı ile persistent veri ayrımı
 
@@ -297,7 +297,7 @@ $env:APP_PORT = '80'; $env:PYTHONUTF8 = '1'; $env:PYTHONIOENCODING = 'utf-8'; & 
 
 Tetikleyici: `-AtStartup` (sistem açılışında, saat bazlı değil). Ayarlar: `-AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable`.
 
-**⚠️ Doğrulanması gereken nokta:** Bu installer script'i, kendi içinde `-RunLevel Highest` / SYSTEM principal'ı AÇIKÇA ayarlamıyor (`New-ScheduledTaskPrincipal` çağrısı script içinde yok). Bu devir dalgasının brifinginde "SYSTEM, Highest" varsayılmıştı — **yeni operatör, canlı sunucudaki görevin gerçek çalıştırma düzeyini `Get-ScheduledTask -TaskName "BYS360 Live Waitress 80" | Select-Object -ExpandProperty Principal` ile doğrudan kontrol etmelidir.**
+**⚠️ Doğrulanması gereken nokta:** Bu installer script'i, kendi içinde `-RunLevel Highest` / SYSTEM principal'ı AÇIKÇA ayarlamıyor (`New-ScheduledTaskPrincipal` çağrısı script içinde yok). Bu devir sürecinde "SYSTEM, Highest" varsayılmıştı — **yeni operatör, canlı sunucudaki görevin gerçek çalıştırma düzeyini `Get-ScheduledTask -TaskName "BYS360 Live Waitress 80" | Select-Object -ExpandProperty Principal` ile doğrudan kontrol etmelidir.**
 
 Task yeniden başlatma (DEPLOYMENT.md §7):
 
@@ -583,14 +583,14 @@ python scripts/release/build_bys360_safe_release.py \
 
 **Negative controls:** Güvenlik testlerinde (host-spoof reddi, CSRF, rate-limit aşımı vb.) sistematik olarak kullanılır — "olumlu" testin yanında "bu girdi REDDEDİLMELİ" testleri de yazılır.
 
-### Portal video wave — test-harness false-positive olayı (HISTORICAL LESSON)
+### Portal video düzeltmesi — test-harness false-positive olayı (HISTORICAL LESSON)
 
-2026-08-24 tarihli bir dalgada, Portal video-URL alanının canlıda görünmediği bulunup düzeltildi (CSS grid taşma hatası, bkz. §16). Bu düzeltme, **kendisiyle hiç ilgisi olmayan** iki eski test dosyasında yanlış-pozitif FAIL'e yol açtı:
+2026-08-24 tarihinde, Portal video-URL alanının canlıda görünmediği bulunup düzeltildi (CSS grid taşma hatası, bkz. §16). Bu düzeltme, **kendisiyle hiç ilgisi olmayan** iki eski test dosyasında yanlış-pozitif FAIL'e yol açtı:
 
 - `test_no_important_declaration_added_by_this_pilot_precise_diff_check` — minified bir CSS satırında yapılan küçük bir değişiklik, aynı fiziksel satırdaki DOKUNULMAMIŞ bir `!important` kuralını "yeni eklenmiş" gibi raporluyordu (satır-bazlı, kaba `git diff` taraması nedeniyle).
 - İki adet `test_no_new_css_file_was_added` (Meeting Final Gate ve P0 Completion testleri) — `git status --porcelain -- app/static/css/` dizininin TAMAMEN boş olmasını şart koşuyordu; bu, Meeting özelliğiyle HİÇ ilgisi olmayan herhangi bir CSS değişikliğinde yanlış FAIL veriyordu.
 
-**Kanıtlanan çözüm:** Her iki mekanizma da, gerçek false-positive olduğu KANITLANDIKTAN sonra (senkron negatif-kontrol fixture'larıyla — bkz. commit `32517cf`), AYRI bir "test-harness düzeltme" dalgasında, minimal ve kapsamı sıkı tutularak düzeltildi: satır-bazlı diff yerine git'in kendi token/word-level diff algoritması (`git diff --no-index --word-diff=porcelain`), ve repo-geneli git-status kontrolü yerine "sahip olunan" (owned-scope) şablon dosyalarının kendi içeriğine bakan bir kontrol.
+**Kanıtlanan çözüm:** Her iki mekanizma da, gerçek false-positive olduğu KANITLANDIKTAN sonra (senkron negatif-kontrol fixture'larıyla — bkz. commit `32517cf`), AYRI bir "test-harness düzeltme" turunda, minimal ve kapsamı sıkı tutularak düzeltildi: satır-bazlı diff yerine git'in kendi token/word-level diff algoritması (`git diff --no-index --word-diff=porcelain`), ve repo-geneli git-status kontrolü yerine "sahip olunan" (owned-scope) şablon dosyalarının kendi içeriğine bakan bir kontrol.
 
 **Kural (bu olaydan çıkarılan, kalıcı):**
 1. Test ASLA bypass edilmez (skip/xfail ile borç gizlenmez).
@@ -668,7 +668,7 @@ python scripts/release/build_bys360_safe_release.py \
 | BYS360 Live Watchdog 80 | Disabled | **Repo'da BU İSİMLE HİÇBİR installer/referans bulunamadı** — yalnız operatör beyanına dayanır |
 | BYS360 Performance Mail Reminder 09 | Disabled | **Repo'da BU İSİMLE HİÇBİR installer/referans bulunamadı** — yalnız operatör beyanına dayanır |
 
-**⚠️ KRİTİK UYARI (görevin kendi talimatından, açıkça korunmuştur):**
+**⚠️ KRİTİK UYARI:**
 - **Watchdog** (`BYS360 Live Watchdog 80`) **deprecated ve disabled** olarak bildirilmiştir — yanlışlıkla yeniden AKTİF EDİLMEMELİDİR.
 - **Performance Mail Reminder 09** disabled olarak bildirilmiştir — yanlışlıkla yeniden AKTİF EDİLMEMELİDİR.
 
@@ -1083,7 +1083,7 @@ Eski handover paketleri/belgeleri SİLİNMEMİŞTİR — aşağıda CURRENT/SUPE
 | `docs/archive/pre_handover_20260708/**` (217 dosya) | **HISTORICAL** | 2026-07-08 öncesi dönemin geniş özellik/refactor notu arşivi |
 | `docs/archive/legacy-root/*.json` | **HISTORICAL** | Eski manifest/rapor dosyaları |
 
-**Not:** Bu devir dalgasının kendi brifinginde örnek olarak verilen `BYS360_HANDOVER_10_10_SOURCE_V6_20260708` adlı bir paket, tam repo taramasıyla ARANDI ve **bu isimle repoda hiçbir dosya/paket bulunamadı**. En yakın gerçek eşleşme `HANDOVER_10_10_EVIDENCE_20260708.md`'dir (farklı isim, aynı tarih) — bu belge yukarıdaki tabloda HISTORICAL olarak zaten doğru şekilde işaretlenmiştir. Var olmayan bir dosya adı bu index'e gerçekmiş gibi eklenmemiştir.
+**Not:** Bu devir sürecinde örnek olarak verilen `BYS360_HANDOVER_10_10_SOURCE_V6_20260708` adlı bir paket, tam repo taramasıyla ARANDI ve **bu isimle repoda hiçbir dosya/paket bulunamadı**. En yakın gerçek eşleşme `HANDOVER_10_10_EVIDENCE_20260708.md`'dir (farklı isim, aynı tarih) — bu belge yukarıdaki tabloda HISTORICAL olarak zaten doğru şekilde işaretlenmiştir. Var olmayan bir dosya adı bu index'e gerçekmiş gibi eklenmemiştir.
 
 ---
 

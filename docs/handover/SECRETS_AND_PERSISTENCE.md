@@ -22,8 +22,8 @@ cutover are allowed to replace wholesale.
 
 Enforced today by `scripts/release/build_bys360_safe_release.py`'s own filtering rules
 (`FORBIDDEN_DIR_PARTS`, `FORBIDDEN_SUFFIXES`, `_is_forbidden_env_file`,
-`FORBIDDEN_NAME_PATTERNS`, `FORBIDDEN_EXACT_NAMES`), independently re-checked by this
-wave's own scanner (`scripts/release/scan_bys360_release_secrets.py` — see below):
+`FORBIDDEN_NAME_PATTERNS`, `FORBIDDEN_EXACT_NAMES`), independently re-checked by the release process's own scanner
+(`scripts/release/scan_bys360_release_secrets.py` — see below):
 
 - A real `.env` file (only `.env.example` / `.env.docker.example` are allowed; there is
   currently no `.env.production.example` in this repository — if one is ever added, it must

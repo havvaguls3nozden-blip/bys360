@@ -35,7 +35,7 @@ the historical script (`Set-StrictMode -Version Latest`, `$ErrorActionPreference
 every phase wrapped so a failure anywhere stops the run and writes a receipt naming the
 phase/reason, never silently proceeding to a later phase).
 
-## The cutover flow (as specified for this wave)
+## The cutover flow (current procedure)
 
 The following step sequence is the design cutover is built against. **Verify the exact step
 numbering, function names, and log-line text against the actually integrated

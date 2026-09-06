@@ -3,7 +3,7 @@
 Doküman Adı: BYS360 Current-State Dokümantasyon Paketi Dizini
 Doküman Türü: İndeks
 Kurum: Çanakkale Savaşları Gelibolu Tarihi Alan Başkanlığı
-Sürüm: Current-State 1.0 (v2 — dokümantasyon sertleştirme fazı: DOC-20 eklendi, literal peer-review tamamlandı, Puantaj soru sayımı düzeltildi)
+Sürüm: Current-State 1.0 (v2 — dokümantasyon sertleştirme fazı: DOC-20 eklendi, belgeler arası çapraz doğrulama tamamlandı, Puantaj soru sayımı düzeltildi)
 Tarih: 2026-09-02
 Durum: Puantaj Öncesi Mevcut Durum Dokümanı
 Kaynak Kod Referansı: 873e6d3348e644c5384a33a99c517600a3346cfd
@@ -20,7 +20,7 @@ Bu dizin (`docs/current_state/`), BYS360'ın AK defektinin kapatılmasından son
 
 ## Kanonik SHA notu — üç farklı SHA aynı anda dolaşımda
 
-Bu paketin tamamı **yerel HEAD `873e6d3348e644c5384a33a99c517600a3346cfd`** için yazılmıştır. Ayrıca dolaşımda iki başka SHA daha vardır: brifingde verilen **uzak doğrulanmış kontrol noktası `7d73ff4d468cad11d78d2339ba770f70b5ec0baf`** (yerel HEAD ile birebir aynı değildir) ve `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md`'nin kendi kanonik SHA'sı **`cb2e57c5d1829ea743c696ae78595a20755f3f07`** (2026-08-24, `docs/handover/README.md` tarafından hâlâ "CURRENT" işaretli). Bu current-state paketi, bu üç SHA'yı birbirine karıştırmaz; her belgede hangi SHA'ya ait bilgi olduğu açıkça belirtilir. Final dokümantasyon yenilemesinde tek bir kanonik "aktif SHA" belirlenmesi önerilir (bkz. `BYS360_CURRENT_STATE_FACTS.md`).
+Bu paketin tamamı **yerel HEAD `873e6d3348e644c5384a33a99c517600a3346cfd`** için yazılmıştır. Ayrıca dolaşımda iki başka SHA daha vardır: önceki bir doğrulama turunda bildirilen **uzak doğrulanmış kontrol noktası `7d73ff4d468cad11d78d2339ba770f70b5ec0baf`** (yerel HEAD ile birebir aynı değildir) ve `docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md`'nin kendi kanonik SHA'sı **`cb2e57c5d1829ea743c696ae78595a20755f3f07`** (2026-08-24, `docs/handover/README.md` tarafından hâlâ "CURRENT" işaretli). Bu current-state paketi, bu üç SHA'yı birbirine karıştırmaz; her belgede hangi SHA'ya ait bilgi olduğu açıkça belirtilir. Final dokümantasyon yenilemesinde tek bir kanonik "aktif SHA" belirlenmesi önerilir (bkz. `BYS360_CURRENT_STATE_FACTS.md`).
 
 Ayrıca bu worktree'de, bu pakete tamamen yabancı, **dördüncü bir SHA'ya** (`ec4e56b...`) ait, izlenmeyen (untracked) kalıntı dosyalar bulunmaktadır (`AGENT2_REPORT.md`, `AGENT3_REPORT.md`, `reports/executive/BYS360_Kurumsal_Rapor_Kaynak.md`, `scripts/windows/deploy_bys360_ec4e56b_production_v*.ps1`). Bunlar farklı, bağımsız bir çalışma dalgasının kalıntılarıdır; bu paketin bir parçası değildir, silinmemiş/taşınmamıştır.
 
@@ -50,7 +50,7 @@ Ayrıca bu worktree'de, bu pakete tamamen yabancı, **dördüncü bir SHA'ya** (
 | 03 | [03_BYS360_Kurulum_Yapilandirma_ve_Canliya_Gecis_Kilavuzu.md](03_BYS360_Kurulum_Yapilandirma_ve_Canliya_Gecis_Kilavuzu.md) | Kurulum önkoşulları, ortam, çevrimdışı bağımlılık, canlıya geçiş |
 | 04 | [04_BYS360_Isletim_Bakim_ve_Guncelleme_Kilavuzu.md](04_BYS360_Isletim_Bakim_ve_Guncelleme_Kilavuzu.md) | Günlük/haftalık/aylık bakım, log, sürüm takibi |
 | 06 | [06_BYS360_Yedekleme_Geri_Donus_ve_Felaket_Kurtarma_Kilavuzu.md](06_BYS360_Yedekleme_Geri_Donus_ve_Felaket_Kurtarma_Kilavuzu.md) | Yedekleme, RPO/RTO, restore, felaket kurtarma |
-| 13 | [13_BYS360_Operasyon_ScheduledTask_ve_Servis_Yonetimi.md](13_BYS360_Operasyon_ScheduledTask_ve_Servis_Yonetimi.md) | Windows Scheduled Task modeli, PT72H bilinen açığı |
+| 13 | [13_BYS360_Operasyon_ScheduledTask_ve_Servis_Yonetimi.md](13_BYS360_Operasyon_ScheduledTask_ve_Servis_Yonetimi.md) | Windows Scheduled Task modeli, PT72H sertleştirmesi (canlı görevde uygulanmış) |
 | 14 | [14_BYS360_Release_Candidate_Cutover_ve_Rollback.md](14_BYS360_Release_Candidate_Cutover_ve_Rollback.md) | Release/candidate/cutover/rollback tam akışı |
 | 15 | [15_BYS360_Sorun_Giderme_ve_Mudahale_Kilavuzu.md](15_BYS360_Sorun_Giderme_ve_Mudahale_Kilavuzu.md) | Sorun giderme senaryoları |
 
@@ -88,8 +88,9 @@ Ayrıca bu worktree'de, bu pakete tamamen yabancı, **dördüncü bir SHA'ya** (
 - **Bu paket final değildir.** "Tüm bilinen defektler kapandı" veya "üretim bu SHA'yı çalıştırıyor" gibi ifadeler bu pakette kullanılmamıştır ve final teslime kadar kullanılmamalıdır.
 - **Puantaj henüz uygulanmamıştır.** Kod tabanında kapsamlı biçimde doğrulanmıştır (DOC-12 §11); bu paketteki hiçbir belge Puantaj'ı mevcut bir özellik olarak sunmaz. Kurumdan beklenen netleştirmeler artık 7 karar grubu altında **22 ayrı soru** olarak sayılmıştır (DOC-18 §3 — önceki "10 madde" sayımı yanıltıcıydı, bu fazda düzeltildi).
 - **Kurumsal tasarım standardı eklendi (bu fazda):** DOC-20, BYS360'ın görsel kimliğini (ana renk `#8B0000`, ay-yıldız filigranı — ikisi de kod taramasıyla doğrulandı) ve arayüz/dil standardını tanımlar.
-- **Literal peer-review tamamlandı (bu fazda):** Agent 1 ↔ Agent 2 ↔ Agent 3 çapraz incelemesi yürütüldü, bulgular `BYS360_DOCUMENT_CONSISTENCY_MATRIX.md`'de kayıtlıdır; tüm bulgular kaynağında düzeltilmiştir.
-- **Değişmeyen alanlar (final SHA/uzak CI/FULL sonrası yenilenmeli):** üretimde fiilen çalışan Alembic revizyonu, canlı domain adının DNS doğrulaması, `requirements.lock`/`build/wheelhouse/`'ın güncel HEAD'e karşı yeniden üretilip üretilmeyeceği, üç-SHA tutarsızlığının çözümü, PT72H sertleştirmesi, devredilebilirlik puanının yeniden hesaplanması, mevcut ekranların DOC-20 §10 (teknik dil yasağı) ilkesine uyumunun taranması.
+- **Belgeler arası çapraz doğrulama tamamlandı (bu fazda):** Doküman seti üzerinde çapraz tutarlılık incelemesi yürütüldü, bulgular `BYS360_DOCUMENT_CONSISTENCY_MATRIX.md`'de kayıtlıdır; tüm bulgular kaynağında düzeltilmiştir.
+- **Scheduled Task PT72H sertleştirmesi uygulandı (bu fazda):** canlı görev doğrudan sertleştirildi — `ExecutionTimeLimit=PT0S`, `RestartCount=3`, `RestartInterval=PT1M`, mekanik olarak doğrulandı (bkz. DOC-13 §5, DOC-15 §3, DOC-19). Kaynak kod, veritabanı değişmedi; yeni bir release dağıtılmadı. Repo kurulum script'inin bu parametreleri geçirecek şekilde güncellenmesi ayrı, düşük öncelikli bir açık madde olarak kalıyor.
+- **Değişmeyen alanlar (final SHA/uzak CI/FULL sonrası yenilenmeli):** üretimde fiilen çalışan Alembic revizyonu, canlı domain adının DNS doğrulaması, `requirements.lock`/`build/wheelhouse/`'ın güncel HEAD'e karşı yeniden üretilip üretilmeyeceği, üç-SHA tutarsızlığının çözümü, devredilebilirlik puanının yeniden hesaplanması, mevcut ekranların DOC-20 §10 (teknik dil yasağı) ilkesine uyumunun taranması.
 - **Puantaj sonrası yenilenmeli:** modül envanteri (DOC-12), yetki modeli (DOC-11), açık teknik defter (DOC-19), kurumsal özet (DOC-01/17), Puantaj'ın semantik renk haritası (DOC-20 §13).
 
 ## Hangi belgeler kurumsal, hangileri teknik/iç?
