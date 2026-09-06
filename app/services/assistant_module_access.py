@@ -152,8 +152,11 @@ def _table_columns(session, table_name: str) -> set[str]:
     """Tablo kolonlarını DB motoruna göre güvenli okur.
 
     Not:
-    - PostgreSQL tarafında information_schema.columns kullanılabilir.
-    - SQLite local/test ortamında information_schema yoktur; PRAGMA table_info kullanılır.
+    - BYS360 DEFECT AL: PostgreSQL tarafı artık SQLAlchemy'nin dialect-neutral
+      inspect() katmanını kullanır (aşağıdaki fallback bloğu); ayrı bir raw
+      information_schema.columns dalı tutulmuyor.
+    - SQLite local/test ortamında inspect() PRAGMA table_info üzerinden çalışır;
+      inspect() beklenmedik şekilde başarısız olursa doğrudan PRAGMA'ya düşülür.
     - Hata logunu spamlememek için beklenen dialect uyumsuzlukları exception olarak loglanmaz.
     """
     if text is None or session is None:
@@ -179,17 +182,6 @@ def _table_columns(session, table_name: str) -> set[str]:
             return {str(row[1]) for row in rows if len(row) > 1}
         except Exception:
             logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=177")
-            return set()
-
-    if dialect_name in {"postgresql", "postgres"}:
-        try:
-            rows = session.execute(
-                text("select column_name from information_schema.columns where table_name = :t"),
-                {"t": table},
-            ).fetchall()
-            return {str(row[0]) for row in rows}
-        except Exception:
-            logger.exception("BYS360 V6B guarded exception | file=app/services/assistant_module_access.py | line=187")
             return set()
 
     try:

@@ -6,7 +6,7 @@ from typing import Any
 
 from flask import jsonify, request
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.route_registry import main_bp
@@ -80,17 +80,13 @@ def _limit(default: int = 1000) -> int:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text(
-            """
-            SELECT column_name
-              FROM information_schema.columns
-             WHERE table_name = :table_name
-            """
-        ),
-        {"table_name": table_name},
-    ).scalars().all()
-    return {str(item) for item in rows}
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.columns``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction."""
+    inspector = inspect(db.engine)
+    if not inspector.has_table(table_name):
+        return set()
+    return {str(column["name"]) for column in inspector.get_columns(table_name)}
 
 
 def _select_expr(columns: set[str], name: str, aliases: tuple[str, ...] = (), fallback: str = "NULL") -> str:
