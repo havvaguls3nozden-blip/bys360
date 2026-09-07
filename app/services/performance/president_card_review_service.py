@@ -171,10 +171,41 @@ def _user_name(user_id: Any) -> str:
     return "-"
 
 def _approval(approval_id: int) -> dict[str, Any] | None:
+    """BYS360 DEFECT AM: the query referenced eight columns
+    (pa.visible_status, f.current_stage, f.current_owner_name,
+    f.last_action_title, f.publish_lock_status, f.publish_lock_reason,
+    f.publish_lock_required_action, f.publish_allowed) that no migration and
+    no reachable runtime schema-repair path ever creates -- confirmed
+    against a real, migration-built database, not just the ORM model. Read
+    with the same column-presence gating this file already uses in
+    _history_from_scoring_table()/_flow_steps(); every caller of these
+    fields in build_president_card_review_context() already has its own
+    fallback for a missing value (visible_status falls back to
+    approval_status, current_stage to current_status, publish_lock_* to
+    fixed default text, publish_allowed to False). current_owner_name was
+    dropped entirely: it is not read anywhere in this file.
+
+    pa.score is left untouched -- it is a real, actively-synced legacy
+    column (see process_engine_phase7_president_rule.py's _ensure_approval(),
+    which writes the same value to both score and final_score), confirmed
+    present on a real migration-built schema; an earlier, unrelated
+    introspection-wave test that reported it missing used a database built
+    from the ORM model only (db.create_all()), which does not reflect this
+    migration-owned column.
+    """
     if not table_exists("performance_president_approvals"):
         return None
+    flow_cols = table_columns("performance_process_flows") if table_exists("performance_process_flows") else set()
+    pa_cols = table_columns("performance_president_approvals")
+    visible_status_expr = "pa.visible_status" if "visible_status" in pa_cols else "NULL"
+    current_stage_expr = "f.current_stage" if "current_stage" in flow_cols else "NULL"
+    last_action_title_expr = "f.last_action_title" if "last_action_title" in flow_cols else "NULL"
+    publish_lock_status_expr = "f.publish_lock_status" if "publish_lock_status" in flow_cols else "NULL"
+    publish_lock_reason_expr = "f.publish_lock_reason" if "publish_lock_reason" in flow_cols else "NULL"
+    publish_lock_required_action_expr = "f.publish_lock_required_action" if "publish_lock_required_action" in flow_cols else "NULL"
+    publish_allowed_expr = "f.publish_allowed" if "publish_allowed" in flow_cols else "NULL"
     return _one(
-        """
+        f"""
         SELECT
             pa.id AS approval_id,
             pa.flow_id,
@@ -183,21 +214,20 @@ def _approval(approval_id: int) -> dict[str, Any] | None:
             pa.employee_id,
             COALESCE(pa.final_score, pa.score, e.final_total_100, f.final_score) AS final_score,
             pa.status AS approval_status,
-            pa.visible_status,
+            {visible_status_expr} AS visible_status,
             pa.requested_at,
             pa.decided_at,
             pa.decision_note,
             pa.president_user_id,
             pa.president_name,
             f.current_status,
-            f.current_stage,
-            f.current_owner_name,
-            f.last_action_title,
+            {current_stage_expr} AS current_stage,
+            {last_action_title_expr} AS last_action_title,
             f.last_action_at,
-            f.publish_lock_status,
-            f.publish_lock_reason,
-            f.publish_lock_required_action,
-            f.publish_allowed,
+            {publish_lock_status_expr} AS publish_lock_status,
+            {publish_lock_reason_expr} AS publish_lock_reason,
+            {publish_lock_required_action_expr} AS publish_lock_required_action,
+            {publish_allowed_expr} AS publish_allowed,
             e.status AS evaluation_status,
             e.workflow_status,
             e.level_1_evaluator_id,
