@@ -131,12 +131,22 @@ def _notification_rows(limit: int = 500) -> Sequence[Any]:
     if not columns:
         return []
     message_filter = ""
+    params: dict[str, Any] = {"limit": limit}
     if "module_key" in columns:
         message_filter = "WHERE module_key IN ('performance', 'ai_decision')"
     elif "title" in columns:
-        message_filter = "WHERE title ILIKE '%performans%' OR title ILIKE '%değerlendirme%'"
+        # BYS360 DEFECT AM: PostgreSQL-only ILIKE has no SQLite equivalent.
+        # LOWER(x) LIKE LOWER(y) is ANSI-standard and preserves the same
+        # case-insensitive substring match on both dialects. Known SQLite-only
+        # limitation: SQLite's built-in LOWER() folds ASCII only, so an
+        # ALL-CAPS Turkish word with a non-ASCII letter (Ğ, İ, Ş, Ö, Ü, Ç) in
+        # the title will not match on SQLite; unaffected on PostgreSQL and on
+        # ordinary sentence-case text on both.
+        message_filter = "WHERE LOWER(title) LIKE LOWER(:kw1) OR LOWER(title) LIKE LOWER(:kw2)"
+        params["kw1"] = "%performans%"
+        params["kw2"] = "%değerlendirme%"
     sql = f"SELECT id FROM notifications {message_filter} ORDER BY id DESC LIMIT :limit"
-    return db.session.execute(text(sql), {"limit": limit}).mappings().all()
+    return db.session.execute(text(sql), params).mappings().all()
 
 
 def _mail_log_rows(limit: int = 500) -> Sequence[Any]:
@@ -144,10 +154,14 @@ def _mail_log_rows(limit: int = 500) -> Sequence[Any]:
     if not columns:
         return []
     filter_sql = ""
+    params: dict[str, Any] = {"limit": limit}
     if "subject" in columns:
-        filter_sql = "WHERE subject ILIKE '%performans%' OR subject ILIKE '%değerlendirme%'"
+        # BYS360 DEFECT AM: PostgreSQL-only ILIKE has no SQLite equivalent.
+        filter_sql = "WHERE LOWER(subject) LIKE LOWER(:kw1) OR LOWER(subject) LIKE LOWER(:kw2)"
+        params["kw1"] = "%performans%"
+        params["kw2"] = "%değerlendirme%"
     sql = f"SELECT id FROM mail_logs {filter_sql} ORDER BY id DESC LIMIT :limit"
-    return db.session.execute(text(sql), {"limit": limit}).mappings().all()
+    return db.session.execute(text(sql), params).mappings().all()
 
 
 @main_bp.route("/ai/decision-support/faz9/health")
