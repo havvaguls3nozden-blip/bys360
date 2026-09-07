@@ -89,7 +89,7 @@ class _FakeExecResult:
     def scalar(self) -> Any:
         return self._scalar
 
-    def mappings(self) -> "_FakeExecResult":
+    def mappings(self) -> _FakeExecResult:
         return self
 
     def first(self) -> dict[str, Any] | None:
@@ -414,6 +414,14 @@ def test_decide_president_approval_approved_by_real_president_updates_status_and
         ]
     )
     fake_db = _install_fake_db(monkeypatch, execute)
+    # BYS360 DEFECT AN: decide_president_approval() now gates its optional
+    # UPDATE columns (decision_status/decision_action/decided_by_name/...)
+    # through _table_columns(), which this fake db cannot answer (no real
+    # engine); _table_columns is mocked directly, matching real production
+    # schema truth -- none of those columns exist under any migration -- so
+    # only the always-real status/president_user_id/decided_at/
+    # decision_note/updated_at columns are asserted below.
+    monkeypatch.setattr(approvals, "_table_columns", lambda name: set())
 
     insert_calls: list[dict[str, Any]] = []
     monkeypatch.setattr(approvals, "_insert_step_for_decision", lambda **kw: insert_calls.append(kw))
@@ -435,11 +443,8 @@ def test_decide_president_approval_approved_by_real_president_updates_status_and
     assert "UPDATE performance_president_approvals" in update_sql
     assert update_params["approval_id"] == approval_id
     assert update_params["status"] == "approved"
-    assert update_params["decision_action"] == "onay"
     assert update_params["actor_id"] == 42
-    assert update_params["actor_name"] == "Ayşe Başkan"
     assert update_params["note"] == "Onaylandı"
-    assert update_params["visible_status"] == "Onaylandı"
 
     # The audit/history side effect the source actually performs on a valid
     # decision: it calls `_insert_step_for_decision` with the real actor and
@@ -469,6 +474,7 @@ def test_decide_president_approval_returned_by_real_admin_updates_status(
         ]
     )
     fake_db = _install_fake_db(monkeypatch, execute)
+    monkeypatch.setattr(approvals, "_table_columns", lambda name: set())
     monkeypatch.setattr(approvals, "_insert_step_for_decision", lambda **kw: None)
 
     admin = SimpleNamespace(
@@ -485,8 +491,7 @@ def test_decide_president_approval_returned_by_real_admin_updates_status(
     update_sql, update_params = execute.calls[1]
     assert "UPDATE performance_president_approvals" in update_sql
     assert update_params["status"] == "returned"
-    assert update_params["decision_action"] == "iade"
-    assert update_params["visible_status"] == "İade edildi"
+    assert update_params["note"] == "İade"
 
 
 # ---------------------------------------------------------------------------

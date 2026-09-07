@@ -218,10 +218,14 @@ def delete_president_approval_record(approval_id: int, actor: Any) -> Phase6Acti
     if not table_exists("performance_president_approvals"):
         return Phase6ActionResult(False, "Başkan onayı tablosu bulunamadı.", approval_id)
 
+    # BYS360 DEFECT AN: this SELECT also listed pa.decision_status, a column
+    # that no migration and no reachable runtime schema path ever creates --
+    # confirmed against a real, migration-built database. The value was
+    # never read anywhere below, so it is dropped rather than gated.
     row = db.session.execute(
         text(
             """
-            SELECT id, flow_id, evaluation_id, employee_id, status, decision_status
+            SELECT id, flow_id, evaluation_id, employee_id, status
             FROM performance_president_approvals
             WHERE id = :approval_id
             LIMIT 1
@@ -258,15 +262,20 @@ def delete_president_approval_record(approval_id: int, actor: Any) -> Phase6Acti
     return Phase6ActionResult(True, "Başkan onayı kaydı silindi." + detail, approval_id)
 
 
-def _status_filter_sql(status_filter: str) -> tuple[str, dict[str, Any]]:
+def _status_filter_sql(status_filter: str, decision_status_expr: str = "pa.decision_status") -> tuple[str, dict[str, Any]]:
+    """BYS360 DEFECT AN: this WHERE fragment referenced pa.decision_status
+    directly; the only caller now passes the same column-presence-gated
+    expression it already uses for the SELECT list, so the filter degrades
+    to the real pa.status column when decision_status is absent, the same
+    way the rest of _approval_base_rows() does."""
     normalized = str(status_filter or "pending").strip().lower()
     if normalized in {"all", "tum", "tumu"}:
         return "", {}
     if normalized in {"approved", "onaylanan"}:
-        return "AND LOWER(COALESCE(pa.status, pa.decision_status, '')) IN ('approved', 'onaylandi', 'onaylandı')", {}
+        return f"AND LOWER(COALESCE(pa.status, {decision_status_expr}, '')) IN ('approved', 'onaylandi', 'onaylandı')", {}
     if normalized in {"returned", "iade"}:
-        return "AND LOWER(COALESCE(pa.status, pa.decision_status, '')) IN ('returned', 'iade', 'iade_edildi')", {}
-    return "AND LOWER(COALESCE(pa.status, pa.decision_status, 'bekliyor')) IN ('pending', 'bekliyor', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')", {}
+        return f"AND LOWER(COALESCE(pa.status, {decision_status_expr}, '')) IN ('returned', 'iade', 'iade_edildi')", {}
+    return f"AND LOWER(COALESCE(pa.status, {decision_status_expr}, 'bekliyor')) IN ('pending', 'bekliyor', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')", {}
 
 
 # BYS360_PRESIDENT_APPROVALS_CORPORATE_UI_V3
@@ -426,13 +435,41 @@ def _full_name_from_row(row: Any, prefix: str) -> str:
 
 
 def _approval_base_rows(*, viewer: Any, status_filter: str = "pending", limit: int = 200) -> list[Any]:
-    status_sql, params = _status_filter_sql(status_filter)
+    """BYS360 DEFECT AN: the SELECT referenced eight columns
+    (pa.decision_status, pa.visible_status, f.current_stage,
+    f.current_owner_name, f.last_action_title, f.waiting_since,
+    f.waiting_days, f.flow_summary) that no migration and no reachable
+    runtime schema path ever creates -- confirmed against a real,
+    migration-built database. This 500'd every request to the Başkan
+    Onayları screen. Read with the same column-presence gating this file
+    already uses in _insert_step_for_decision()/the flow UPDATE below;
+    every caller of these fields already had its own fallback for a
+    missing value (raw_status already falls back to the real pa.status
+    column; current_stage/last_action_title/flow_summary already fall
+    back to visible_status or a fixed default text). f.current_owner_id is
+    real (the model's current_owner_id) and is now selected directly so
+    the owner's display name can be resolved via this file's own
+    _display_user_name() instead of a nonexistent name column.
+    """
+    pa_cols = _table_columns("performance_president_approvals")
+    flow_cols = _table_columns("performance_process_flows") if table_exists("performance_process_flows") else set()
+    decision_status_expr = "pa.decision_status" if "decision_status" in pa_cols else "NULL"
+    visible_status_expr = "pa.visible_status" if "visible_status" in pa_cols else "NULL"
+
+    status_sql, params = _status_filter_sql(status_filter, decision_status_expr)
     params["limit"] = int(limit)
     where_parts = ["1=1", status_sql.replace("AND ", "", 1) if status_sql else ""]
     if is_president_user(viewer) and not is_admin_user(viewer):
         where_parts.append("(pa.president_user_id IS NULL OR pa.president_user_id = :viewer_id)")
         params["viewer_id"] = int(getattr(viewer, "id", 0) or 0)
     where_sql = " AND ".join(part for part in where_parts if part)
+
+    current_stage_expr = "f.current_stage" if "current_stage" in flow_cols else "NULL"
+    current_owner_id_expr = "f.current_owner_id" if "current_owner_id" in flow_cols else "NULL"
+    last_action_title_expr = "f.last_action_title" if "last_action_title" in flow_cols else "NULL"
+    waiting_days_expr = "f.waiting_days" if "waiting_days" in flow_cols else "NULL"
+    flow_summary_expr = "f.flow_summary" if "flow_summary" in flow_cols else "NULL"
+
     return _rows(
         f"""
         SELECT
@@ -443,20 +480,19 @@ def _approval_base_rows(*, viewer: Any, status_filter: str = "pending", limit: i
             pa.employee_id,
             pa.final_score,
             pa.status AS approval_status,
-            pa.decision_status,
-            pa.visible_status,
+            {decision_status_expr} AS decision_status,
+            {visible_status_expr} AS visible_status,
             pa.president_user_id,
             pa.requested_at,
             pa.decided_at,
             pa.decision_note,
             f.current_status AS flow_status,
-            f.current_stage,
-            f.current_owner_name,
-            f.last_action_title,
+            {current_stage_expr} AS current_stage,
+            {current_owner_id_expr} AS current_owner_id,
+            {last_action_title_expr} AS last_action_title,
             f.last_action_at,
-            f.waiting_since,
-            f.waiting_days,
-            f.flow_summary,
+            {waiting_days_expr} AS waiting_days,
+            {flow_summary_expr} AS flow_summary,
             e.final_total_100 AS evaluation_final_score,
             e.status AS evaluation_status,
             e.workflow_status,
@@ -502,11 +538,17 @@ def _history_from_evaluation_items(evaluation_id: int | None) -> list[dict[str, 
     if "evaluation_id" not in item_cols or "manager_level" not in item_cols:
         return []
 
+    # BYS360 DEFECT AN: ::numeric is PostgreSQL-only syntax with no SQLite
+    # equivalent (raised "unrecognized token: :", crashing this reachable
+    # dependency of build_president_approval_workspace() on every request).
+    # The cast was dropped; "/ 4.0" (a real literal) keeps the same
+    # non-truncating division on both dialects that "::numeric" gave on
+    # PostgreSQL alone.
     if "score_100" in item_cols:
-        score_expr = "ROUND(AVG(NULLIF(i.score_100, 0))::numeric, 2)"
+        score_expr = "ROUND(AVG(NULLIF(i.score_100, 0)), 2)"
         score_filter = "i.score_100 IS NOT NULL AND i.score_100 > 0"
     elif "score" in item_cols:
-        score_expr = "ROUND(AVG((((i.score::numeric - 1) / 4) * 100))::numeric, 2)"
+        score_expr = "ROUND(AVG(((i.score - 1) / 4.0) * 100), 2)"
         score_filter = "i.score IS NOT NULL"
     else:
         return []
@@ -547,7 +589,7 @@ def _history_from_evaluation_items(evaluation_id: int | None) -> list[dict[str, 
         )
         SELECT
             s.*,
-            NULLIF(TRIM(CONCAT_WS(' ', u.ad, u.soyad)), '') AS scorer_full_name,
+            NULLIF(TRIM(COALESCE(u.ad, '') || ' ' || COALESCE(u.soyad, '')), '') AS scorer_full_name,
             u.email AS scorer_email
         FROM item_summary s
         LEFT JOIN users u ON u.id = s.scorer_user_id
@@ -625,9 +667,14 @@ def _display_user_name(user_id: Any) -> str:
     if not user_id or not table_exists("users"):
         return "-"
     try:
+        # BYS360 DEFECT AN: CONCAT_WS is PostgreSQL-only with no SQLite
+        # equivalent -- always raised here on SQLite (silently caught below,
+        # degrading every owner-name lookup to "Kullanıcı #<id>"). Replaced
+        # with the ANSI-portable TRIM(COALESCE(...) || ' ' || COALESCE(...))
+        # already used elsewhere in this file/wave.
         row = db.session.execute(
             text("""
-                SELECT NULLIF(TRIM(CONCAT_WS(' ', ad, soyad)), '') AS full_name, email
+                SELECT NULLIF(TRIM(COALESCE(ad, '') || ' ' || COALESCE(soyad, '')), '') AS full_name, email
                 FROM users
                 WHERE id = :user_id
                 LIMIT 1
@@ -696,6 +743,13 @@ def _scoring_history(evaluation_id: int | None) -> list[dict[str, Any]]:
 
 
 def _flow_steps(flow_id: int | None, evaluation_id: int | None) -> list[dict[str, Any]]:
+    """BYS360 DEFECT AN: the SELECT referenced visible_title/visible_status/
+    waiting_owner_name/action_at, none of which are real columns on
+    performance_process_flow_steps under any migration or reachable
+    runtime schema path. Every caller already falls back to the real
+    step_title/step_status/owner_label/occurred_at columns when these are
+    absent, so they are now read with this file's own column-presence
+    gating."""
     if not table_exists("performance_process_flow_steps"):
         return []
     if flow_id:
@@ -706,25 +760,30 @@ def _flow_steps(flow_id: int | None, evaluation_id: int | None) -> list[dict[str
         params = {"evaluation_id": evaluation_id}
     else:
         return []
+    step_cols = _table_columns("performance_process_flow_steps")
+    visible_title_expr = "visible_title" if "visible_title" in step_cols else "NULL"
+    visible_status_expr = "visible_status" if "visible_status" in step_cols else "NULL"
+    waiting_owner_name_expr = "waiting_owner_name" if "waiting_owner_name" in step_cols else "NULL"
+    action_at_expr = "action_at" if "action_at" in step_cols else "NULL"
     rows = _rows(
         f"""
         SELECT
             id,
             step_order,
             step_title,
-            visible_title,
+            {visible_title_expr} AS visible_title,
             step_status,
-            visible_status,
+            {visible_status_expr} AS visible_status,
             actor_label,
             owner_label,
-            waiting_owner_name,
+            {waiting_owner_name_expr} AS waiting_owner_name,
             action_summary,
             occurred_at,
-            action_at,
+            {action_at_expr} AS action_at,
             created_at
         FROM performance_process_flow_steps
         WHERE {where_sql}
-        ORDER BY COALESCE(step_order, 0), COALESCE(action_at, occurred_at, created_at, CURRENT_TIMESTAMP), id
+        ORDER BY COALESCE(step_order, 0), COALESCE({action_at_expr}, occurred_at, created_at, CURRENT_TIMESTAMP), id
         """,
         params,
     )
@@ -776,6 +835,7 @@ def build_president_approval_workspace(viewer: Any, status_filter: str = "pendin
         visible_status = _public_status_label(row.get("visible_status") or raw_status)
         current_stage = _public_text(row.get("current_stage"), visible_status)
         last_action_title = _public_text(row.get("last_action_title"), visible_status)
+        current_owner_name = _display_user_name(row.get("current_owner_id")) if row.get("current_owner_id") else "Başkan"
         rows.append(
             {
                 "approval_id": row.get("approval_id"),
@@ -796,7 +856,7 @@ def build_president_approval_workspace(viewer: Any, status_filter: str = "pendin
                 "decided_at": _safe_date(row.get("decided_at")),
                 "decision_note": _public_text(row.get("decision_note"), ""),
                 "current_stage": current_stage,
-                "current_owner_name": _public_text(row.get("current_owner_name"), "Başkan"),
+                "current_owner_name": current_owner_name,
                 "last_action_title": last_action_title,
                 "last_action_at": _safe_date(row.get("last_action_at")),
                 "waiting_days": row.get("waiting_days") if row.get("waiting_days") is not None else 0,
@@ -818,6 +878,19 @@ def build_president_approval_workspace(viewer: Any, status_filter: str = "pendin
 
 
 def _insert_step_for_decision(*, approval_id: int, flow_id: int | None, evaluation_id: int | None, actor: Any, action: str, note: str | None) -> None:
+    """BYS360 DEFECT AN: performance_process_flow_steps.flow_id is NOT NULL
+    (see PerformanceProcessFlowStep in performance_process_engine_models.py),
+    but performance_president_approvals.flow_id is nullable and legacy
+    flow-less approval records genuinely exist (_approval_base_rows()'s own
+    LEFT JOIN already anticipates this). Deciding such a record always
+    raised IntegrityError here, which the caller's broad except swallowed
+    as a generic "could not save" failure -- silently blocking every
+    approve/return decision on a flow-less record. There is no flow to
+    attach a timeline step to, so this now skips the insert instead of
+    crashing; the decision itself (status/decided_at/decision_note) is
+    still recorded by the caller."""
+    if flow_id is None:
+        return
     if not table_exists("performance_process_flow_steps"):
         return
     actor_name = user_display_name(actor)
@@ -883,36 +956,46 @@ def decide_president_approval(approval_id: int, actor: Any, action: str, note: s
     decision_action = "onay" if action == "approved" else "iade"
 
     try:
+        # BYS360 DEFECT AN: this UPDATE referenced eight columns
+        # (decision_status, decision_action, decided_by_user_id,
+        # decided_by_name, visible_status, action_required, process_version,
+        # updated_by_phase6_at) that no migration and no reachable runtime
+        # schema path ever creates -- confirmed against a real,
+        # migration-built database. Every approve/return decision silently
+        # failed. Gated the same way the flow UPDATE just below this one
+        # already does; status/president_user_id/decided_at/decision_note/
+        # updated_at are the real, canonical columns and are always written.
+        optional_payload = {
+            "decision_status": action,
+            "decision_action": decision_action,
+            "decided_by_user_id": actor_id,
+            "decided_by_name": actor_name,
+            "visible_status": visible_status,
+            "action_required": False,
+            "process_version": PHASE6_VERSION,
+            "updated_by_phase6_at": now,
+        }
+        available_approval_cols = _table_columns("performance_president_approvals")
+        filtered_optional = {key: value for key, value in optional_payload.items() if key in available_approval_cols}
+        assignments = ", ".join(
+            [
+                "status = :status",
+                "president_user_id = COALESCE(president_user_id, :actor_id)",
+                "decided_at = :now",
+                "decision_note = :note",
+                "updated_at = :now",
+                *(f"{key} = :{key}" for key in filtered_optional),
+            ]
+        )
         db.session.execute(
-            text(
-                """
-                UPDATE performance_president_approvals
-                   SET status = :status,
-                       decision_status = :status,
-                       decision_action = :decision_action,
-                       president_user_id = COALESCE(president_user_id, :actor_id),
-                       decided_by_user_id = :actor_id,
-                       decided_by_name = :actor_name,
-                       decided_at = :now,
-                       decision_note = :note,
-                       visible_status = :visible_status,
-                       action_required = FALSE,
-                       process_version = :version,
-                       updated_by_phase6_at = :now,
-                       updated_at = :now
-                 WHERE id = :approval_id
-                """
-            ),
+            text(f"UPDATE performance_president_approvals SET {assignments} WHERE id = :approval_id"),
             {
                 "approval_id": approval_id,
                 "status": action,
-                "decision_action": decision_action,
                 "actor_id": actor_id,
-                "actor_name": actor_name,
                 "now": now,
                 "note": note,
-                "visible_status": visible_status,
-                "version": PHASE6_VERSION,
+                **filtered_optional,
             },
         )
 
