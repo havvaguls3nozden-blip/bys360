@@ -124,11 +124,16 @@ def _latest_approval(evaluation_id: int | None, flow_id: int | None) -> dict[str
         params["flow_id"] = flow_id
     if not conditions:
         return None
+    # BYS360 DEFECT AM: the status expression referenced decision_status/
+    # visible_status, neither of which is a real column on
+    # performance_president_approvals (confirmed by the model and by every
+    # migration that owns this table) -- status (already first in the
+    # COALESCE) is the real, correct source.
     row = db.session.execute(
         text(
             f"""
             SELECT id,
-                   COALESCE(status, decision_status, visible_status, '') AS status,
+                   COALESCE(status, '') AS status,
                    COALESCE(final_score, score) AS final_score,
                    president_user_id,
                    requested_at
@@ -144,6 +149,13 @@ def _latest_approval(evaluation_id: int | None, flow_id: int | None) -> dict[str
 
 
 def _latest_flow(evaluation_id: int) -> dict[str, Any] | None:
+    """BYS360 DEFECT AM: query referenced ``president_required``, which does
+    not exist on performance_process_flows -- the real column is
+    ``president_approval_required`` (confirmed by the model and by every
+    migration that owns this table). The output key stays ``president_required``
+    (via the AS alias) since evaluate_publish_lock() reads that exact key.
+    ``current_stage`` was dropped: it is not a real column on this table and
+    is never read by any caller in this module."""
     if not _table_exists("performance_process_flows"):
         return None
     row = db.session.execute(
@@ -154,10 +166,9 @@ def _latest_flow(evaluation_id: int) -> dict[str, Any] | None:
                    period_id,
                    employee_id,
                    final_score,
-                   COALESCE(president_required, false) AS president_required,
-                   COALESCE(president_status, president_approval_status, '') AS president_status,
-                   COALESCE(current_status, '') AS current_status,
-                   COALESCE(current_stage, '') AS current_stage
+                   COALESCE(president_approval_required, false) AS president_required,
+                   COALESCE(president_approval_status, '') AS president_status,
+                   COALESCE(current_status, '') AS current_status
               FROM performance_process_flows
              WHERE evaluation_id = :evaluation_id
              ORDER BY id DESC

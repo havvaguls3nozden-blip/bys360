@@ -434,25 +434,37 @@ def _build_process_notification(
 
 
 def _waiting_flow_rows() -> list[Any]:
+    """BYS360 DEFECT AM: query referenced ``current_owner_user_id``, which
+    does not exist on performance_process_flows -- the real column is
+    ``current_owner_id`` (confirmed by the model and by every migration that
+    owns this table). ``current_owner_name``/``current_stage`` are also not
+    real columns; neither is created by any migration or reachable runtime
+    schema-repair path, so they are read with the same column-presence
+    gating this file family already uses elsewhere (see
+    _history_from_scoring_table() in president_card_review_service.py) --
+    both callers of these two fields already tolerate a missing value.
+    ``flow_summary``/``last_action_title`` were dropped: neither is read by
+    sync_phase5_notifications()."""
     if not table_exists("performance_process_flows"):
         return []
+    cols = _table_columns("performance_process_flows")
+    owner_name_expr = "current_owner_name" if "current_owner_name" in cols else "NULL"
+    current_stage_expr = "current_stage" if "current_stage" in cols else "NULL"
     return _rows(
-        """
+        f"""
         SELECT
             id,
             evaluation_id,
             period_id,
             employee_id,
-            current_owner_user_id,
-            current_owner_name,
-            current_stage,
+            current_owner_id,
+            {owner_name_expr} AS current_owner_name,
+            {current_stage_expr} AS current_stage,
             current_status,
             current_step_key,
-            flow_summary,
-            last_action_title,
             last_action_at
         FROM performance_process_flows
-        WHERE current_owner_user_id IS NOT NULL
+        WHERE current_owner_id IS NOT NULL
           AND LOWER(COALESCE(current_status, '')) IN ('bekliyor', 'waiting', 'takipte')
         ORDER BY COALESCE(last_action_at, CURRENT_TIMESTAMP) DESC, id DESC
         """
@@ -490,7 +502,7 @@ def sync_phase5_notifications() -> Phase5SyncResult:
     skipped = 0
 
     for row in _waiting_flow_rows():
-        recipient_id = row.get("current_owner_user_id")
+        recipient_id = row.get("current_owner_id")
         if not recipient_id:
             skipped += 1
             continue
