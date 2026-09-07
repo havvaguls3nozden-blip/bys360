@@ -144,7 +144,7 @@ def test_can_manage_process_tracking_false_for_real_personel() -> None:
 # row.get(...), so a dict is a fully honest stand-in for a DB row mapping).
 # Per source: president_pending is checked before is_overdue, which is
 # checked before is_finalized/current_status-completed, which is checked
-# before current_owner_user_id-present, which falls back to raw/monitoring.
+# before current_owner_id-present, which falls back to raw/monitoring.
 # ---------------------------------------------------------------------------
 
 
@@ -155,7 +155,7 @@ def test_row_bucket_president_pending_beats_overdue_even_when_both_true() -> Non
         "president_status": "pending",
         "is_overdue": True,
         "is_finalized": False,
-        "current_owner_user_id": None,
+        "current_owner_id": None,
     }
     assert pt._row_bucket(row) == "president_pending"
 
@@ -167,7 +167,7 @@ def test_row_bucket_overdue_beats_completed_when_no_president_pending() -> None:
         "president_status": None,
         "is_overdue": True,
         "is_finalized": True,
-        "current_owner_user_id": None,
+        "current_owner_id": None,
     }
     assert pt._row_bucket(row) == "overdue"
 
@@ -179,7 +179,7 @@ def test_row_bucket_completed_beats_owner_present_waiting() -> None:
         "president_status": None,
         "is_overdue": False,
         "is_finalized": True,
-        "current_owner_user_id": 5,
+        "current_owner_id": 5,
     }
     assert pt._row_bucket(row) == "completed"
 
@@ -191,7 +191,7 @@ def test_row_bucket_waiting_when_owner_present_and_nothing_else() -> None:
         "president_status": None,
         "is_overdue": False,
         "is_finalized": False,
-        "current_owner_user_id": 5,
+        "current_owner_id": 5,
     }
     assert pt._row_bucket(row) == "waiting"
 
@@ -203,7 +203,7 @@ def test_row_bucket_default_monitoring_when_nothing_matches() -> None:
         "president_status": None,
         "is_overdue": False,
         "is_finalized": False,
-        "current_owner_user_id": None,
+        "current_owner_id": None,
     }
     assert pt._row_bucket(row) == "monitoring"
 
@@ -215,7 +215,7 @@ def test_row_bucket_passes_through_tracking_bucket_text_as_last_resort() -> None
         "president_status": None,
         "is_overdue": False,
         "is_finalized": False,
-        "current_owner_user_id": None,
+        "current_owner_id": None,
     }
     assert pt._row_bucket(row) == "iade_edildi"
 
@@ -282,8 +282,24 @@ def test_clean_process_label_uses_custom_fallback_for_empty_value() -> None:
 
 # ---------------------------------------------------------------------------
 # _status_clause / _scope_clause: exact SQL-fragment and params text, never
-# executed here.
+# executed here. BYS360 DEFECT AN: both functions now take flow_cols as an
+# explicit parameter (production's _flow_base_rows() computes it once and
+# passes it in) instead of each issuing its own _table_columns() lookup --
+# keeping them pure, deterministic clause-builders with no ambient database/
+# app-context dependency, true to this file's own Tier 1 design. The set
+# below simulates the real+fixture schema (see _PHASE8_EXTRA_FLOW_COLUMNS
+# further down for the Tier 2 ALTER TABLE list this mirrors, and the real
+# current_owner_id/president_approval_* model columns).
 # ---------------------------------------------------------------------------
+
+_STATUS_CLAUSE_FLOW_COLS = {
+    "current_stage", "current_owner_name", "last_action_title", "waiting_since",
+    "waiting_days", "is_overdue", "overdue_days", "tracking_status", "tracking_bucket",
+    "tracking_priority", "tracking_label", "tracking_url", "last_visible_action",
+    "president_required", "president_status", "president_requested_at",
+    "process_version", "updated_by_engine_at", "tracking_updated_at",
+    "current_owner_id", "president_approval_required", "president_approval_status",
+}
 
 
 @pytest.mark.parametrize(
@@ -294,7 +310,7 @@ def test_clean_process_label_uses_custom_fallback_for_empty_value() -> None:
         ("nonsense_unknown_filter", ""),
         (
             "waiting",
-            "AND COALESCE(f.current_owner_user_id, 0) <> 0 AND LOWER(COALESCE(f.tracking_bucket, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')",
+            "AND COALESCE(f.current_owner_id, 0) <> 0 AND LOWER(COALESCE(f.tracking_bucket, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')",
         ),
         (
             "president",
@@ -312,29 +328,29 @@ def test_clean_process_label_uses_custom_fallback_for_empty_value() -> None:
     ],
 )
 def test_status_clause_exact_fragments(status_filter: str, expected_sql: str) -> None:
-    sql, params = pt._status_clause(status_filter)
+    sql, params = pt._status_clause(status_filter, _STATUS_CLAUSE_FLOW_COLS)
     assert sql == expected_sql
     assert params == {}
 
 
 def test_scope_clause_admin_has_no_restriction() -> None:
     admin = SimpleNamespace(id=1, role="admin", unvan=None)
-    sql, params = pt._scope_clause(admin)
+    sql, params = pt._scope_clause(admin, _STATUS_CLAUSE_FLOW_COLS)
     assert sql == ""
     assert params == {}
 
 
 def test_scope_clause_baskan_title_has_no_restriction() -> None:
     baskan = SimpleNamespace(id=2, role="personel", unvan="Baskan Yardimcisi")
-    sql, params = pt._scope_clause(baskan)
+    sql, params = pt._scope_clause(baskan, _STATUS_CLAUSE_FLOW_COLS)
     assert sql == ""
     assert params == {}
 
 
 def test_scope_clause_regular_viewer_restricts_to_owner_or_employee() -> None:
     viewer = SimpleNamespace(id=42, role="personel", unvan="Uzman")
-    sql, params = pt._scope_clause(viewer)
-    assert sql == "AND (f.current_owner_user_id = :viewer_id OR f.employee_id = :viewer_id)"
+    sql, params = pt._scope_clause(viewer, _STATUS_CLAUSE_FLOW_COLS)
+    assert sql == "AND (f.current_owner_id = :viewer_id OR f.employee_id = :viewer_id)"
     assert params == {"viewer_id": 42}
 
 
@@ -363,7 +379,15 @@ def test_build_search_clause_empty_search_returns_empty_without_touching_table_e
 
 def test_build_search_clause_nonempty_search_exact_fragment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pt, "table_exists", lambda name: name == "users")
-    monkeypatch.setattr(pt, "_table_columns", lambda name: {"email"} if name == "users" else set())
+
+    def _fake_table_columns(name: str) -> set[str]:
+        if name == "users":
+            return {"email"}
+        if name == "performance_process_flows":
+            return {"current_stage", "tracking_label", "last_action_title"}
+        return set()
+
+    monkeypatch.setattr(pt, "_table_columns", _fake_table_columns)
 
     sql, params = pt._build_search_clause("Ayşe Ö")
 
@@ -520,6 +544,7 @@ def _seed_flow(
                 """
                 UPDATE performance_process_flows
                    SET current_owner_user_id = :owner,
+                       current_owner_id = :owner,
                        employee_id = :emp,
                        is_overdue = :overdue,
                        waiting_days = :wd,

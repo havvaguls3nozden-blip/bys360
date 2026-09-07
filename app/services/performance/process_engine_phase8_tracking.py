@@ -430,24 +430,54 @@ def _full_name_from_row(row: Any, prefix: str) -> str:
     return name or _safe_text(row.get(prefix + "_email"))
 
 
-def _status_clause(status_filter: str) -> tuple[str, dict[str, Any]]:
+# BYS360 DEFECT AN: these three functions referenced a wide set of
+# performance_process_flows columns (current_owner_user_id, tracking_bucket,
+# president_status, is_overdue, current_stage, tracking_label,
+# last_action_title) that no migration and no reachable runtime schema path
+# ever creates -- confirmed against a real, migration-built database. Every
+# request to the live Süreç Takibi page raised OperationalError. Fixed with
+# this module's own _table_columns() gating (already the established
+# pattern elsewhere in this file); current_owner_user_id/president_status
+# are replaced by their real, canonical equivalents
+# (current_owner_id/president_approval_status) where a real column exists,
+# and the remaining fields -- which have no real column under any name
+# today -- degrade to their neutral SQL value (never true/never matched)
+# rather than raising. Restoring real tracking data for these fields is a
+# separate, larger item (a genuine schema migration would be required) and
+# is intentionally not attempted here.
+def _status_clause(status_filter: str, flow_cols: set[str] | None = None) -> tuple[str, dict[str, Any]]:
+    """BYS360 DEFECT AN: takes flow_cols as an optional parameter (falling
+    back to its own _table_columns() lookup only when the caller doesn't
+    already have one) so this stays a pure, deterministic clause-builder --
+    _flow_base_rows() passes its own already-computed set instead of every
+    caller of this function issuing its own redundant schema-introspection
+    query."""
     normalized = str(status_filter or "all").strip().lower()
     if normalized in {"all", "tum", "tumu"}:
         return "", {}
+    if flow_cols is None:
+        flow_cols = _table_columns("performance_process_flows")
+    owner_expr = "f.current_owner_id" if "current_owner_id" in flow_cols else "NULL"
+    bucket_expr = "f.tracking_bucket" if "tracking_bucket" in flow_cols else "NULL"
+    president_status_expr = "f.president_status" if "president_status" in flow_cols else "NULL"
+    overdue_expr = "f.is_overdue" if "is_overdue" in flow_cols else "NULL"
     if normalized in {"waiting", "bekleyen"}:
-        return "AND COALESCE(f.current_owner_user_id, 0) <> 0 AND LOWER(COALESCE(f.tracking_bucket, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')", {}
+        return f"AND COALESCE({owner_expr}, 0) <> 0 AND LOWER(COALESCE({bucket_expr}, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')", {}
     if normalized in {"president", "baskan", "baskan_onayi"}:
-        return "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.tracking_bucket, '')) IN ('pending', 'bekliyor', 'president_pending', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')", {}
+        return f"AND LOWER(COALESCE({president_status_expr}, f.president_approval_status, {bucket_expr}, '')) IN ('pending', 'bekliyor', 'president_pending', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')", {}
     if normalized in {"overdue", "geciken"}:
-        return "AND COALESCE(f.is_overdue, FALSE) = TRUE", {}
+        return f"AND COALESCE({overdue_expr}, FALSE) = TRUE", {}
     if normalized in {"completed", "tamamlanan"}:
         return "AND (COALESCE(f.is_finalized, FALSE) = TRUE OR LOWER(COALESCE(f.current_status, '')) IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti', 'tamamlandi', 'tamamlandı'))", {}
     if normalized in {"returned", "iade"}:
-        return "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.current_status, '')) IN ('returned', 'iade', 'iade_edildi')", {}
+        return f"AND LOWER(COALESCE({president_status_expr}, f.president_approval_status, f.current_status, '')) IN ('returned', 'iade', 'iade_edildi')", {}
     return "", {}
 
 
-def _scope_clause(viewer: Any) -> tuple[str, dict[str, Any]]:
+def _scope_clause(viewer: Any, flow_cols: set[str] | None = None) -> tuple[str, dict[str, Any]]:
+    """BYS360 DEFECT AN: see _status_clause() -- flow_cols is an optional
+    parameter for the same reason (pure, deterministic, no redundant
+    schema-introspection query when the caller already has one)."""
     if is_admin_user(viewer):
         return "", {}
     viewer_id = int(getattr(viewer, "id", 0) or 0)
@@ -455,7 +485,10 @@ def _scope_clause(viewer: Any) -> tuple[str, dict[str, Any]]:
     title = normalize_role(getattr(viewer, "unvan", None))
     if "baskan" in f"{role} {title}":
         return "", {}
-    return "AND (f.current_owner_user_id = :viewer_id OR f.employee_id = :viewer_id)", {"viewer_id": viewer_id}
+    if flow_cols is None:
+        flow_cols = _table_columns("performance_process_flows")
+    owner_expr = "f.current_owner_id" if "current_owner_id" in flow_cols else "NULL"
+    return f"AND ({owner_expr} = :viewer_id OR f.employee_id = :viewer_id)", {"viewer_id": viewer_id}
 
 
 def _build_search_clause(search: str) -> tuple[str, dict[str, Any]]:
@@ -464,6 +497,7 @@ def _build_search_clause(search: str) -> tuple[str, dict[str, Any]]:
         return "", {}
 
     user_cols = _table_columns("users") if table_exists("users") else set()
+    flow_cols = _table_columns("performance_process_flows")
     search_parts: list[str] = []
     for alias in ("emp", "owner"):
         for column in (
@@ -473,18 +507,22 @@ def _build_search_clause(search: str) -> tuple[str, dict[str, Any]]:
         ):
             if column in user_cols:
                 search_parts.append(f"LOWER(COALESCE({alias}.{_qident(column)}, '')) LIKE :search")
-    search_parts.extend([
-        "LOWER(COALESCE(f.current_stage, '')) LIKE :search",
-        "LOWER(COALESCE(f.current_status, '')) LIKE :search",
-        "LOWER(COALESCE(f.tracking_label, '')) LIKE :search",
-        "LOWER(COALESCE(f.last_action_title, '')) LIKE :search",
-    ])
+    if "current_stage" in flow_cols:
+        search_parts.append("LOWER(COALESCE(f.current_stage, '')) LIKE :search")
+    search_parts.append("LOWER(COALESCE(f.current_status, '')) LIKE :search")
+    for column in ("tracking_label", "last_action_title"):
+        if column in flow_cols:
+            search_parts.append(f"LOWER(COALESCE(f.{column}, '')) LIKE :search")
     return "AND (" + " OR ".join(search_parts) + ")", {"search": f"%{cleaned.lower()}%"}
 
 
 def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int = 300) -> list[Any]:
-    status_sql, status_params = _status_clause(status_filter)
-    scope_sql, scope_params = _scope_clause(viewer)
+    # BYS360 DEFECT AN: computed once and passed into _status_clause()/
+    # _scope_clause() so they stay pure, deterministic clause-builders
+    # instead of each issuing its own redundant schema-introspection query.
+    flow_cols = _table_columns("performance_process_flows")
+    status_sql, status_params = _status_clause(status_filter, flow_cols)
+    scope_sql, scope_params = _scope_clause(viewer, flow_cols)
     search_sql, search_params = _build_search_clause(search)
     params = {"limit": int(limit), **status_params, **scope_params, **search_params}
 
@@ -505,6 +543,34 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
     owner_soyad = f"owner.{_qident('soyad')} AS owner_soyad" if "soyad" in user_cols else "NULL AS owner_soyad"
     owner_email = f"owner.{_qident('email')} AS owner_email" if "email" in user_cols else "NULL AS owner_email"
 
+    # BYS360 DEFECT AN: most of these tracking-specific columns have no real
+    # backing under any name; each is read with column-presence gating
+    # (flow_cols, computed once above) so the query executes, with
+    # current_owner_user_id/president_status mapped to their real,
+    # canonical equivalents.
+    def _flow_expr(name: str, real_name: str | None = None) -> str:
+        candidate = real_name or name
+        return f"f.{candidate}" if candidate in flow_cols else "NULL"
+
+    current_owner_id_expr = _flow_expr("current_owner_id")
+    current_stage_expr = _flow_expr("current_stage")
+    current_owner_name_expr = _flow_expr("current_owner_name")
+    last_action_title_expr = _flow_expr("last_action_title")
+    waiting_since_expr = _flow_expr("waiting_since")
+    waiting_days_expr = _flow_expr("waiting_days")
+    is_overdue_expr = _flow_expr("is_overdue")
+    overdue_days_expr = _flow_expr("overdue_days")
+    tracking_status_expr = _flow_expr("tracking_status")
+    tracking_bucket_expr = _flow_expr("tracking_bucket")
+    tracking_priority_expr = _flow_expr("tracking_priority")
+    tracking_label_expr = _flow_expr("tracking_label")
+    last_visible_action_expr = _flow_expr("last_visible_action")
+    president_required_expr = _flow_expr("president_required", "president_approval_required")
+    president_status_expr = _flow_expr("president_status")
+    president_requested_at_expr = _flow_expr("president_requested_at")
+    updated_by_engine_at_expr = _flow_expr("updated_by_engine_at")
+    owner_join = f"LEFT JOIN users owner ON owner.id = {current_owner_id_expr}" if current_owner_id_expr != "NULL" else ""
+
     return _rows(
         f"""
         SELECT
@@ -514,25 +580,25 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
             {period_select}
             f.employee_id,
             f.current_status,
-            f.current_stage,
-            f.current_owner_user_id,
-            f.current_owner_name,
-            f.last_action_title,
+            {current_stage_expr} AS current_stage,
+            {current_owner_id_expr} AS current_owner_id,
+            {current_owner_name_expr} AS current_owner_name,
+            {last_action_title_expr} AS last_action_title,
             f.last_action_at,
-            f.waiting_since,
-            f.waiting_days,
-            f.is_overdue,
-            f.overdue_days,
-            f.tracking_status,
-            f.tracking_bucket,
-            f.tracking_priority,
-            f.tracking_label,
-            f.last_visible_action,
+            {waiting_since_expr} AS waiting_since,
+            {waiting_days_expr} AS waiting_days,
+            {is_overdue_expr} AS is_overdue,
+            {overdue_days_expr} AS overdue_days,
+            {tracking_status_expr} AS tracking_status,
+            {tracking_bucket_expr} AS tracking_bucket,
+            {tracking_priority_expr} AS tracking_priority,
+            {tracking_label_expr} AS tracking_label,
+            {last_visible_action_expr} AS last_visible_action,
             f.final_score,
-            f.president_required,
-            f.president_status,
+            {president_required_expr} AS president_required,
+            {president_status_expr} AS president_status,
             f.president_approval_status,
-            f.president_requested_at,
+            {president_requested_at_expr} AS president_requested_at,
             f.is_finalized,
             {emp_full_name},
             {emp_ad},
@@ -544,15 +610,15 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
             {owner_email}
         FROM performance_process_flows f
         LEFT JOIN users emp ON emp.id = f.employee_id
-        LEFT JOIN users owner ON owner.id = f.current_owner_user_id
+        {owner_join}
         {period_join}
         WHERE 1=1
         {status_sql}
         {scope_sql}
         {search_sql}
-        ORDER BY COALESCE(f.is_overdue, FALSE) DESC,
-                 COALESCE(f.waiting_days, 0) DESC,
-                 COALESCE(f.last_action_at, f.updated_by_engine_at, f.created_at, CURRENT_TIMESTAMP) DESC
+        ORDER BY COALESCE({is_overdue_expr}, FALSE) DESC,
+                 COALESCE({waiting_days_expr}, 0) DESC,
+                 COALESCE(f.last_action_at, {updated_by_engine_at_expr}, f.created_at, CURRENT_TIMESTAMP) DESC
         LIMIT :limit
         """,
         params,
@@ -560,16 +626,27 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
 
 
 def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """BYS360 DEFECT AN: action_at/tracking_visible are not real columns on
+    performance_process_flow_steps under any migration or reachable
+    runtime schema path -- confirmed against a real, migration-built
+    database. Referencing them by name in WHERE/ORDER BY (not just the
+    SELECT list) raised OperationalError even though the SELECT itself is
+    a plain ``SELECT *``; row.get(...) below already tolerates their
+    absence, so only the two raw references need gating."""
     if not flow_ids:
         return {}
-    _table_columns("performance_process_flow_steps")
-    order_expr = "COALESCE(step_order, 0), COALESCE(action_at, created_at, CURRENT_TIMESTAMP), id"
+    step_cols = _table_columns("performance_process_flow_steps")
+    action_at_expr = "action_at" if "action_at" in step_cols else "NULL"
+    tracking_visible_filter = (
+        " AND COALESCE(tracking_visible, TRUE) = TRUE" if "tracking_visible" in step_cols else ""
+    )
+    order_expr = f"COALESCE(step_order, 0), COALESCE({action_at_expr}, created_at, CURRENT_TIMESTAMP), id"
     rows = _rows(
         f"""
         SELECT *
         FROM performance_process_flow_steps
         WHERE flow_id IN :flow_ids
-          AND COALESCE(tracking_visible, TRUE) = TRUE
+        {tracking_visible_filter}
         ORDER BY {order_expr}
         """,
         {"flow_ids": flow_ids},
@@ -594,12 +671,19 @@ def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
 
 
 def _history_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """BYS360 DEFECT AN: action_at is not a real column on
+    performance_scoring_history (no migration touches this table; the ORM
+    model only has created_at) -- confirmed against a real,
+    migration-built database. row.get("action_at") below already falls
+    back to created_at, so only the raw ORDER BY reference needs gating."""
     if not flow_ids:
         return {}
     if not column_exists("performance_scoring_history", "evaluation_id"):
         return {}
+    history_cols = _table_columns("performance_scoring_history")
+    action_at_expr = "h.action_at" if "action_at" in history_cols else "NULL"
     rows = _rows(
-        """
+        f"""
         SELECT
             h.*,
             f.id AS flow_id
@@ -607,7 +691,7 @@ def _history_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
         JOIN performance_process_flows f
           ON f.evaluation_id = h.evaluation_id
         WHERE f.id IN :flow_ids
-        ORDER BY COALESCE(h.action_at, h.created_at, CURRENT_TIMESTAMP), h.id
+        ORDER BY COALESCE({action_at_expr}, h.created_at, CURRENT_TIMESTAMP), h.id
         """,
         {"flow_ids": flow_ids},
         expanding=("flow_ids",),
@@ -637,7 +721,7 @@ def _row_bucket(row: Any) -> str:
         return "overdue"
     if row.get("is_finalized") or raw in {"completed", "finalized", "kesinlesti", "kesinleşti", "tamamlandi", "tamamlandı"}:
         return "completed"
-    if row.get("current_owner_user_id"):
+    if row.get("current_owner_id"):
         return "waiting"
     return raw or "monitoring"
 
@@ -697,7 +781,7 @@ def build_process_tracking_workspace(
             "status_label": _visible_bucket(bucket),
             "status_tone": _bucket_tone(bucket),
             "owner_name": owner_name,
-            "owner_user_id": row.get("current_owner_user_id"),
+            "owner_user_id": row.get("current_owner_id"),
             "last_action": _clean_process_label(row.get("last_visible_action") or row.get("last_action_title"), "Süreç takipte"),
             "last_action_at": _safe_date(row.get("last_action_at")),
             "waiting_since": _safe_date(row.get("waiting_since")),
@@ -785,21 +869,57 @@ def delete_visible_process_tracking_flows(
     return _delete_tracking_flow_ids(flow_ids)
 
 def synchronize_phase8_tracking(limit: int | None = None) -> Phase8SyncResult:
+    """BYS360 DEFECT AN: both the SELECT and the UPDATE below referenced the
+    same wide set of ungated tracking columns as _flow_base_rows() (see the
+    note above _status_clause()) -- gated the same way, for the same
+    reason: none of the tracking_*/waiting_*/is_overdue/last_visible_action
+    columns exist under any name today, so the UPDATE now only writes the
+    columns that are actually present, and current_owner_user_id is read as
+    the real current_owner_id.
+    """
     if not table_exists("performance_process_flows"):
         return Phase8SyncResult()
     sql_limit = "LIMIT :limit" if limit else ""
     params = {"limit": int(limit)} if limit else {}
+    flow_cols = _table_columns("performance_process_flows")
+
+    def _flow_expr(name: str, real_name: str | None = None) -> str:
+        candidate = real_name or name
+        return candidate if candidate in flow_cols else "NULL"
+
     rows = _rows(
         f"""
-        SELECT id, current_status, current_stage, current_owner_user_id, current_owner_name,
-               waiting_since, waiting_days, is_finalized, president_status, president_approval_status,
-               president_required, last_action_title, last_action_at
+        SELECT id, current_status,
+               {_flow_expr("current_stage")} AS current_stage,
+               {_flow_expr("current_owner_id")} AS current_owner_id,
+               {_flow_expr("current_owner_name")} AS current_owner_name,
+               {_flow_expr("waiting_since")} AS waiting_since,
+               {_flow_expr("waiting_days")} AS waiting_days,
+               is_finalized,
+               {_flow_expr("president_status")} AS president_status,
+               president_approval_status,
+               {_flow_expr("president_required", "president_approval_required")} AS president_required,
+               {_flow_expr("last_action_title")} AS last_action_title,
+               last_action_at
         FROM performance_process_flows
         ORDER BY id DESC
         {sql_limit}
         """,
         params,
     )
+    optional_set_columns = {
+        "tracking_status",
+        "tracking_bucket",
+        "tracking_priority",
+        "tracking_label",
+        "tracking_url",
+        "is_overdue",
+        "overdue_days",
+        "last_visible_action",
+        "tracking_updated_at",
+        "process_version",
+    }
+    available_set_columns = optional_set_columns & flow_cols
     updated = 0
     for row in rows:
         flow_id = int(row["id"])
@@ -807,27 +927,36 @@ def synchronize_phase8_tracking(limit: int | None = None) -> Phase8SyncResult:
         waiting_days = int(row.get("waiting_days") or 0)
         is_overdue = bool(row.get("is_overdue") or waiting_days >= 7)
         priority = 80 if bucket == "president_pending" or is_overdue else "normal"
-        db.session.execute(
-            text(
-                """
-                UPDATE performance_process_flows
-                   SET tracking_status = COALESCE(current_status, tracking_status, 'takipte'),
-                       tracking_bucket = :bucket,
-                       tracking_priority = :priority,
-                       tracking_label = COALESCE(current_stage, tracking_label, 'Süreç takipte'),
-                       tracking_url = COALESCE(tracking_url, '/performans/surec-takibi'),
-                       is_overdue = :is_overdue,
-                       overdue_days = CASE WHEN :is_overdue THEN COALESCE(waiting_days, 0) ELSE COALESCE(overdue_days, 0) END,
-                       last_visible_action = COALESCE(last_action_title, last_visible_action, current_stage),
-                       tracking_updated_at = CURRENT_TIMESTAMP,
-                       process_version = :version
-                 WHERE id = :flow_id
-                """
+        last_visible_action_sources = ", ".join(
+            column for column in ("last_action_title", "last_visible_action", "current_stage") if column in flow_cols
+        )
+        set_expressions = {
+            "tracking_status": "COALESCE(current_status, tracking_status, 'takipte')",
+            "tracking_bucket": ":bucket",
+            "tracking_priority": ":priority",
+            "tracking_label": "COALESCE(current_stage, tracking_label, 'Süreç takipte')" if "current_stage" in flow_cols else "COALESCE(tracking_label, 'Süreç takipte')",
+            "tracking_url": "COALESCE(tracking_url, '/performans/surec-takibi')",
+            "is_overdue": ":is_overdue",
+            "overdue_days": (
+                "CASE WHEN :is_overdue THEN COALESCE(waiting_days, 0) ELSE COALESCE(overdue_days, 0) END"
+                if "waiting_days" in flow_cols
+                else "CASE WHEN :is_overdue THEN :waiting_days ELSE COALESCE(overdue_days, 0) END"
             ),
+            "last_visible_action": f"COALESCE({last_visible_action_sources})" if last_visible_action_sources else "last_visible_action",
+            "tracking_updated_at": "CURRENT_TIMESTAMP",
+            "process_version": ":version",
+        }
+        assignments = ", ".join(f"{column} = {set_expressions[column]}" for column in available_set_columns)
+        if not assignments:
+            updated += 1
+            continue
+        db.session.execute(
+            text(f"UPDATE performance_process_flows SET {assignments} WHERE id = :flow_id"),
             {
                 "bucket": bucket,
                 "priority": _normalize_tracking_priority(priority),
                 "is_overdue": is_overdue,
+                "waiting_days": waiting_days,
                 "version": PHASE8_VERSION,
                 "flow_id": flow_id,
             },
