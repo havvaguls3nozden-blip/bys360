@@ -5,10 +5,85 @@ from datetime import datetime
 from typing import Any
 
 from sqlalchemy import inspect, text
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 
 PHASE4_VERSION = "2026-04-29-process-flow-phase4"
+
+_FINALIZED_STATUS_TOKENS = {"tamamlandi", "tamamlandı", "completed", "published"}
+
+
+def ensure_process_flow_for_evaluation(evaluation: Any, *, flush: bool = True) -> Any:
+    """Değerlendirmenin genel süreç takip kaydını oluşturur veya günceller.
+
+    BYS360 DEFECT AP: performance_process_flows tablosunun production'da
+    erişilebilir hiçbir writer'ı yoktu -- sync_phase4_flows()/_ensure_flow()
+    (bu dosyanın kendi eski Faz 4 yardımcıları) ve Phase7'nin eşdeğer akış
+    oluşturma yolu hiçbir yerden çağrılmıyordu, bu yüzden Süreç Takibi ekranı
+    doğru okuma mantığına sahip olsa da gösterecek veri bulamıyordu.
+
+    Bu fonksiyon, aynı süreç içinde zaten canlı ve çağrılan
+    low_score_process_service.ensure_low_score_process_for_evaluation ile
+    birebir aynı çağrı noktasından (değerlendirme tamamlandığında) tetiklenir
+    ve aynı ORM tabanlı "varsa güncelle, yoksa oluştur" desenini izler.
+
+    Bilinçli olarak ayrık tutulur: başkan onayı gerekip gerekmediği veya
+    düşük puan durumu gibi iş kararları burada tekrarlanmaz. Bu kayıt
+    yalnızca değerlendirmenin genel süreç durumunu (aşama, son işlem
+    zamanı, final puan) izler; düşük puan/başkan onayı iş akışının kendi
+    kaydı (PerformanceLowScoreProcess) tamamen ayrı ve o konuda tek
+    yetkili kaynak olmaya devam eder.
+    """
+    if evaluation is None or getattr(evaluation, "id", None) is None:
+        return None
+
+    from app.models.performance_process_engine_models import PerformanceProcessFlow
+
+    status = (getattr(evaluation, "status", "") or "").strip().lower()
+    step_key = status or "created"
+    is_finalized = status in _FINALIZED_STATUS_TOKENS
+    now = datetime.utcnow()
+
+    flow = PerformanceProcessFlow.query.filter_by(evaluation_id=evaluation.id).first()
+    if flow is not None:
+        flow.period_id = getattr(evaluation, "period_id", flow.period_id)
+        flow.employee_id = getattr(evaluation, "employee_id", flow.employee_id)
+        flow.current_step_key = step_key
+        flow.current_status = step_key
+        flow.final_score = getattr(evaluation, "final_total_100", flow.final_score)
+        flow.is_finalized = is_finalized
+        flow.last_action_at = now
+        if flush:
+            db.session.flush()
+        return flow
+
+    new_flow = PerformanceProcessFlow(
+        evaluation_id=evaluation.id,
+        period_id=getattr(evaluation, "period_id", None),
+        employee_id=getattr(evaluation, "employee_id", None),
+        current_step_key=step_key,
+        current_status=step_key,
+        final_score=getattr(evaluation, "final_total_100", None),
+        is_finalized=is_finalized,
+        started_at=now,
+        last_action_at=now,
+        rule_version=PHASE4_VERSION,
+    )
+    try:
+        with db.session.begin_nested():
+            db.session.add(new_flow)
+            db.session.flush()
+    except IntegrityError:
+        # Eşzamanlı iki çağrı aynı değerlendirme için yarışırsa (evaluation_id
+        # tekil alan): kaybeden tarafın eklemesi geri alınır (yalnızca bu
+        # savepoint kapsamında -- çağıranın kendi bekleyen değişiklikleri
+        # etkilenmez) ve kazanan tarafın kaydı okunup döndürülür.
+        existing = PerformanceProcessFlow.query.filter_by(evaluation_id=evaluation.id).first()
+        if existing is None:
+            raise
+        return existing
+    return new_flow
 
 
 @dataclass(frozen=True)
