@@ -153,12 +153,14 @@ def test_build_process_tracking_workspace_real_caller_succeeds_with_real_data(ap
 
 
 def test_synchronize_phase8_tracking_real_caller_succeeds_without_writing_ghost_columns(app) -> None:
-    """Before the fix, both the SELECT and the UPDATE inside this function
-    raised OperationalError. It must now run to completion; since none of
-    the tracking_*/is_overdue/overdue_days columns exist under any name
-    today, no UPDATE is actually issued for those fields (there is nothing
-    real to write), but the function completes and reports the row as
-    checked."""
+    """Before the AN fix, both the SELECT and the UPDATE inside this
+    function raised OperationalError. AO's own field-by-field schema
+    investigation then established that none of the tracking_*/is_overdue/
+    overdue_days values need a persisted column at all -- every one is
+    safely derivable at read time (see build_process_tracking_workspace()
+    and its own real-data tests). This function now only verifies the
+    flows are present and readable; it writes nothing, so flows_updated
+    is always 0."""
     from app.extensions import db
     from app.services.performance.process_engine_phase8_tracking import (
         synchronize_phase8_tracking,
@@ -168,4 +170,4 @@ def test_synchronize_phase8_tracking_real_caller_succeeds_without_writing_ghost_
         _insert_flow(db, evaluation_id=8003, current_owner_id=42, current_status="bekliyor")
         result = synchronize_phase8_tracking()
         assert result.flows_checked == 1
-        assert result.flows_updated == 1
+        assert result.flows_updated == 0

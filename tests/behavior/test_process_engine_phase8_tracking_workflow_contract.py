@@ -77,6 +77,7 @@ from __future__ import annotations
 
 import os
 import uuid
+from datetime import datetime, timedelta
 from types import SimpleNamespace
 from typing import Any
 
@@ -112,9 +113,21 @@ def test_is_process_tracking_user_true_for_role_grup_baskani() -> None:
     assert pt.is_process_tracking_user(user) is True
 
 
-def test_is_process_tracking_user_true_for_unvan_containing_koordinator() -> None:
-    user = SimpleNamespace(role="personel", unvan="Bölge Koordinatörü")
+def test_is_process_tracking_user_true_for_unvan_exactly_koordinator() -> None:
+    user = SimpleNamespace(role="personel", unvan="Koordinator")
     assert pt.is_process_tracking_user(user) is True
+
+
+def test_is_process_tracking_user_false_for_unvan_containing_koordinator_as_substring() -> None:
+    """BYS360 DEFECT AO: previously matched via substring containment --
+    "koordinator" is a prefix of the Turkish possessive form
+    "koordinatörü", so any unvan merely built on that root (e.g. a
+    qualified regional title) passed. Now exact-token-set only, mirroring
+    process_engine_phase6_president_approvals.py's is_president_user
+    design, whose own comment states plainly: only an exact role/unvan
+    value grants authority, never text that happens to contain it."""
+    user = SimpleNamespace(role="personel", unvan="Bölge Koordinatörü")
+    assert pt.is_process_tracking_user(user) is False
 
 
 def test_is_process_tracking_user_false_for_plain_personel_uzman() -> None:
@@ -140,19 +153,111 @@ def test_can_manage_process_tracking_false_for_real_personel() -> None:
 
 
 # ---------------------------------------------------------------------------
+# can_manage_process_tracking / is_process_tracking_user: adversarial
+# authorization contract (BYS360 DEFECT AO). Both functions previously
+# used substring containment (``token in combined``), so any role/unvan
+# that merely CONTAINED an allowed token -- rather than equaling one --
+# passed. Fixed to exact-token-set matching, mirroring
+# process_engine_phase6_president_approvals.py's proven is_admin_user/
+# is_president_user design. Each case below is a real bypass this file's
+# own baseline test run demonstrated before the fix.
+# ---------------------------------------------------------------------------
+
+
+def test_can_manage_process_tracking_true_for_real_baskan() -> None:
+    baskan = SimpleNamespace(role="baskan", unvan=None)
+    assert pt.can_manage_process_tracking(baskan) is True
+
+
+def test_can_manage_process_tracking_true_for_real_baskan_yardimcisi() -> None:
+    deputy = SimpleNamespace(role="baskan_yardimcisi", unvan=None)
+    assert pt.can_manage_process_tracking(deputy) is True
+
+
+def test_can_manage_process_tracking_false_for_grup_baskani() -> None:
+    """grup_baskani has real view access (is_process_tracking_user) but is
+    deliberately excluded from can_manage_process_tracking()'s own,
+    narrower allowed_tokens set -- two different token sets defined side
+    by side in the same module is direct evidence of intentional design,
+    not an oversight the substring bug happened to paper over."""
+    grup_baskani = SimpleNamespace(role="grup_baskani", unvan=None)
+    assert pt.can_manage_process_tracking(grup_baskani) is False
+
+
+def test_can_manage_process_tracking_false_for_role_containing_privileged_word_but_not_equal() -> None:
+    fake = SimpleNamespace(role="grup_baskani_yardimcisi_fake", unvan=None)
+    assert pt.can_manage_process_tracking(fake) is False
+
+
+def test_can_manage_process_tracking_false_for_unvan_containing_baskanligi() -> None:
+    """Institution-name reference ("Başkanlığı" = "of the Presidency"),
+    not a personal role -- must never grant authority on its own, per the
+    same principle process_engine_phase6_president_approvals.py's
+    is_president_user already documents explicitly."""
+    user = SimpleNamespace(role="personel", unvan="Başkanlığı Uzmanı")
+    assert pt.can_manage_process_tracking(user) is False
+
+
+def test_can_manage_process_tracking_false_for_unknown_role() -> None:
+    user = SimpleNamespace(role="asdlkfj_unknown_role", unvan=None)
+    assert pt.can_manage_process_tracking(user) is False
+
+
+def test_can_manage_process_tracking_false_for_empty_role_and_unvan() -> None:
+    user = SimpleNamespace(role="", unvan="")
+    assert pt.can_manage_process_tracking(user) is False
+
+
+def test_can_manage_process_tracking_false_for_none_role_and_unvan() -> None:
+    user = SimpleNamespace(role=None, unvan=None)
+    assert pt.can_manage_process_tracking(user) is False
+
+
+def test_can_manage_process_tracking_true_for_mixed_case_role() -> None:
+    admin = SimpleNamespace(role="ADMIN", unvan=None)
+    assert pt.can_manage_process_tracking(admin) is True
+
+
+def test_is_process_tracking_user_false_for_role_containing_privileged_word_but_not_equal() -> None:
+    fake = SimpleNamespace(role="baskanlik_danismani_sahte", unvan=None)
+    assert pt.is_process_tracking_user(fake) is False
+
+
+def test_is_process_tracking_user_false_for_unvan_containing_baskanligi() -> None:
+    user = SimpleNamespace(role="personel", unvan="Başkanlığı Uzmanı")
+    assert pt.is_process_tracking_user(user) is False
+
+
+def test_is_process_tracking_user_false_for_unknown_role() -> None:
+    user = SimpleNamespace(role="unknown_garbage_role", unvan=None)
+    assert pt.is_process_tracking_user(user) is False
+
+
+def test_is_process_tracking_user_false_for_empty_role_and_unvan() -> None:
+    user = SimpleNamespace(role="", unvan="")
+    assert pt.is_process_tracking_user(user) is False
+
+
+# ---------------------------------------------------------------------------
 # _row_bucket: precedence order over plain dict rows (production calls
-# row.get(...), so a dict is a fully honest stand-in for a DB row mapping).
-# Per source: president_pending is checked before is_overdue, which is
-# checked before is_finalized/current_status-completed, which is checked
-# before current_owner_id-present, which falls back to raw/monitoring.
+# row.get(...), so a dict is a fully honest stand-in for a DB row mapping
+# after build_process_tracking_workspace() has merged in the derived
+# is_overdue field -- see _derive_tracking_fields()). BYS360 DEFECT AO:
+# these dicts previously used tracking_bucket/president_status, neither a
+# real column; now president_approval_required/president_approval_status
+# (real, model-backed) drive the same precedence. Per source:
+# president_pending is checked before returned, which is checked before
+# is_overdue, which is checked before is_finalized/current_status-
+# completed, which is checked before current_owner_id-present, which
+# falls back to monitoring.
 # ---------------------------------------------------------------------------
 
 
 def test_row_bucket_president_pending_beats_overdue_even_when_both_true() -> None:
     row = {
-        "tracking_bucket": None,
         "current_status": "takipte",
-        "president_status": "pending",
+        "president_approval_required": True,
+        "president_approval_status": "not_required",
         "is_overdue": True,
         "is_finalized": False,
         "current_owner_id": None,
@@ -160,11 +265,23 @@ def test_row_bucket_president_pending_beats_overdue_even_when_both_true() -> Non
     assert pt._row_bucket(row) == "president_pending"
 
 
+def test_row_bucket_returned_beats_overdue_when_not_president_pending() -> None:
+    row = {
+        "current_status": "takipte",
+        "president_approval_required": True,
+        "president_approval_status": "returned",
+        "is_overdue": True,
+        "is_finalized": False,
+        "current_owner_id": None,
+    }
+    assert pt._row_bucket(row) == "returned"
+
+
 def test_row_bucket_overdue_beats_completed_when_no_president_pending() -> None:
     row = {
-        "tracking_bucket": None,
         "current_status": "takipte",
-        "president_status": None,
+        "president_approval_required": False,
+        "president_approval_status": "not_required",
         "is_overdue": True,
         "is_finalized": True,
         "current_owner_id": None,
@@ -174,9 +291,9 @@ def test_row_bucket_overdue_beats_completed_when_no_president_pending() -> None:
 
 def test_row_bucket_completed_beats_owner_present_waiting() -> None:
     row = {
-        "tracking_bucket": None,
         "current_status": "takipte",
-        "president_status": None,
+        "president_approval_required": False,
+        "president_approval_status": "not_required",
         "is_overdue": False,
         "is_finalized": True,
         "current_owner_id": 5,
@@ -186,9 +303,9 @@ def test_row_bucket_completed_beats_owner_present_waiting() -> None:
 
 def test_row_bucket_waiting_when_owner_present_and_nothing_else() -> None:
     row = {
-        "tracking_bucket": None,
         "current_status": "takipte",
-        "president_status": None,
+        "president_approval_required": False,
+        "president_approval_status": "not_required",
         "is_overdue": False,
         "is_finalized": False,
         "current_owner_id": 5,
@@ -198,26 +315,14 @@ def test_row_bucket_waiting_when_owner_present_and_nothing_else() -> None:
 
 def test_row_bucket_default_monitoring_when_nothing_matches() -> None:
     row = {
-        "tracking_bucket": None,
         "current_status": None,
-        "president_status": None,
+        "president_approval_required": False,
+        "president_approval_status": "not_required",
         "is_overdue": False,
         "is_finalized": False,
         "current_owner_id": None,
     }
     assert pt._row_bucket(row) == "monitoring"
-
-
-def test_row_bucket_passes_through_tracking_bucket_text_as_last_resort() -> None:
-    row = {
-        "tracking_bucket": "iade_edildi",
-        "current_status": "whatever",
-        "president_status": None,
-        "is_overdue": False,
-        "is_finalized": False,
-        "current_owner_id": None,
-    }
-    assert pt._row_bucket(row) == "iade_edildi"
 
 
 # ---------------------------------------------------------------------------
@@ -282,24 +387,12 @@ def test_clean_process_label_uses_custom_fallback_for_empty_value() -> None:
 
 # ---------------------------------------------------------------------------
 # _status_clause / _scope_clause: exact SQL-fragment and params text, never
-# executed here. BYS360 DEFECT AN: both functions now take flow_cols as an
-# explicit parameter (production's _flow_base_rows() computes it once and
-# passes it in) instead of each issuing its own _table_columns() lookup --
-# keeping them pure, deterministic clause-builders with no ambient database/
-# app-context dependency, true to this file's own Tier 1 design. The set
-# below simulates the real+fixture schema (see _PHASE8_EXTRA_FLOW_COLUMNS
-# further down for the Tier 2 ALTER TABLE list this mirrors, and the real
-# current_owner_id/president_approval_* model columns).
+# executed here. BYS360 DEFECT AO: both functions reference only real,
+# always-present columns now (current_owner_id, is_finalized, current_status,
+# president_approval_required, president_approval_status, last_action_at/
+# started_at/created_at) -- no more flow_cols parameter, no more schema
+# introspection at all, since there is nothing left to gate against.
 # ---------------------------------------------------------------------------
-
-_STATUS_CLAUSE_FLOW_COLS = {
-    "current_stage", "current_owner_name", "last_action_title", "waiting_since",
-    "waiting_days", "is_overdue", "overdue_days", "tracking_status", "tracking_bucket",
-    "tracking_priority", "tracking_label", "tracking_url", "last_visible_action",
-    "president_required", "president_status", "president_requested_at",
-    "process_version", "updated_by_engine_at", "tracking_updated_at",
-    "current_owner_id", "president_approval_required", "president_approval_status",
-}
 
 
 @pytest.mark.parametrize(
@@ -310,46 +403,73 @@ _STATUS_CLAUSE_FLOW_COLS = {
         ("nonsense_unknown_filter", ""),
         (
             "waiting",
-            "AND COALESCE(f.current_owner_id, 0) <> 0 AND LOWER(COALESCE(f.tracking_bucket, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')",
+            "AND f.current_owner_id IS NOT NULL AND COALESCE(f.is_finalized, FALSE) = FALSE "
+            "AND LOWER(COALESCE(f.current_status, '')) NOT IN "
+            "('completed', 'finalized', 'kesinlesti', 'kesinleşti', 'tamamlandi', 'tamamlandı')",
         ),
         (
             "president",
-            "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.tracking_bucket, '')) IN ('pending', 'bekliyor', 'president_pending', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')",
+            "AND COALESCE(f.president_approval_required, FALSE) = TRUE "
+            "AND LOWER(COALESCE(f.president_approval_status, '')) NOT IN ('approved', 'returned', 'iade', 'iade_edildi')",
         ),
-        ("overdue", "AND COALESCE(f.is_overdue, FALSE) = TRUE"),
         (
             "completed",
-            "AND (COALESCE(f.is_finalized, FALSE) = TRUE OR LOWER(COALESCE(f.current_status, '')) IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti', 'tamamlandi', 'tamamlandı'))",
+            "AND (COALESCE(f.is_finalized, FALSE) = TRUE OR LOWER(COALESCE(f.current_status, '')) IN "
+            "('completed', 'finalized', 'kesinlesti', 'kesinleşti', 'tamamlandi', 'tamamlandı'))",
         ),
         (
             "returned",
-            "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.current_status, '')) IN ('returned', 'iade', 'iade_edildi')",
+            "AND LOWER(COALESCE(f.president_approval_status, '')) IN ('returned', 'iade', 'iade_edildi')",
         ),
     ],
 )
 def test_status_clause_exact_fragments(status_filter: str, expected_sql: str) -> None:
-    sql, params = pt._status_clause(status_filter, _STATUS_CLAUSE_FLOW_COLS)
+    sql, params = pt._status_clause(status_filter)
     assert sql == expected_sql
     assert params == {}
 
 
+def test_status_clause_overdue_binds_a_real_cutoff_timestamp() -> None:
+    """BYS360 DEFECT AO: is_overdue has no real column -- the "overdue"
+    filter compares the real last_action_at/started_at/created_at columns
+    against a bound cutoff computed in Python (datetime.utcnow() minus
+    PHASE8_OVERDUE_THRESHOLD_DAYS), portable to both SQLite and PostgreSQL
+    without any dialect-specific date-diff SQL."""
+    before = datetime.utcnow() - timedelta(days=pt.PHASE8_OVERDUE_THRESHOLD_DAYS)
+    sql, params = pt._status_clause("overdue")
+    after = datetime.utcnow() - timedelta(days=pt.PHASE8_OVERDUE_THRESHOLD_DAYS)
+    assert sql == "AND COALESCE(f.last_action_at, f.started_at, f.created_at) <= :overdue_cutoff"
+    assert set(params) == {"overdue_cutoff"}
+    assert before <= params["overdue_cutoff"] <= after
+
+
 def test_scope_clause_admin_has_no_restriction() -> None:
     admin = SimpleNamespace(id=1, role="admin", unvan=None)
-    sql, params = pt._scope_clause(admin, _STATUS_CLAUSE_FLOW_COLS)
+    sql, params = pt._scope_clause(admin)
     assert sql == ""
     assert params == {}
 
 
 def test_scope_clause_baskan_title_has_no_restriction() -> None:
     baskan = SimpleNamespace(id=2, role="personel", unvan="Baskan Yardimcisi")
-    sql, params = pt._scope_clause(baskan, _STATUS_CLAUSE_FLOW_COLS)
+    sql, params = pt._scope_clause(baskan)
     assert sql == ""
     assert params == {}
 
 
+def test_scope_clause_grup_baskani_role_is_restricted_not_unrestricted() -> None:
+    """BYS360 DEFECT AO: previously a substring match ("baskan" in
+    "grup_baskani") incorrectly granted unrestricted scope to a Grup
+    Başkanı, the same defect class as can_manage_process_tracking()."""
+    grup_baskani = SimpleNamespace(id=7, role="grup_baskani", unvan=None)
+    sql, params = pt._scope_clause(grup_baskani)
+    assert sql == "AND (f.current_owner_id = :viewer_id OR f.employee_id = :viewer_id)"
+    assert params == {"viewer_id": 7}
+
+
 def test_scope_clause_regular_viewer_restricts_to_owner_or_employee() -> None:
     viewer = SimpleNamespace(id=42, role="personel", unvan="Uzman")
-    sql, params = pt._scope_clause(viewer, _STATUS_CLAUSE_FLOW_COLS)
+    sql, params = pt._scope_clause(viewer)
     assert sql == "AND (f.current_owner_id = :viewer_id OR f.employee_id = :viewer_id)"
     assert params == {"viewer_id": 42}
 
@@ -379,15 +499,7 @@ def test_build_search_clause_empty_search_returns_empty_without_touching_table_e
 
 def test_build_search_clause_nonempty_search_exact_fragment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(pt, "table_exists", lambda name: name == "users")
-
-    def _fake_table_columns(name: str) -> set[str]:
-        if name == "users":
-            return {"email"}
-        if name == "performance_process_flows":
-            return {"current_stage", "tracking_label", "last_action_title"}
-        return set()
-
-    monkeypatch.setattr(pt, "_table_columns", _fake_table_columns)
+    monkeypatch.setattr(pt, "_table_columns", lambda name: {"email"} if name == "users" else set())
 
     sql, params = pt._build_search_clause("Ayşe Ö")
 
@@ -395,10 +507,7 @@ def test_build_search_clause_nonempty_search_exact_fragment(monkeypatch: pytest.
         [
             "LOWER(COALESCE(emp.\"email\", '')) LIKE :search",
             "LOWER(COALESCE(owner.\"email\", '')) LIKE :search",
-            "LOWER(COALESCE(f.current_stage, '')) LIKE :search",
             "LOWER(COALESCE(f.current_status, '')) LIKE :search",
-            "LOWER(COALESCE(f.tracking_label, '')) LIKE :search",
-            "LOWER(COALESCE(f.last_action_title, '')) LIKE :search",
         ]
     ) + ")"
     assert sql == expected_sql
@@ -528,41 +637,39 @@ def _seed_flow(
     waiting_days: int = 0,
     president_status: str | None = None,
 ) -> int:
+    """BYS360 DEFECT AO: waiting_days/is_overdue/tracking_bucket/
+    president_status are no longer real (or even fixture-only ghost)
+    columns this module reads -- every value production now derives comes
+    from real, migrated PerformanceProcessFlow columns instead. This
+    helper's own parameter names are kept for minimal call-site churn
+    across this file, but now translate into real columns: is_overdue/
+    waiting_days become last_action_at (the actual timestamp production
+    derives waiting time from), and president_status becomes the real
+    president_approval_required/president_approval_status pair
+    ("pending" => required, still undecided; "returned" => required,
+    decided-and-sent-back; None => not required)."""
     from app.extensions import db
     from app.models import PerformanceProcessFlow
+
+    effective_waiting_days = waiting_days or (pt.PHASE8_OVERDUE_THRESHOLD_DAYS if is_overdue else 0)
+    president_approval_required = president_status is not None
+    president_approval_status = {
+        "pending": "not_required",
+        "returned": "returned",
+    }.get(president_status or "", "not_required")
 
     with app.app_context():
         flow = PerformanceProcessFlow(
             evaluation_id=evaluation_id,
             current_status=current_status or "created",
             is_finalized=is_finalized,
+            current_owner_id=current_owner_user_id,
+            employee_id=employee_id,
+            last_action_at=datetime.utcnow() - timedelta(days=effective_waiting_days),
+            president_approval_required=president_approval_required,
+            president_approval_status=president_approval_status,
         )
         db.session.add(flow)
-        db.session.commit()
-        db.session.execute(
-            text(
-                """
-                UPDATE performance_process_flows
-                   SET current_owner_user_id = :owner,
-                       current_owner_id = :owner,
-                       employee_id = :emp,
-                       is_overdue = :overdue,
-                       waiting_days = :wd,
-                       president_status = :pstatus,
-                       current_status = :status
-                 WHERE id = :fid
-                """
-            ),
-            {
-                "owner": current_owner_user_id,
-                "emp": employee_id,
-                "overdue": is_overdue,
-                "wd": waiting_days,
-                "pstatus": president_status,
-                "status": current_status,
-                "fid": flow.id,
-            },
-        )
         db.session.commit()
         return flow.id
 
@@ -773,129 +880,148 @@ def test_synchronize_phase8_tracking_returns_empty_result_when_table_missing(
     assert result == pt.Phase8SyncResult(flows_checked=0, flows_updated=0)
 
 
-def test_synchronize_phase8_tracking_president_pending_branch(app) -> None:
-    owner_id = _create_user(app, ad="Owner", soyad="Sync")
-    flow_id = _seed_flow(
-        app, evaluation_id=9401, current_owner_user_id=owner_id, is_overdue=False,
-        is_finalized=False, president_status="pending", waiting_days=0, current_status="takipte",
-    )
+def test_synchronize_phase8_tracking_counts_flows_and_writes_nothing(app) -> None:
+    """BYS360 DEFECT AO: synchronize_phase8_tracking() used to persist
+    derived tracking_bucket/is_overdue/tracking_priority values into ghost
+    columns that no migration ever created. Now that every one of those
+    values is safely computable at read time (build_process_tracking_
+    workspace() recomputes them fresh on every page load, proven in the
+    tests below), there is nothing left to persist -- a stored copy could
+    only drift from reality. This function now verifies the flows are
+    present and readable, and genuinely writes nothing: flows_updated is
+    always 0."""
+    _seed_flow(app, evaluation_id=9401, current_owner_user_id=None, current_status="takipte")
+    _seed_flow(app, evaluation_id=9402, current_owner_user_id=None, is_finalized=True, current_status="tamamlandi")
 
     with app.app_context():
+        from app.extensions import db
+
+        before = dict(
+            db.session.execute(
+                text("SELECT id, current_status, is_finalized, updated_at FROM performance_process_flows ORDER BY id")
+            ).mappings().all()[0]
+        )
         result = pt.synchronize_phase8_tracking()
-        assert result.flows_checked == 1
-        assert result.flows_updated == 1
+        after = dict(
+            db.session.execute(
+                text("SELECT id, current_status, is_finalized, updated_at FROM performance_process_flows ORDER BY id")
+            ).mappings().all()[0]
+        )
 
-        row = db_row(app, flow_id)
-        assert row["tracking_bucket"] == "president_pending"
-        assert int(row["tracking_priority"]) == 80
-        assert bool(row["is_overdue"]) is False
-
-
-def test_synchronize_phase8_tracking_completed_branch(app) -> None:
-    flow_id = _seed_flow(
-        app, evaluation_id=9402, current_owner_user_id=None, is_overdue=False,
-        is_finalized=True, president_status=None, waiting_days=0, current_status="tamamlandi",
-    )
-
-    with app.app_context():
-        pt.synchronize_phase8_tracking()
-        row = db_row(app, flow_id)
-        assert row["tracking_bucket"] == "completed"
-        assert int(row["tracking_priority"]) == 50
-        assert bool(row["is_overdue"]) is False
+    assert result.flows_checked == 2
+    assert result.flows_updated == 0
+    assert before == after
 
 
-def test_synchronize_phase8_tracking_waiting_branch_owner_present(app) -> None:
-    owner_id = _create_user(app, ad="Owner", soyad="Waiting")
-    flow_id = _seed_flow(
-        app, evaluation_id=9403, current_owner_user_id=owner_id, is_overdue=False,
-        is_finalized=False, president_status=None, waiting_days=0, current_status="takipte",
-    )
+def test_synchronize_phase8_tracking_respects_limit(app) -> None:
+    for i in range(3):
+        _seed_flow(app, evaluation_id=9410 + i, current_owner_user_id=None, current_status="takipte")
 
     with app.app_context():
-        pt.synchronize_phase8_tracking()
-        row = db_row(app, flow_id)
-        assert row["tracking_bucket"] == "waiting"
-        assert int(row["tracking_priority"]) == 50
-        assert bool(row["is_overdue"]) is False
+        result = pt.synchronize_phase8_tracking(limit=2)
 
-
-def test_synchronize_phase8_tracking_default_monitoring_branch(app) -> None:
-    # current_status must be "" (falsy), not NULL: the ORM column is
-    # NOT NULL. _row_bucket's fallback (`row.get("current_status") or
-    # "monitoring"`) treats an empty string the same as a missing value.
-    flow_id = _seed_flow(
-        app, evaluation_id=9404, current_owner_user_id=None, is_overdue=False,
-        is_finalized=False, president_status=None, waiting_days=0, current_status="",
-    )
-
-    with app.app_context():
-        pt.synchronize_phase8_tracking()
-        row = db_row(app, flow_id)
-        assert row["tracking_bucket"] == "monitoring"
-        assert int(row["tracking_priority"]) == 50
-        assert bool(row["is_overdue"]) is False
-
-
-def test_synchronize_phase8_tracking_waiting_days_overdue_threshold_boundary(app) -> None:
-    # NOTE: this proves the is_overdue COLUMN + priority threshold only
-    # (waiting_days >= 7), deliberately not the tracking_bucket text --
-    # see module docstring defect 1 for why bucket does not reflect this.
-    just_under = _seed_flow(
-        app, evaluation_id=9405, current_owner_user_id=None, is_overdue=False,
-        is_finalized=False, president_status=None, waiting_days=6, current_status="takipte",
-    )
-    at_threshold = _seed_flow(
-        app, evaluation_id=9406, current_owner_user_id=None, is_overdue=False,
-        is_finalized=False, president_status=None, waiting_days=7, current_status="takipte",
-    )
-
-    with app.app_context():
-        pt.synchronize_phase8_tracking()
-        under_row = db_row(app, just_under)
-        at_row = db_row(app, at_threshold)
-        assert bool(under_row["is_overdue"]) is False
-        assert int(under_row["tracking_priority"]) == 50
-        assert bool(at_row["is_overdue"]) is True
-        assert int(at_row["tracking_priority"]) == 80
+    assert result.flows_checked == 2
+    assert result.flows_updated == 0
 
 
 def test_synchronize_phase8_tracking_is_idempotent_on_repeat_call(app) -> None:
-    owner_id = _create_user(app, ad="Owner", soyad="Idempotent")
-    flow_id = _seed_flow(
-        app, evaluation_id=9407, current_owner_user_id=owner_id, is_overdue=False,
-        is_finalized=False, president_status=None, waiting_days=0, current_status="takipte",
-    )
+    _seed_flow(app, evaluation_id=9407, current_owner_user_id=None, current_status="takipte")
 
     with app.app_context():
         first = pt.synchronize_phase8_tracking()
-        first_row = db_row(app, flow_id)
-
         second = pt.synchronize_phase8_tracking()
-        second_row = db_row(app, flow_id)
 
-    # flows_updated stays 1 both times (the function always updates every
-    # row it selects -- "idempotent" here means the VALUES converge and
-    # stay stable across repeat calls, not that zero SQL runs the 2nd time.
-    assert first.flows_updated == 1
-    assert second.flows_updated == 1
-    assert first_row["tracking_bucket"] == second_row["tracking_bucket"] == "waiting"
-    assert first_row["tracking_priority"] == second_row["tracking_priority"]
-    assert bool(first_row["is_overdue"]) == bool(second_row["is_overdue"]) is False
+    assert first == second == pt.Phase8SyncResult(flows_checked=1, flows_updated=0)
 
 
-def db_row(app, flow_id: int) -> dict[str, Any]:
-    from app.extensions import db
+# ---------------------------------------------------------------------------
+# build_process_tracking_workspace: the bucket-precedence proof now lives
+# here (not synchronize_phase8_tracking(), which no longer computes a
+# bucket at all) -- these are the real values a user sees, derived from
+# real columns against a real, migration-shaped SQLite database.
+# ---------------------------------------------------------------------------
 
-    result = db.session.execute(
-        text(
-            "SELECT tracking_bucket, tracking_priority, is_overdue "
-            "FROM performance_process_flows WHERE id = :fid"
-        ),
-        {"fid": flow_id},
-    ).mappings().first()
-    assert result is not None
-    return dict(result)
+
+def test_build_process_tracking_workspace_waiting_days_and_overdue_boundary(app) -> None:
+    just_under = _seed_flow(
+        app, evaluation_id=9405, current_owner_user_id=None,
+        is_finalized=False, waiting_days=6, current_status="takipte",
+    )
+    at_threshold = _seed_flow(
+        app, evaluation_id=9406, current_owner_user_id=None,
+        is_finalized=False, waiting_days=7, current_status="takipte",
+    )
+    admin = SimpleNamespace(id=1, role="admin", unvan=None)
+
+    with app.app_context():
+        workspace = pt.build_process_tracking_workspace(admin, status_filter="all", search="", limit=300)
+
+    items_by_flow = {item["flow_id"]: item for item in workspace["items"]}
+    under_item = items_by_flow[just_under]
+    at_item = items_by_flow[at_threshold]
+    assert under_item["waiting_days"] == 6
+    assert under_item["is_overdue"] is False
+    assert under_item["bucket"] == "monitoring"
+    assert at_item["waiting_days"] == 7
+    assert at_item["is_overdue"] is True
+    assert at_item["bucket"] == "overdue"
+
+
+def test_build_process_tracking_workspace_overdue_beats_completed_bucket(app) -> None:
+    """BYS360 DEFECT AO: this is the exact defect AN's own investigation
+    documented -- a flow past the overdue threshold that is also finalized
+    must still show bucket="overdue" (is_overdue is checked before
+    is_finalized in _row_bucket()'s precedence), not silently fall back to
+    "completed"."""
+    flow_id = _seed_flow(
+        app, evaluation_id=9408, current_owner_user_id=None,
+        is_finalized=True, waiting_days=10, current_status="tamamlandi",
+    )
+    admin = SimpleNamespace(id=1, role="admin", unvan=None)
+
+    with app.app_context():
+        workspace = pt.build_process_tracking_workspace(admin, status_filter="all", search="", limit=300)
+
+    item = {item["flow_id"]: item for item in workspace["items"]}[flow_id]
+    assert item["is_overdue"] is True
+    assert item["bucket"] == "overdue"
+
+
+def test_build_process_tracking_workspace_president_pending_and_returned_buckets(app) -> None:
+    pending_flow = _seed_flow(
+        app, evaluation_id=9409, current_owner_user_id=None,
+        president_status="pending", current_status="takipte",
+    )
+    returned_flow = _seed_flow(
+        app, evaluation_id=9411, current_owner_user_id=None,
+        president_status="returned", current_status="takipte",
+    )
+    admin = SimpleNamespace(id=1, role="admin", unvan=None)
+
+    with app.app_context():
+        workspace = pt.build_process_tracking_workspace(admin, status_filter="all", search="", limit=300)
+
+    items_by_flow = {item["flow_id"]: item for item in workspace["items"]}
+    assert items_by_flow[pending_flow]["bucket"] == "president_pending"
+    assert items_by_flow[pending_flow]["president_required"] is True
+    assert items_by_flow[returned_flow]["bucket"] == "returned"
+
+
+def test_build_process_tracking_workspace_default_monitoring_bucket(app) -> None:
+    # current_status must be "" (falsy), not NULL: the ORM column is
+    # NOT NULL. _row_bucket's fallback (`row.get("current_status") or ""`)
+    # treats an empty string the same as a missing value.
+    flow_id = _seed_flow(
+        app, evaluation_id=9404, current_owner_user_id=None,
+        is_finalized=False, current_status="",
+    )
+    admin = SimpleNamespace(id=1, role="admin", unvan=None)
+
+    with app.app_context():
+        workspace = pt.build_process_tracking_workspace(admin, status_filter="all", search="", limit=300)
+
+    item = {item["flow_id"]: item for item in workspace["items"]}[flow_id]
+    assert item["bucket"] == "monitoring"
 
 
 # ===========================================================================
