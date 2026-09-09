@@ -1,5 +1,5 @@
 {
-  "route_count": 1025,
+  "route_count": 1024,
   "contract_keys": [
     "/about-bys360|GET",
     "/account/change-password|GET,POST",
@@ -831,7 +831,6 @@
     "/performans/baskan-onaylari/<int:approval_id>/karne|GET",
     "/performans/baskan-onaylari/<int:approval_id>/onayla|POST",
     "/performans/baskan-onaylari/<int:approval_id>/sil|POST",
-    "/performans/baskan-onaylari|GET",
     "/performans/baskan-onaylari|GET",
     "/performans/baskan-onaylari|GET",
     "/performans/baskan-onaylari|GET,POST",

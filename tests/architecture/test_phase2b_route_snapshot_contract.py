@@ -193,6 +193,17 @@ def build_contract_keys() -> list[str]:
     return sorted(routes)
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2 kaldirdi
+# app/performance/president_low_score_card_routes.py'deki
+# @main.route("/performans/baskan-onaylari", methods=["GET"]) dekoratorunu --
+# bu URL zaten her zaman process_engine_phase6_president_approvals_routes.py
+# tarafindan kazaniliyordu (bkz. tests/quality/test_route_conflict_runtime_
+# contract.py KNOWN_CONFLICTS guncellemesi). Bu KAYNAK SEVIYESINDE (AST
+# taramasi, calisma zamani url_map degil) "/performans/baskan-onaylari|GET"
+# icin 3 ayri dekorator kaynagindan (kaldirilan dosya + phase6'nin kendi
+# ikinci dekoratoru + olu app/routes_president_scorecard_v2.py'nin kendi
+# dekoratoru) birini kaldirdi -- snapshot 1025'ten 1024'e, bu anahtarin
+# tekrar sayisi 3'ten 2'ye dusurulerek bilincli olarak guncellendi.
 def test_phase2b_route_contract_snapshot_is_stable():
     assert SNAPSHOT_JSON.exists(), f"Snapshot missing: {SNAPSHOT_JSON}"
 
