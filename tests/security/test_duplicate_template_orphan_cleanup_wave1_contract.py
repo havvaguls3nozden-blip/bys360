@@ -366,6 +366,14 @@ def test_meeting_family_shared_css_is_untouched() -> None:
 # 9) Real, isolated create_app(): url_map route count is unchanged (985) --
 #    deleting unreferenced templates cannot change registered routes, but
 #    this is independently re-verified, not assumed.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984. This
+# wave's own change (template deletion only) is still unrelated to routes;
+# the baseline below is updated to the new, correct total.
 # ---------------------------------------------------------------------------
 
 _TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "dup_template_wave1" / "test_dbs"
@@ -406,7 +414,7 @@ def wave1_app():
     mp.undo()
 
 
-EXPECTED_URL_MAP_TOTAL = 985
+EXPECTED_URL_MAP_TOTAL = 984
 
 
 def test_url_map_route_count_is_unchanged(wave1_app) -> None:

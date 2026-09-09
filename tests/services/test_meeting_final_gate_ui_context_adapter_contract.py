@@ -694,7 +694,12 @@ def test_final_gate_old_generic_shell_heading_is_not_the_main_content(final_gate
 # 19) url_map unchanged.
 # ---------------------------------------------------------------------------
 
-EXPECTED_URL_MAP_TOTAL = 985
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984.
+EXPECTED_URL_MAP_TOTAL = 984
 
 
 def test_url_map_route_count_is_unchanged(final_gate_env) -> None:

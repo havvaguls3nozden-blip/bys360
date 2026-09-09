@@ -118,8 +118,16 @@ RESIDUAL_TEMPLATE_FILE = "app/templates/dashboard/executive_summary.html"
 # create_app() both immediately before and immediately after deletion --
 # byte-identical in both cases, proving the dead module never contributed
 # a single runtime endpoint.
-EXPECTED_ROUTE_COUNT = 985
-EXPECTED_ENDPOINT_LIST_SHA256 = "624e25c447915f9eaf68c8583b80e962236dcecbea962259a1a21604bb48a94a"
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984 and
+# changing the endpoint-list hash. This wave's own change (dead module
+# deletion) remains unrelated to routes; the baseline below is updated to
+# the new, correct values.
+EXPECTED_ROUTE_COUNT = 984
+EXPECTED_ENDPOINT_LIST_SHA256 = "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
 
 STARTUP_FILES_THAT_MUST_NOT_REFERENCE_THE_DEAD_MODULE = (
     "app/dashboard/routes.py",

@@ -415,9 +415,16 @@ def test_real_template_render_still_resolves_safe_url_for_to_route_support(clean
     )
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984. This
+# wave's own change (weight template/safe_url_for cleanup) remains
+# unrelated to routes; the baseline below is updated to the new value.
 def test_url_map_route_count_is_unchanged(cleanup_wave_app) -> None:
     total = len(list(cleanup_wave_app.url_map.iter_rules()))
-    assert total == 985, f"url_map route count is {total}; expected 985 (unchanged -- neither candidate touched routes)."
+    assert total == 984, f"url_map route count is {total}; expected 984 (unchanged -- neither candidate touched routes)."
 
 
 def test_all_weight_stale_endpoints_remain_unregistered_in_url_map(cleanup_wave_app) -> None:

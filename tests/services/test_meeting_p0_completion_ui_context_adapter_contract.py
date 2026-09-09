@@ -623,7 +623,12 @@ def test_fixture_context_values_are_genuinely_in_response_body(p0_response_body)
 # 15) url_map unchanged.
 # ---------------------------------------------------------------------------
 
-EXPECTED_URL_MAP_TOTAL = 985
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984.
+EXPECTED_URL_MAP_TOTAL = 984
 
 
 def test_url_map_route_count_is_unchanged(p0_ui_env) -> None:

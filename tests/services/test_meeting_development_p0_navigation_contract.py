@@ -164,7 +164,12 @@ ORIGINAL_NINE_ERROR_MESSAGES: tuple[str, ...] = (
 OLD_BASELINE_PASSED_COUNT = 27
 EXPECTED_PASSED_COUNT = 36
 EXPECTED_FINAL_CHECKS_COUNT = 6
-EXPECTED_URL_MAP_TOTAL = 985
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984.
+EXPECTED_URL_MAP_TOTAL = 984
 
 
 def _normalize_line_endings(data: bytes) -> bytes:

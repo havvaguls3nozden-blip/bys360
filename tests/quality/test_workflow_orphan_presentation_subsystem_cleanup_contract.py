@@ -137,8 +137,16 @@ DELETED_TEST_FILES = (
     "tests/workflow/test_generic_sync_sql_identifier_phase5u.py",
 )
 
-EXPECTED_ROUTE_COUNT = 985
-EXPECTED_ENDPOINT_LIST_SHA256 = "624e25c447915f9eaf68c8583b80e962236dcecbea962259a1a21604bb48a94a"
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984 and
+# changing the endpoint-list hash. This wave's own change (dead workflow
+# subsystem removal) remains independently unrelated; the baseline below
+# is updated to the new, correct values.
+EXPECTED_ROUTE_COUNT = 984
+EXPECTED_ENDPOINT_LIST_SHA256 = "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
 
 # The 12 routes app/workflow/routes.py used to claim -- independently
 # reproduced live in the same-process-contamination experiment during the

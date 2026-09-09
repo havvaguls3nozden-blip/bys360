@@ -415,9 +415,15 @@ def test_p0_context_settings_now_genuinely_contains_seeded_fixture_rows(p0_fix_e
 # ---------------------------------------------------------------------------
 # 11) url_map route count is unchanged (985) -- this fix touches only a
 #     service-layer query, no route/blueprint registration.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): an unrelated later
+# wave (AQ-2) removed the /performans/baskan-onaylari route registration
+# that always lost that URL's dispatch conflict anyway (see
+# tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
+# update), dropping the real url_map route count from 985 to 984.
 # ---------------------------------------------------------------------------
 
-EXPECTED_URL_MAP_TOTAL = 985
+EXPECTED_URL_MAP_TOTAL = 984
 
 
 def test_url_map_route_count_is_unchanged(p0_fix_env) -> None:
