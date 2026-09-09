@@ -122,8 +122,13 @@ def _matches_visibility(item: dict[str, Any], menu_visibility_map: dict[str, boo
     return False
 
 def _normalize_role_value(value: Any) -> str:
-    raw = str(value or "").strip().lower()
-    tr_map = str.maketrans("çğıöşüâîûİ", "cgiosuaiui")
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa aşağıdaki tr_map'teki 'İ' anahtarı
+    # asla eşleşmez. 'İ' burada .lower() çağrılmadan ÖNCE, tek kod noktalı
+    # haldeyken ayrı olarak 'i'ye çevrilir.
+    raw = str(value or "").strip().replace("İ", "i").lower()
+    tr_map = str.maketrans("çğıöşüâîû", "cgiosuaiu")
     return raw.translate(tr_map).replace(" ", "_").replace("-", "_")
 
 def _is_president_approvals_authorized_user(user) -> bool:

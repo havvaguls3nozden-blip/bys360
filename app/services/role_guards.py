@@ -10,21 +10,30 @@ from typing import Any
 
 # BYS360_MAINTENANCE_10E_ROLE_GUARDS
 
-TOP_OR_MANAGER_TOKENS = (
+# BYS360 DEFECT AQ: bu küme önceden TOP_OR_MANAGER_TOKENS adlı kısmi/parça
+# jeton listesiyle "token in role" alt dize eşleştirmesi için kullanılıyordu
+# -- bare "ik" (2 karakter) jetonu "Teknik Personel" gibi ilgisiz bir unvanı
+# ("tekn-ik") da eşleştiriyordu, "baskan" jetonu ise phase6'nın kendi
+# yorumunun uyardığı "Başkanlığı Uzmanı" tarzı görünüşte-benzer unvanları da
+# kapsıyordu. Her jetonun karşılık geldiği kanonik rol koduna TAM eşleşme
+# yapılır artık (kapsam daraltılmadı/genişletilmedi -- aynı 10 jetonun
+# kendi kanonik karşılığı listelenir). "admin", "baskan", "baskan_
+# yardimcisi", "grup_baskani", "mali_musavir", "koordinator",
+# "birim_sorumlusu" alt kümesi zaten app/main_handlers/comparison_handlers.py
+# ve app/institutional/hr_scope_helpers.py'de aynen kullanılan, kanıtlanmış
+# kanonik "yönetici katmanı" kümesidir.
+TOP_OR_MANAGER_ROLES = frozenset({
     "admin",
-    "sistem",
-    "başkan",
+    "sistem_yoneticisi",
     "baskan",
-    "yardımc",
-    "yardimc",
-    "grup",
-    "koordinat",
-    "performans",
+    "baskan_yardimcisi",
+    "grup_baskani",
+    "koordinator",
+    "performans_yetkilisi",
     "ik",
-    "mali",
-    "yönetici",
-    "yonetici",
-)
+    "mali_musavir",
+    "birim_sorumlusu",
+})
 
 
 def role_name(user: Any) -> str:
@@ -41,7 +50,7 @@ def is_top_or_manager(user: Any) -> bool:
         return False
     role = role_name(user)
     return (
-        any(token in role for token in TOP_OR_MANAGER_TOKENS)
+        role in TOP_OR_MANAGER_ROLES
         or bool(getattr(user, "is_admin", False))
         or bool(getattr(user, "is_superuser", False))
     )

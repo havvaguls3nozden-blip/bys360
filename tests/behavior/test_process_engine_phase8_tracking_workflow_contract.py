@@ -135,6 +135,17 @@ def test_is_process_tracking_user_false_for_plain_personel_uzman() -> None:
     assert pt.is_process_tracking_user(user) is False
 
 
+def test_is_admin_user_true_for_all_caps_turkish_capital_i_role_value() -> None:
+    """BYS360 DEFECT AQ: normalize_role() used to call .lower() before
+    .translate(); Python's 'İ'.lower() (capital dotted I, U+0130) produces
+    the two-codepoint sequence 'i' + COMBINING DOT ABOVE (U+0307), not
+    plain 'i', so the translate table's 'İ' entry was dead code and a
+    realistic all-caps HR value like "SİSTEM YÖNETİCİSİ" failed to
+    normalize to "sistem_yoneticisi", silently denying a real admin."""
+    user = SimpleNamespace(role="SİSTEM YÖNETİCİSİ", unvan=None)
+    assert pt.is_admin_user(user) is True
+
+
 def test_can_view_process_tracking_matches_is_process_tracking_user_positive_and_negative() -> None:
     allowed = SimpleNamespace(role="grup_baskani", unvan=None)
     denied = SimpleNamespace(role="personel", unvan="Uzman")

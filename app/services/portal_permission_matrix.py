@@ -88,8 +88,13 @@ PORTAL_ROLE_FIRST_KEYS = set(INTERACTION_KEYS)
 
 
 def _norm(value: Any) -> str:
-    tr_map = str.maketrans("çğıöşüÇĞİÖŞÜ", "cgiosuCGIOSU")
-    return str(value or "").strip().lower().translate(tr_map).replace(" ", "_").replace("-", "_")
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa tr_map'in büyük harf yarısı
+    # (Ç,Ğ,İ,Ö,Ş,Ü) zaten hiç eşleşemez. 'İ' burada .lower() çağrılmadan
+    # ÖNCE, tek kod noktalı haldeyken ayrı olarak 'i'ye çevrilir.
+    tr_map = str.maketrans("çğıöşüÇĞÖŞÜ", "cgiosuCGOSU")
+    return str(value or "").strip().replace("İ", "i").lower().translate(tr_map).replace(" ", "_").replace("-", "_")
 
 
 def _query_bool(model, **filters) -> bool | None:

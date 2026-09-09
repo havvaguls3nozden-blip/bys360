@@ -38,17 +38,19 @@ _PERSONNEL_CREATE_ROLES = {
 }
 
 
+# BYS360 DEFECT AQ: "admin" in role / "personel_yonetimi" in role /
+# "personel yönetimi" in label alt dize kontrolleri kaldırıldı -- her üçü
+# de zaten _PERSONNEL_CREATE_ROLES kümesinin birer TAM üyesiydi
+# ("admin", "personel_yonetimi", "personel yönetimi yetkilisi"), bu yüzden
+# alt dize hâlleri hiçbir meşru değeri ek olarak kapsamıyordu, yalnızca
+# "birim_admin_full" gibi ilgisiz roller için yanlışlıkla personel oluşturma
+# yetkisi açıyordu. role == "ik" / label == "ik" zaten tam eşleşme.
 def _can_mobile_create_personnel(user: User) -> bool:
     role = _role_key(user)
     label = ((getattr(user, "role_label", "") or "").strip().lower())
     return bool(
         role in _PERSONNEL_CREATE_ROLES
         or label in _PERSONNEL_CREATE_ROLES
-        or "admin" in role
-        or "personel_yonetimi" in role
-        or "personel yönetimi" in label
-        or role == "ik"
-        or label == "ik"
     )
 
 

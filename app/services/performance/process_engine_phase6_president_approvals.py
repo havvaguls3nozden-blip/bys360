@@ -146,8 +146,15 @@ def apply_phase6_schema() -> None:
 
 
 def normalize_role(value: Any) -> str:
-    raw = str(value or "").strip().lower()
-    tr_map = str.maketrans("çğıöşüâîûİ", "cgiosuaiui")
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa aşağıdaki tr_map'teki 'İ' anahtarı
+    # asla eşleşmez ve normalize edilmiş sonuçta artık nokta işareti kalır
+    # (ör. "Sİstem Yöneticisi" -> "si̇stem_yoneti̇ci̇si̇", beklenen
+    # "sistem_yoneticisi" değil). 'İ' burada .lower() çağrılmadan ÖNCE,
+    # tek kod noktalı haldeyken ayrı olarak 'i'ye çevrilir.
+    raw = str(value or "").strip().replace("İ", "i").lower()
+    tr_map = str.maketrans("çğıöşüâîû", "cgiosuaiu")
     return raw.translate(tr_map).replace(" ", "_").replace("-", "_")
 
 

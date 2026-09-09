@@ -187,6 +187,17 @@ def test_is_admin_user_rejects_plain_employee() -> None:
     assert approvals.is_admin_user(user) is False
 
 
+def test_is_admin_user_recognizes_all_caps_turkish_capital_i_role_value() -> None:
+    # BYS360 DEFECT AQ: normalize_role() used to call .lower() before
+    # .translate(); Python's 'İ'.lower() (capital dotted I, U+0130) produces
+    # the two-codepoint sequence 'i' + COMBINING DOT ABOVE (U+0307), not
+    # plain 'i', so the translate table's 'İ' entry was dead code and a
+    # realistic all-caps HR value like "SİSTEM YÖNETİCİSİ" failed to
+    # normalize to "sistem_yoneticisi", silently denying a real admin.
+    user = SimpleNamespace(is_admin=False, is_superuser=False, role="SİSTEM YÖNETİCİSİ", role_name=None, user_type=None)
+    assert approvals.is_admin_user(user) is True
+
+
 def test_is_president_user_recognizes_role_field_with_turkish_diacritic() -> None:
     user = SimpleNamespace(role="Başkan", role_name=None, user_type=None, unvan=None, title=None)
     assert approvals.is_president_user(user) is True

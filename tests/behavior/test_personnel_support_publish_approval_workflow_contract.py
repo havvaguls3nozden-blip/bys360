@@ -48,14 +48,14 @@ exercising or asserting the real buggy resolution. The score>=70.0
 short-circuit tests use a raising stub to prove the dependency is never even
 invoked.
 
-A SEPARATE, NEW (non-Defect-A) production defect was found empirically while
-implementing the group-chair "scattered substring fallback" contract: see
-the docstring on
-`test_is_personnel_support_group_chair_user_true_via_scattered_substring_fallback`
-below and this file's completion report for the full write-up. It is
-documented here, not encoded as a passing assertion on the buggy behavior,
-matching the precedent already established in
-tests/behavior/test_low_score_process_service_workflow_contract.py.
+BYS360 DEFECT AQ update: two separate, non-Defect-A production defects that
+were found empirically while implementing the group-chair "scattered
+substring fallback" contract (a live authorization-overgrant substring bug,
+and the `_normalize` 'İ'.lower() two-codepoint Unicode bug) have both since
+been FIXED -- see the docstrings around
+`test_is_personnel_support_group_chair_user_false_for_scattered_fields_no_longer_matches`
+and `test_is_personnel_support_group_chair_user_true_for_correctly_capitalized_single_field_title`
+below for the corrected, locked-in behavior.
 """
 from __future__ import annotations
 
@@ -447,41 +447,47 @@ def test_is_personnel_support_group_chair_user_true_via_explicit_role_string(app
     assert svc.is_personnel_support_group_chair_user(chair) is True
 
 
-def test_is_personnel_support_group_chair_user_true_via_scattered_substring_fallback(app):
-    """Fallback branch: required tokens ("personel", "idari", "grup",
-    "baskan") scattered across DIFFERENT fields (role/unvan/title), whose
-    combined normalized text does not exactly match any of the four
-    explicit literal strings but does contain all four required substrings.
-
-    NOTE ON TEST DATA -- NEW PRODUCTION DEFECT FOUND (not Defect A): the
-    orthographically-correct Turkish capitalization "Personel ve İdari İşler
-    Grup Başkanı" (capital dotted İ, U+0130) was deliberately NOT used here.
-    Verified empirically while writing this file:
-
-        >>> _normalize("Personel ve İdari İşler Grup Başkanı")
-
-    Python's str.lower() case-folds capital İ into the TWO-codepoint
-    sequence "i" + COMBINING DOT ABOVE (U+0307) *before* `_normalize`'s own
-    `str.translate(tr_map)` step ever runs. `_normalize`'s translate map
-    contains an "İ" -> "i" entry, but it is dead code: it can only match the
-    literal single-codepoint U+0130, which `.lower()` has already consumed
-    by the time `.translate()` executes. The stray combining-dot codepoint
-    survives untouched inside the normalized text, splitting what should
-    read as "idari" into "i" + U+0307 + "dari" -- so `"idari" in combined`
-    is False, and the explicit-set exact-match also fails, for ANY real
-    free-text role/unvan/title/position/gorev value that uses standard
-    Turkish capitalization for "İdari" (confirmed via direct call:
-    `is_personnel_support_group_chair_user` returns False for that exact
-    phrase even though it is the correct spelling of an explicit-set
-    synonym). This silently denies group-chair authorization to a real user
-    whose title is entered with correct Turkish capitalization. Reported in
-    this file's completion report as NEW_PRODUCTION_DEFECT_FOUND rather than
-    encoded here as a passing assertion on the buggy behavior. The
-    scattered-field values below use plain ASCII-safe lowercase Turkish text
-    to exercise the same fallback code path without tripping that defect.
-    """
+# BYS360 DEFECT AQ: both production defects this test file's own docstring
+# and the test below used to document have been FIXED:
+#
+# 1. The substring-composite fallback (required tokens "personel",
+#    "idari"/"destek", "grup", "baskan" scattered across DIFFERENT fields,
+#    combined-then-substring-matched) has been REMOVED entirely --
+#    is_personnel_support_group_chair_user now only ever grants via the
+#    `explicit` exact-match set. A real exploit example: a Grup Başkan
+#    YARDIMCISI (Deputy Group Chair, role="personel", unvan="destek
+#    hizmetleri", title="grup başkan yardımcısı") satisfied all four
+#    scattered substrings ("başkan" appears inside "başkan yardımcısı")
+#    and was incorrectly granted publish-approval decision authority.
+#
+# 2. `_normalize`'s 'İ'.lower() two-codepoint bug (documented at length
+#    below in test_is_personnel_support_group_chair_user_true_for_correctly_
+#    capitalized_single_field_title) is also fixed -- 'İ' is now folded to
+#    'i' BEFORE .lower() runs, so it no longer needs an ASCII-only
+#    workaround to exercise the explicit exact-match set correctly.
+def test_is_personnel_support_group_chair_user_false_for_scattered_fields_no_longer_matches():
     svc = _import_service()
     chair = SimpleNamespace(role="personel", unvan="idari isler", title="grup baskani")
+    assert svc.is_personnel_support_group_chair_user(chair) is False
+
+
+def test_is_personnel_support_group_chair_user_denies_deputy_lookalike():
+    # BYS360 DEFECT AQ adversarial case: the confirmed live exploit -- a
+    # deputy/assistant group chair is NOT the group chair.
+    svc = _import_service()
+    deputy = SimpleNamespace(role="personel", unvan="destek hizmetleri", title="grup başkan yardımcısı")
+    assert svc.is_personnel_support_group_chair_user(deputy) is False
+
+
+def test_is_personnel_support_group_chair_user_true_for_correctly_capitalized_single_field_title():
+    # BYS360 DEFECT AQ: this closes the NEW_PRODUCTION_DEFECT this file
+    # itself previously documented -- with the Unicode ordering fix, the
+    # orthographically-correct Turkish capitalization (capital dotted İ,
+    # U+0130), entered as one real, single unvan field value (as an HR
+    # system realistically would store a full official title), now
+    # correctly normalizes to and exactly matches an `explicit` set member.
+    svc = _import_service()
+    chair = SimpleNamespace(role="personel", unvan="Personel ve İdari İşler Grup Başkanı", title=None)
     assert svc.is_personnel_support_group_chair_user(chair) is True
 
 
