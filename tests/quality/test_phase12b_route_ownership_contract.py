@@ -30,36 +30,44 @@ class _StrategicConflict(TypedDict):
     indexes: tuple[int, int]
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2 kaldirdi
+# /performans/baskan-onaylari icin main.president_low_score_approvals_center'in
+# kendi route kaydini (app/performance/president_low_score_card_routes.py),
+# bu url_map'ten bu bes route'un TUMUNDEN once tam olarak bir Rule kaldirdi --
+# asagidaki tum "indexes" degerleri buna gore -1 kaydirildi (mekanik olarak
+# yeniden dogrulandi, bkz. tests/quality/test_route_conflict_runtime_contract.py
+# KNOWN_CONFLICTS guncellemesi). Endpoint isimleri ve winner/shadowed iliskisi
+# degismedi.
 STRATEGIC_CONFLICTS: dict[str, _StrategicConflict] = {
     "/performans/stratejik/kpi-dashboard": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_dashboard_tr",
         "shadowed": "strategic_performance.kpi_dashboard",
-        "indexes": (798, 878),
+        "indexes": (797, 877),
     },
     "/performans/stratejik/hedefler": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_targets_tr",
         "shadowed": "strategic_performance.target_list",
-        "indexes": (800, 880),
+        "indexes": (799, 879),
     },
     "/performans/stratejik/yetkinlik-kutuphanesi": {
         "methods": {"GET"},
         "winner": "main.sp1_competency_library_tr",
         "shadowed": "strategic_performance.competency_library",
-        "indexes": (806, 879),
+        "indexes": (805, 878),
     },
     "/performans/stratejik/oz-degerlendirme": {
         "methods": {"GET", "POST"},
         "winner": "main.sp1_self_review_tr",
         "shadowed": "strategic_performance.self_review",
-        "indexes": (808, 883),
+        "indexes": (807, 882),
     },
     "/performans/stratejik/ai-kpi-analiz": {
         "methods": {"GET"},
         "winner": "main.sp1_ai_kpi_analysis_tr",
         "shadowed": "strategic_performance.ai_kpi_analysis",
-        "indexes": (810, 884),
+        "indexes": (809, 883),
     },
 }
 
@@ -226,17 +234,23 @@ def test_strategic_menu_endpoints_resolve_to_shadowed_names_but_main_wins(app):
     assert alias_endpoint == "strategic_performance.ai_kpi_analysis"
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2'nin
+# /performans/baskan-onaylari route kaydi kaldirmasi, url_map'ten tam olarak
+# bir Rule (985->984) ve bir endpoint (main.president_low_score_approvals_
+# center artik hicbir yerde kayitli degil, 880->879) dusurdu; unique path
+# sayisi (960) degismedi. Manifest indexleri de bu kaldirmadan once
+# geldikleri icin -1 kaydirildi -- mekanik olarak yeniden dogrulandi.
 def test_manifest_winner_and_route_snapshot_are_deterministic_across_factories(
     fresh_runtime_snapshot,
 ):
-    expected_snapshot = [985, 960, 880]
+    expected_snapshot = [984, 960, 879]
 
     for runtime in fresh_runtime_snapshot.values():
         assert runtime["counts"] == expected_snapshot
         entries = runtime["entries"]["/manifest.webmanifest"]
         assert [(entry["index"], entry["endpoint"]) for entry in entries] == [
-            (812, "main.bys360_pwa_manifest"),
-            (906, "pwa.manifest_webmanifest"),
+            (811, "main.bys360_pwa_manifest"),
+            (905, "pwa.manifest_webmanifest"),
         ]
         assert (
             runtime["winners"]["/manifest.webmanifest|GET"]
@@ -467,11 +481,19 @@ def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):
     )
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2, /performans/
+# baskan-onaylari icin main.president_low_score_approvals_center'in kendi
+# route kaydini kaldirdiktan sonra bu URL artik tek endpoint'e sahip --
+# dolayisiyla asagidaki conflict dedektoru bu URL'yi artik cakisma olarak
+# GORMUYOR (9 -> 8 bilinen cakisma). Karne alt-route'u
+# (/performans/baskan-onaylari/<int:approval_id>/karne) ve diger 7 bilinen
+# cakisma DEGISMEDEN kaldi -- mekanik olarak yeniden dogrulandi.
 def test_phase12a_route_and_conflict_totals_remain_unchanged(fresh_runtime_snapshot):
     runtime = fresh_runtime_snapshot["first"]
-    assert runtime["counts"] == [985, 960, 880]
+    assert runtime["counts"] == [984, 960, 879]
     conflicts = set(runtime["conflicts"])
-    assert len(conflicts) == 9
+    assert len(conflicts) == 8
     assert set(STRATEGIC_CONFLICTS) <= conflicts
     assert "/manifest.webmanifest" in conflicts
-    assert "/performans/baskan-onaylari" in conflicts
+    assert "/performans/baskan-onaylari" not in conflicts
+    assert "/performans/baskan-onaylari/<int:approval_id>/karne" in conflicts

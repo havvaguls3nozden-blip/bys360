@@ -383,6 +383,15 @@ def test_style_and_handler_inventory_is_completely_unaffected() -> None:
     assert inventory.javascript_url_total == 0
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2 kaldirdi
+# /performans/baskan-onaylari icin main.president_low_score_approvals_center'in
+# kendi route kaydini (app/performance/president_low_score_card_routes.py) --
+# bu URL zaten her zaman main.performance_president_approvals tarafindan
+# kazaniliyordu (bkz. tests/quality/test_route_conflict_runtime_contract.py
+# KNOWN_CONFLICTS guncellemesi). Bu, url_map'ten tam olarak bir Rule kaldirdi
+# ve main.president_low_score_approvals_center endpoint'ini tamamen kayitsiz
+# birakti, ROUTE_COUNT'u 985'ten 984'e dusurdu ve ENDPOINT_SHA256'yi degistirdi
+# -- bilincli baseline guncellemesi.
 def test_url_map_route_count_and_hash_are_unaffected() -> None:
     probe_script = (
         "import hashlib\n"
@@ -394,8 +403,8 @@ def test_url_map_route_count_and_hash_are_unaffected() -> None:
     )
     output_lines = _run_isolated_probe(probe_script)
     values = dict(line.split("=", 1) for line in output_lines if "=" in line)
-    assert values.get("ROUTE_COUNT") == "985"
-    assert values.get("ENDPOINT_SHA256") == "624e25c447915f9eaf68c8583b80e962236dcecbea962259a1a21604bb48a94a"
+    assert values.get("ROUTE_COUNT") == "984"
+    assert values.get("ENDPOINT_SHA256") == "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
 
 
 # ---------------------------------------------------------------------------

@@ -336,7 +336,17 @@ CARD_TEMPLATE = """
 {% endblock %}
 """
 
-@main.route("/performans/baskan-onaylari", methods=["GET"])
+# BYS360 DEFECT AQ: bu URL, app/performance/__init__.py'nin import
+# sırası nedeniyle her zaman process_engine_phase6_president_approvals_
+# routes.py'deki performance_president_approvals tarafından
+# karşılanıyordu (Flask/Werkzeug aynı statik yola birden fazla Rule
+# eklenmesine izin verir; ilk kaydedilen, o yolu isteyen her HTTP
+# metodunda kazanır). Bu fonksiyon hiçbir zaman gerçek bir istek
+# karşılamadı -- kendi route kaydı, tespit edilen ve
+# tests/quality/test_route_conflict_runtime_contract.py ile önceden
+# kilitlenen çakışmayı kaldırmak için buradan çıkarıldı. Fonksiyonun
+# kendisi ve yardımcıları (bazıları ayrı testlerle doğrudan test
+# ediliyor) korunuyor.
 @login_required
 def president_low_score_approvals_center():
     if not _can_view_president_approvals():
