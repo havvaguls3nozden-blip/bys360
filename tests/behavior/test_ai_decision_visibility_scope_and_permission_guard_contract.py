@@ -116,14 +116,41 @@ def test_role_group_for_defect_d_boundary_grup_baskani_is_manager_not_global():
     assert role_group_for(SimpleNamespace(role="Grup Başkanı")) == "manager_scope"
 
 
-def test_role_group_for_substring_fallback_excludes_baskan_plus_grup_combo():
-    # Optional substring-fallback proof: a role string that is NOT an exact
-    # member of any named set but still contains both "baskan" and "grup"
-    # together must NOT resolve to "global" -- the "baskan" in role and
-    # "grup" not in role guard correctly excludes it, and it instead falls
-    # into the "grup" in role manager-scope fallback below it.
+# BYS360 DEFECT AQ: role_group_for'un eski substring-fallback bloğu
+# (tam rol kodu eşleşmese bile metinde "baskan"/"admin"/"grup" gibi alt
+# dizeler geçtiğinde kapsam veren kısım) tamamen kaldırıldı -- kanonik rol
+# kodu olmayan HER girdi artık güvenli varsayılan "own_scope"a düşer. Bu iki
+# test önceki (kaldırılan) fallback davranışını değil, düzeltilmiş,
+# güvenli-varsayılan davranışı kilitler.
+def test_role_group_for_non_canonical_lookalike_falls_back_to_own_scope_not_manager():
     synthetic_role = "grup_lideri_baskanvekili"
-    assert role_group_for(synthetic_role) == "manager_scope"
+    assert role_group_for(synthetic_role) == "own_scope"
+
+
+def test_role_group_for_baskanligi_uzmani_lookalike_denied_global_scope():
+    # phase6's is_president_user kendi yorumu: "kurum adı veya 'Başkanlığı'
+    # metni yetki vermez." Aynı ilke burada da geçerli olmalı: "Başkanlığı
+    # Uzmanı" (Başkan değil, sıradan bir uzman unvanı) "baskan" alt dizesini
+    # içerir ama kanonik hiçbir kümenin tam üyesi değildir -- artık "global"
+    # değil, "own_scope" döner.
+    assert role_group_for("Başkanlığı Uzmanı") == "own_scope"
+    assert role_group_for(SimpleNamespace(role="Başkanlığı Uzmanı")) == "own_scope"
+
+
+def test_role_group_for_free_form_display_text_with_privileged_substrings_denied():
+    # Serbest metin unvan/görev alanları (ör. "Sistem Destek ve Bakım
+    # Uzmanı" -- ne admin ne başkan) kanonik kümelerin dışındadır ve artık
+    # yalnızca güvenli varsayılana düşer, alt dize eşleşmesiyle
+    # yükseltilmez.
+    assert role_group_for("Sistem Destek ve Bakım Uzmanı") == "own_scope"
+    assert role_group_for("Grup Koordinasyon Ofisi Asistanı") == "own_scope"
+
+
+def test_role_group_for_unknown_or_malformed_role_denied():
+    assert role_group_for("") == "own_scope"
+    assert role_group_for(None) == "own_scope"
+    assert role_group_for(SimpleNamespace(role=None)) == "own_scope"
+    assert role_group_for(SimpleNamespace()) == "own_scope"
 
 
 # ---------------------------------------------------------------------------

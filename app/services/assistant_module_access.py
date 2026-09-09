@@ -410,10 +410,14 @@ def assistant_module_enabled_for_current_user() -> bool:
 
     if role in CLOSED_ROLES:
         return False
-    if role in OPEN_ROLES:
-        return True
-
-    return any(token in role for token in ("admin", "yonetici", "yönetici", "baskan", "başkan", "koordinator", "koordinat", "grup"))
+    # BYS360 DEFECT AQ: burada önceden, DB tabanlı hiçbir politika satırı
+    # bulunamadığında ve rol OPEN_ROLES/CLOSED_ROLES kümelerinin tam üyesi
+    # olmadığında, rol metninde "baskan"/"admin"/"koordinat"/"grup" gibi alt
+    # dizeler geçiyorsa modül erişimi veriliyordu -- "Başkanlığı Uzmanı" gibi
+    # sıradan bir unvan da bu şekilde erişim kazanıyordu. Kataloglanmamış/
+    # tanınmayan her rol artık güvenli varsayılan olarak reddedilir (OPEN_
+    # ROLES'un tam üyesi olmayan hiçbir şey erişim kazanmaz).
+    return role in OPEN_ROLES
 
 
 def assistant_shortcut_visible(feature_key: str | None = None) -> bool:

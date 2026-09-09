@@ -7,22 +7,23 @@ from .repository import count_table, insert_agent_audit_log, table_columns, tabl
 
 logger = logging.getLogger(__name__)
 
-PRIVILEGED_ROLE_KEYWORDS = (
+# BYS360 DEFECT AQ: bu küme önceden "keyword in role_text" biçiminde alt
+# dize eşleştirmesi için kullanılıyordu -- ör. "sistem" jetonu, ilgisiz
+# "Sistem Destek Uzmanı" gibi bir unvanı da kapsıyordu. Artık her rol
+# alanı AYRI AYRI normalize edilip bu kümeyle TAM eşleştiriliyor (bkz.
+# has_performance_overview_permission), bu yüzden hem Türkçe hem ASCII
+# yazımları burada tam değer olarak listelenir.
+PRIVILEGED_ROLE_VALUES = frozenset({
     "admin",
-    "sistem",
-    "başkan",
-    "baskan",
-    "üst yönetim",
-    "ust yonetim",
+    "sistem_yoneticisi", "sistem yöneticisi", "sistem yoneticisi",
+    "başkan", "baskan",
+    "üst yönetim", "ust yonetim", "ust_yonetim",
     "ik",
-    "insan kaynakları",
-    "insan kaynaklari",
-    "personel ve destek",
-    "grup başkanı",
-    "grup baskani",
-    "koordinatör",
-    "koordinator",
-)
+    "insan kaynakları", "insan kaynaklari", "insan_kaynaklari",
+    "personel ve destek", "personel_ve_destek",
+    "grup başkanı", "grup baskani", "grup_baskani",
+    "koordinatör", "koordinator",
+})
 
 PENDING_STATUSES = "'pending', 'assigned', 'waiting', 'bekliyor', 'in_progress'"
 PRESIDENT_STATUSES = "'president_pending', 'blocked_president_pending', 'Başkan Onayı Bekliyor', 'baskan_onayi_bekliyor'"
@@ -37,26 +38,30 @@ def _user_id(user: Any) -> int | None:
         return None
 
 
-def _role_text(user: Any) -> str:
+def _role_values(user: Any) -> list[str]:
     values: list[str] = []
     for attr in ("role", "role_name", "user_role", "role_key", "title", "unvan", "position"):
         value = getattr(user, attr, None)
         if value:
-            values.append(str(value))
+            values.append(str(value).strip().lower())
     roles = getattr(user, "roles", None)
     if roles:
         try:
             for role in roles:
-                values.append(str(getattr(role, "name", role)))
+                values.append(str(getattr(role, "name", role)).strip().lower())
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            values.append(str(roles))
-    return " ".join(values).lower()
+            values.append(str(roles).strip().lower())
+    return values
 
 
 def has_performance_overview_permission(user: Any) -> bool:
-    role_text = _role_text(user)
-    if any(keyword in role_text for keyword in PRIVILEGED_ROLE_KEYWORDS):
+    # BYS360 DEFECT AQ: her rol/unvan alanı KENDİ TEK BAŞINA değeriyle
+    # PRIVILEGED_ROLE_VALUES'a karşı TAM eşleştirilir -- birleştirilmiş tek
+    # bir metin üzerinde alt dize aranmaz. "Başkanlığı Uzmanı" gibi bir
+    # unvan artık "baskan" içerdiği için değil, kendisi tam olarak
+    # kümedeki bir değere eşit OLMADIĞI için reddedilir.
+    if any(value in PRIVILEGED_ROLE_VALUES for value in _role_values(user)):
         return True
     for attr in ("is_admin", "is_superuser", "is_system_admin", "is_president", "is_manager"):
         try:
