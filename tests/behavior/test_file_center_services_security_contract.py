@@ -385,8 +385,7 @@ def test_has_double_extension_risk_does_not_flag_marker_only_as_final_suffix():
     [
         SimpleNamespace(role="admin", role_label="", username="x"),
         SimpleNamespace(role="sistem_yoneticisi", role_label="", username="x"),
-        SimpleNamespace(role="birim_admin_full", role_label="", username="x"),  # "admin" substring
-        SimpleNamespace(role="personel", role_label="Yönetici Yardımcısı", username="x"),
+        SimpleNamespace(role="personel", role_label="Yönetici", username="x"),
         SimpleNamespace(role="personel", role_label="", username="admin"),
     ],
 )
@@ -401,6 +400,26 @@ def test_is_admin_like_false_for_regular_personnel():
 
     regular = SimpleNamespace(role="personel", role_label="Personel", username="user123")
     assert is_admin_like(regular) is False
+
+
+# BYS360 DEFECT AQ: is_admin_like() önceden "admin" in role / "yönetici" in
+# label biçiminde alt dize eşleştirmesi kullanıyordu -- aşağıdaki testler bu
+# davranışın KALDIRILDIĞINI kilitler (önceki test sürümünde bu iki senaryo
+# "documented admin signals" olarak True bekleniyordu; bu, düzeltilen
+# güvenlik açığının kendisiydi).
+@pytest.mark.parametrize(
+    "user",
+    [
+        SimpleNamespace(role="birim_admin_full", role_label="", username="x"),
+        SimpleNamespace(role="personel", role_label="İnsan Kaynakları Yöneticisi", username="x"),
+        SimpleNamespace(role="personel", role_label="Yönetici Yardımcısı", username="x"),
+        SimpleNamespace(role="office-admin", role_label="", username="x"),
+    ],
+)
+def test_is_admin_like_denies_substring_lookalikes(user):
+    from app.file_center.services import is_admin_like
+
+    assert is_admin_like(user) is False
 
 
 # ---------------------------------------------------------------------------

@@ -194,15 +194,24 @@ def default_download_limit() -> int:
     return _db_int("default_download_limit", "FILE_CENTER_DEFAULT_DOWNLOAD_LIMIT", 5)
 
 
+# BYS360 DEFECT AQ: bu kümeler önceden "in" alt dize eşleştirmesi ile
+# kullanılıyordu ("admin" in role, "yönetici" in label) -- ör. role_label
+# "İnsan Kaynakları Yöneticisi" (sıradan bir birim yöneticisi, admin değil)
+# "yönetici" alt dizesini içerdiği için Dosya Merkezi'nde tam admin yetkisi
+# kazanıyordu. Artık role/role_label alanlarının KENDİSİ bu kümelerle TAM
+# eşleştirilir; orijinal jetonlar (aynı anlamda) korunur, yalnızca
+# eşleştirme yöntemi değişir.
+_ADMIN_ROLE_VALUES = frozenset({"admin", "sistem_yoneticisi", "sistem yöneticisi", "sistem yoneticisi", "superadmin"})
+_ADMIN_LABEL_VALUES = frozenset({"yönetici", "yonetici"})
+
+
 def is_admin_like(user) -> bool:
-    role = str(getattr(user, "role", "") or "").lower()
-    label = str(getattr(user, "role_label", "") or "").lower()
-    username = str(getattr(user, "username", "") or "").lower()
+    role = str(getattr(user, "role", "") or "").strip().lower()
+    label = str(getattr(user, "role_label", "") or "").strip().lower()
+    username = str(getattr(user, "username", "") or "").strip().lower()
     return (
-        role in {"admin", "sistem_yoneticisi", "sistem yöneticisi", "superadmin"}
-        or "admin" in role
-        or "yönetici" in label
-        or "yonetici" in label
+        role in _ADMIN_ROLE_VALUES
+        or label in _ADMIN_LABEL_VALUES
         or username == "admin"
     )
 

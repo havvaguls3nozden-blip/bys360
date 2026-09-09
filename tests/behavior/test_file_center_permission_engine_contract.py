@@ -34,15 +34,23 @@ pysqlite dual-connection isolation-level/explicit-BEGIN fix), with its own
 tmp DB directory (C:\\bys360_pytest_tmp_wave5_agent2_fcperm) so this file
 shares no state with any other wave/agent (Group B).
 
-Defect I (already known, out of scope to fix -- tracked separately):
-``_effective_role_key``'s first priority check is a raw
-``if "admin" in text: return "admin"`` where ``text`` is built by
-``_user_text`` concatenating role/role_key/role_name/role_label/title/
-position/job_title/username/email/department/unit/unit_name -- so e.g. an
-``email="sysadmin-contact@..."`` on an otherwise "personel" user currently
-misclassifies as admin. No test below constructs that collision or asserts
-it as correct; only unambiguous, single-field role classification is
-exercised for ``_effective_role_key``.
+BYS360 DEFECT AQ update -- Defect I is now FIXED (was: already known, out of
+scope, tracked separately): ``_effective_role_key``/``_admin_like_text``/
+``_manager_like_text``/``_permission_from_matrix``'s fallback substring scan
+used to run ``if "admin" in text: return "admin"`` against ``role_key(user)``
+(``_user_text`` concatenating all 12 fields, including username/email/
+department/unit) -- so e.g. an ``email="sysadmin-contact@..."`` on an
+otherwise "personel" user misclassified as admin, and a real 12-field
+concatenation exploit could reach as far as editing the role-permission
+matrix itself. This has been replaced with ``_user_role_values(user)``: each
+of 7 genuine role-bearing fields (role/role_key/role_name/role_label/title/
+position/job_title -- username/email/department/unit/unit_name excluded) is
+normalized and checked individually via EXACT set membership, never
+substring/"in" containment on a concatenated blob. ``role_key(user)``/
+``_user_text(user)`` themselves are left intact (unused internally now, kept
+as existing public surface) -- only the 4 functions that consumed them for
+authorization decisions were changed. See the new "BYS360 DEFECT AQ" test
+group below for the adversarial coverage this fix requires.
 
 NEW_PRODUCTION_DEFECT (found while implementing, reported rather than
 frozen -- see final report): ``_permission()`` has
@@ -184,6 +192,17 @@ def test_admin_like_text_false_for_non_admin_roles(role):
     assert _admin_like_text(_user(role)) is False
 
 
+def test_admin_like_text_true_for_all_caps_turkish_capital_i_role_value():
+    # BYS360 DEFECT AQ: _normalize() used to call .lower() before
+    # .translate(); Python's 'İ'.lower() (capital dotted I, U+0130)
+    # produces the two-codepoint sequence 'i' + COMBINING DOT ABOVE
+    # (U+0307), not plain 'i', so the translate table's 'İ' entry was dead
+    # code and a realistic all-caps HR value like "SİSTEM YÖNETİCİSİ"
+    # failed to normalize to "sistem_yoneticisi", silently denying a real
+    # admin. This is now fixed.
+    assert _admin_like_text(_user("SİSTEM YÖNETİCİSİ")) is True
+
+
 @pytest.mark.parametrize("role", ["yonetici", "koordinator", "mudur", "baskan"])
 def test_manager_like_text_true_for_manager_hints(role):
     assert _manager_like_text(_user(role)) is True
@@ -192,6 +211,71 @@ def test_manager_like_text_true_for_manager_hints(role):
 @pytest.mark.parametrize("role", ["personel", "admin"])
 def test_manager_like_text_false_for_non_manager_roles(role):
     assert _manager_like_text(_user(role)) is False
+
+
+# ---------------------------------------------------------------------------
+# BYS360 DEFECT AQ -- mandatory adversarial coverage for the substring-match
+# fix (canonical authorized role -> allowed; substring lookalike -> denied;
+# unknown role -> denied; free-form unvan/display text -> denied; helper
+# failure/missing-field -> denied).
+# ---------------------------------------------------------------------------
+
+
+def test_admin_like_text_denies_email_and_department_lookalikes_not_role():
+    # BYS360 DEFECT AQ adversarial case: the confirmed live exploit -- an
+    # ordinary "personel" whose email/department merely CONTAINS "admin"/
+    # "sistem"+"yonetici" must not be treated as admin-like. email/
+    # department are not role-identity fields at all.
+    user = SimpleNamespace(
+        role="personel", role_key=None, role_name=None, role_label=None,
+        title=None, position=None, job_title=None,
+        username="user123", email="office-admin@bys360.test",
+        department="Sistem Yönetimi Destek Birimi", unit=None, unit_name=None,
+        is_authenticated=True,
+    )
+    assert _admin_like_text(user) is False
+    assert _effective_role_key(user) == "personel"
+
+
+def test_admin_like_text_denies_baskanligi_uzmani_lookalike_via_title():
+    user = SimpleNamespace(
+        role="personel", role_key=None, role_name=None, role_label=None,
+        title="Başkanlığı Uzmanı", position=None, job_title=None,
+        username=None, email=None, department=None, unit=None, unit_name=None,
+        is_authenticated=True,
+    )
+    assert _admin_like_text(user) is False
+    assert _manager_like_text(user) is False
+    assert _effective_role_key(user) == "personel"
+
+
+def test_manager_like_text_denies_insan_kaynaklari_yoneticisi_job_title_lookalike():
+    # "İnsan Kaynakları Yöneticisi" (HR Manager) contains "yonetici" as a
+    # substring but is not itself an exact MANAGER_HINTS member.
+    user = SimpleNamespace(
+        role="personel", role_key=None, role_name=None, role_label=None,
+        title=None, position=None, job_title="İnsan Kaynakları Yöneticisi",
+        username=None, email=None, department=None, unit=None, unit_name=None,
+        is_authenticated=True,
+    )
+    assert _manager_like_text(user) is False
+
+
+def test_admin_like_text_allows_real_canonical_role_field():
+    user = _user("sistem_yoneticisi")
+    assert _admin_like_text(user) is True
+
+
+def test_effective_role_key_denies_unknown_role_with_no_matching_fields():
+    user = SimpleNamespace(
+        role="", role_key=None, role_name=None, role_label=None,
+        title=None, position=None, job_title=None,
+        username=None, email=None, department=None, unit=None, unit_name=None,
+        is_authenticated=True,
+    )
+    assert _effective_role_key(user) == "personel"
+    assert _admin_like_text(user) is False
+    assert _manager_like_text(user) is False
 
 
 def test_permission_fail_closed_unauthenticated_across_all_wrappers():
@@ -435,16 +519,19 @@ def test_is_active_false_row_ignored_by_exact_match_and_fallback_scan(app):
         assert can_use_file_center(user) is True
 
 
-def test_permission_matrix_fallback_substring_scan_intentional_match(app):
+# BYS360 DEFECT AQ: bu test önceden fallback taramasının "prefix/substring"
+# eşleşmesini ("saha_teknisyeni_kidemli" rol metni, "saha_teknisyeni" DB
+# satırının role_key'ini ALT DİZE olarak içerdiği için eşleşiyordu)
+# "kasıtlı" olarak kilitliyordu. Bu davranışın gerçek bir ürün gereksinimi
+# olduğuna dair kod tabanında başka hiçbir kanıt yok; aynı mekanizma canlı
+# bir yetki açığının kök nedeniydi (bkz. üstteki modül notu). Fallback
+# taraması artık TAM eşleşme gerektirir -- aşağıdaki iki test hem düzeltilen
+# (artık eşleşmeyen) hem de hâlâ çalışan (tam eşleşen) durumu kilitler.
+def test_permission_matrix_fallback_scan_no_longer_matches_hierarchical_prefix(app):
     from app.extensions import db
     from app.models.file_center_models import FileCenterRolePermission
 
     with app.app_context():
-        # "saha_teknisyeni" is not one of the 5 DEFAULT_ROLE_MATRIX keys and
-        # not an ADMIN_ROLE_HINTS/MANAGER_HINTS token, so _effective_role_key
-        # falls back to "personel" and the exact-key query misses. The
-        # fallback substring scan should still find this row because its
-        # role_key is a genuine substring of the user's composed role text.
         db.session.add(FileCenterRolePermission(
             role_key="saha_teknisyeni",
             role_label="Saha Teknisyeni",
@@ -453,9 +540,53 @@ def test_permission_matrix_fallback_substring_scan_intentional_match(app):
         ))
         db.session.commit()
 
+        # "saha_teknisyeni_kidemli" is not an EXACT match for the DB row's
+        # role_key "saha_teknisyeni" -- must no longer inherit that row.
         user = _user("saha_teknisyeni_kidemli")
+        assert _permission_from_matrix(user, "can_view_logs") is None
+        assert can_view_logs(user) is False
+
+
+def test_permission_matrix_fallback_scan_still_matches_exact_custom_role(app):
+    from app.extensions import db
+    from app.models.file_center_models import FileCenterRolePermission
+
+    with app.app_context():
+        db.session.add(FileCenterRolePermission(
+            role_key="saha_teknisyeni",
+            role_label="Saha Teknisyeni",
+            description="",
+            can_view_logs=True,
+        ))
+        db.session.commit()
+
+        user = _user("saha_teknisyeni")
         assert _permission_from_matrix(user, "can_view_logs") is True
         assert can_view_logs(user) is True
+
+
+def test_permission_matrix_fallback_scan_denies_email_department_lookalike(app):
+    # BYS360 DEFECT AQ adversarial case: the confirmed live exploit -- a
+    # custom role_key/label must not be granted via username/email/
+    # department/unit containment, only via a genuine role field.
+    from app.extensions import db
+    from app.models.file_center_models import FileCenterRolePermission
+
+    with app.app_context():
+        db.session.add(FileCenterRolePermission(
+            role_key="vip",
+            role_label="VIP",
+            description="",
+            can_view_logs=True,
+        ))
+        db.session.commit()
+
+        user = SimpleNamespace(
+            role="personel", is_authenticated=True,
+            email="vip-support@bys360.test", department="VIP Destek Birimi",
+        )
+        assert _permission_from_matrix(user, "can_view_logs") is None
+        assert can_view_logs(user) is False
 
 
 def test_db_seeded_dosya_merkezi_yetkilisi_respects_granular_false_fields(app):

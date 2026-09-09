@@ -130,9 +130,14 @@ MANAGER_HINTS = {"baskan", "başkan", "grup_baskani", "grup başkanı", "koordin
 
 
 def _normalize(value: Any) -> str:
-    text = str(value or "").strip().lower()
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa aşağıdaki table'daki 'İ' anahtarı
+    # asla eşleşmez. 'İ' burada .lower() çağrılmadan ÖNCE, tek kod noktalı
+    # haldeyken ayrı olarak 'i'ye çevrilir.
+    text = str(value or "").strip().replace("İ", "i").lower()
     table = str.maketrans({
-        "ı": "i", "İ": "i", "ğ": "g", "Ğ": "g", "ü": "u", "Ü": "u",
+        "ı": "i", "ğ": "g", "Ğ": "g", "ü": "u", "Ü": "u",
         "ş": "s", "Ş": "s", "ö": "o", "Ö": "o", "ç": "c", "Ç": "c",
     })
     text = text.translate(table)
@@ -153,6 +158,28 @@ def role_key(user=None) -> str:
     return _normalize(_user_text(user))
 
 
+# BYS360 DEFECT AQ: _admin_like_text / _manager_like_text / _effective_role_key
+# / _permission_from_matrix'in DB satırı bulunamadığında düştüğü fallback
+# taraması önceden role_key(user)'ın (12 alanı -- username, email, department,
+# unit dahil -- TEK bir metinde birleştiren) döndürdüğü metin üzerinde "in"
+# alt dize eşleştirmesi yapıyordu. Bu, ör. email'i "office-admin@..." olan
+# veya department'ı "Sistem Yönetimi Destek Birimi" olan sıradan bir
+# "personel" kullanıcısına tam Dosya Merkezi admin yetkisi (rol matrisini
+# DÜZENLEME dahil) veriyordu. Artık yalnızca gerçek rol/unvan alanları
+# (username/email/department/unit HARİÇ) tek tek normalize edilip bu
+# kümelerle TAM eşleştiriliyor.
+_ROLE_IDENTITY_ATTRS = ("role", "role_key", "role_name", "role_label", "title", "position", "job_title")
+
+
+def _user_role_values(user=None) -> set[str]:
+    user = user or current_user
+    return {
+        _normalize(getattr(user, attr, ""))
+        for attr in _ROLE_IDENTITY_ATTRS
+        if getattr(user, attr, "")
+    }
+
+
 def _table_ready() -> bool:
     try:
         FileCenterRolePermission.query.limit(1).all()
@@ -161,20 +188,16 @@ def _table_ready() -> bool:
         return False
 
 
+_ADMIN_ROLE_HINT_VALUES = frozenset(_normalize(hint) for hint in ADMIN_ROLE_HINTS)
+_MANAGER_HINT_VALUES = frozenset(_normalize(hint) for hint in MANAGER_HINTS)
+
+
 def _admin_like_text(user=None) -> bool:
-    text = role_key(user)
-    if not text:
-        return False
-    if "admin" in text:
-        return True
-    if "sistem" in text and ("yonetici" in text or "admin" in text):
-        return True
-    return any(_normalize(hint) in text for hint in ADMIN_ROLE_HINTS)
+    return bool(_user_role_values(user) & _ADMIN_ROLE_HINT_VALUES)
 
 
 def _manager_like_text(user=None) -> bool:
-    text = role_key(user)
-    return any(_normalize(hint) in text for hint in MANAGER_HINTS)
+    return bool(_user_role_values(user) & _MANAGER_HINT_VALUES)
 
 
 def _default_by_key(role_key_value: str) -> RolePermissionDefault | None:
@@ -183,16 +206,12 @@ def _default_by_key(role_key_value: str) -> RolePermissionDefault | None:
 
 
 def _effective_role_key(user=None) -> str:
-    text = role_key(user)
+    role_values = _user_role_values(user)
     # Önce daha özel roller.
     priority = ("admin", "sistem_yoneticisi", "dosya_merkezi_yetkilisi", "yonetici", "personel")
     for key in priority:
-        if key in text:
+        if key in role_values:
             return key
-    if "sistem" in text and "yonetici" in text:
-        return "sistem_yoneticisi"
-    if "dosya" in text and "merkezi" in text and "yetkili" in text:
-        return "dosya_merkezi_yetkilisi"
     if _manager_like_text(user):
         return "yonetici"
     if _admin_like_text(user):
@@ -211,12 +230,12 @@ def _permission_from_matrix(user, field: str) -> bool | None:
         key = _effective_role_key(user)
         row = FileCenterRolePermission.query.filter_by(role_key=key, is_active=True).one_or_none()
         if row is None:
-            text = role_key(user)
+            role_values = _user_role_values(user)
             rows = FileCenterRolePermission.query.filter_by(is_active=True).all()
             for candidate in rows:
                 ckey = _normalize(candidate.role_key)
                 clabel = _normalize(candidate.role_label)
-                if ckey and ckey in text or clabel and clabel in text:
+                if (ckey and ckey in role_values) or (clabel and clabel in role_values):
                     row = candidate
                     break
         if row is None:
