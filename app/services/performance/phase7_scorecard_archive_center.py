@@ -289,97 +289,12 @@ def phase7_archive_contract() -> dict[str, Any]:
     }
 
 
-def phase7_archive_schema_sql() -> str:
-    return f"""
-CREATE TABLE IF NOT EXISTS {PHASE7_ARCHIVE_TABLE_NAME} (
-    id SERIAL PRIMARY KEY,
-    user_id INTEGER NULL,
-    employee_id INTEGER NULL,
-    registry_no VARCHAR(64) NOT NULL,
-    full_name VARCHAR(255) NULL,
-    year INTEGER NOT NULL,
-    period_label VARCHAR(120) NOT NULL,
-    score NUMERIC(5,2) NOT NULL,
-    score_band VARCHAR(80) NULL,
-    source_type VARCHAR(40) NOT NULL DEFAULT 'manual',
-    source_file VARCHAR(255) NULL,
-    note TEXT NULL,
-    status VARCHAR(40) NOT NULL DEFAULT 'imported',
-    created_by_id INTEGER NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (registry_no, year, period_label)
-);
-""".strip()
-
-
-def ensure_phase7_archive_schema() -> dict[str, Any]:
-    try:
-        from sqlalchemy import text
-
-        from app import db
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        return {"ok": False, "error": str(exc), "table": PHASE7_ARCHIVE_TABLE_NAME}
-    try:
-        db.session.execute(text(phase7_archive_schema_sql()))
-        db.session.commit()
-        return {"ok": True, "table": PHASE7_ARCHIVE_TABLE_NAME}
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        try:
-            db.session.rollback()
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase7_scorecard_archive_center.py:326")
-        return {"ok": False, "error": str(exc), "table": PHASE7_ARCHIVE_TABLE_NAME}
-
-
-def seed_phase7_scorecard_archive_settings() -> dict[str, Any]:
-    changed: list[str] = []
-    schema = {"ok": False, "skipped": True}
-    try:
-        from app import db
-        try:
-            from app.models import ModuleSetting
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            from app.models.settings_models import ModuleSetting
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        return {"ok": False, "error": str(exc), "settings": changed, "schema": schema}
-
-    schema = ensure_phase7_archive_schema()
-    for module_key, setting_key, label, value_type, default_value, description in PHASE7_SETTING_ROWS:
-        try:
-            row = ModuleSetting.query.filter_by(module_key=module_key, setting_key=setting_key).first()
-            if row is None:
-                row = ModuleSetting(module_key=module_key, setting_key=setting_key)
-                db.session.add(row)
-            if hasattr(row, "label"):
-                row.label = label
-            if hasattr(row, "value_type"):
-                row.value_type = value_type
-            if hasattr(row, "default_value"):
-                row.default_value = default_value
-            if hasattr(row, "value_text") and not getattr(row, "value_text", None):
-                row.value_text = default_value
-            if hasattr(row, "description"):
-                row.description = description
-            if hasattr(row, "is_active"):
-                row.is_active = True
-            changed.append(f"{module_key}.{setting_key}")
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            continue
-    try:
-        db.session.commit()
-        return {"ok": True, "settings": changed, "schema": schema}
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        try:
-            db.session.rollback()
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase7_scorecard_archive_center.py:371")
-        return {"ok": False, "error": str(exc), "settings": changed, "schema": schema}
+# BYS360 DEFECT AR: ensure_phase7_archive_schema()/
+# seed_phase7_scorecard_archive_settings() (ve onlarin ozel
+# phase7_archive_schema_sql() DDL uretecisi) kaldirildi -- ikisinin de
+# repo genelinde (app/, tests/, scripts/) hicbir gercek cagirani yoktu.
+# Canli "Faz 7 Arsiv" ozelligi app/performance/meeting_p2_archive_notes_routes.py
+# -> app/services/performance/meeting_p2_archive_notes.py uzerinden calisir;
+# bu dosyanin geri kalani (phase7_status_label dahil, tests/test_h1e_n_
+# feedback_meeting_p4_archive_status_label_contract.py tarafindan
+# kullaniliyor) canli/test kapsaminda kaliyor, degismedi.

@@ -22,8 +22,17 @@ PHASE12_PRESIDENT_APPROVALS_MENU_CARD_ACCESS = True
 def _table_exists(table_name: str) -> bool:
     """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
     query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
-    by construction."""
-    return bool(inspect(db.engine).has_table(table_name))
+    by construction.
+
+    BYS360 DEFECT AR: previously raised straight through on any inspect()
+    failure, unlike ~20 other table-existence helpers doing the identical
+    conceptual check elsewhere in this codebase, which all log and return
+    False. Aligned to that dominant convention."""
+    try:
+        return bool(inspect(db.engine).has_table(table_name))
+    except Exception:
+        logger.exception("BYS360 president low score card _table_exists guvenli fallback | table=%s", table_name)
+        return False
 
 
 def _columns(table_name: str) -> set[str]:

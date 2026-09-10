@@ -31,19 +31,21 @@ def _safe(factory: Callable[[], Any], default: Any = None) -> Any:
 
 
 def _table_exists(table_name: str) -> bool:
+    # BYS360 DEFECT AR: eskiden inspect() basarisiz olursa SQLite'a ozgu
+    # ham sqlite_master sorgusuna dusuyordu -- bu, PostgreSQL'de her zaman
+    # ayrica basarisiz olup ayni sonuca (False) varan, yalniz kafa
+    # karistiran ve diger ~20 table_exists kopyasiyla tutarsiz gorunen bir
+    # ikinci deneme katmaniydi. inspect() zaten her iki dialect'te de
+    # calisir; tek denemeli guvenli-yakalama deseni yeterli.
     if not table_name:
         return False
     try:
         inspector = db.inspect(db.engine)
         return table_name in set(inspector.get_table_names())
     except Exception:
-        try:
-            rows = db.session.execute(db.text("select name from sqlite_master where type='table' and name=:name"), {"name": table_name}).fetchall()
-            return bool(rows)
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-            return False
+        import logging
+        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+        return False
 
 
 def _portal_tables_ready() -> bool:

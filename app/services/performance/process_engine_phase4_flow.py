@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
@@ -107,8 +108,20 @@ def table_exists(table_name: str) -> bool:
     by construction (works identically against SQLite/PostgreSQL) -- the
     same proven pattern already used by process_engine_phase3_history.py's
     ``_table_exists`` and process_engine_phase8_tracking.py's own fixed
-    helpers."""
-    return bool(inspect(db.engine).has_table(table_name))
+    helpers.
+
+    BYS360 DEFECT AR: previously raised straight through on any inspect()
+    failure (e.g. a dropped connection), unlike ~20 other table-existence
+    helpers doing the identical conceptual check elsewhere in this codebase
+    (including this module's own family, process_engine_phase8_tracking.py),
+    which all log and return False. Aligned to that dominant convention."""
+    try:
+        return bool(inspect(db.engine).has_table(table_name))
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "BYS360 phase4 flow table_exists guvenli fallback | table=%s", table_name,
+        )
+        return False
 
 
 def column_exists(table_name: str, column_name: str) -> bool:
