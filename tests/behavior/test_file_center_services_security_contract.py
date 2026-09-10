@@ -376,17 +376,27 @@ def test_has_double_extension_risk_does_not_flag_marker_only_as_final_suffix():
 
 
 # ---------------------------------------------------------------------------
-# is_admin_like() -- pure function, no app needed
+# is_admin_like() -- delegates to the canonical DB-role-matrix-aware source
+# (app.file_center.permissions.is_file_center_admin); requires
+# is_authenticated=True like any real current_user, and works without an
+# app context because permissions._table_ready() catches RuntimeError and
+# falls back to its own safe role-hint default.
+#
+# BYS360 DEFECT AR: is_admin_like() used to be an independent, hardcoded
+# check that (a) treated a plain "Yönetici" role_label as admin-equivalent
+# and (b) granted admin via a bare username=="admin" bypass -- neither of
+# which the canonical role matrix in permissions.py actually grants (plain
+# "Yönetici" is MANAGER_HINTS, not ADMIN_ROLE_HINTS; there is no
+# username-based bypass at all). Both of those cases are now corrected
+# below to match the canonical, single source of truth.
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.parametrize(
     "user",
     [
-        SimpleNamespace(role="admin", role_label="", username="x"),
-        SimpleNamespace(role="sistem_yoneticisi", role_label="", username="x"),
-        SimpleNamespace(role="personel", role_label="Yönetici", username="x"),
-        SimpleNamespace(role="personel", role_label="", username="admin"),
+        SimpleNamespace(role="admin", role_label="", username="x", is_authenticated=True),
+        SimpleNamespace(role="sistem_yoneticisi", role_label="", username="x", is_authenticated=True),
     ],
 )
 def test_is_admin_like_matches_documented_admin_signals(user):
@@ -398,8 +408,38 @@ def test_is_admin_like_matches_documented_admin_signals(user):
 def test_is_admin_like_false_for_regular_personnel():
     from app.file_center.services import is_admin_like
 
-    regular = SimpleNamespace(role="personel", role_label="Personel", username="user123")
+    regular = SimpleNamespace(role="personel", role_label="Personel", username="user123", is_authenticated=True)
     assert is_admin_like(regular) is False
+
+
+def test_is_admin_like_false_for_plain_yonetici_label_no_longer_admin_equivalent():
+    # BYS360 DEFECT AR: a plain "Yönetici" role_label (an ordinary unit
+    # manager, not a true admin) previously got full File Center admin
+    # rights -- cross-user file/session access, the org-wide quota
+    # dashboard, is_admin=True in the UI. permissions.py's canonical role
+    # matrix places this in MANAGER_HINTS, not ADMIN_ROLE_HINTS.
+    from app.file_center.services import is_admin_like
+
+    manager = SimpleNamespace(role="personel", role_label="Yönetici", username="x", is_authenticated=True)
+    assert is_admin_like(manager) is False
+
+
+def test_is_admin_like_false_for_bare_admin_username_no_matching_role():
+    # BYS360 DEFECT AR: a username literally equal to "admin" (with no
+    # admin-equivalent role/role_label) previously bypassed the role check
+    # entirely -- a second, independent overgrant path the canonical role
+    # matrix never had.
+    from app.file_center.services import is_admin_like
+
+    fake_username = SimpleNamespace(role="personel", role_label="", username="admin", is_authenticated=True)
+    assert is_admin_like(fake_username) is False
+
+
+def test_is_admin_like_false_when_not_authenticated_even_for_admin_role():
+    from app.file_center.services import is_admin_like
+
+    unauthenticated = SimpleNamespace(role="admin", role_label="", username="x", is_authenticated=False)
+    assert is_admin_like(unauthenticated) is False
 
 
 # BYS360 DEFECT AQ: is_admin_like() önceden "admin" in role / "yönetici" in

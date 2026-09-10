@@ -230,7 +230,12 @@ def file_center_upload():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
+        # BYS360 DEFECT AR: log_audit() yalnizca db.session.add() yapar,
+        # commit etmez -- bu satirdan sonra bir commit yoktu, bu yuzden
+        # basarisiz yukleme/indirme denemeleri (parola tahmini gibi
+        # guvenlik-ilgili olaylar dahil) denetim kaydina hic yazilmiyordu.
         log_audit("file_upload_failed", message="Dosya yükleme sırasında teknik bir hata oluştu.", actor_user_id=int(current_user.id))
+        db.session.commit()
         flash("Dosya yükleme sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.file_center_home"))
 
@@ -256,7 +261,9 @@ def file_center_download(file_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
+        # BYS360 DEFECT AR: bkz. file_center_upload() ayni not.
         log_audit("file_download_failed", file_id=item.id, message="Dosya indirme sırasında teknik bir hata oluştu.", actor_user_id=int(current_user.id))
+        db.session.commit()
         flash("Dosya indirilemedi. Lütfen daha sonra tekrar deneyin veya sistem yöneticisine başvurun.", "danger")
         return redirect(url_for("main.file_center_home"))
 
@@ -1047,7 +1054,11 @@ def file_center_guest_download(token: str):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
+            # BYS360 DEFECT AR: bkz. file_center_upload() ayni not -- bu
+            # yol, tekrarlanan hatali misafir indirme denemeleri (parola
+            # tahmini olasi gostergesi) icin ozellikle onemlidir.
             log_audit("guest_file_download_failed", file_id=link.file_id, message="Misafir indirme sırasında teknik bir hata oluştu.", actor_user_id=None)
+            db.session.commit()
             return safe_render("file_center/guest_download.html", error="Dosya şu anda indirilemedi. Lütfen bağlantıyı gönderen birimle iletişime geçin.", link=None, format_bytes=format_bytes)
     return safe_render("file_center/guest_download.html", error=None, link=link, format_bytes=format_bytes)
 
@@ -1081,7 +1092,9 @@ def file_center_guest_upload(token: str):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             safe_db_rollback()
+            # BYS360 DEFECT AR: bkz. file_center_upload() ayni not.
             log_audit("guest_file_upload_failed", message="Misafir yükleme sırasında teknik bir hata oluştu.", actor_user_id=None)
+            db.session.commit()
             flash("Dosya şu anda yüklenemedi. Lütfen tekrar deneyin veya bağlantıyı gönderen birimle iletişime geçin.", "danger")
             return safe_render("file_center/guest_upload.html", error=None, request_row=row, uploaded=False, format_bytes=format_bytes, request_max_bytes=request_max_bytes)
     return safe_render("file_center/guest_upload.html", error=None, request_row=row, uploaded=False, format_bytes=format_bytes, request_max_bytes=request_max_bytes)

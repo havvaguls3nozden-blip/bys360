@@ -7,10 +7,14 @@ build_evaluation_form_visibility_context ve completed_previous_levels_for_form.
 Bu dosya SADECE visibility_guard.py'nin KENDİ karar/dallanma mantığını doğrular.
 Modülün dış bağımlılığı olan düşük performans yayın kilidi fonksiyonu
 (get_low_score_employee_publish_lock_reason) tek noktada mock'lanır; böylece
-low_score_process_service.py içindeki ayrı/bilinen/ertelenmiş bir hatanın (ensure=False
-ile zaten var olan bir PerformanceLowScoreProcess kaydını doğru çözememesi) bu testlere
-sızması engellenir. O hata bu ajanın kapsamı dışındadır; burada ne düzeltilir ne de
-doğru davranışmış gibi test edilir.
+low_score_process_service.py'nin kendi davranışı bu dosyanın testlerine
+sızmaz (o davranış tests/behavior/test_low_score_process_service_workflow_contract.py'de
+doğrudan test edilir). Bu dosyanın yazıldığı sırada low_score_process_service.py'de
+ayrı/bilinen bir hata vardı (ensure=False ile zaten var olan bir
+PerformanceLowScoreProcess kaydını doğru çözememesi); o hata BYS360 DEFECT AR
+kapsamında düzeltildi -- ama bu dosya zaten o fonksiyonu hiçbir zaman gerçek
+haliyle çağırmadığı için (her zaman mock), bu düzeltme bu dosyadaki testleri
+etkilemedi.
 
 Hiçbir test gerçek Flask app/DB gerektirmez: hedef fonksiyonların tamamı ya saf
 öznitelik okuması (getattr tabanlı duck typing) yapar ya da kendi içindeki

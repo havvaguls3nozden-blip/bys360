@@ -33,15 +33,16 @@ tests/services/test_low_score_process_service_phase4t.py does not already cover:
   app/services/performance/personnel_support_publish_approval_service.py).
 
 A confirmed, separate production defect was found in the `ensure=False`
-path of `get_low_score_publish_block_reason` while writing this file
-(it never looks up an already-existing PerformanceLowScoreProcess row for
-that path, so a genuinely finalized low-score evaluation can stay reported
-as locked). That defect is deliberately NOT characterized by any test in
-this file -- doing so would assert the current, incorrect behavior as the
-expected passing outcome, which would break the moment the defect is
-correctly fixed. It is tracked separately for a controlled defect wave
-(correct failing regression -> minimal production fix -> regression green
--> full gates), not mixed into this behavioral-contract suite.
+path of `get_low_score_publish_block_reason` while writing this file (it
+never looked up an already-existing PerformanceLowScoreProcess row for that
+path, so a genuinely finalized low-score evaluation could stay reported as
+locked). It was deliberately NOT characterized by any test in this file at
+the time -- doing so would have asserted the then-current, incorrect
+behavior as the expected passing outcome, which would break the moment the
+defect was correctly fixed. It has since been fixed and is now covered by
+test_publish_lock_reason_with_ensure_false_finds_already_finalized_process
+and test_publish_lock_reason_with_ensure_false_still_blocks_when_no_process_exists
+below (BYS360 DEFECT AR).
 """
 from __future__ import annotations
 
@@ -749,15 +750,54 @@ def test_publish_lock_reason_for_non_low_score_evaluation_is_always_released(ls_
         assert svc.get_low_score_employee_publish_lock_reason(evaluation, ensure=True) is None
         assert svc.is_low_score_employee_publish_released(evaluation) is True
 
-# BYS360_PHASE5_COVERAGE_WAVE1_HYGIENE_CLOSURE: a third test in this section,
-# test_publish_lock_reason_with_ensure_false_ignores_already_finalized_process_confirmed_defect,
-# was removed here. It positively asserted a confirmed production defect
-# (get_low_score_publish_block_reason(evaluation=..., ensure=False) never
-# looking up an existing PerformanceLowScoreProcess row, so a genuinely
-# finalized low-score evaluation stays reported as locked/not-visible) as
-# the test's own expected-passing outcome -- meaning a correct future fix to
-# that defect would break this test. The defect itself is real and remains
-# tracked for a separate, controlled defect wave (correct failing
-# regression -> minimal production fix -> regression green -> full gates);
-# it is deliberately not characterized here so this wave's suite cannot be
-# read as having blessed the current, incorrect behavior.
+def test_publish_lock_reason_with_ensure_false_finds_already_finalized_process(ls_app) -> None:
+    """BYS360 DEFECT AR: `get_low_score_publish_block_reason(evaluation=...,
+    ensure=False)` previously never looked up an already-persisted
+    PerformanceLowScoreProcess row -- it would report a genuinely finalized
+    (Başkan-approved + warning-recorded) low-score evaluation as permanently
+    publish-locked, forever, because `ensure=False` skipped both creation
+    AND lookup. Fixed to do a read-only lookup before falling through to the
+    "blocked" default. This is the corrected counterpart to
+    test_publish_lock_reason_with_ensure_true_releases_only_after_full_approval_chain
+    above, using the `evaluation=` + `ensure=False` call shape instead of
+    passing `process` directly -- exactly the shape
+    visibility_guard.py/personnel_support_publish_approval_service.py's live
+    callers use."""
+    from app.extensions import db
+
+    employee_id = _create_user(ls_app)
+    president_id = _create_user(ls_app, role="baskan")
+    period_id = _create_period(ls_app, start=date(2026, 1, 1), end=date(2026, 3, 31))
+    evaluation_id = _create_evaluation(ls_app, period_id=period_id, employee_id=employee_id, final_total_100=57.0)
+
+    with ls_app.app_context():
+        evaluation = db.session.get(PerformanceEvaluation, evaluation_id)
+        process = svc.ensure_low_score_process_for_evaluation(evaluation)
+        db.session.commit()
+        svc.president_approve_process(process, actor=president_id)
+        db.session.commit()
+        assert process.is_finalized_for_publish is True
+
+        # Before the fix: this returned the "Başkan onayı bekliyor" blocked
+        # message unconditionally, even though approval already happened.
+        reason = svc.get_low_score_publish_block_reason(evaluation=evaluation, ensure=False)
+        assert reason is None
+        assert svc.is_low_score_employee_publish_released(evaluation) is True
+
+
+def test_publish_lock_reason_with_ensure_false_still_blocks_when_no_process_exists(ls_app) -> None:
+    """Negative counterpart: ensure=False must still report the safe
+    "pending" default (not silently unblock) when no process has ever been
+    created for a low-score evaluation."""
+    from app.extensions import db
+
+    employee_id = _create_user(ls_app)
+    period_id = _create_period(ls_app, start=date(2026, 1, 1), end=date(2026, 3, 31))
+    evaluation_id = _create_evaluation(ls_app, period_id=period_id, employee_id=employee_id, final_total_100=57.0)
+
+    with ls_app.app_context():
+        evaluation = db.session.get(PerformanceEvaluation, evaluation_id)
+        reason = svc.get_low_score_publish_block_reason(evaluation=evaluation, ensure=False)
+        assert reason is not None
+        assert "Başkan" in reason
+        assert svc.is_low_score_employee_publish_released(evaluation) is False

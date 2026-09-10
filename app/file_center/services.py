@@ -201,19 +201,24 @@ def default_download_limit() -> int:
 # kazanıyordu. Artık role/role_label alanlarının KENDİSİ bu kümelerle TAM
 # eşleştirilir; orijinal jetonlar (aynı anlamda) korunur, yalnızca
 # eşleştirme yöntemi değişir.
-_ADMIN_ROLE_VALUES = frozenset({"admin", "sistem_yoneticisi", "sistem yöneticisi", "sistem yoneticisi", "superadmin"})
-_ADMIN_LABEL_VALUES = frozenset({"yönetici", "yonetici"})
-
-
+#
+# BYS360 DEFECT AR: AQ'nun exact-match duzeltmesi bu dosyadaki kopyayi
+# duzeltti, ama permissions.py'deki KANONIK, DB rol-matrisi farkindaki
+# tanimla uzlastirmadi -- orada "yonetici" (sirada bir birim yoneticisi)
+# ADMIN_ROLE_HINTS'te DEGIL, ayri ve daha dusuk yetkili MANAGER_HINTS'te
+# yer alir (permissions.is_file_center_manager, is_file_center_admin degil).
+# Bu iki bagimsiz tanim arasindaki farkli, tam admin-esdegeri "Yonetici"
+# rol_label'ina sahip herhangi bir kullanicinin baskasinin ozel dosyalarini
+# indirip/silip misafir paylasim linki olusturabilmesine ve organizasyon
+# capinda kota panosunu gorebilmesine izin veriyordu -- kanonik rol
+# matrisinin ayni role verdiginden daha fazlasi. Artik dogrudan kanonik
+# kaynaga yonlendirilir; DB rol-matrisi tablosu hazir degilse
+# is_file_center_admin kendi guvenli varsayilanina (_admin_like_text,
+# ayni ADMIN_ROLE_HINTS) duser.
 def is_admin_like(user) -> bool:
-    role = str(getattr(user, "role", "") or "").strip().lower()
-    label = str(getattr(user, "role_label", "") or "").strip().lower()
-    username = str(getattr(user, "username", "") or "").strip().lower()
-    return (
-        role in _ADMIN_ROLE_VALUES
-        or label in _ADMIN_LABEL_VALUES
-        or username == "admin"
-    )
+    from app.file_center.permissions import is_file_center_admin
+
+    return is_file_center_admin(user)
 
 
 def format_bytes(size: int | None) -> str:

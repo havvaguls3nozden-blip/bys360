@@ -39,14 +39,23 @@ no state with any other Wave 5 agent running concurrently.
 
 DEFECT A BOUNDARY: `_low_score_predecessor_is_ready` only calls
 `app.services.performance.low_score_process_service.get_low_score_publish_block_reason`
-(a known-buggy `ensure=False` path, tracked separately) when
-`final_total_100 < 70.0`. Every test in this file that reaches that branch
-monkeypatches that function AT ITS SOURCE MODULE (the consumer does a local
-`from ... import ...` inside the function body on every call, so there is no
-consumer-side module attribute to patch) with a deterministic fake -- never
-exercising or asserting the real buggy resolution. The score>=70.0
-short-circuit tests use a raising stub to prove the dependency is never even
-invoked.
+when `final_total_100 < 70.0`. Every test in this file that reaches that
+branch monkeypatches that function AT ITS SOURCE MODULE (the consumer does a
+local `from ... import ...` inside the function body on every call, so there
+is no consumer-side module attribute to patch) with a deterministic fake --
+never exercising the real dependency's resolution logic here (see
+tests/services/test_low_score_process_service_workflow_contract.py for
+direct coverage of that function itself). The score>=70.0 short-circuit
+tests use a raising stub to prove the dependency is never even invoked.
+
+BYS360 DEFECT AR update: `get_low_score_publish_block_reason`'s `ensure=False`
+path previously never looked up an already-persisted
+`PerformanceLowScoreProcess` row, so a finalized low-score evaluation stayed
+permanently reported as publish-locked even after full President approval
+and administrative-process completion. That has since been FIXED (the
+`ensure=False` branch now does a read-only lookup of any existing process
+before falling through to the "blocked" default) -- this file's tests were
+never affected either way, since they always monkeypatch the dependency.
 
 BYS360 DEFECT AQ update: two separate, non-Defect-A production defects that
 were found empirically while implementing the group-chair "scattered

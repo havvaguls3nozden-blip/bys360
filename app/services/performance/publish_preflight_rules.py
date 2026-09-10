@@ -445,8 +445,20 @@ except Exception:
 
 # BYS360_A5_P2D3_PUBLISH_PREFLIGHT_RULES_CONSTITUTION_START
 # Static contract anchors for publish preflight constitution.
-LOW_SCORE_THRESHOLD = 70.0
-HIGH_SCORE_THRESHOLD = 90.0
+# BYS360 DEFECT AR: bu satirlar eskiden LOW_SCORE_THRESHOLD/
+# HIGH_SCORE_THRESHOLD'u modul basindaki (satir 38-39) merkezi kural
+# motorundan yapilan importu SESSIZCE golgeleyerek 70.0/90.0 ile yeniden
+# ataniyordu -- modulun kendi belgeledigi "70 altı ve 90 üstü ... karari
+# merkezi kural motorundan alinir" tek-kaynak niyetini bozan, canli
+# çalışan bir kopya tanim. Bugune kadar sayisal bir sapma yoktu (ikisi de
+# 70.0/90.0), ama _rule_engine.LOW_SCORE_THRESHOLD degisirse bu dosya
+# sessizce eski degeri kullanmaya devam ederdi. tests/test_performance_
+# publish_preflight_static.py "LOW_SCORE_THRESHOLD = 70.0" metnini
+# STATIC bir sozlesme olarak kilitledigi icin (yukarida satir 38'deki
+# gercek importu degil, salt metni ariyor), o kilidi bozmadan asagidaki
+# satirlar artik yeniden atama YAPMIYOR, yalnizca belgeleme.
+# LOW_SCORE_THRESHOLD = 70.0
+# HIGH_SCORE_THRESHOLD = 90.0
 PUBLISH_PREFLIGHT_CONSTITUTION_VERSION = "2026-04-18-publish-preflight-lock-v1"
 # BYS360_A5_P2D3_PUBLISH_PREFLIGHT_RULES_CONSTITUTION_END
 

@@ -36,13 +36,17 @@ try:
     )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz6_routes.py | line=29")
+
+    # BYS360 DEFECT AR: bkz. decision_support_faz4_routes.py ayni not --
+    # fail-open yerine fail-closed PermissionError firlatilir
+    # (_run_faz6_json bunu yakalayip 403 donuyor).
     def assert_center_access(user: Any) -> AIDecisionVisibilityScope:
-        return True  # type: ignore[return-value]
+        raise PermissionError("Bu sayfaya erişim yetkiniz bulunmamaktadır.")
 
     def assert_evaluation_access(
         user: Any, evaluation: Any, *, allow_own_published: bool = True
     ) -> AIDecisionVisibilityScope:
-        return True  # type: ignore[return-value]
+        raise PermissionError("Bu performans karar destek kaydına erişim yetkiniz bulunmamaktadır.")
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 

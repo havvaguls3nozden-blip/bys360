@@ -1270,6 +1270,17 @@ def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=Tru
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 target = None
+        else:
+            # BYS360 DEFECT AR: ensure=False dallanmasi hicbir zaman zaten
+            # var olan bir sureci kontrol etmiyordu -- Baskan onayi ve idari
+            # surec tamamlanmis bir degerlendirme bile, sirf burasi surec
+            # olusturmadigi icin, kalici olarak "onay bekliyor" gosteriliyordu.
+            # Salt-okunur arama, olusturma yapmadan mevcut kaydi bulur.
+            try:
+                target = PerformanceLowScoreProcess.query.filter_by(evaluation_id=evaluation.id).first()
+            except Exception:
+                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+                target = None
         if target is None:
             return "Başkan onayı bekliyor. Başkan/Üst Onay tamamlanmadan 70 altı karne yayınlanamaz. Başkan/Üst Onay Yayın Kilidi"
     target = _bys360_lh13_get_process(target)
