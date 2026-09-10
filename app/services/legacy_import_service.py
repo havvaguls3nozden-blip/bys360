@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from sqlalchemy import func
-
 from app.models import OrganizationUnit, User
+from app.utils.turkish_text import turkish_casefold
 
 
 def legacy_norm(value: Any) -> str:
@@ -51,10 +50,21 @@ def resolve_legacy_employee(row_data: dict[str, Any]):
         if len(parts) >= 2:
             ad = parts[0]
             soyad = " ".join(parts[1:])
-            employee = User.query.filter(
-                func.lower(User.ad) == ad.lower(),
-                func.lower(User.soyad) == soyad.lower(),
-            ).first()
+            # BYS360 DEFECT AR: veritabaninin LOWER() uygulamasina
+            # guvenmek yerine (SQLite Turkce buyuk/kucuk harf donusumunu
+            # ASCII disinda uygulamaz, PostgreSQL davranisi dogrulanamaz),
+            # esitlik Python tarafinda turkish_casefold ile her iki
+            # dialect'te de tutarli sekilde kontrol edilir.
+            ad_fold, soyad_fold = turkish_casefold(ad), turkish_casefold(soyad)
+            employee = next(
+                (
+                    candidate
+                    for candidate in User.query.all()
+                    if turkish_casefold(candidate.ad) == ad_fold
+                    and turkish_casefold(candidate.soyad) == soyad_fold
+                ),
+                None,
+            )
 
     return employee
 
@@ -65,9 +75,12 @@ def resolve_unit_for_legacy(birim: str, ust_birim: str):
     if not birim:
         return None
 
-    candidates = OrganizationUnit.query.filter(
-        func.lower(OrganizationUnit.name) == birim.lower()
-    ).all()
+    # BYS360 DEFECT AR: bkz. resolve_legacy_employee() ayni not.
+    birim_fold = turkish_casefold(birim)
+    candidates = [
+        unit for unit in OrganizationUnit.query.all()
+        if turkish_casefold(unit.name) == birim_fold
+    ]
 
     if not candidates:
         return None
@@ -75,9 +88,10 @@ def resolve_unit_for_legacy(birim: str, ust_birim: str):
     if not ust_birim:
         return candidates[0]
 
+    ust_birim_fold = turkish_casefold(ust_birim)
     for unit in candidates:
         parent_name = legacy_norm(unit.parent.name) if unit.parent else ""
-        if parent_name.lower() == ust_birim.lower():
+        if turkish_casefold(parent_name) == ust_birim_fold:
             return unit
 
     return candidates[0]

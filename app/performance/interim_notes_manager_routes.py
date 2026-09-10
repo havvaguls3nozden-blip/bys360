@@ -14,6 +14,7 @@ from app.route_registry import main_bp
 
 # BYS360_STUB_AI_V60_INTERIM_IMPORT
 from app.services.ai.stub_panel_bridge import build_interim_notes_ai_panel
+from app.services.performance.interim_notes_runtime import _id_sql
 
 logger = logging.getLogger(__name__)
 # /BYS360_STUB_AI_V60_INTERIM_IMPORT
@@ -252,7 +253,7 @@ def _access_denied():
 def performance_interim_notes():
     from flask import flash, redirect, render_template, request
     from flask_login import current_user
-    from sqlalchemy import text as _sql_text
+    from sqlalchemy import bindparam, text as _sql_text
 
     from app.extensions import db
 
@@ -270,9 +271,16 @@ def performance_interim_notes():
     scoped_people = _people()
     scoped_ids = [int(p.get('id')) for p in scoped_people if p.get('id') is not None]
 
-    def _rows(sql, params=None):
+    def _rows(sql, params=None, *, expanding=()):
+        # BYS360 DEFECT AR: `expanding` bir IN listesinin ham string
+        # birlestirme yerine gercek SQLAlchemy bind parametresi olarak
+        # genisletilmesini saglar (bkz. process_engine_phase8_tracking.py
+        # _prepare_clause, ayni desen).
+        clause = _sql_text(sql)
+        if expanding:
+            clause = clause.bindparams(*(bindparam(name, expanding=True) for name in expanding))
         try:
-            return list(db.session.execute(_sql_text(sql), params or {}).mappings())
+            return list(db.session.execute(clause, params or {}).mappings())
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return []
@@ -286,9 +294,11 @@ def performance_interim_notes():
             return default
 
     def _ensure_table():
-        db.session.execute(_sql_text("""
+        # BYS360 DEFECT AR: id kolonu artik dialect'e gore uretiliyor; eskiden
+        # sabit SERIAL kullanildigi icin SQLite'ta id her zaman NULL kaliyordu.
+        db.session.execute(_sql_text(f"""
             CREATE TABLE IF NOT EXISTS performance_interim_notes_live (
-                id SERIAL PRIMARY KEY,
+                {_id_sql()},
                 personnel_id INTEGER,
                 period_id INTEGER,
                 note_type VARCHAR(40) NOT NULL DEFAULT 'genel',
@@ -296,7 +306,7 @@ def performance_interim_notes():
                 note TEXT NOT NULL,
                 scorecard_visible BOOLEAN NOT NULL DEFAULT FALSE,
                 created_by_user_id INTEGER,
-                created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """))
         db.session.commit()
@@ -404,14 +414,15 @@ def performance_interim_notes():
     if _is_admin_like():
         scope_where = ""
     elif scoped_ids:
-        scope_where = "WHERE n.personnel_id IN ({})".format(", ".join(str(int(i)) for i in scoped_ids))
+        scope_where = "WHERE n.personnel_id IN :scope_ids"
     else:
         scope_where = None
 
     if scope_where is None:
         note_items_raw = []
     else:
-        note_items_raw = _rows(f"""
+        note_items_raw = _rows(
+            f"""
             SELECT
                 n.id,
                 n.personnel_id,
@@ -428,7 +439,10 @@ def performance_interim_notes():
             {scope_where}
             ORDER BY n.created_at DESC, n.id DESC
             LIMIT 300
-        """)
+        """,
+            {"scope_ids": scoped_ids} if scoped_ids else None,
+            expanding=("scope_ids",) if scoped_ids else (),
+        )
 
     note_items = []
     for row in note_items_raw:

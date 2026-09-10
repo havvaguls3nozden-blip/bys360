@@ -50,8 +50,14 @@ NOTE_TYPE_OPTIONS = [
 
 
 def _dialect_name() -> str:
+    # BYS360 DEFECT AR: db.session.bind her zaman None doner (bu
+    # SQLAlchemy/Flask-SQLAlchemy surumunde bagli motoru gostermiyor);
+    # db.session.get_bind() gercek motoru dondurur. Eski kod bu yuzden
+    # istisnaya duserek sessizce "postgresql" varsayilanina donuyordu --
+    # yani _id_sql()/_bool_sql() SQLite'ta bile hep PostgreSQL dalini
+    # aliyordu (id sutunu SQLite'ta kalici NULL kaliyordu).
     try:
-        return db.session.bind.dialect.name  # type: ignore[union-attr]
+        return db.session.get_bind().dialect.name
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return "postgresql"

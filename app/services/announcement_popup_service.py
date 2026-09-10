@@ -459,7 +459,18 @@ def target_user_query(announcement: Announcement | None = None, *, target_scope:
 
     query = User.query.filter(User.is_active.is_(True))
     if scope == "role" and role:
-        query = query.filter(func.lower(func.trim(func.coalesce(User.role, ""))) == role.lower())
+        # BYS360 DEFECT AR: veritabaninin LOWER() uygulamasina guvenmek
+        # yerine (SQLite Turkce buyuk/kucuk harf donusumunu ASCII disinda
+        # uygulamaz, PostgreSQL davranisi dogrulanamaz), esitlik Python
+        # tarafinda kontrol edilir; Query nesnesi (count()/order_by().all()
+        # zincirleme cagrilari icin) id listesi uzerinden korunur.
+        role_lower = role.lower()
+        matching_ids = [
+            user.id
+            for user in User.query.filter(User.is_active.is_(True)).all()
+            if (user.role or "").strip().lower() == role_lower
+        ]
+        query = query.filter(User.id.in_(matching_ids))
     elif scope == "unit" and unit_id:
         query = query.filter(User.organization_unit_id == int(unit_id))
     return query

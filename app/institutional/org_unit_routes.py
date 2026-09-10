@@ -30,6 +30,7 @@ from app.services.ai import build_org_unit_detail_ai_panel, build_org_units_risk
 from app.services.hierarchy_admin_service import (
     sync_organization_units_from_users_if_stale,
 )
+from app.utils.turkish_text import turkish_casefold
 
 logger = logging.getLogger(__name__)
 
@@ -107,10 +108,23 @@ def admin_org_unit_create():
             parent_id = int(parent_id_raw) if parent_id_raw.isdigit() else None
             sort_order = int(sort_order_raw) if sort_order_raw.isdigit() else 0
 
-            existing = OrganizationUnit.query.filter(
-                func.lower(OrganizationUnit.name) == name.lower(),
-                OrganizationUnit.parent_id == parent_id,
-            ).first()
+            # BYS360 DEFECT AR: karsilastirma artik veritabaninin LOWER()
+            # uygulamasina guvenmiyor (SQLite Turkce buyuk/kucuk harf
+            # donusumunu ASCII disinda uygulamaz, PostgreSQL davranisi ise
+            # dogrulanamaz); ayni parent_id altindaki adaylar sorguyla
+            # daraltilir, esitlik Python tarafinda turkish_casefold ile
+            # tutarli sekilde kontrol edilir.
+            name_fold = turkish_casefold(name)
+            existing = next(
+                (
+                    candidate
+                    for candidate in OrganizationUnit.query.filter(
+                        OrganizationUnit.parent_id == parent_id,
+                    ).all()
+                    if turkish_casefold(candidate.name) == name_fold
+                ),
+                None,
+            )
 
             if existing:
                 flash("Aynı üst birim altında bu isimde bir birim zaten mevcut.", "warning")
@@ -188,11 +202,19 @@ def admin_org_unit_edit(unit_id: int):
                 flash("Bir birim kendi alt birimlerinden birine bağlanamaz.", "warning")
                 return redirect(url_for("main.admin_org_unit_edit", unit_id=unit.id))
 
-            duplicate = OrganizationUnit.query.filter(
-                OrganizationUnit.id != unit.id,
-                func.lower(OrganizationUnit.name) == name.lower(),
-                OrganizationUnit.parent_id == parent_id,
-            ).first()
+            # BYS360 DEFECT AR: bkz. admin_org_unit_create() ayni not.
+            name_fold = turkish_casefold(name)
+            duplicate = next(
+                (
+                    candidate
+                    for candidate in OrganizationUnit.query.filter(
+                        OrganizationUnit.id != unit.id,
+                        OrganizationUnit.parent_id == parent_id,
+                    ).all()
+                    if turkish_casefold(candidate.name) == name_fold
+                ),
+                None,
+            )
             if duplicate:
                 flash("Aynı üst birim altında bu isimde başka bir birim zaten mevcut.", "warning")
                 return redirect(url_for("main.admin_org_unit_edit", unit_id=unit.id))

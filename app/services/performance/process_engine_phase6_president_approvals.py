@@ -35,8 +35,18 @@ def table_exists(table_name: str) -> bool:
     query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
     by construction -- the same proven pattern already used elsewhere in
     this codebase (process_engine_phase3_history.py, process_engine_
-    phase4_flow.py, process_engine_phase8_tracking.py)."""
-    return bool(inspect(db.engine).has_table(table_name))
+    phase4_flow.py, process_engine_phase8_tracking.py).
+
+    BYS360 DEFECT AR: previously raised straight through on any inspect()
+    failure, unlike ~20 other table-existence helpers doing the identical
+    conceptual check elsewhere in this codebase (including this module's
+    own claimed sibling, process_engine_phase8_tracking.py), which all log
+    and return False. Aligned to that dominant convention."""
+    try:
+        return bool(inspect(db.engine).has_table(table_name))
+    except Exception:
+        logger.exception("BYS360 phase6 president approvals table_exists guvenli fallback | table=%s", table_name)
+        return False
 
 
 def _table_columns(table_name: str) -> set[str]:
@@ -551,11 +561,15 @@ def _history_from_evaluation_items(evaluation_id: int | None) -> list[dict[str, 
     # The cast was dropped; "/ 4.0" (a real literal) keeps the same
     # non-truncating division on both dialects that "::numeric" gave on
     # PostgreSQL alone.
+    # BYS360 DEFECT AR: bare ROUND(<float agregat>, N) PostgreSQL'de
+    # calismiyor (round(double precision, integer) imzasi yok, sadece
+    # round(numeric, integer) var); CAST(...AS NUMERIC) her iki dialect'te
+    # de gecerli ve PostgreSQL'in imza gereksinimini karsiliyor.
     if "score_100" in item_cols:
-        score_expr = "ROUND(AVG(NULLIF(i.score_100, 0)), 2)"
+        score_expr = "ROUND(CAST(AVG(NULLIF(i.score_100, 0)) AS NUMERIC), 2)"
         score_filter = "i.score_100 IS NOT NULL AND i.score_100 > 0"
     elif "score" in item_cols:
-        score_expr = "ROUND(AVG(((i.score - 1) / 4.0) * 100), 2)"
+        score_expr = "ROUND(CAST(AVG(((i.score - 1) / 4.0) * 100) AS NUMERIC), 2)"
         score_filter = "i.score IS NOT NULL"
     else:
         return []

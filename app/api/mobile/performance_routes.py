@@ -970,9 +970,15 @@ def _v2853_ensure_interim_notes_table():
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             from sqlalchemy import text as _sql_text
-            db.session.execute(_sql_text('''
+
+            from app.services.performance.interim_notes_runtime import _id_sql
+            # BYS360 DEFECT AR: id kolonu artik dialect'e gore uretiliyor;
+            # eskiden sabit SERIAL kullanildigi icin SQLite'ta id her zaman
+            # NULL kaliyordu (yalnizca birincil yol basarisiz olursa calisan
+            # bu yedek yolda).
+            db.session.execute(_sql_text(f'''
                 CREATE TABLE IF NOT EXISTS performance_interim_notes (
-                    id SERIAL PRIMARY KEY,
+                    {_id_sql()},
                     period_id INTEGER NULL,
                     employee_id INTEGER NULL,
                     employee_user_id INTEGER NULL,

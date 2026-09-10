@@ -351,7 +351,7 @@ def _unit_average(reader: _Reader, period_id: int | None, scope_ids: list[int] |
     label_expr = "COALESCE(" + ", ".join(label_parts + ["'Birim bilgisi yok'"]) + ")"
     rows = reader.rows(
         f"""
-        SELECT {label_expr} AS label, ROUND(AVG(pe.final_total_100), 1) AS avg_score, COUNT(*) AS row_count
+        SELECT {label_expr} AS label, ROUND(CAST(AVG(pe.final_total_100) AS NUMERIC), 1) AS avg_score, COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id
         {where}
@@ -381,7 +381,7 @@ def _category_average(reader: _Reader, period_id: int | None, scope_ids: list[in
     rows = reader.rows(
         f"""
         SELECT COALESCE(NULLIF(u.personnel_category,''), 'Diğer') AS label,
-               ROUND(AVG(pe.final_total_100), 1) AS avg_score,
+               ROUND(CAST(AVG(pe.final_total_100) AS NUMERIC), 1) AS avg_score,
                COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id
