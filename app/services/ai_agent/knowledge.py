@@ -63,9 +63,20 @@ def init_knowledge_table() -> None:
     text = _ag5_text()
     if db is None or text is None:
         return
-    db.session.execute(text("""
+    # BYS360 DEFECT AR: sabit "id SERIAL PRIMARY KEY" hicbir dialect dali
+    # olmadan kullaniliyordu -- SQLite'ta bu, eklenen her satirin id'sinin
+    # kalici NULL kalmasina yol acardi (bkz. interim_notes_runtime.py::_id_sql()
+    # ayni kusur sinifi).
+    try:
+        dialect = db.session.get_bind().dialect.name
+    except Exception:
+        import logging
+        logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+        dialect = "postgresql"
+    id_sql = "id INTEGER PRIMARY KEY AUTOINCREMENT" if dialect == "sqlite" else "id SERIAL PRIMARY KEY"
+    db.session.execute(text(f"""
         CREATE TABLE IF NOT EXISTS ai_agent_knowledge_entries (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             title VARCHAR(240) NOT NULL,
             question_patterns TEXT NOT NULL,
             answer TEXT NOT NULL,
