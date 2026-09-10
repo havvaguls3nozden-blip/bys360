@@ -96,6 +96,10 @@ Write-Host "Action Execute    : powershell.exe"
 Write-Host "Action Argument   : $ActionArgument"
 Write-Host "Trigger           : Sistem baslangicinda (AtStartup)"
 Write-Host "Principal         : SYSTEM (LogonType=ServiceAccount, RunLevel=Highest)"
+Write-Host "ExecutionTimeLimit: PT0S (sinirsiz)"
+Write-Host "RestartCount      : 3"
+Write-Host "RestartInterval   : PT1M (1 dakika)"
+Write-Host "AllowHardTerminate: True"
 Write-Host ""
 
 if ($Apply) {
@@ -123,7 +127,20 @@ if ($Apply) {
 
     $Action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $ActionArgument -WorkingDirectory $WorkingDirectory
     $Trigger = New-ScheduledTaskTrigger -AtStartup
-    $Settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
+    # BYS360 DEFECT AR: bu ayarlar eskiden acikca verilmiyordu, bu yuzden
+    # New-ScheduledTaskSettingsSet'in platform varsayilanlarina (72 saatlik
+    # ExecutionTimeLimit, RestartCount=0, RestartInterval yok) dusuyordu --
+    # canli gorevde daha once yasanan ve elle sertlestirilen tikanma
+    # olayinin (72 saat boyunca yeniden baslatilmayan surec) aynisi.
+    # Degerler canli, zaten sertlestirilmis goreve (ExecutionTimeLimit=PT0S
+    # yani sinirsiz, RestartCount=3, RestartInterval=PT1M,
+    # AllowHardTerminate=True) birebir eslesir.
+    $Settings = New-ScheduledTaskSettingsSet `
+        -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable `
+        -ExecutionTimeLimit ([TimeSpan]::Zero) `
+        -RestartCount 3 `
+        -RestartInterval (New-TimeSpan -Minutes 1) `
+        -AllowHardTerminate:$true
     # BYS360 DEFECT Y: explicit unattended-service principal. Without this,
     # Register-ScheduledTask/Set-ScheduledTask default to the CURRENT
     # INTERACTIVE caller's identity with an interactive logon type -- a

@@ -80,7 +80,24 @@ function New-ScheduledTaskTrigger {
 }
 function New-ScheduledTaskSettingsSet {
     [CmdletBinding()]
-    param([switch]$AllowStartIfOnBatteries,[switch]$DontStopIfGoingOnBatteries,[switch]$StartWhenAvailable,[string]$MultipleInstances)
+    param(
+        [switch]$AllowStartIfOnBatteries,[switch]$DontStopIfGoingOnBatteries,[switch]$StartWhenAvailable,[string]$MultipleInstances,
+        $ExecutionTimeLimit,[int]$RestartCount,$RestartInterval,[bool]$AllowHardTerminate
+    )
+    # BYS360 DEFECT AR: eskiden bu mock hicbir cagriyi kaydetmiyordu, bu
+    # yuzden 72 saatlik varsayilan calisma-suresi-siniri/RestartCount=0
+    # reintroduce defekti sessizce test kapsaminin disinda kalabiliyordu.
+    $ExecutionTimeLimitText = $null
+    if ($null -ne $ExecutionTimeLimit) { $ExecutionTimeLimitText = $ExecutionTimeLimit.ToString() }
+    $RestartIntervalText = $null
+    if ($null -ne $RestartInterval) { $RestartIntervalText = $RestartInterval.ToString() }
+    [void]$Global:MockCalls.Add(@{
+        Cmdlet='New-ScheduledTaskSettingsSet'
+        ExecutionTimeLimit=$ExecutionTimeLimitText
+        RestartCount=$RestartCount
+        RestartInterval=$RestartIntervalText
+        AllowHardTerminate=$AllowHardTerminate
+    })
     return [PSCustomObject]@{}
 }
 function New-ScheduledTaskPrincipal {
@@ -439,6 +456,44 @@ def test_apply_without_existing_task_uses_explicit_system_service_account_princi
     )
     assert passed_principal.get("LogonType") == "ServiceAccount"
     assert passed_principal.get("RunLevel") == "Highest"
+
+
+def test_apply_uses_hardened_execution_time_limit_and_restart_settings(tmp_path: Path) -> None:
+    """BYS360 DEFECT AR: without explicit -ExecutionTimeLimit/-RestartCount/
+    -RestartInterval/-AllowHardTerminate, New-ScheduledTaskSettingsSet falls
+    back to platform defaults (ExecutionTimeLimit=PT72H, RestartCount=0, no
+    RestartInterval) -- exactly the historical incident configuration that
+    left a hung canli process un-restarted for up to 72 hours. This locks
+    the installer to the same hardened values the live task already runs
+    with (ExecutionTimeLimit=PT0S/unlimited, RestartCount=3,
+    RestartInterval=PT1M, AllowHardTerminate=True), so a future edit cannot
+    silently reintroduce the 72-hour-shutdown defect."""
+    project_root = _build_fake_project_root(tmp_path / "sandbox")
+
+    harness_result = _run_mocked_installer(
+        project_root, tmp_path / "harness", apply=True, existing_task=False,
+    )
+
+    assert harness_result["success"] is True, f"Apply basarisiz oldu: {harness_result.get('error')}"
+
+    calls = harness_result["mock_calls"]
+    settings_calls = [c for c in calls if c.get("Cmdlet") == "New-ScheduledTaskSettingsSet"]
+    assert len(settings_calls) == 1, "Apply modu tam olarak bir New-ScheduledTaskSettingsSet cagirmali."
+    settings = settings_calls[0]
+
+    # PT72H (platform varsayilani) DEGIL -- sinirsiz calisma suresi (PT0S/Zero).
+    assert settings.get("ExecutionTimeLimit") not in (None, "", "PT72H")
+    assert "72" not in str(settings.get("ExecutionTimeLimit")), (
+        f"ExecutionTimeLimit 72 saat icermemeli (tarihi tikanma defekti): {settings!r}"
+    )
+    # RestartCount=0 (platform varsayilani) DEGIL.
+    assert settings.get("RestartCount") not in (None, 0), (
+        f"RestartCount 0 olmamali (yeniden baslatma devre disi kalir): {settings!r}"
+    )
+    assert settings.get("RestartInterval") not in (None, ""), (
+        f"RestartInterval acikca ayarlanmali: {settings!r}"
+    )
+    assert settings.get("AllowHardTerminate") is True
 
 
 def test_apply_with_existing_task_and_confirm_replace_uses_explicit_system_service_account_principal(tmp_path: Path) -> None:
