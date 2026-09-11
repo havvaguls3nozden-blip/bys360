@@ -327,3 +327,74 @@ def test_legacy_fcm_token_alias_registers_token_same_as_canonical_route(app, cli
     assert response.get_json()["action"] == "created"
     row = _token_row(app, "wave2-push-test-token-legacy-alias")
     assert row is not None
+
+
+# --- BYS360 DEFECT AR: db.session.bind dialect-detection defect ---
+#
+# _is_sqlite() used to read db.session.bind, which this Flask-SQLAlchemy
+# runtime always returns as None -- the AttributeError was swallowed and
+# _is_sqlite() always returned False, so SQLite always took the PostgreSQL
+# "id SERIAL PRIMARY KEY" branch. SQLite accepts SERIAL as an arbitrary
+# (non-INTEGER) type-affinity token and does not apply rowid-alias /
+# autoincrement behaviour to it, so every inserted row's id came back
+# permanently NULL. The fix switches to db.session.get_bind() (the same
+# established pattern already used by interim_notes_runtime.py::_id_sql()).
+
+
+def test_register_push_token_assigns_nonnull_integer_id_on_sqlite(app, client):
+    _, headers = _create_user_and_token(app, client, sicil_no="90415", email="w2.push.idnotnull@bys360.test")
+
+    response = client.post(
+        "/api/mobile/push/register-token",
+        json={"token": "wave2-push-test-token-id-not-null", "platform": "android"},
+        headers=headers,
+    )
+
+    assert response.status_code == 200
+    row = _token_row(app, "wave2-push-test-token-id-not-null")
+    assert row is not None
+    # Before the fix this was always NULL on SQLite.
+    assert row["id"] is not None
+    assert isinstance(row["id"], int)
+
+
+def test_mobile_push_tokens_table_id_column_is_sqlite_integer_autoincrement_not_serial(app):
+    from app.api.mobile.domains.push_notifications import _ensure_mobile_push_token_table
+    from app.extensions import db
+
+    with app.app_context():
+        _ensure_mobile_push_token_table()
+        columns = db.session.execute(text("PRAGMA table_info(mobile_push_tokens)")).fetchall()
+
+    id_column = next(col for col in columns if col[1] == "id")
+    # column tuple: (cid, name, type, notnull, dflt_value, pk)
+    assert id_column[2].upper() == "INTEGER", (
+        f"id column type is {id_column[2]!r}, expected INTEGER (the SQLite "
+        "rowid-alias/autoincrement type) -- SERIAL would mean the bug regressed"
+    )
+    assert id_column[5] == 1, "id column must be the PRIMARY KEY for autoincrement behaviour to apply"
+
+
+def test_is_sqlite_returns_true_on_real_sqlite_app_context(app):
+    from app.api.mobile.domains.push_notifications import _is_sqlite
+
+    with app.app_context():
+        # Before the fix this always returned False, even on SQLite.
+        assert _is_sqlite() is True
+
+
+def test_is_sqlite_returns_false_when_bind_dialect_is_postgresql(app, monkeypatch):
+    from app.api.mobile.domains.push_notifications import _is_sqlite
+    from app.extensions import db
+
+    class _FakeDialect:
+        name = "postgresql"
+
+    class _FakeBind:
+        dialect = _FakeDialect()
+
+    with app.app_context():
+        monkeypatch.setattr(db.session, "get_bind", lambda: _FakeBind())
+        # The PostgreSQL (SERIAL) branch selection must remain unchanged: a
+        # real postgresql dialect must still make _is_sqlite() return False.
+        assert _is_sqlite() is False
