@@ -156,7 +156,7 @@ class PerformanceFeedbackPipelineFlow(db.Model):
     created_by_id = db.Column(db.Integer, nullable=True, index=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    rule_version = db.Column(db.String(120), nullable=False, default="claude_feedback_state_machine_v1")
+    rule_version = db.Column(db.String(120), nullable=False, default="feedback_state_machine_v1")
 
     feedback_steps = db.relationship("PerformanceFeedbackPipelineStep", backref="feedback_flow", lazy="dynamic")
 
@@ -178,4 +178,4 @@ class PerformanceFeedbackPipelineStep(db.Model):
     completed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
-    rule_version = db.Column(db.String(120), nullable=False, default="claude_feedback_state_machine_v1")
+    rule_version = db.Column(db.String(120), nullable=False, default="feedback_state_machine_v1")

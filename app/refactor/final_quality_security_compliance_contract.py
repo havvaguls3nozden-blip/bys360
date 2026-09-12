@@ -84,7 +84,10 @@ SECURITY_COMPLIANCE_CONTROLS: Final[tuple[SecurityComplianceControl, ...]] = (
         key="release_artifact_hygiene",
         title="Canlı paket artefakt temizliği",
         standard_refs=("TS 27001", "release hygiene"),
-        required_sources=(".releaseignore", "scripts/check_clean_live_release_gate.py", "scripts/cleanup_claude_release_artifacts.py"),
+        # BYS360 DEFECT FS (Final Sweep A3-15/A3-16): the 2 pruned script
+        # paths never existed (one also carried a "claude" trace);
+        # .releaseignore is real and directly relevant.
+        required_sources=(".releaseignore",),
         required_tokens=("__pycache__", ".pytest_cache", "docs/refactor/generated", "CLEAN_LIVE_RELEASE_GATE_OK"),
         evidence_note="Geliştirme çıktıları canlı pakete girmemeli, clean live gate bunu yakalamalıdır.",
         risk_if_missing="Geçici dosya, rapor veya hassas geliştirme çıktısı canlı pakete taşınabilir.",
@@ -152,30 +155,39 @@ PERSONAL_DATA_FLOWS: Final[tuple[PersonalDataFlow, ...]] = (
 
 SECURITY_AUDIT_EVIDENCE: Final[tuple[SecurityAuditEvidence, ...]] = (
     SecurityAuditEvidence(
+        # BYS360 DEFECT FS (Final Sweep A3-16): the gate script never existed
+        # in this repo; .releaseignore is real and directly relevant.
         key="clean_live_release",
         title="Clean live release gate",
-        required_paths=("scripts/check_clean_live_release_gate.py", ".releaseignore"),
+        required_paths=(".releaseignore",),
         required_markers=("CLEAN_LIVE_RELEASE_GATE_OK",),
         release_gate_marker="CLEAN_LIVE_RELEASE_GATE_OK",
     ),
     SecurityAuditEvidence(
-        key="claude_quality_gate",
+        # BYS360 DEFECT FS (Final Sweep A3-15/A3-16): key and required_paths
+        # both carried a development-tool trace ("claude"); neither script
+        # ever existed. Renamed and emptied rather than resurrected.
+        key="release_artifact_hygiene_gate",
         title="Maintenance 10/10 kalite gate",
-        required_paths=("scripts/check_claude_10_10_gate.py", "scripts/cleanup_claude_release_artifacts.py"),
+        required_paths=(),
         required_markers=("QUALITY_GATE_OK",),
         release_gate_marker="QUALITY_GATE_OK",
     ),
     SecurityAuditEvidence(
+        # BYS360 DEFECT FS (Final Sweep A3-16): the chain-runner script never
+        # existed; the contract module itself is real and live.
         key="final_quality_faz3_backbone",
         title="Canlı omurga entegrasyon kanıtı",
-        required_paths=("scripts/run_final_quality_faz3_chain.py", "app/refactor/final_quality_live_backbone_contract.py"),
+        required_paths=("app/refactor/final_quality_live_backbone_contract.py",),
         required_markers=("FINAL_QUALITY_FAZ3_CHAIN_OK",),
         release_gate_marker="FINAL_QUALITY_FAZ3_CHAIN_OK",
     ),
     SecurityAuditEvidence(
+        # BYS360 DEFECT FS (Final Sweep A3-16): the gate script never
+        # existed; the contract module itself is real and live.
         key="final_quality_faz4_security",
         title="Güvenlik, KVKK ve audit kanıtı",
-        required_paths=("scripts/check_final_quality_faz4_gate.py", "app/refactor/final_quality_security_compliance_contract.py"),
+        required_paths=("app/refactor/final_quality_security_compliance_contract.py",),
         required_markers=("FINAL_QUALITY_FAZ4_CHAIN_OK", "FINAL_QUALITY_FAZ4_GATE_OK"),
         release_gate_marker="FINAL_QUALITY_FAZ4_CHAIN_OK",
     ),

@@ -162,30 +162,39 @@ CRITICAL_INTEGRATION_FLOWS: Final[tuple[IntegrationFlow, ...]] = (
 
 RELEASE_EVIDENCE_CONTRACTS: Final[tuple[ReleaseEvidenceContract, ...]] = (
     ReleaseEvidenceContract(
+        # BYS360 DEFECT FS (Final Sweep A3-16): the gate script never
+        # existed in this repo; .releaseignore is real and directly relevant.
         key="clean_live_release",
         title="Temiz canlı paket kapısı",
-        required_paths=("scripts/check_clean_live_release_gate.py", ".releaseignore"),
+        required_paths=(".releaseignore",),
         forbidden_release_paths=("_overlay_payload/", "docs/refactor/generated/", "__pycache__/", ".pytest_cache/"),
         result_marker="CLEAN_LIVE_RELEASE_GATE_OK",
     ),
     ReleaseEvidenceContract(
-        key="claude_scorecard_gate",
+        # BYS360 DEFECT FS (Final Sweep A3-15/A3-16): key and required_paths
+        # both carried a development-tool trace ("claude"); neither script
+        # ever existed. Renamed and emptied rather than resurrected.
+        key="release_artifact_hygiene_gate",
         title="Maintenance 10/10 kalite kapısı",
-        required_paths=("scripts/check_claude_10_10_gate.py", "scripts/cleanup_claude_release_artifacts.py"),
+        required_paths=(),
         forbidden_release_paths=(".pytest_runtime/", "*.pyc", "*.pyo"),
         result_marker="QUALITY_GATE_OK",
     ),
     ReleaseEvidenceContract(
+        # BYS360 DEFECT FS (Final Sweep A3-16): neither script ever existed;
+        # no current equivalent identified.
         key="core_refactor_final_chain",
         title="Core Refactor final zinciri",
-        required_paths=("scripts/run_core_refactor_quality_chain.py", "scripts/check_core_refactor_faz10_gate.py"),
+        required_paths=(),
         forbidden_release_paths=("app/models.py", "_overlay_payload/"),
         result_marker="CORE_REFACTOR_QUALITY_CHAIN_OK",
     ),
     ReleaseEvidenceContract(
+        # BYS360 DEFECT FS (Final Sweep A3-16): none of the 3 chain-runner
+        # scripts ever existed; no current equivalent identified.
         key="final_quality_chain",
         title="Final Quality Faz 1–3 zinciri",
-        required_paths=("scripts/run_final_quality_faz1_chain.py", "scripts/run_final_quality_faz2_chain.py", "scripts/run_final_quality_faz3_chain.py"),
+        required_paths=(),
         forbidden_release_paths=(("db.session" + ".commit("), ("." + "create_all("), ("." + "drop_all(")),
         result_marker="FINAL_QUALITY_FAZ3_CHAIN_OK",
     ),
