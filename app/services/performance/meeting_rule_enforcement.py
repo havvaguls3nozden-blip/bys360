@@ -281,8 +281,14 @@ def build_employee_group_average_context(employee_id: Any, period_id: Any | None
     parts: list[str] = []
     params: dict[str, Any] = {"category_name": category_name}
     if _has_table("performance_legacy_scorecards"):
+        # BYS360 DEFECT FS (Final Sweep A1-01): `score_100::numeric` is
+        # PostgreSQL-only cast syntax (breaks on SQLite: "unrecognized token:
+        # ':'"). CAST(x AS NUMERIC) is ANSI-portable and behaves identically
+        # on both supported dialects -- still the required fix for
+        # PostgreSQL's ROUND(AVG(double precision)) incompatibility, but
+        # without the non-portable `::` shorthand.
         parts.append("""
-            SELECT score_100::numeric AS score_100
+            SELECT CAST(score_100 AS NUMERIC) AS score_100
             FROM performance_legacy_scorecards
             WHERE category_name=:category_name
               AND score_100 IS NOT NULL
@@ -294,7 +300,7 @@ def build_employee_group_average_context(employee_id: Any, period_id: Any | None
             where_period = "AND e.period_id=:period_id"
             params["period_id"] = period_id
         parts.append(f"""
-            SELECT e.final_total_100::numeric AS score_100
+            SELECT CAST(e.final_total_100 AS NUMERIC) AS score_100
             FROM performance_evaluations e
             JOIN performance_employee_category_assignments a ON a.employee_id=e.employee_id AND COALESCE(a.is_active, true)=true
             JOIN performance_employee_categories c ON c.id=a.category_id

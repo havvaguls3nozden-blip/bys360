@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from functools import lru_cache
 from typing import Any
 
@@ -431,7 +432,7 @@ def performance_interim_notes():
                 n.title,
                 n.note,
                 n.scorecard_visible,
-                TO_CHAR(n.created_at, 'DD.MM.YYYY HH24:MI') AS created_at_label,
+                n.created_at AS created_at_raw,
                 COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.ad, u.soyad)), ''), u.email, CAST(n.personnel_id AS TEXT)) AS personnel_name,
                 '' AS unit_name
             FROM performance_interim_notes_live n
@@ -444,9 +445,36 @@ def performance_interim_notes():
             expanding=("scope_ids",) if scoped_ids else (),
         )
 
+    # BYS360 DEFECT FS (Final Sweep A1-04): TO_CHAR(...) is PostgreSQL-only
+    # (no SQLite version has it, unlike CONCAT_WS which SQLite 3.44+ added).
+    # It previously failed on SQLite and was silently swallowed by _rows()'s
+    # broad except, rendering an empty note list with no visible error.
+    # Formatting the raw datetime in Python after fetch works identically on
+    # both dialects and preserves the exact "DD.MM.YYYY HH24:MI" display
+    # format already used elsewhere in this codebase (e.g. app/api/mobile/
+    # shared.py, app/admin/ai_routes.py).
+    def _format_created_at_label(raw_value):
+        if raw_value is None:
+            return None
+        if isinstance(raw_value, str):
+            for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    raw_value = datetime.strptime(raw_value, fmt)
+                    break
+                except ValueError:
+                    continue
+            else:
+                return raw_value
+        try:
+            return raw_value.strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            return None
+
     note_items = []
     for row in note_items_raw:
         item = dict(row)
+        item["created_at_label"] = _format_created_at_label(item.pop("created_at_raw", None))
         item["note_type_label"] = _type_label(item.get("note_type"))
         note_items.append(item)
 

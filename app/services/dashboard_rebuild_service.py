@@ -151,8 +151,14 @@ def _user_label(user: Any) -> str:
 
 
 def _is_manager(user: Any) -> bool:
-    role = _normalize_role(user)
-    return role in MANAGER_ROLES or "baskan" in role or "başkan" in role or "admin" in role
+    # BYS360 DEFECT FS (Final Sweep A2-04): the substring fallback
+    # (`"baskan" in role`) matched any role string merely *containing* those
+    # letters, which could surface manager-only quick-action navigation
+    # links to a non-manager. UI/navigation exposure only -- this flag never
+    # gated real data (see _resolve_scope_ids, an independent exact-match
+    # function used for all actual scope filtering). MANAGER_ROLES already
+    # lists every legitimate manager role variant explicitly.
+    return _normalize_role(user) in MANAGER_ROLES
 
 
 def _resolve_scope_ids(user: Any) -> list[int] | None:

@@ -166,3 +166,44 @@ def test_ensure_interim_notes_table_id_column_is_not_null_on_sqlite(monkeypatch)
 
     assert row is not None
     assert row[0] is not None
+
+
+def test_interim_notes_list_view_renders_real_created_at_label_not_empty_on_sqlite(monkeypatch):
+    """BYS360 DEFECT FS (Final Sweep A1-04): the list query in
+    performance_interim_notes() used TO_CHAR(n.created_at, 'DD.MM.YYYY
+    HH24:MI') -- a PostgreSQL-only function with no SQLite equivalent at
+    any version. On SQLite this raised inside _rows()'s broad except,
+    which logged and returned an empty list -- so the manager's note list
+    silently rendered as empty instead of showing real note data. Fix:
+    fetch the raw datetime and format it in Python (same "%d.%m.%Y %H:%M"
+    convention already used elsewhere in this codebase)."""
+    app = _make_app(monkeypatch)
+    _create_user(app, sicil_no="fs104", email="fs104.manager@ktb.gov.tr", role="birim_sorumlusu")
+    subordinate_id = _create_user(
+        app, sicil_no="fs105", email="fs105.subordinate@ktb.gov.tr", role="personel", yonetici_sicil="fs104",
+    )
+
+    client = app.test_client()
+    _login(client, "fs104")
+
+    response = client.post(
+        "/performance/interim-notes",
+        data={"personnel_id": str(subordinate_id), "note_type": "genel", "note": "BYS360-DEFECT-FS-A1-04-NOTE"},
+        follow_redirects=False,
+    )
+    assert response.status_code == 302
+
+    list_response = client.get("/performance/interim-notes")
+    assert list_response.status_code == 200
+
+    body = list_response.get_data(as_text=True)
+    assert "BYS360-DEFECT-FS-A1-04-NOTE" in body, (
+        "Before the fix, TO_CHAR's SQLite failure was silently swallowed and "
+        "the note list rendered empty -- the posted note must be visible."
+    )
+    import re
+    assert re.search(r"\d{2}\.\d{2}\.\d{4} \d{2}:\d{2}", body), (
+        "Expected a real 'DD.MM.YYYY HH:MM' formatted created_at_label in the "
+        "rendered page (the same display format TO_CHAR previously produced "
+        "on PostgreSQL), not a missing/blank date."
+    )
