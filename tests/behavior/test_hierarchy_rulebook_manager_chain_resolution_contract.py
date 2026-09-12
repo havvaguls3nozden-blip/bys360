@@ -21,6 +21,7 @@ from app.services.hierarchy_rulebook_service import (
     is_vice_president,
     resolve_explicit_level3,
 )
+from app.services.personnel_sync_service import canonical_role_value
 
 
 def _user(**kwargs):
@@ -268,14 +269,88 @@ def test_infer_role_from_profile_title_exact_baskan_branch():
     assert (value, label) == ('baskan', 'Başkan')
 
 
-def test_infer_role_from_profile_title_contains_baskan_without_yardim_branch():
-    value, label = infer_role_from_profile(raw_role=None, unvan='Genel Başkan', birim='Başkanlık', ust_birim='')
-    assert (value, label) == ('baskan', 'Başkan')
-
-
-def test_infer_role_from_profile_title_baskan_yardim_substring_branch():
-    value, label = infer_role_from_profile(raw_role=None, unvan='Başkan Yardımcısı (Vekil)', birim='Başkanlık', ust_birim='')
+def test_infer_role_from_profile_title_exact_baskan_yardimcisi_branch():
+    value, label = infer_role_from_profile(raw_role=None, unvan='Başkan Yardımcısı', birim='Başkanlık', ust_birim='')
     assert (value, label) == ('baskan_yardimcisi', 'Başkan Yardımcısı')
+
+
+def test_infer_role_from_profile_title_exact_grup_baskani_branch():
+    # BYS360 DEFECT FS (Final Sweep FS-R1): this exact title was previously
+    # unreachable -- any title containing "Grup Başkanı" also contains the
+    # substring "baskan" without "yardim", so it was always intercepted
+    # earlier by the (now-fixed) 'baskan' substring branch and misclassified
+    # as the president role. Now reachable and correctly classified.
+    value, label = infer_role_from_profile(raw_role=None, unvan='Grup Başkanı', birim='', ust_birim='')
+    assert (value, label) == ('grup_baskani', 'Grup Başkanı')
+
+
+@pytest.mark.parametrize(
+    'unvan',
+    [
+        'Başkanlık Danışmanı',
+        'Genel Başkan',
+    ],
+)
+def test_infer_role_from_profile_title_containing_baskan_without_exact_match_does_not_become_president(unvan):
+    # BYS360 DEFECT FS (Final Sweep FS-R1): titles that merely *contain*
+    # "başkan" as a substring/modifier (advisor to the presidency, or a
+    # non-canonical "Genel Başkan" variant) previously escalated to the
+    # literal president role via 'baskan' in title. Fixed: exact match only.
+    value, _label = infer_role_from_profile(raw_role=None, unvan=unvan, birim='', ust_birim='')
+    assert value != 'baskan', (unvan, value)
+
+
+def test_infer_role_from_profile_title_containing_baskan_yardim_without_exact_match_does_not_become_vice_president():
+    # BYS360 DEFECT FS (Final Sweep FS-R1): a private-office specialist title
+    # under the vice-presidency, not the vice president themselves.
+    value, _label = infer_role_from_profile(
+        raw_role=None, unvan='Başkan Yardımcılığı Özel Kalem Uzmanı', birim='', ust_birim='',
+    )
+    assert value != 'baskan_yardimcisi', value
+
+
+def test_infer_role_from_profile_title_containing_grup_baskan_without_exact_match_does_not_become_grup_baskani():
+    # BYS360 DEFECT FS (Final Sweep FS-R1): a data analyst working within a
+    # "Grup Başkanlığı" department, not its head.
+    value, _label = infer_role_from_profile(
+        raw_role=None, unvan='Grup Başkanlığı Veri Analisti', birim='', ust_birim='',
+    )
+    assert value not in ('baskan', 'grup_baskani'), value
+
+
+def test_infer_role_from_profile_title_qualifier_suffix_no_longer_exact_matches_baskan_yardimcisi():
+    # A qualifier suffix ("(Vekil)" = acting/deputy) means this is no longer
+    # the exact canonical "Başkan Yardımcısı" phrase, so it must not
+    # auto-escalate either -- exact-phrase matching intentionally has no
+    # tolerance for surrounding qualifier text.
+    value, _label = infer_role_from_profile(
+        raw_role=None, unvan='Başkan Yardımcısı (Vekil)', birim='Başkanlık', ust_birim='',
+    )
+    assert value != 'baskan_yardimcisi', value
+
+
+@pytest.mark.parametrize(
+    'unvan',
+    [
+        'Başkanlık Danışmanı',
+        'Grup Başkanlığı Veri Analisti',
+        'Başkan Yardımcılığı Özel Kalem Uzmanı',
+        'Genel Başkan',
+    ],
+)
+def test_infer_role_from_profile_import_persistence_path_never_persists_false_positive_privileged_role(unvan):
+    """BYS360 DEFECT FS (Final Sweep FS-R1): reproduces the exact production
+    persistence chain used by the bulk personnel import
+    (app/admin/ops_import_services.py) and the admin user create/edit route
+    (app/admin/routes.py) -- ``infer_role_from_profile()`` followed by
+    ``canonical_role_value(raw_role or inferred_role or "personel")`` -- with
+    a blank raw_role and a free-text title known to previously collide.
+    Proves the value that would actually be written to User.role is never
+    one of the three top-leadership roles for a non-leadership title."""
+    raw_role = ''
+    inferred_role, _inferred_role_label = infer_role_from_profile(raw_role=None, unvan=unvan, birim=None, ust_birim=None)
+    persisted_role = canonical_role_value(raw_role or inferred_role or 'personel')
+    assert persisted_role not in {'baskan', 'baskan_yardimcisi', 'grup_baskani'}, (unvan, persisted_role)
 
 
 def test_infer_role_from_profile_direct_to_president_title_branch():
@@ -292,14 +367,6 @@ def test_infer_role_from_profile_direct_to_president_unit_branch():
 def test_infer_role_from_profile_hukuk_title_branch():
     value, label = infer_role_from_profile(raw_role=None, unvan='Hukuk Müşaviri', birim='Genel', ust_birim='Başkanlık')
     assert (value, label) == ('mali_musavir', 'Mali Müşavir')
-
-
-# NOTE: A title-only "'grup baskan' in title" scenario is intentionally not tested
-# here as a positive case for the grup_baskani branch. It is unreachable: any title
-# containing "Grup Başkanı" also contains the substring "baskan" without "yardim",
-# so it is always intercepted earlier by the 'baskan' branch and misclassified as
-# the president role. See PRODUCTION_DEFECT_FOUND in the handoff report — this is a
-# genuine production defect, not something this suite may assert as correct.
 
 
 def test_infer_role_from_profile_grup_baskani_unit_branch():
