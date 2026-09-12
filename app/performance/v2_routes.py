@@ -437,7 +437,7 @@ def performance_v2_phase5_publish():
 def performance_v2_phase6_dashboard():
     period = _resolve_period(request.args.get('period_id', type=int))
     periods = PerformancePeriod.query.order_by(PerformancePeriod.id.desc()).limit(50).all()
-    dashboard = build_management_dashboard_context(period) if period else None
+    dashboard = build_management_dashboard_context(period, viewer=current_user) if period else None
     publish_summary = build_publish_workspace_context(period, viewer=current_user) if period else None
     ai_management_panel = build_management_ai_panel(
         dashboard=dashboard,
@@ -463,7 +463,7 @@ def performance_v2_phase6_export_xlsx():
     if not period:
         flash('Dönem bulunamadı.', 'warning')
         return redirect(url_for('main.performance_v2_phase6_dashboard'))
-    payload = build_excel_export(period)
+    payload = build_excel_export(period, viewer=current_user)
     return send_file(
         payload,
         as_attachment=True,
@@ -482,7 +482,7 @@ def performance_v2_phase6_export_csv():
     if not period:
         flash('Dönem bulunamadı.', 'warning')
         return redirect(url_for('main.performance_v2_phase6_dashboard'))
-    payload = build_csv_export(period, export_type=export_type)
+    payload = build_csv_export(period, export_type=export_type, viewer=current_user)
     return send_file(
         payload,
         as_attachment=True,
@@ -499,7 +499,7 @@ def performance_v2_phase6_print():
     if not period:
         flash('Dönem bulunamadı.', 'warning')
         return redirect(url_for('main.performance_v2_phase6_dashboard'))
-    dashboard = build_management_dashboard_context(period)
+    dashboard = build_management_dashboard_context(period, viewer=current_user)
     publish_summary = build_publish_workspace_context(period, viewer=current_user)
     return render_template(
         'performance_v2_phase6_print.html',
