@@ -126,9 +126,15 @@ def is_president(user: Any) -> bool:
 
 
 def is_vice_president(user: Any) -> bool:
+    # BYS360 DEFECT FS (Final Sweep NEW-FS-R3): 'baskan yardim' in title
+    # previously matched any compound title containing that phrase as a
+    # modifier (e.g. "Başkan Yardımcılığı Özel Kalem Uzmanı" -- a
+    # vice-presidency-office specialist, not the vice president), the same
+    # collision class already fixed for infer_role_from_profile() (FS-R1).
+    # Fixed: exact normalized-title match only.
     role = _role(user)
     title = _norm(getattr(user, 'unvan', ''))
-    return role == 'baskan_yardimcisi' or 'baskan yardim' in title
+    return role == 'baskan_yardimcisi' or title == 'baskan yardimcisi'
 
 
 def is_hukuk_context(user: Any) -> bool:

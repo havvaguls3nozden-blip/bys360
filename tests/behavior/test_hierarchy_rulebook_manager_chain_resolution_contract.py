@@ -142,8 +142,8 @@ def test_is_president_false_for_vice_president_title():
     assert is_president(_user(role='baskan_yardimcisi', unvan='Başkan Yardımcısı')) is False
 
 
-@pytest.mark.parametrize('title', ['Başkan Yardımcısı', 'BAŞKAN YARDIMCISI (Vekil)', 'başkan yardımcısı'])
-def test_is_vice_president_detects_title_variants(title):
+@pytest.mark.parametrize('title', ['Başkan Yardımcısı', 'BAŞKAN YARDIMCISI', 'başkan yardımcısı'])
+def test_is_vice_president_detects_exact_title_variants_regardless_of_case(title):
     assert is_vice_president(_user(role='personel', unvan=title)) is True
 
 
@@ -153,6 +153,24 @@ def test_is_vice_president_role_field_alone_is_sufficient():
 
 def test_is_vice_president_false_for_plain_president():
     assert is_vice_president(_user(role='baskan', unvan='Başkan')) is False
+
+
+@pytest.mark.parametrize(
+    'title',
+    [
+        # BYS360 DEFECT FS (Final Sweep NEW-FS-R3): 'baskan yardim' in title
+        # previously matched any of these compound titles as a substring,
+        # misclassifying vice-presidency-office staff as the vice president
+        # themselves. Fixed: exact normalized-title match only.
+        'Başkan Yardımcılığı Özel Kalem Uzmanı',
+        'Başkan Yardımcısı Ofisi Uzmanı',
+        'Başkan Yardımcılığı Danışmanı',
+        'BAŞKAN YARDIMCISI (Vekil)',  # qualifier suffix -- no longer an exact match, consistent with FS-R1
+        'Uzman',
+    ],
+)
+def test_is_vice_president_false_for_compound_titles_containing_baskan_yardim_substring(title):
+    assert is_vice_president(_user(role='personel', unvan=title)) is False
 
 
 # ---------------------------------------------------------------------------
@@ -422,6 +440,23 @@ def test_build_lookup_resolves_president_and_vice_president():
     assert lookup.vice_president is not None
     assert lookup.president.sicil_no == '001'
     assert lookup.vice_president.sicil_no == '002'
+
+
+def test_build_lookup_does_not_select_compound_title_false_positive_as_vice_president_fallback():
+    """BYS360 DEFECT FS (Final Sweep NEW-FS-R3): with no genuine
+    baskan_yardimcisi in the pool, build_lookup()'s fallback
+    (_pick_first([u for u in pool if is_vice_president(u)])) must not select
+    a vice-presidency-office specialist as "the" vice president -- this
+    previously fed automatic management-chain assignment with the wrong
+    person."""
+    president = _user(id=1, sicil_no='001', role='baskan', unvan='Başkan')
+    false_positive_staff = _user(
+        id=2, sicil_no='002', role='personel', unvan='Başkan Yardımcılığı Özel Kalem Uzmanı',
+    )
+
+    lookup = build_lookup([president, false_positive_staff])
+
+    assert lookup.vice_president is None
 
 
 def test_build_lookup_president_absent_when_only_inactive_candidate_exists():
