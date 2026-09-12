@@ -280,7 +280,7 @@ def test_effective_role_key_denies_unknown_role_with_no_matching_fields():
 
 def test_permission_fail_closed_unauthenticated_across_all_wrappers():
     user = _user("admin", authenticated=False)
-    for wrapper, field in _CAN_WRAPPERS:
+    for wrapper, _field in _CAN_WRAPPERS:
         assert wrapper(user) is False, f"{wrapper.__name__} should be False for unauthenticated user"
     assert _permission(user, "can_use", default=True) is False
     assert _permission_from_matrix(user, "can_use") is False
@@ -304,13 +304,13 @@ def test_permission_default_matrix_yonetici_no_db():
 
 def test_permission_default_matrix_admin_full_access_no_db():
     user = _user("admin")
-    for wrapper, field in _CAN_WRAPPERS:
+    for wrapper, _field in _CAN_WRAPPERS:
         assert wrapper(user) is True, f"{wrapper.__name__} should be True for admin"
 
 
 def test_permission_default_matrix_sistem_yoneticisi_full_access_no_db():
     user = _user("sistem_yoneticisi")
-    for wrapper, field in _CAN_WRAPPERS:
+    for wrapper, _field in _CAN_WRAPPERS:
         assert wrapper(user) is True, f"{wrapper.__name__} should be True for sistem_yoneticisi"
 
 

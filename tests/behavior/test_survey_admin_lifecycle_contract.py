@@ -230,6 +230,7 @@ def _create_survey(app, *, status="draft", created_by_id):
 
 def _add_completed_response(app, *, survey_id, user_id=None):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import SurveyResponse
 

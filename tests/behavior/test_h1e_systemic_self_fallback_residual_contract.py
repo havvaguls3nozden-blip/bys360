@@ -138,11 +138,19 @@ def test_performance_gate_status_label_functions_never_leak_raw(app) -> None:
     )
     from app.services.performance.meeting_development_gate import label_status
     from app.services.performance.phase5_scorecard_ui_policy import translate_status
-    from app.services.performance.phase6_low_score_approval_policy import status_label as phase6_status_label
-    from app.services.performance.v2_1_6a_category_ui_cleanup import corporate_gate_label
-    from app.services.performance.v2_1_6a_category_ui_cleanup import label_status as v2_1_6a_label_status
-    from app.services.performance.v2_1_10_evaluation_live_tracking import status_label as v2_1_10_status_label
-    from app.services.performance.v2_1_14_period_center_real_summary import _status_label as v2_1_14_status_label
+    from app.services.performance.phase6_low_score_approval_policy import (
+        status_label as phase6_status_label,
+    )
+    from app.services.performance.v2_1_6a_category_ui_cleanup import (
+        corporate_gate_label,
+        label_status as v2_1_6a_label_status,
+    )
+    from app.services.performance.v2_1_10_evaluation_live_tracking import (
+        status_label as v2_1_10_status_label,
+    )
+    from app.services.performance.v2_1_14_period_center_real_summary import (
+        _status_label as v2_1_14_status_label,
+    )
     from app.services.performance.v2_1_rule_engine import status_label as rule_engine_status_label
 
     unmapped = "future_gate_status_v9"

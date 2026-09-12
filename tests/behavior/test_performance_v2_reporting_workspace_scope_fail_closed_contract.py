@@ -173,6 +173,7 @@ def _create_user(app, *, ad="Deniz", soyad=None, role="personel"):
 
 def _create_period(app):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 

@@ -630,8 +630,8 @@ def test_check_user_quota_for_upload_allows_unknown_user_id(app):
 
 
 def test_update_quota_for_user_sums_only_non_deleted_files(app):
-    from app.extensions import db
     from app.core.datetime_utils import utc_now
+    from app.extensions import db
     from app.file_center.services import update_quota_for_user
     from app.models.file_center_models import FileQuotaUsage, FileStorageItem
 
@@ -740,9 +740,9 @@ def test_secure_file_path_rejects_path_outside_storage_root(app, build_storage_p
     that resolves outside the root, whatever shape produced it, is
     rejected with ValueError BEFORE any filesystem existence check, so no
     real file needs to exist at the traversal target for this to fire."""
+    from app.extensions import db
     from app.file_center.services import secure_file_path, storage_root
     from app.models.file_center_models import FileStorageItem
-    from app.extensions import db
 
     user_id = _create_user(app)
     with app.app_context():
@@ -762,7 +762,7 @@ def test_secure_file_path_rejects_path_outside_storage_root(app, build_storage_p
 
 def test_secure_file_path_raises_filenotfound_when_physically_missing(app):
     from app.extensions import db
-    from app.file_center.services import secure_file_path, storage_root, upload_root_for_user
+    from app.file_center.services import secure_file_path, upload_root_for_user
     from app.models.file_center_models import FileStorageItem
 
     user_id = _create_user(app)

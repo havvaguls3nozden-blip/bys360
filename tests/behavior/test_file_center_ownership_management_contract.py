@@ -276,9 +276,11 @@ def _create_file(app, *, owner_id, is_deleted=False):
 
 def _create_share_link(app, *, file_id, created_by_id, is_active=True):
     import datetime as _dt
+
+    from werkzeug.security import generate_password_hash
+
     from app.extensions import db
     from app.models.file_center_models import FileShareLink
-    from werkzeug.security import generate_password_hash
 
     with app.app_context():
         link = FileShareLink(
@@ -298,6 +300,7 @@ def _create_share_link(app, *, file_id, created_by_id, is_active=True):
 
 def _create_request(app, *, owner_id, status="open", recipient_email="alici@bys360.test"):
     import datetime as _dt
+
     from app.extensions import db
     from app.models.file_center_models import FileRequest
 

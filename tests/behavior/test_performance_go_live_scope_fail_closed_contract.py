@@ -146,6 +146,7 @@ def _create_user(app):
 
 def _create_period(app, *, level_1_weight=50.0, level_2_weight=50.0, level_3_weight=0.0):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 
@@ -176,6 +177,7 @@ def _get_period(app, period_id):
 
 def _create_assignment(app, *, period_id, employee_id, evaluator_id, status="bekliyor", overdue=False):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import EvaluationAssignment
 

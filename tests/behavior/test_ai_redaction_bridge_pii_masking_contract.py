@@ -84,7 +84,6 @@ from app.services.ai_decision.security_contract import (
     should_redact_field,
 )
 
-
 # ---------------------------------------------------------------------------
 # should_redact_field -- case-insensitive default-field membership
 # ---------------------------------------------------------------------------

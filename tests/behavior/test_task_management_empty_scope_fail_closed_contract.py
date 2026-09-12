@@ -152,6 +152,7 @@ def _create_user(app, *, role="personel", is_active=True):
 
 def _create_period(app):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 
@@ -234,7 +235,9 @@ def _create_coverage_log(app, *, period_id, employee_id, event_type, severity="w
 
 
 def test_dashboard_none_scope_preserves_unrestricted_behavior(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -248,7 +251,9 @@ def test_dashboard_none_scope_preserves_unrestricted_behavior(app):
 
 
 def test_dashboard_matching_nonempty_scope_sees_authorized_records(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -263,7 +268,9 @@ def test_dashboard_matching_nonempty_scope_sees_authorized_records(app):
 
 
 def test_dashboard_unrelated_nonempty_scope_sees_zero_records(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -279,7 +286,9 @@ def test_dashboard_unrelated_nonempty_scope_sees_zero_records(app):
 
 
 def test_dashboard_empty_set_scope_sees_zero_records(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -294,7 +303,9 @@ def test_dashboard_empty_set_scope_sees_zero_records(app):
 
 
 def test_dashboard_empty_set_scope_all_aggregates_zero_and_no_identity_leak(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -328,7 +339,9 @@ def test_dashboard_empty_set_scope_all_aggregates_zero_and_no_identity_leak(app)
 
 
 def test_recommendation_none_scope_preserves_unrestricted_behavior(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     period_id = _create_period(app)
     employee_id = _create_user(app)
@@ -341,7 +354,9 @@ def test_recommendation_none_scope_preserves_unrestricted_behavior(app):
 
 
 def test_recommendation_matching_scope_includes_authorized_data(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     period_id = _create_period(app)
     employee_id = _create_user(app)
@@ -355,7 +370,9 @@ def test_recommendation_matching_scope_includes_authorized_data(app):
 
 
 def test_recommendation_unrelated_scope_excludes_data(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     period_id = _create_period(app)
     employee_id = _create_user(app)
@@ -370,7 +387,9 @@ def test_recommendation_unrelated_scope_excludes_data(app):
 
 
 def test_recommendation_empty_set_scope_returns_deterministic_empty_payload(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     period_id = _create_period(app)
     employee_id = _create_user(app)

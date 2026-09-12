@@ -177,6 +177,7 @@ def _create_user(app):
 
 def _create_period(app):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 
@@ -400,7 +401,9 @@ def test_clear_period_task_records_caller_rollback_fully_undoes_delete(app):
 
 
 def test_log_performance_recommendation_export_returns_early_with_falsy_period(app):
-    from app.services.performance.task_management_service import log_performance_recommendation_export
+    from app.services.performance.task_management_service import (
+        log_performance_recommendation_export,
+    )
 
     with app.app_context():
         before = _ai_request_log_count(app)
@@ -420,7 +423,9 @@ def test_log_performance_recommendation_export_returns_early_with_falsy_period(a
 
 
 def test_log_performance_recommendation_export_writes_real_audit_row(app):
-    from app.services.performance.task_management_service import log_performance_recommendation_export
+    from app.services.performance.task_management_service import (
+        log_performance_recommendation_export,
+    )
 
     actor_id = _create_user(app)
     period_id = _create_period(app)

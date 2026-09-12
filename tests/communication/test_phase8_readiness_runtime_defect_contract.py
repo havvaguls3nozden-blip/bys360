@@ -241,7 +241,7 @@ def test_pending_surveys_counts_assignments_without_a_completed_response(app, cl
         from app.services.communication_phase8_service import pilot_readiness_snapshot
 
         readiness = pilot_readiness_snapshot()
-        gate = next(g for g in readiness["gates"] if g["label"] == "Pilot kontrol noktası kaydı")
+        next(g for g in readiness["gates"] if g["label"] == "Pilot kontrol noktası kaydı")
         # Sanity: the gate itself doesn't expose the raw count, so assert
         # indirectly via a direct re-query matching the fixed logic, proving
         # no exception was raised and the readiness snapshot completed.

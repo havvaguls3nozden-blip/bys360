@@ -160,6 +160,7 @@ def _create_user(app, *, ad="Merve", soyad=None):
 
 def _create_period(app):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 
@@ -233,6 +234,7 @@ def _create_coverage_log(app, *, period_id, employee_id, event_type="uncovered")
 
 def _create_mail_log(app, *, period_id, employee_id):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import MailLog
 
@@ -253,6 +255,7 @@ def _create_mail_log(app, *, period_id, employee_id):
 
 def _create_feedback_request(app, *, period_id, evaluation_id, employee_id):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import FeedbackRequest
 
@@ -272,6 +275,7 @@ def _create_feedback_request(app, *, period_id, evaluation_id, employee_id):
 
 def _create_publish_log(app, *, period_id, evaluation_id, employee_id):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import EvaluationPublishLog
 

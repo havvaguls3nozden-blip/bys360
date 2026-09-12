@@ -201,6 +201,7 @@ def _create_user(app, *, role="personel", ad=None, soyad=None, is_active=True):
 
 def _create_period(app):
     import datetime as _dt
+
     from app.extensions import db
     from app.models import PerformancePeriod
 
@@ -290,7 +291,9 @@ def _fetch_coverage_logs_in_context(ids):
 
 
 def test_dashboard_none_scope_shows_global_assignments(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -305,7 +308,9 @@ def test_dashboard_none_scope_shows_global_assignments(app):
 
 
 def test_dashboard_real_scope_includes_matching_employee(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -319,7 +324,9 @@ def test_dashboard_real_scope_includes_matching_employee(app):
 
 
 def test_dashboard_real_scope_excludes_unrelated_employee(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     employee_id = _create_user(app)
@@ -335,7 +342,9 @@ def test_dashboard_real_scope_excludes_unrelated_employee(app):
 
 
 def test_dashboard_status_aggregates_correct_across_mixed_states(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     evaluator_id = _create_user(app)
     period_id = _create_period(app)
@@ -357,7 +366,9 @@ def test_dashboard_status_aggregates_correct_across_mixed_states(app):
 
 
 def test_dashboard_no_period_returns_empty_shell_without_crashing(app):
-    from app.services.performance.task_management_service import build_task_management_dashboard_payload
+    from app.services.performance.task_management_service import (
+        build_task_management_dashboard_payload,
+    )
 
     with app.test_request_context():
         payload = build_task_management_dashboard_payload(None, scope_user_ids=None)
@@ -514,7 +525,9 @@ def test_build_audit_employee_options_scoped_to_ids(app):
 
 
 def test_recommendation_payload_empty_shell_when_no_period(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     with app.test_request_context():
         payload = build_assignment_recommendation_payload(None, "")
@@ -525,7 +538,9 @@ def test_recommendation_payload_empty_shell_when_no_period(app):
 
 
 def test_recommendation_payload_reflects_real_uncovered_logs(app):
-    from app.services.performance.task_management_service import build_assignment_recommendation_payload
+    from app.services.performance.task_management_service import (
+        build_assignment_recommendation_payload,
+    )
 
     period_id = _create_period(app)
     employee_id = _create_user(app)
@@ -608,7 +623,9 @@ def test_build_task_audit_csv_text_empty_rows_still_has_header(app):
 
 
 def test_build_task_recommendation_export_response_csv_content_and_type(app):
-    from app.services.performance.task_management_service import build_task_recommendation_export_response
+    from app.services.performance.task_management_service import (
+        build_task_recommendation_export_response,
+    )
 
     action_plan_rows = [
         {"priority": 1, "title": "Açıkta kalan görevleri önce kapat", "count": 5, "tone": "critical", "owner": "İK", "next_step": "İncele", "url": "/x"},
@@ -623,7 +640,9 @@ def test_build_task_recommendation_export_response_csv_content_and_type(app):
 
 
 def test_build_task_recommendation_export_response_defaults_to_csv_for_unknown_format(app):
-    from app.services.performance.task_management_service import build_task_recommendation_export_response
+    from app.services.performance.task_management_service import (
+        build_task_recommendation_export_response,
+    )
 
     result = build_task_recommendation_export_response([], export_format="unknown-format")
 
