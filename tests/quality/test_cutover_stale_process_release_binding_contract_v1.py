@@ -107,7 +107,37 @@ def _run_ps_snippet(body: str, timeout: int = 30) -> subprocess.CompletedProcess
 
 
 def _dot_source_prefix() -> str:
-    return ". " + _ps_single_quote(str(CUTOVER_SCRIPT)) + " -CandidateSourceSha 'dummy_test_sha_for_dotsource_probe'\n"
+    """Cross-platform not: cutover_bys360_candidate.ps1'in dot-source anindaki
+    (Main() cagrilmadan once, ust-seviye) $Script:DeployLogDir atamasi, kendi
+    `-DeployLogsRoot` parametresinden BAGIMSIZ olarak sabit `C:\bys360\
+    deploy_logs` yolunu kullanir -- gercek/kasitli bir production convention,
+    degistirilmedi. test_installer_launcher_overwrite_guard_v1.py::
+    _run_mocked_installer()'da zaten kanitlanmis olan ayni fake-C:-PSDrive
+    koprusu burada da uygulanir (BYS360 DEFECT: bu dot-source prefix'i,
+    Linux runner'inda "Cannot find drive" hatasiyla patliyordu cunku ayni
+    koprude yoktu). Mount/unmount, dot-source'un kendisini sarar; testin
+    kendi PowerShell govdesi (bu prefix'in sonrasina eklenir) hicbir C:\
+    yoluna dokunmaz, sadece dot-source ile yuklenen saf fonksiyonlari
+    (Test-ReadinessGate vb.) cagirir."""
+    return (
+        r"""
+$hasRealCDrive = $false
+try { $hasRealCDrive = [bool](Test-Path -LiteralPath 'C:\') } catch { $hasRealCDrive = $false }
+$FakeCDriveRoot = $null
+if (-not $hasRealCDrive) {
+    $FakeCDriveRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("bys360_fake_c_drive_" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $FakeCDriveRoot | Out-Null
+    New-PSDrive -Name 'C' -PSProvider FileSystem -Root $FakeCDriveRoot -Scope Global | Out-Null
+}
+"""
+        + ". " + _ps_single_quote(str(CUTOVER_SCRIPT)) + " -CandidateSourceSha 'dummy_test_sha_for_dotsource_probe'\n"
+        + r"""
+if ($FakeCDriveRoot) {
+    Remove-PSDrive -Name 'C' -Force -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $FakeCDriveRoot -ErrorAction SilentlyContinue
+}
+"""
+    )
 
 
 # ---------------------------------------------------------------------------

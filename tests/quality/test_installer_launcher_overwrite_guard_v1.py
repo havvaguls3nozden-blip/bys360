@@ -708,7 +708,14 @@ def _run_mocked_standalone_pulse_installer(project_root: Path, work_dir: Path) -
     """install_bys360_daily_pulse_mail_task.ps1'i mock'lanmis bir PowerShell
     oturumunda calistirir (ayni MOCK_SCHEDULED_TASK_CMDLETS katmani, ama
     sadece -ProjectRoot alan tek bir installer icin, -File tabanli calistirma
-    olmadan -- bu dosya Apply/dry-run modu yok, dogrudan calistirilir)."""
+    olmadan -- bu dosya Apply/dry-run modu yok, dogrudan calistirilir).
+
+    Cross-platform not: bu installer da (siblingleri gibi) kendi `-ProjectRoot`
+    parametresinden BAGIMSIZ olarak sabit `C:\bys360\logs` yolunu olusturur --
+    gercek/kasitli bir production convention, degistirilmedi. _run_mocked_
+    installer()'da zaten kanitlanmis olan ayni fake-C:-PSDrive koprusu burada
+    da uygulanir (BYS360 DEFECT: bu yardimci fonksiyon, Linux runner'inda
+    "Cannot find drive" hatasiyla patliyordu cunku ayni koprude yoktu)."""
     exe = _require_ps()
     work_dir.mkdir(parents=True, exist_ok=True)
     out_json = work_dir / "harness_out.json"
@@ -718,6 +725,15 @@ def _run_mocked_standalone_pulse_installer(project_root: Path, work_dir: Path) -
     harness += "\n$installerPath = " + _ps_single_quote(str(INSTALL_PULSE_STANDALONE)) + "\n"
     harness += "$projectRoot = " + _ps_single_quote(str(project_root)) + "\n"
     harness += r"""
+$hasRealCDrive = $false
+try { $hasRealCDrive = [bool](Test-Path -LiteralPath 'C:\') } catch { $hasRealCDrive = $false }
+$FakeCDriveRoot = $null
+if (-not $hasRealCDrive) {
+    $FakeCDriveRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("bys360_fake_c_drive_" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $FakeCDriveRoot | Out-Null
+    New-PSDrive -Name 'C' -PSProvider FileSystem -Root $FakeCDriveRoot -Scope Global | Out-Null
+}
+
 $errMsg = $null
 $success = $true
 try {
@@ -726,6 +742,12 @@ try {
     $success = $false
     $errMsg = $_.Exception.Message
 }
+
+if ($FakeCDriveRoot) {
+    Remove-PSDrive -Name 'C' -Force -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $FakeCDriveRoot -ErrorAction SilentlyContinue
+}
+
 $output = [PSCustomObject]@{
     Success = $success
     Error = $errMsg

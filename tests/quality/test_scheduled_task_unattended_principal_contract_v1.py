@@ -214,7 +214,17 @@ def _build_fake_project_root(tmp_path: Path) -> Path:
 def _run_mocked_installer(target_script: Path, project_root: Path, work_dir: Path, *, extra_switches: tuple[str, ...] = ()) -> dict:
     """target_script'i, TUM Scheduled Task cmdlet'leri mock'lanmis bir
     PowerShell oturumunda bir kez calistirir. Sonuc:
-    {"success": bool, "error": str|None, "stdout": str, "mock_calls": [...]}."""
+    {"success": bool, "error": str|None, "stdout": str, "mock_calls": [...]}.
+
+    Cross-platform not: bu dosyanin kapsadigi installer'lardan bazilari
+    (daily_pulse_mail, executive_mail_center_v2, corporate_information_
+    center_phase2) kendi `-ProjectRoot` parametresinden BAGIMSIZ olarak sabit
+    `C:\bys360\logs` yolunu olusturur -- gercek/kasitli bir production
+    convention, degistirilmedi. test_installer_launcher_overwrite_guard_v1.py
+    ::_run_mocked_installer()'da zaten kanitlanmis olan ayni fake-C:-PSDrive
+    koprusu burada da uygulanir (BYS360 DEFECT: bu ayri/tekrar yazilmis
+    yardimci fonksiyon, Linux runner'inda "Cannot find drive" hatasiyla
+    patliyordu cunku ayni koprude yoktu)."""
     exe = _require_ps()
     work_dir.mkdir(parents=True, exist_ok=True)
     out_json = work_dir / "harness_out.json"
@@ -229,6 +239,15 @@ def _run_mocked_installer(target_script: Path, project_root: Path, work_dir: Pat
     harness += "$installerPath = " + _ps_single_quote(str(target_script)) + "\n"
     harness += "$installerArgs = @{" + pairs + "}\n"
     harness += r"""
+$hasRealCDrive = $false
+try { $hasRealCDrive = [bool](Test-Path -LiteralPath 'C:\') } catch { $hasRealCDrive = $false }
+$FakeCDriveRoot = $null
+if (-not $hasRealCDrive) {
+    $FakeCDriveRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("bys360_fake_c_drive_" + [guid]::NewGuid().ToString('N'))
+    New-Item -ItemType Directory -Force -Path $FakeCDriveRoot | Out-Null
+    New-PSDrive -Name 'C' -PSProvider FileSystem -Root $FakeCDriveRoot -Scope Global | Out-Null
+}
+
 $errMsg = $null
 $success = $true
 $stdout = $null
@@ -238,6 +257,12 @@ try {
     $success = $false
     $errMsg = $_.Exception.Message
 }
+
+if ($FakeCDriveRoot) {
+    Remove-PSDrive -Name 'C' -Force -ErrorAction SilentlyContinue
+    Remove-Item -Recurse -Force $FakeCDriveRoot -ErrorAction SilentlyContinue
+}
+
 $output = [PSCustomObject]@{
     Success = $success
     Error = $errMsg
