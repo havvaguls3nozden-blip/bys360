@@ -118,7 +118,29 @@ def _dot_source_prefix() -> str:
     koprude yoktu). Mount/unmount, dot-source'un kendisini sarar; testin
     kendi PowerShell govdesi (bu prefix'in sonrasina eklenir) hicbir C:\
     yoluna dokunmaz, sadece dot-source ile yuklenen saf fonksiyonlari
-    (Test-ReadinessGate vb.) cagirir."""
+    (Test-ReadinessGate vb.) cagirir.
+
+    Ikinci katman (BYS360 DEFECT, second-layer): Test-ProcessBinding ->
+    Get-ListeningProcessOnPort, gercek/kasitli Windows-only Get-NetTCPConnection
+    cmdlet'ini cagirir; Test-ReleaseIdentityBinding / Test-ReadinessGate,
+    gercek/kasitli Windows'a ozgu `curl.exe` ikili adini cozer (Linux'ta
+    gercek curl "curl" adiyla mevcuttur, "curl.exe" degil). Ikisi de gercek,
+    degistirilmemis production convention'lardir. Get-Command ... yoksa
+    (yalnizca Linux pwsh'ta), bu iki komut adi icin de ayni "sadece harness'ta
+    kopru, production'da sifir degisiklik, gercek Windows'ta no-op" felsefesiyle
+    dar kapsamli fonksiyon golgeleme (shim) eklenir:
+      - Get-NetTCPConnection shim'i sahte bir sonuc UYDURMAZ; istenen
+        LocalPort'a gercek bir TCP connect-probe yapar (System.Net.Sockets.
+        TcpClient). Dinleyici yoksa $null doner (su an aktif tek testin --
+        NO_LISTENER dali -- ihtiyaci budur). Bir dinleyici varsa, gercek ama
+        Windows'a ozgu process-sahiplik (OwningProcess) semantiginin capraz
+        platformda sadakatle uretilemeyecegini acikca belgeleyerek
+        OwningProcess=$null donen uyumlu bir sekil doner -- bu dal, su an
+        aktif (skip edilmemis) hicbir testte tetiklenmez.
+      - curl.exe shim'i saf bir yonlendiricidir (${function:curl.exe} = {
+        & curl @args }); gercek curl'e TUM argumanlari degistirmeden iletir,
+        hicbir HTTP yaniti uydurmaz -- testler yine gercek, tek kullanimlik
+        yerel sahte sunucuya gercek istek atar."""
     return (
         r"""
 $hasRealCDrive = $false
@@ -135,6 +157,38 @@ if (-not $hasRealCDrive) {
 if ($FakeCDriveRoot) {
     Remove-PSDrive -Name 'C' -Force -ErrorAction SilentlyContinue
     Remove-Item -Recurse -Force $FakeCDriveRoot -ErrorAction SilentlyContinue
+}
+
+if (-not (Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue)) {
+    ${function:Get-NetTCPConnection} = {
+        param([int]$LocalPort, [string]$State, [string]$ErrorAction)
+        $client = $null
+        try {
+            $client = New-Object System.Net.Sockets.TcpClient
+            $connectTask = $client.ConnectAsync('127.0.0.1', $LocalPort)
+            if ($connectTask.Wait(200) -and $client.Connected) {
+                return [PSCustomObject]@{ LocalPort = $LocalPort; State = 'Listen'; OwningProcess = $null }
+            }
+            return $null
+        } finally {
+            if ($client) { $client.Dispose() }
+        }
+    }
+}
+
+if (-not (Get-Command curl.exe -ErrorAction SilentlyContinue)) {
+    # BYS360 DEFECT (second-layer harness portability): a bare `curl` call
+    # is NOT safe here -- Windows PowerShell (5.1) ships a built-in alias
+    # `curl` -> Invoke-WebRequest, which would silently hijack this shim on
+    # a machine where both the alias and a real curl happen to coexist
+    # (confirmed by direct reproduction: `& curl --version` resolved to
+    # Invoke-WebRequest and failed trying to parse "--version" as a URI).
+    # -CommandType Application restricts resolution to the real external
+    # executable, bypassing any Alias/Function/Cmdlet of the same bare name.
+    $realCurlCommand = Get-Command curl -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($realCurlCommand) {
+        ${function:curl.exe} = { & $realCurlCommand.Source @args }.GetNewClosure()
+    }
 }
 """
     )
