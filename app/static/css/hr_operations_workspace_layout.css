@@ -31,6 +31,16 @@
   margin-top: 16px;
 }
 
+/* BYS360 UI refinement wave (operation-first reorder): hr_attendance.html's
+   filter/actions/list blocks became top-level reordered siblings and need
+   the same 18px top-gap .scope-strip-offset already gives .scope-strip --
+   added as its own class (not reused, to keep .scope-strip-offset's name
+   accurate) since margin-top:18px alone (no other margins) recurs across
+   several non-.scope-strip elements after the reorder. */
+.block-spacing-top-lg {
+  margin-top: 18px;
+}
+
 /* hr_attendance.html: .scope-strip previously carried style="margin:18px 0 0;"
    (a margin shorthand, not a single margin-top declaration -- kept as its
    own rule rather than folded into the margin-top-only scale above). */

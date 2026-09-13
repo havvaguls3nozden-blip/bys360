@@ -368,103 +368,12 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
         .personnel-grid{grid-template-columns:1fr}
         .personnel-head-left{flex-direction:column}
     }
+
+    .info-panel-top{margin-top:14px}
+    .collapse-body{margin-top:14px;display:grid;gap:18px}
 </style>
 
 <div class="personnel-shell bys-premium-page">
-    {{ premium_context_banner(
-        title='Merkezi personel havuzu',
-        text='Kurumdaki tüm personel kayıtları burada merkezi olarak yönetilir. Performans, eğitim, randevu ve iletişim ekranları bu veri yapısından beslenir; o yüzden arama, filtre ve toplu işlem dili burada daha görünür hale getirildi.',
-        kicker='Kurumsal personel omurgası',
-        icon='fa-solid fa-users-gear',
-        badges=[
-            {'icon':'fa-solid fa-user-group','text': (stats.total_count or 0) ~ ' toplam personel', 'tone':'soft-red'},
-            {'icon':'fa-solid fa-user-check','text': (stats.active_count or 0) ~ ' aktif kayıt', 'tone':'soft-green'},
-            {'icon':'fa-solid fa-sitemap','text': (stats.unit_count or 0) ~ ' bağlı birim', 'tone':'soft-blue'}
-        ],
-        side_title='Bugünkü görünüm',
-        side_text=(stats.filtered_count or 0) ~ ' kayıt görünür durumda. Filtreler daralsa bile toplu işlemler ve yeni kayıt aksiyonları aynı yerde kalır; göz tekrar aramaz.'
-    ) }}
-
-    <div class="bys-metric-grid" style="grid-template-columns:repeat(5,minmax(0,1fr));">
-        {{ premium_metric_card('Toplam Personel', stats.total_count or 0, 'fa-solid fa-users') }}
-        {{ premium_metric_card('Aktif Personel', stats.active_count or 0, 'fa-solid fa-user-check', tone='success') }}
-        {{ premium_metric_card('Pasif Personel', stats.passive_count or 0, 'fa-solid fa-user-slash', tone='warning') }}
-        {{ premium_metric_card('Birim Sayısı', stats.unit_count or 0, 'fa-solid fa-sitemap', tone='info') }}
-        {{ premium_metric_card('Filtre Sonucu', stats.filtered_count or 0, 'fa-solid fa-filter') }}
-    </div>
-
-    {% if ai_personnel_list_panel %}
-    <div class="glass-card panel-card ai-panel">
-        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_list_panel.badge or 'AI veri kalite özeti' }}</div>
-        <h4 class="ai-headline">{{ ai_personnel_list_panel.headline }}</h4>
-        <p class="ai-summary">{{ ai_personnel_list_panel.summary }}</p>
-        <ul class="ai-bullets">
-            {% for item in ai_personnel_list_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
-        </ul>
-        <div class="ai-actions">
-            {% for row in ai_personnel_list_panel.actions or [] %}
-                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
-            {% endfor %}
-            {% for row in ai_personnel_list_panel.spotlight or [] %}
-                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
-            {% endfor %}
-        </div>
-    </div>
-    {% endif %}
-
-    {% if ai_personnel_density_panel %}
-    <div class="glass-card panel-card ai-panel" style="margin-top:-4px;">
-        <div class="ai-kicker"><i class="fa-solid fa-chart-column"></i> {{ ai_personnel_density_panel.badge or 'AI yoğunluk özeti' }}</div>
-        <h4 class="ai-headline">{{ ai_personnel_density_panel.headline }}</h4>
-        <p class="ai-summary">{{ ai_personnel_density_panel.summary }}</p>
-        <ul class="ai-bullets">
-            {% for item in ai_personnel_density_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
-        </ul>
-        <div class="ai-actions">
-            {% for row in ai_personnel_density_panel.actions or [] %}
-                <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
-            {% endfor %}
-        </div>
-        <div class="table-responsive" style="margin-top:14px;">
-            <table class="table table-borderless align-middle mb-0">
-                <thead>
-                    <tr>
-                        <th style="width:50%;">Birim yoğunluğu</th>
-                        <th style="width:50%;">Rol yoğunluğu</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set max_rows = [ai_personnel_density_panel.unit_density|length, ai_personnel_density_panel.role_density|length]|max %}
-                    {% for i in range(max_rows) %}
-                    {% set unit_row = ai_personnel_density_panel.unit_density[i] if i < (ai_personnel_density_panel.unit_density|length) else None %}
-                    {% set role_row = ai_personnel_density_panel.role_density[i] if i < (ai_personnel_density_panel.role_density|length) else None %}
-                    <tr>
-                        <td>
-                            {% if unit_row %}
-                            <div style="font-weight:800;color:#111827;">{{ unit_row.label }}</div>
-                            <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
-                                <div style="height:100%;width:{{ unit_row.share }}%;background:linear-gradient(90deg,#8B0000,rgba(139,0,0,.45));"></div>
-                            </div>
-                            <div style="font-size:.82rem;color:#6b7280;">{{ unit_row.value }} kişi · %{{ '%.1f'|format(unit_row.share) }}</div>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if role_row %}
-                            <div style="font-weight:800;color:#111827;">{{ role_row.label }}</div>
-                            <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
-                                <div style="height:100%;width:{{ role_row.share }}%;background:linear-gradient(90deg,#111827,rgba(17,24,39,.35));"></div>
-                            </div>
-                            <div style="font-size:.82rem;color:#6b7280;">{{ role_row.value }} kişi · %{{ '%.1f'|format(role_row.share) }}</div>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
-    {% endif %}
-
     {% call premium_action_shell('Filtre ve hızlı aksiyonlar', 'Personel yönetimi ekranındaki ana arama, filtre ve yeni kayıt aksiyonları burada tek hatta toplandı. Excel yükleme ve örnek şablon da aynı blokta duruyor.', 'fa-solid fa-sliders') %}
         <form method="GET" action="{{ url_for('main.personnel_list') }}">
             <div class="toolbar-grid">
@@ -705,6 +614,109 @@ Tüm modülleri besleyen merkezi personel havuzu. Kayıtları arayın, filtreley
             </div>
     {% endif %}
         {% endcall %}
+    </div>
+
+    <div class="glass-card panel-card info-panel-top">
+        <button class="btn-soft secondary" type="button" data-bs-toggle="collapse" data-bs-target="#personnelInfoPanel" aria-expanded="false" aria-controls="personnelInfoPanel">
+            <i class="fa-solid fa-circle-info"></i> Bilgilendirme
+        </button>
+        <div class="collapse" id="personnelInfoPanel">
+            <div class="collapse-body">
+                {{ premium_context_banner(
+                    title='Merkezi personel havuzu',
+                    text='Kurumdaki tüm personel kayıtları burada merkezi olarak yönetilir. Performans, eğitim, randevu ve iletişim ekranları bu veri yapısından beslenir; o yüzden arama, filtre ve toplu işlem dili burada daha görünür hale getirildi.',
+                    kicker='Kurumsal personel omurgası',
+                    icon='fa-solid fa-users-gear',
+                    badges=[
+                        {'icon':'fa-solid fa-user-group','text': (stats.total_count or 0) ~ ' toplam personel', 'tone':'soft-red'},
+                        {'icon':'fa-solid fa-user-check','text': (stats.active_count or 0) ~ ' aktif kayıt', 'tone':'soft-green'},
+                        {'icon':'fa-solid fa-sitemap','text': (stats.unit_count or 0) ~ ' bağlı birim', 'tone':'soft-blue'}
+                    ],
+                    side_title='Bugünkü görünüm',
+                    side_text=(stats.filtered_count or 0) ~ ' kayıt görünür durumda. Filtreler daralsa bile toplu işlemler ve yeni kayıt aksiyonları aynı yerde kalır; göz tekrar aramaz.'
+                ) }}
+
+                <div class="bys-metric-grid" style="grid-template-columns:repeat(5,minmax(0,1fr));">
+                    {{ premium_metric_card('Toplam Personel', stats.total_count or 0, 'fa-solid fa-users') }}
+                    {{ premium_metric_card('Aktif Personel', stats.active_count or 0, 'fa-solid fa-user-check', tone='success') }}
+                    {{ premium_metric_card('Pasif Personel', stats.passive_count or 0, 'fa-solid fa-user-slash', tone='warning') }}
+                    {{ premium_metric_card('Birim Sayısı', stats.unit_count or 0, 'fa-solid fa-sitemap', tone='info') }}
+                    {{ premium_metric_card('Filtre Sonucu', stats.filtered_count or 0, 'fa-solid fa-filter') }}
+                </div>
+
+                {% if ai_personnel_list_panel %}
+                <div class="glass-card panel-card ai-panel">
+                    <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_personnel_list_panel.badge or 'AI veri kalite özeti' }}</div>
+                    <h4 class="ai-headline">{{ ai_personnel_list_panel.headline }}</h4>
+                    <p class="ai-summary">{{ ai_personnel_list_panel.summary }}</p>
+                    <ul class="ai-bullets">
+                        {% for item in ai_personnel_list_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+                    </ul>
+                    <div class="ai-actions">
+                        {% for row in ai_personnel_list_panel.actions or [] %}
+                            <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+                        {% endfor %}
+                        {% for row in ai_personnel_list_panel.spotlight or [] %}
+                            <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if ai_personnel_density_panel %}
+                <div class="glass-card panel-card ai-panel" style="margin-top:-4px;">
+                    <div class="ai-kicker"><i class="fa-solid fa-chart-column"></i> {{ ai_personnel_density_panel.badge or 'AI yoğunluk özeti' }}</div>
+                    <h4 class="ai-headline">{{ ai_personnel_density_panel.headline }}</h4>
+                    <p class="ai-summary">{{ ai_personnel_density_panel.summary }}</p>
+                    <ul class="ai-bullets">
+                        {% for item in ai_personnel_density_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+                    </ul>
+                    <div class="ai-actions">
+                        {% for row in ai_personnel_density_panel.actions or [] %}
+                            <span class="ai-chip"><strong>{{ row.label }}:</strong> {{ row.value }}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="table-responsive" style="margin-top:14px;">
+                        <table class="table table-borderless align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th style="width:50%;">Birim yoğunluğu</th>
+                                    <th style="width:50%;">Rol yoğunluğu</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% set max_rows = [ai_personnel_density_panel.unit_density|length, ai_personnel_density_panel.role_density|length]|max %}
+                                {% for i in range(max_rows) %}
+                                {% set unit_row = ai_personnel_density_panel.unit_density[i] if i < (ai_personnel_density_panel.unit_density|length) else None %}
+                                {% set role_row = ai_personnel_density_panel.role_density[i] if i < (ai_personnel_density_panel.role_density|length) else None %}
+                                <tr>
+                                    <td>
+                                        {% if unit_row %}
+                                        <div style="font-weight:800;color:#111827;">{{ unit_row.label }}</div>
+                                        <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
+                                            <div style="height:100%;width:{{ unit_row.share }}%;background:linear-gradient(90deg,#8B0000,rgba(139,0,0,.45));"></div>
+                                        </div>
+                                        <div style="font-size:.82rem;color:#6b7280;">{{ unit_row.value }} kişi · %{{ '%.1f'|format(unit_row.share) }}</div>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if role_row %}
+                                        <div style="font-weight:800;color:#111827;">{{ role_row.label }}</div>
+                                        <div style="height:8px;border-radius:999px;background:rgba(15,23,42,.08);overflow:hidden;margin:8px 0 6px;">
+                                            <div style="height:100%;width:{{ role_row.share }}%;background:linear-gradient(90deg,#111827,rgba(17,24,39,.35));"></div>
+                                        </div>
+                                        <div style="font-size:.82rem;color:#6b7280;">{{ role_row.value }} kişi · %{{ '%.1f'|format(role_row.share) }}</div>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
