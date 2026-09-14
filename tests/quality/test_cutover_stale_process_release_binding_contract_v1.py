@@ -137,6 +137,30 @@ def _dot_source_prefix() -> str:
         platformda sadakatle uretilemeyecegini acikca belgeleyerek
         OwningProcess=$null donen uyumlu bir sekil doner -- bu dal, su an
         aktif (skip edilmemis) hicbir testte tetiklenmez.
+        BYS360 DEFECT (third-layer harness portability, Linux-only): dinleyici
+        yokken Windows'ta loopback yaniti sessizce zaman asimina ugrar (bu
+        shim'in Wait(200)-> $false dalini tetikler), ama Linux'ta ayni durum
+        neredeyse aninda TCP RST / "Connection refused" ile SONUCLANIR --
+        ConnectAsync'in Task'i, 200ms zaman asimi dolmadan once Faulted
+        durumuna gecer. .NET'in kendi Task.Wait(ms) sozlesmesi geregi, bir
+        Faulted Task uzerinde Wait cagirmak $false DONDURMEZ, AggregateException
+        FIRLATIR (dogrudan yerel olarak kanitlandi: zorla Faulted edilmis bir
+        Task uzerinde Wait(200), Task.Status=Faulted iken MethodInvocationException
+        icinde sarili gercek bir System.AggregateException firlatiyor). Bu shim'in
+        eski hali yalnizca try/finally icindeydi (catch yoktu), bu yuzden bu
+        AggregateException hicbir yerde yakalanmadan scriptblock'un disina
+        sizip cagirani (Get-ListeningProcessOnPort -> Test-ProcessBinding)
+        cokertiyordu -- tam olarak "PROBING_PORT olarak nothing-is-listening"
+        senaryosunun Linux'taki gercek davranisi, ve tam olarak remote'ta
+        gorulen "One or more errors occurred. (Connection refused)" hatasi.
+        Asagidaki ic try/catch, YALNIZCA bu beklenen AggregateException'i
+        NO_LISTENER anlamina gelecek sekilde $null'a cevirir (timeout dali ile
+        ayni anlam); ConnectAsync'in tek govdesi bir baglanti denemesi
+        oldugundan, bu Task'ten firlayabilecek her fault zaten aglar/soket
+        kaynaklidir -- baska hicbir kod yolu bu Task icinde calismaz. Gercekten
+        beklenmeyen (network-disi) hatalar bu catch bloguna hic girmez, cunku
+        yalnizca Wait() cagrisini sarmalar; digerleri (ornegin disposal
+        hatalari) disaridaki try/finally'e degismeden ulasir.
       - curl.exe shim'i saf bir yonlendiricidir (${function:curl.exe} = {
         & curl @args }); gercek curl'e TUM argumanlari degistirmeden iletir,
         hicbir HTTP yaniti uydurmaz -- testler yine gercek, tek kullanimlik
@@ -166,10 +190,18 @@ if (-not (Get-Command Get-NetTCPConnection -ErrorAction SilentlyContinue)) {
         try {
             $client = New-Object System.Net.Sockets.TcpClient
             $connectTask = $client.ConnectAsync('127.0.0.1', $LocalPort)
-            if ($connectTask.Wait(200) -and $client.Connected) {
-                return [PSCustomObject]@{ LocalPort = $LocalPort; State = 'Listen'; OwningProcess = $null }
+            try {
+                if ($connectTask.Wait(200) -and $client.Connected) {
+                    return [PSCustomObject]@{ LocalPort = $LocalPort; State = 'Listen'; OwningProcess = $null }
+                }
+                return $null
+            } catch [System.AggregateException] {
+                # ConnectAsync's Task faulted (e.g. immediate ECONNREFUSED on
+                # Linux) before the 200ms timeout elapsed -- Task.Wait(ms)
+                # throws in that case rather than returning $false. Same
+                # meaning as the timeout branch above: nothing is listening.
+                return $null
             }
-            return $null
         } finally {
             if ($client) { $client.Dispose() }
         }
