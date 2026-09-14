@@ -1,15 +1,25 @@
 name: BYS360 Step2 First Error Diagnostic
 
-# TEMPORARY, MANUAL-ONLY diagnostic workflow. Not part of the final CI gate
+# TEMPORARY diagnostic workflow. Not part of the final CI gate
 # (.github/workflows/bys360-ci.yml, untouched by this file). Purpose: run the
 # exact same GitHub Linux environment and exact same canonical Step2 test
 # selection as the real quality-gate job, but stop at the FIRST real pytest
 # error/failure with a full traceback (-x -vv --tb=long), instead of running
 # to completion or to the 45-minute job timeout. Base source SHA for this
 # diagnostic branch: abae58faf134d7dfb82debeeef44e7a7a8ec81bf.
+#
+# This workflow file lives only on diag-step2-linux-first-error-abae58fa, so
+# workflow_dispatch alone does not make it appear as a manually runnable
+# workflow in the Actions UI (GitHub only lists workflow_dispatch-triggerable
+# workflows that exist on the repository's default branch). The push trigger
+# below is scoped to this exact diagnostic branch name only, so pushing it
+# runs this workflow automatically without broadening to any other branch.
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - diag-step2-linux-first-error-abae58fa
 
 jobs:
   step2-first-error-diagnostic:
