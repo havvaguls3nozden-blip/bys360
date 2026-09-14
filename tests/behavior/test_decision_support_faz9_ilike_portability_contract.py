@@ -18,12 +18,14 @@ for the first time.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_am"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_am")
 
 
 def _make_app(monkeypatch: pytest.MonkeyPatch):

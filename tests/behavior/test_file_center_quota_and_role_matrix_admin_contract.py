@@ -83,12 +83,14 @@ create_or_update_quota_policy/deactivate_quota_policy bodies.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent3_filecenter"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent3_filecenter")
 
 DEFAULT_PASSWORD = "FileCenterQuotaRoleTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "file-center-quota-role-first-login-test-pw"

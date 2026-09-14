@@ -33,13 +33,15 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import tempfile
 import uuid
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_am"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_am")
 _MIGRATION_FILE = (
     r"C:\bys360\worktrees\phase5-critical-lint-clean\migrations\versions"
     r"\6f2b8c4d1a90_adopt_workflow_president_approval_schema.py"

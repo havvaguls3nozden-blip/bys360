@@ -46,7 +46,9 @@ below (BYS360 DEFECT AR).
 """
 from __future__ import annotations
 
+import tempfile
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -92,7 +94,7 @@ def _import_low_score_symbols() -> None:
 # running against this same module concurrently.
 # ---------------------------------------------------------------------------
 
-_PHASE5_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent1_workflow"
+_PHASE5_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent1_workflow")
 _user_counter = 0
 
 

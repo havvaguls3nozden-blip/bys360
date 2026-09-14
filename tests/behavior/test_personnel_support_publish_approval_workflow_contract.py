@@ -69,8 +69,10 @@ below for the corrected, locked-in behavior.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
 from datetime import date
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -78,7 +80,7 @@ import pytest
 from sqlalchemy import text
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_wave5_agent1_pspaw"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_wave5_agent1_pspaw")
 
 _APPROVAL_TABLE = "performance_personnel_support_publish_approvals"
 

@@ -31,12 +31,14 @@ with any other wave/agent/test file running concurrently.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_t_go_live"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_t_go_live")
 
 DEFAULT_PASSWORD = "DefectTGoLiveTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "defect-t-go-live-first-login-test-pw"

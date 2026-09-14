@@ -37,12 +37,14 @@ wave/agent/test file running concurrently.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_qr_final_q"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_qr_final_q")
 
 DEFAULT_PASSWORD = "QrFinalQRestoreGuardTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "qr-final-q-first-login-test-pw"

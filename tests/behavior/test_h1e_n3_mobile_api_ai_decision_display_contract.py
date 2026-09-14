@@ -72,12 +72,14 @@ no state with any other wave/agent running concurrently in this worktree.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_h1e_n3"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_h1e_n3")
 
 _PASSWORD = "H1EN3MobileAiContractTest1!"
 _FIRST_LOGIN_PASSWORD = "h1e-n3-first-login-test-pw"

@@ -107,14 +107,16 @@ from __future__ import annotations
 
 import logging
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
 _SENTINEL = "TECHNICAL_SENTINEL_DO_NOT_SHOW_9F3A"
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_h1f_mobile"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_h1f_mobile")
 
 _PASSWORD = "H1FMobileLeakContractTest1!"
 _FIRST_LOGIN_PASSWORD = "h1f-mobile-first-login-test-pw"

@@ -24,8 +24,10 @@ keeps this file's DB state isolated from that one.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -82,7 +84,7 @@ def _import_symbols() -> None:
     process_engine_phase4_flow = _process_engine_phase4_flow
 
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_ap"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_ap")
 _user_counter = 0
 
 

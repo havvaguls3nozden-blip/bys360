@@ -76,8 +76,10 @@ instructed and all pass against real, unmodified production code.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
 from datetime import datetime, timedelta
+from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
@@ -530,7 +532,7 @@ def test_build_search_clause_nonempty_search_exact_fragment(monkeypatch: pytest.
 # table_exists, column_exists, _flow_base_rows, synchronize_phase8_tracking.
 # ===========================================================================
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent3_phase8tracking"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent3_phase8tracking")
 
 # Columns the production ORM model (app/models/performance_process_engine_models.py)
 # does not declare, but which the phase4/phase6/phase7/phase8 raw-SQL schema

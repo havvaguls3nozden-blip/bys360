@@ -69,14 +69,16 @@ from __future__ import annotations
 import hashlib
 import io
 import os
+import tempfile
 import uuid
 from datetime import timedelta
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 from werkzeug.security import generate_password_hash
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent2_filecenter"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent2_filecenter")
 _RUN_ID = uuid.uuid4().hex
 _TMP_STORAGE_ROOT = os.path.join(_TMP_DB_DIR, f"storage_{_RUN_ID}")
 

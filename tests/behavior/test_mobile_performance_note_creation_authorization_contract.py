@@ -44,12 +44,14 @@ wave/agent running concurrently.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_secfix_n"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_secfix_n")
 
 DEFAULT_PASSWORD = "SecFixNContractTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "secfix-n-first-login-test-pw"

@@ -36,12 +36,14 @@ from __future__ import annotations
 
 import datetime
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_secfix_p"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_secfix_p")
 
 DEFAULT_PASSWORD = "SecFixPContractTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "secfix-p-first-login-test-pw"

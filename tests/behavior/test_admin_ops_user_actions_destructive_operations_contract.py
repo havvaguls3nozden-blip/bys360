@@ -86,12 +86,14 @@ from __future__ import annotations
 
 import io
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent_adminops"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent_adminops")
 _TMP_PHOTO_DIR = os.path.join(_TMP_DB_DIR, "photos")
 
 DEFAULT_PASSWORD = "AdminOpsDestructiveTest1!"

@@ -51,7 +51,9 @@ because its purpose is exercising ONLY the five AB call sites in isolation
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
@@ -62,7 +64,7 @@ from app.services.performance.process_engine_phase8_tracking import (
     _steps_for_flows,
 )
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_ab"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_ab")
 
 
 def _make_app(monkeypatch: pytest.MonkeyPatch):

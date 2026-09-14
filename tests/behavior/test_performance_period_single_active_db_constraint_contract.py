@@ -28,6 +28,7 @@ from __future__ import annotations
 
 import importlib.util
 import os
+import tempfile
 import uuid
 from datetime import date
 from pathlib import Path
@@ -38,7 +39,7 @@ import sqlalchemy as sa
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_ad"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_ad")
 
 _MIGRATION_PATH = (
     Path(__file__).resolve().parents[2]

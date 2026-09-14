@@ -63,12 +63,14 @@ wave/agent running concurrently.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_wave6_agent3"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_wave6_agent3")
 
 DEFAULT_PASSWORD = "Wave6Agent3TaskMgmtTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "wave6-agent3-first-login-test-pw"

@@ -79,7 +79,9 @@ the real ``default_role.permissions`` dict is genuinely consulted.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -115,7 +117,7 @@ from app.file_center.permissions import (
     update_role_matrix_from_form,
 )
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_wave5_agent2_fcperm"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_wave5_agent2_fcperm")
 
 # All can_* wrapper functions paired with the underlying PERMISSION_FIELDS
 # key they read, in the exact order declared in permissions.py.

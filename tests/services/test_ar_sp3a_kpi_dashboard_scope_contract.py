@@ -17,7 +17,9 @@ table eventually gets built.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
@@ -35,7 +37,7 @@ def _make_app(monkeypatch: pytest.MonkeyPatch):
     monkeypatch.setenv("MAIL_SUPPRESS_SEND", "true")
     monkeypatch.setenv("SCHEDULER_ENABLED", "false")
 
-    tmp_dir = r"C:\bys360_pytest_tmp_defect_ar_sp3a"
+    tmp_dir = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_ar_sp3a")
     os.makedirs(tmp_dir, exist_ok=True)
     db_path = os.path.join(tmp_dir, f"defect_ar_sp3a_{uuid.uuid4().hex}.sqlite3")
     db_uri = "sqlite:///" + db_path.replace("\\", "/")

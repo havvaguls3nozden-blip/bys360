@@ -40,7 +40,9 @@ own internals (including a separate, already-tracked production defect in its
 """
 from __future__ import annotations
 
+import tempfile
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -96,7 +98,7 @@ def _import_symbols() -> None:
 # with any other wave/agent running concurrently against this worktree.
 # ---------------------------------------------------------------------------
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent_evalworkspace"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent_evalworkspace")
 _user_counter = 0
 
 

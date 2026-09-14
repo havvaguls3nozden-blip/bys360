@@ -1,6 +1,8 @@
 ﻿from __future__ import annotations
 
+import tempfile
 from datetime import date
+from pathlib import Path
 from types import SimpleNamespace
 from typing import cast
 
@@ -280,7 +282,7 @@ def test_phase4t_auto_transition_shortcuts_with_process_resolution_patched(monke
 # ---------------------------------------------------------------------------
 
 _phase5_user_counter = 0
-_PHASE5_TMP_DB_DIR = r"C:\bys360_pytest_tmp_agent2"
+_PHASE5_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_agent2")
 
 
 def _phase5_make_app(monkeypatch: pytest.MonkeyPatch):

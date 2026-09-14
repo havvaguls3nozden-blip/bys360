@@ -63,12 +63,14 @@ so it shares no state with any other wave/agent running concurrently.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_wave7_agent1"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_wave7_agent1")
 
 DEFAULT_PASSWORD = "Wave7Agent1SurveyAdminTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "wave7-agent1-first-login-test-pw"

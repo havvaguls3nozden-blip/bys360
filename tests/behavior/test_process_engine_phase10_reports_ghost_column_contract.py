@@ -19,13 +19,15 @@ Phase6/Phase8 contracts in this same wave do.
 from __future__ import annotations
 
 import os
+import tempfile
 import uuid
 from decimal import Decimal
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_defect_an"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_defect_an")
 
 
 def _make_app(monkeypatch: pytest.MonkeyPatch):

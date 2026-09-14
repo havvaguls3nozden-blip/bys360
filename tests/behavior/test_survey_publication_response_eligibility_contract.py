@@ -72,12 +72,14 @@ from __future__ import annotations
 
 import datetime as _dt
 import os
+import tempfile
 import uuid
+from pathlib import Path
 
 import pytest
 from sqlalchemy.pool import StaticPool
 
-_TMP_DB_DIR = r"C:\bys360_pytest_tmp_wave6_agent2"
+_TMP_DB_DIR = str(Path(tempfile.gettempdir()) / "bys360_pytest_tmp_wave6_agent2")
 
 DEFAULT_PASSWORD = "Wave6Agent2SurveyTest1!"
 DEFAULT_FIRST_LOGIN_PASSWORD = "wave6-agent2-first-login-test-pw"
