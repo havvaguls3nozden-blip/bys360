@@ -1,0 +1,109 @@
+name: BYS360 Step2 First Error Diagnostic
+
+# TEMPORARY diagnostic workflow. Not part of the final CI gate
+# (.github/workflows/bys360-ci.yml, untouched by this file). Purpose: run the
+# exact same GitHub Linux environment and exact same canonical Step2 test
+# selection as the real quality-gate job, but stop at the FIRST real pytest
+# error/failure with a full traceback (-x -vv --tb=long), instead of running
+# to completion or to the 45-minute job timeout. Base source SHA for this
+# diagnostic branch: e88e438f2b8187dec762e92fa03eb7e74a0aa83d (the 59-file
+# Step2 SQLite Linux-portability remediation, parent
+# abae58faf134d7dfb82debeeef44e7a7a8ec81bf -- itself the source of the first
+# Linux Step2 failure this diagnostic previously proved, at
+# tests/services/test_ai_decision_table_exists_schema_introspection_contract.py).
+#
+# This workflow file lives only on this diagnostic branch, so
+# workflow_dispatch alone does not make it appear as a manually runnable
+# workflow in the Actions UI (GitHub only lists workflow_dispatch-triggerable
+# workflows that exist on the repository's default branch). The push trigger
+# below is scoped to this exact diagnostic branch name only, so pushing it
+# runs this workflow automatically without broadening to any other branch.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - diag-step2-post-sqlite-fix-e88e438f
+
+jobs:
+  step2-first-error-diagnostic:
+    runs-on: ubuntu-latest
+    # Diagnostic-only timeout. Does not apply to, and is not authorization to
+    # change, the real quality-gate job's timeout-minutes: 45.
+    timeout-minutes: 60
+
+    # Same PostgreSQL 15 service/container definition and health options as
+    # the real quality-gate job, so the environment is comparable even though
+    # no step in this diagnostic workflow explicitly connects to it before
+    # Step2 (matching the real job's own step order, where the disposable
+    # migration-test database and migration-integrity gate both run after
+    # Step2).
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: bys360_ci_test_only_password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install -r requirements.txt
+          python -m pip install -r requirements-dev.txt
+
+      - name: Source identity proof (diagnostic workflow file is the only allowed delta)
+        run: |
+          echo "BASE_REMEDIATION_SOURCE_SHA=e88e438f2b8187dec762e92fa03eb7e74a0aa83d"
+          git diff --name-only e88e438f2b8187dec762e92fa03eb7e74a0aa83d..HEAD | tee /tmp/diag_delta.txt
+          UNEXPECTED=$(grep -vxF ".github/workflows/bys360-step2-first-error-diagnostic.yml" /tmp/diag_delta.txt || true)
+          if [ -n "$UNEXPECTED" ]; then
+            echo "UNEXPECTED SOURCE DELTA DETECTED (beyond the diagnostic workflow file itself):"
+            echo "$UNEXPECTED"
+            exit 1
+          fi
+          echo "DIAGNOSTIC_NON_WORKFLOW_DELTA_COUNT=0 (excluding the diagnostic workflow file itself)"
+
+      # Exact canonical Step1 command from bys360-ci.yml, unmodified. If this
+      # fails, the job stops here (default GitHub Actions step-failure
+      # behavior) and the diagnostic Step2 below never runs.
+      - name: Run quality tests (Step1, required before diagnostic Step2)
+        run: python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report= --cov-fail-under=0 --tb=short -q
+
+      # Exact canonical Step2 test selection from bys360-ci.yml, same
+      # coverage flags, with reporting/runtime flags changed ONLY for
+      # diagnosis: -x -vv --tb=long instead of --tb=short -q, so the run
+      # stops at the first real error/failure and prints its full traceback
+      # immediately, rather than continuing for ~45 minutes.
+      - name: Run integration and architecture tests (Step2, fail-fast diagnostic)
+        run: |
+          mkdir -p reports/quality
+          set -o pipefail
+          python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/release tests/communication tests/behavior tests/mobile tests/performance tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_contract.py tests/test_10_10_core_static_gate.py tests/test_ai_analysis_excel_preview_static.py tests/test_ai_executive_report_static.py tests/test_ai_recommendation_priority_static.py tests/test_ai_routes.py tests/test_claude_phase5_function_signatures.py tests/test_claude_phase5_template_compilation.py tests/test_compat_redirects.py tests/test_datetime_utils.py tests/test_error_support.py tests/test_feedback_admin_endpoint_static.py tests/test_feedback_privacy_static.py tests/test_feedback_pulse_admin_tab_static.py tests/test_feedback_pulse_menu_visibility_static.py tests/test_feedback_pulse_privacy_behavior.py tests/test_hr_reports_template_no_unpack_static.py tests/test_live_scope_and_security_static.py tests/test_module_maturity_scoring.py tests/test_no_admin_org_units_duplicate_static.py tests/test_no_duplicate_admin_org_units_static.py tests/test_performance_archive_visibility_contract.py tests/test_performance_chain_constitution.py tests/test_performance_form_guard.py tests/test_performance_ops_center.py tests/test_performance_preflight.py tests/test_performance_publish_guard.py tests/test_performance_publish_preflight_static.py tests/test_performance_publish_preflight_rules_behavior.py tests/test_personel_analizi_dalga7_static.py tests/test_score100_handover_docs_contract_v1.py tests/test_shared_cache_store_behavior.py tests/test_sp_routes_smoke.py tests/test_team_compare_publish_visibility.py tests/test_team_compare_service.py --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 -x -vv --tb=long 2>&1 | tee reports/quality/step2_first_error_diagnostic.log
+
+      - name: Upload diagnostic log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bys360-step2-first-error-diagnostic
+          path: reports/quality/step2_first_error_diagnostic.log
+          if-no-files-found: ignore
