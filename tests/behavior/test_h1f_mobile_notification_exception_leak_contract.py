@@ -231,6 +231,7 @@ def _auth_headers(app, user_id):
 
     with app.app_context():
         user = db.session.get(User, user_id)
+        assert user is not None
         token = _issue_token(user)
         return {"Authorization": f"Bearer {token}"}
 
@@ -449,6 +450,7 @@ def test_communication_v2_send_message_legacy_function_has_no_warning_key_or_sen
         db.session.commit()
         thread_id = thread.id
         user = db.session.get(User, user_id)
+        assert user is not None
 
         def _raise_on_flush():
             raise Exception(_SENTINEL)
@@ -483,6 +485,7 @@ def test_communication_v2_create_thread_legacy_function_has_no_warning_key_or_se
 
     with app.app_context():
         user = db.session.get(User, user_id)
+        assert user is not None
 
         def _raise_on_flush():
             raise Exception(_SENTINEL)

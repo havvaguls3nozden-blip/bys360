@@ -302,6 +302,8 @@ def test_stored_retention_scope_and_health_status_are_unchanged_by_rendering(app
     with app.app_context():
         policy = db.session.get(CommunicationRetentionPolicy, policy_id)
         health = db.session.get(CommunicationOperationHealth, health_id)
+        assert policy is not None
+        assert health is not None
         assert policy.data_scope == "future_scope_v9"
         assert health.status == "future_status_v9"
 

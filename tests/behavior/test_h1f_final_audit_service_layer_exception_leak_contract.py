@@ -237,9 +237,9 @@ def test_delete_president_approval_record_db_failure_never_leaks_raw_exception(a
 def test_ai_client_stub_fallback_never_appends_raw_exception_to_response_text(app, caplog) -> None:
     from urllib.error import URLError
 
-    from app.services.ai.client import _WrappedClient
+    from app.services.ai.client import BaseAIClient, _WrappedClient
 
-    class _FailingInner:
+    class _FailingInner(BaseAIClient):
         def generate(self, *, system_prompt, user_prompt, prompt_version=None):
             raise URLError(_SENTINEL)
 

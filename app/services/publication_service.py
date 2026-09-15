@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import re
 import uuid
+from types import ModuleType
 
 from app.core.datetime_utils import utc_now
 
 try:
+    pymupdf: ModuleType | None
     import pymupdf
 except Exception:  # pragma: no cover
     pymupdf = None

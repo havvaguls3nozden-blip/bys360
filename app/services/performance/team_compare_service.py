@@ -92,7 +92,7 @@ def score_band(value: float) -> str:
     return "mid"
 
 
-def status_view(status_value: str, *, status_options: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+def status_view(status_value: str | None, *, status_options: list[tuple[str, str]] | None = None) -> tuple[str, str]:
     status_label_map = {value: label for value, label in (status_options or STATUS_OPTIONS)}
     normalized = (status_value or "").strip()
     if normalized == "tamamlandi":

@@ -267,8 +267,13 @@ def test_feedback_request_mail_never_leaks_an_unmapped_status(app) -> None:
         from app.models import FeedbackRequest, User
 
         req = db.session.get(FeedbackRequest, req_id)
-        req.level_1_manager = db.session.get(User, manager_id)
-        req.employee = db.session.get(User, employee_id)
+        assert req is not None
+        manager = db.session.get(User, manager_id)
+        employee = db.session.get(User, employee_id)
+        assert manager is not None
+        assert employee is not None
+        req.level_1_manager = manager
+        req.employee = employee
         original = mail_feedback.send_email
         mail_feedback.send_email = _fake_send_email
         try:
@@ -298,7 +303,10 @@ def test_feedback_response_mail_shows_turkish_for_known_status(app) -> None:
         from app.models import FeedbackRequest, User
 
         req = db.session.get(FeedbackRequest, req_id)
-        req.employee = db.session.get(User, employee_id)
+        assert req is not None
+        employee = db.session.get(User, employee_id)
+        assert employee is not None
+        req.employee = employee
         original = mail_feedback.send_email
         mail_feedback.send_email = _fake_send_email
         try:
@@ -344,13 +352,18 @@ def test_feedback_meeting_status_update_mail_never_leaks_an_unmapped_status(app)
     with app.app_context():
         from app.models import FeedbackMeeting as _FM, User
 
-        meeting = db.session.get(_FM, meeting_id)
-        meeting.employee = db.session.get(User, employee_id)
-        meeting.manager = db.session.get(User, manager_id)
+        fetched_meeting = db.session.get(_FM, meeting_id)
+        assert fetched_meeting is not None
+        meeting_employee = db.session.get(User, employee_id)
+        meeting_manager = db.session.get(User, manager_id)
+        assert meeting_employee is not None
+        assert meeting_manager is not None
+        fetched_meeting.employee = meeting_employee
+        fetched_meeting.manager = meeting_manager
         original = mail_feedback.send_email
         mail_feedback.send_email = _fake_send_email
         try:
-            mail_feedback.send_feedback_meeting_status_update_mail(meeting)
+            mail_feedback.send_feedback_meeting_status_update_mail(fetched_meeting)
         finally:
             mail_feedback.send_email = original
 

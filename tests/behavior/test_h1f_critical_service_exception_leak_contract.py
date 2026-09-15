@@ -103,6 +103,7 @@ from __future__ import annotations
 import uuid
 from pathlib import Path
 from types import SimpleNamespace
+from typing import cast
 
 _SENTINEL = "TECHNICAL_SENTINEL_DO_NOT_SHOW_9F3A"
 
@@ -121,6 +122,7 @@ _SCRATCH_ROOT = Path(__file__).resolve().parents[2] / "reports" / "quality" / "h
 
 def test_file_center_move_file_to_area_failure_sanitizes_audit_message(app, monkeypatch, caplog):
     from app.file_center import services as fc_services
+    from app.models.file_center_models import FileStorageItem
 
     captured: dict[str, object] = {}
 
@@ -142,7 +144,7 @@ def test_file_center_move_file_to_area_failure_sanitizes_audit_message(app, monk
 
     with app.app_context():
         caplog.set_level("ERROR")
-        fc_services._move_file_to_area(item, "quarantine")
+        fc_services._move_file_to_area(cast(FileStorageItem, item), "quarantine")
 
     assert captured.get("action") == "file_security_move_failed"
     message = str(captured.get("message") or "")
@@ -221,8 +223,10 @@ def test_collect_item_payloads_non_numeric_score_shows_safe_turkish_message(app)
 
     assert result is None
     assert len(flashed) == 1
-    assert "could not convert" not in flashed[0].lower()
-    assert flashed[0] == "Puan değeri sayısal olmalıdır."
+    first_message = flashed[0]
+    assert isinstance(first_message, str)
+    assert "could not convert" not in first_message.lower()
+    assert first_message == "Puan değeri sayısal olmalıdır."
 
 
 def test_collect_item_payloads_out_of_range_score_still_uses_fixed_business_message(app):

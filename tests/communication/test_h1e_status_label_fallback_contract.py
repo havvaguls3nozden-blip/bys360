@@ -337,6 +337,7 @@ def test_stored_bulletin_status_and_priority_are_unchanged_by_rendering(app, cli
 
     with app.app_context():
         row = db.session.get(CommunicationBulletin, bulletin_id)
+        assert row is not None
         assert row.status == "future_status_v9"
         assert row.priority == "future_priority_v9"
 

@@ -245,6 +245,7 @@ def _auth_headers(app, user_id):
 
     with app.app_context():
         user = db.session.get(User, user_id)
+        assert user is not None
         token = _issue_token(user)
         return {"Authorization": f"Bearer {token}"}
 
