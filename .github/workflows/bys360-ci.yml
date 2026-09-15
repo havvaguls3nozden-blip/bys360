@@ -15,14 +15,21 @@ jobs:
     # "Run integration and architecture tests" (Step2) at 99% -- 0 test
     # failures, 0 errors, no concurrency/superseding-push mechanism
     # configured in this workflow, and the timing matched timeout-minutes:
-    # 25 almost exactly. Local measurement across many runs this session
-    # (canonical Python 3.12.10): Step1 ~60-65s, Step2 alone ~1570-1700s
-    # (~26-28 min) -- already exceeding the old 25-minute *job* budget
-    # before counting checkout/pip install/Ruff/PostgreSQL/coverage/mypy/
-    # quality9/pip-audit, which run before and after it in the same job.
-    # 45 minutes leaves a real margin (~6-7 min) over that estimate without
-    # being an unbounded/unnecessarily broad budget.
-    timeout-minutes: 45
+    # 25 almost exactly. The budget was then raised to 45 minutes.
+    #
+    # Second remote-CI unblock (2026-09-15): 45 minutes was itself proven
+    # insufficient by the same failure mode recurring -- a real remote run
+    # cancelled by its own timeout-minutes: 45 mid-Step2 (0 test failures,
+    # 0 errors; see tests/architecture/test_postgres_migration_ci_enforcement_contract.py's
+    # test_quality_gate_job_timeout_has_an_evidence_backed_floor for the
+    # regression guard). An isolated GitHub Ubuntu diagnostic run of the
+    # exact canonical Step1+Step2 selection at this branch's SHA measured
+    # Step1 2m48s and Step2 alone 1h04m50s (total job 1h08m50s), after two
+    # Linux-only test-fixture portability defects (hardcoded Windows temp
+    # and repository-worktree paths) were fixed -- the Step2 runtime itself,
+    # not a defect, was the bottleneck. 90 minutes leaves a real margin
+    # (~20 min) over that measured total without being an unbounded budget.
+    timeout-minutes: 90
 
     # TD-032 closure: real PostgreSQL 15 target for the migration-integrity
     # gate below. Disposable, CI-only credentials -- never production
