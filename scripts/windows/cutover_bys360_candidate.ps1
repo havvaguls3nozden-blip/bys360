@@ -342,6 +342,37 @@ function Get-ListeningProcessOnPort {
     }
 }
 
+function Get-CandidateVenvBaseExecutable {
+    <# BYS360 DEFECT Z HOTFIX: Windows venv redirector semantics mean the
+       OS-observed Win32_Process.ExecutablePath for a process launched via
+       <venv>\Scripts\python.exe is the BASE interpreter that venv was
+       created from, not the venv's own launcher path -- confirmed directly
+       against a real production cutover failure (EXECUTABLE_PATH_MISMATCH:
+       Win32_Process reported the base Python312 install under
+       C:\Users\Administrator\...\Python312\python.exe; sys.executable
+       inside the running app correctly showed the venv's own
+       .venv\Scripts\python.exe; sys._base_executable matched the
+       Win32_Process value exactly). Reads the candidate venv's own
+       pyvenv.cfg 'executable' entry -- written once by Python's own venv
+       module at venv-creation time, the same source CPython itself uses to
+       resolve sys._base_executable -- as the ONLY additional trusted path.
+       Never a PATH search, never any other Program Files/AppData
+       python.exe: this is deterministically scoped to THIS SPECIFIC
+       candidate's own venv metadata, shipped as part of the candidate
+       itself. Returns $null (not a guess) if pyvenv.cfg is missing or has
+       no readable 'executable = ' line -- the caller must fail closed on
+       $null, never silently fall back to trusting only the venv launcher
+       path when this signal is unavailable. #>
+    param([Parameter(Mandatory)][string]$VenvRoot)
+    $cfgPath = Join-Path $VenvRoot "pyvenv.cfg"
+    if (-not (Test-Path -LiteralPath $cfgPath)) { return $null }
+    $match = Get-Content -LiteralPath $cfgPath -ErrorAction SilentlyContinue |
+        Select-String -Pattern '^\s*executable\s*=\s*(.+?)\s*$' |
+        Select-Object -First 1
+    if (-not $match) { return $null }
+    return $match.Matches[0].Groups[1].Value
+}
+
 function Test-ProcessBinding {
     <# BYS360 DEFECT Z: proves the process currently listening on $Port is
        (a) our own venv python.exe under the just-promoted $ProjectRoot,
@@ -350,10 +381,20 @@ function Test-ProcessBinding {
        Stop-LiveService check timestamp) -- not a stale/leftover process
        from before cutover. Does NOT and cannot prove WHICH release's code
        is loaded (every promoted version shares the identical path); that
-       is Test-ReleaseIdentityBinding's job. #>
+       is Test-ReleaseIdentityBinding's job.
+
+       BYS360 DEFECT Z HOTFIX: -ExpectedExecutablePath accepts one or more
+       candidate paths (Windows venv redirector semantics mean the genuine
+       process may legitimately show either the venv's own launcher path
+       or that venv's own recorded base interpreter -- see
+       Get-CandidateVenvBaseExecutable -- never a generic python.exe
+       allowlist or PATH-based search). A single string still binds
+       correctly here (PowerShell wraps a scalar into a one-element
+       [string[]] automatically), so this widening is source-compatible
+       with every pre-existing caller. #>
     param(
         [Parameter(Mandatory)][int]$Port,
-        [Parameter(Mandatory)][string]$ExpectedExecutablePath,
+        [Parameter(Mandatory)][string[]]$ExpectedExecutablePath,
         [Parameter(Mandatory)][string]$ExpectedCommandLineFragment,
         [datetime]$NotBeforeUtc
     )
@@ -364,9 +405,9 @@ function Test-ProcessBinding {
     if (-not $binding.ExecutablePath) {
         return [PSCustomObject]@{ Ok = $false; Reason = "EXECUTABLE_PATH_UNRESOLVED"; Binding = $binding }
     }
-    $expectedExeFull = [System.IO.Path]::GetFullPath($ExpectedExecutablePath)
+    $expectedExeFullSet = $ExpectedExecutablePath | Where-Object { $_ } | ForEach-Object { [System.IO.Path]::GetFullPath($_) }
     $actualExeFull = [System.IO.Path]::GetFullPath($binding.ExecutablePath)
-    if ($actualExeFull -ne $expectedExeFull) {
+    if ($expectedExeFullSet -notcontains $actualExeFull) {
         return [PSCustomObject]@{ Ok = $false; Reason = "EXECUTABLE_PATH_MISMATCH"; Binding = $binding }
     }
     if (-not $binding.CommandLine -or ($binding.CommandLine -notlike "*$ExpectedCommandLineFragment*")) {
@@ -1111,7 +1152,19 @@ function Start-LiveService {
     # OUR freshly-started process serving the just-promoted tree -- bind the
     # actual owning PID's executable path / command line / start time.
     $expectedExe = Join-Path $ProjectRoot ".venv\Scripts\python.exe"
-    $processBinding = Test-ProcessBinding -Port $AppPort -ExpectedExecutablePath $expectedExe -ExpectedCommandLineFragment "run_server.py" -NotBeforeUtc $startInvokeUtc
+    # BYS360 DEFECT Z HOTFIX: also accept the candidate venv's own recorded
+    # base interpreter (see Get-CandidateVenvBaseExecutable) -- Windows venv
+    # redirector semantics mean Win32_Process.ExecutablePath legitimately
+    # reports that path, not the venv launcher, for the real promoted
+    # process. Fails closed (not a silent single-path fallback) if the
+    # candidate's own pyvenv.cfg cannot be read.
+    $candidateVenvBaseExe = Get-CandidateVenvBaseExecutable -VenvRoot (Join-Path $ProjectRoot ".venv")
+    if (-not $candidateVenvBaseExe) {
+        $Script:Receipt.SERVICE_RESULT = "FAIL"
+        Invoke-FailClosed -Phase "SERVICE_START_FAILED" -Reason "Could not resolve the candidate venv's own base interpreter from '$(Join-Path $ProjectRoot ".venv\pyvenv.cfg")' (missing file or no 'executable = ' entry). Process binding cannot be safely evaluated without it."
+    }
+    $expectedRunServerPath = Join-Path $ProjectRoot "run_server.py"
+    $processBinding = Test-ProcessBinding -Port $AppPort -ExpectedExecutablePath @($expectedExe, $candidateVenvBaseExe) -ExpectedCommandLineFragment $expectedRunServerPath -NotBeforeUtc $startInvokeUtc
     if (-not $processBinding.Ok) {
         $Script:Receipt.SERVICE_RESULT = "FAIL"
         $Script:Receipt.PROCESS_BINDING = "FAIL:$($processBinding.Reason)"

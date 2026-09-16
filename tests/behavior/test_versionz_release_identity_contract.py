@@ -167,6 +167,35 @@ def test_versionz_from_loopback_caller_still_exposes_release_identity(monkeypatc
     assert body["migration_head"] == "10858a18e9ac"
 
 
+def test_versionz_from_ipv6_loopback_caller_still_exposes_release_identity(monkeypatch, tmp_path: Path):
+    """The IPv6 loopback form (::1) must be recognized exactly like the
+    IPv4 one -- proves the canonical IP-parsing rewrite of the loopback
+    gate didn't narrow acceptance to IPv4 only."""
+    app = _make_app_with_candidate_ready(monkeypatch, tmp_path)
+    response = app.test_client().get("/versionz", environ_overrides={"REMOTE_ADDR": "::1"})
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["source_sha"] == "abc123deadbeef"
+    assert body["migration_head"] == "10858a18e9ac"
+
+
+def test_versionz_from_ipv4_mapped_ipv6_loopback_caller_still_exposes_release_identity(monkeypatch, tmp_path: Path):
+    """BYS360_DEFECT_Z_HOTFIX core proof: a real production cutover's own
+    self-curl to http://127.0.0.1:$AppPort observed its raw socket peer as
+    "::ffff:127.0.0.1" (the IPv4-mapped-IPv6 form a dual-stack Windows
+    socket may legitimately report for a genuine IPv4 loopback connection),
+    which the old literal {"127.0.0.1", "::1"} string-set check did not
+    recognize -- silently forcing source_sha/migration_head to null even
+    though the caller genuinely was loopback, and failing
+    Test-ReleaseIdentityBinding for a correctly-promoted candidate."""
+    app = _make_app_with_candidate_ready(monkeypatch, tmp_path)
+    response = app.test_client().get("/versionz", environ_overrides={"REMOTE_ADDR": "::ffff:127.0.0.1"})
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["source_sha"] == "abc123deadbeef"
+    assert body["migration_head"] == "10858a18e9ac"
+
+
 def test_versionz_from_non_loopback_caller_gets_null_release_identity(monkeypatch, tmp_path: Path):
     """BYS360 DEFECT AF core proof: a caller connecting from a real, non-
     loopback address (simulating any public-internet or LAN caller of the

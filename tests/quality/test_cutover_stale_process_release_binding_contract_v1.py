@@ -372,6 +372,102 @@ Write-Output ("REASON=" + $result.Reason)
         proc.wait(timeout=5)
 
 
+def test_process_binding_accepts_when_actual_executable_matches_the_second_candidate_path(tmp_path: Path) -> None:
+    """BYS360_DEFECT_Z_HOTFIX core proof: -ExpectedExecutablePath now takes
+    one or more candidate paths (Windows venv redirector semantics mean the
+    real Win32_Process.ExecutablePath for a genuine candidate-venv process
+    legitimately equals that venv's own recorded base interpreter, not its
+    launcher path -- see Get-CandidateVenvBaseExecutable). Passes a
+    deliberately WRONG path first and the real one second to prove
+    Test-ProcessBinding accepts a match found anywhere in the set, not only
+    at position 0 -- the actual "OR" semantics the hotfix relies on."""
+    if SYSTEM_PYTHON is None:
+        pytest.skip("No standalone (non-venv) Python install found on this host; array-acceptance test skipped.")
+    port = _free_port()
+    before_spawn_utc_iso = time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime(time.time() - 5))
+    proc = _spawn_listening_process(SYSTEM_PYTHON, port, tmp_path)
+    try:
+        body = _dot_source_prefix() + f"""
+$notBefore = [datetime]::ParseExact('{before_spawn_utc_iso}', 'yyyy-MM-ddTHH:mm:ss', $null)
+$result = Test-ProcessBinding -Port {port} -ExpectedExecutablePath @('C:\\bys360\\project\\.venv\\Scripts\\python.exe', '{SYSTEM_PYTHON}') -ExpectedCommandLineFragment 'listener_{port}.py' -NotBeforeUtc $notBefore
+Write-Output ("OK=" + $result.Ok)
+Write-Output ("REASON=" + $result.Reason)
+"""
+        result = _run_ps_snippet(body)
+        assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+        assert "OK=True" in result.stdout, result.stdout
+        assert "REASON=OK" in result.stdout
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)
+
+
+def test_process_binding_rejects_a_process_referencing_a_different_run_server_path(tmp_path: Path) -> None:
+    """BYS360_DEFECT_Z_HOTFIX: the real cutover call site now passes the
+    candidate's own full run_server.py path (Join-Path $ProjectRoot
+    'run_server.py'), not the bare filename fragment -- a process whose
+    command line references a DIFFERENT run_server.py (e.g. another
+    candidate directory, or a stale/unrelated one) must be rejected, not
+    accepted merely because some run_server.py appears somewhere on the
+    command line."""
+    if SYSTEM_PYTHON is None:
+        pytest.skip("No standalone (non-venv) Python install found on this host; wrong-run_server.py test skipped.")
+    port = _free_port()
+    proc = _spawn_listening_process(SYSTEM_PYTHON, port, tmp_path)
+    try:
+        body = _dot_source_prefix() + f"""
+$result = Test-ProcessBinding -Port {port} -ExpectedExecutablePath '{SYSTEM_PYTHON}' -ExpectedCommandLineFragment 'C:\\bys360\\candidate\\some_other_sha\\run_server.py'
+Write-Output ("OK=" + $result.Ok)
+Write-Output ("REASON=" + $result.Reason)
+"""
+        result = _run_ps_snippet(body)
+        assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+        assert "OK=False" in result.stdout, result.stdout
+        assert "REASON=COMMAND_LINE_MISMATCH" in result.stdout
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)
+
+
+def test_get_candidate_venv_base_executable_reads_pyvenv_cfg(tmp_path: Path) -> None:
+    """BYS360_DEFECT_Z_HOTFIX: proves the new helper reads a venv's own
+    pyvenv.cfg 'executable = ' entry verbatim -- the same field Python's
+    own venv module writes at creation time and CPython itself uses to
+    resolve sys._base_executable."""
+    venv_root = tmp_path / "fake_venv"
+    venv_root.mkdir(parents=True, exist_ok=True)
+    (venv_root / "pyvenv.cfg").write_text(
+        "home = C:\\Some\\Base\\Install\n"
+        "include-system-site-packages = false\n"
+        "version = 3.12.10\n"
+        "executable = C:\\Some\\Base\\Install\\python.exe\n"
+        "command = C:\\Some\\Base\\Install\\python.exe -m venv C:\\fake_venv\n",
+        encoding="utf-8",
+    )
+    body = _dot_source_prefix() + f"""
+$result = Get-CandidateVenvBaseExecutable -VenvRoot '{venv_root}'
+Write-Output ("RESULT=" + $result)
+"""
+    result = _run_ps_snippet(body)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    assert "RESULT=C:\\Some\\Base\\Install\\python.exe" in result.stdout, result.stdout
+
+
+def test_get_candidate_venv_base_executable_returns_null_when_pyvenv_cfg_missing(tmp_path: Path) -> None:
+    """Fail-closed proof: no pyvenv.cfg means no guessed fallback -- the
+    caller (Start-LiveService) must treat $null as a hard stop, never
+    silently trust only the venv launcher path."""
+    venv_root = tmp_path / "no_pyvenv_cfg_here"
+    venv_root.mkdir(parents=True, exist_ok=True)
+    body = _dot_source_prefix() + f"""
+$result = Get-CandidateVenvBaseExecutable -VenvRoot '{venv_root}'
+Write-Output ("IS_NULL=" + ($null -eq $result))
+"""
+    result = _run_ps_snippet(body)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    assert "IS_NULL=True" in result.stdout, result.stdout
+
+
 def test_process_binding_rejects_a_stale_process_that_predates_the_start_invocation(tmp_path: Path) -> None:
     """THE stale-process negative proof required by Defect Z: the correct
     executable, the correct command line -- but it started BEFORE this
@@ -515,6 +611,35 @@ Write-Output ("REASON=" + $result.Reason)
         assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
         assert "OK=False" in result.stdout, result.stdout
         assert "REASON=SOURCE_SHA_MISMATCH" in result.stdout
+    finally:
+        proc.kill()
+        proc.wait(timeout=5)
+
+
+def test_release_identity_binding_rejects_matching_source_sha_but_mismatched_migration_head(tmp_path: Path) -> None:
+    """Closes a coverage gap distinct from the existing wrong-release test
+    (which mismatches both fields at once, so only ever proves
+    SOURCE_SHA_MISMATCH is reached first): a responder whose source_sha is
+    exactly right but whose migration_head is not must still be rejected,
+    with its own distinct reason -- e.g. a candidate whose code was
+    promoted correctly but whose migration never actually reached the
+    expected head."""
+    port = _free_port()
+    proc = _spawn_fake_versionz_readyz_server(port, tmp_path, config={
+        "versionz_body": {"service": "bys360", "source_sha": "cafef00d", "migration_head": "STALE_OLD_HEAD"},
+        "versionz_status": 200,
+        "readyz_body": {}, "readyz_status": 200,
+    })
+    try:
+        body = _dot_source_prefix() + f"""
+$result = Test-ReleaseIdentityBinding -BaseUrl 'http://127.0.0.1:{port}' -HostHeader 'bys360.canakkaletarihialan.gov.tr' -ExpectedSourceSha 'cafef00d' -ExpectedMigrationHead '10858a18e9ac'
+Write-Output ("OK=" + $result.Ok)
+Write-Output ("REASON=" + $result.Reason)
+"""
+        result = _run_ps_snippet(body)
+        assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+        assert "OK=False" in result.stdout, result.stdout
+        assert "REASON=MIGRATION_HEAD_MISMATCH" in result.stdout
     finally:
         proc.kill()
         proc.wait(timeout=5)

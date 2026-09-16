@@ -7,6 +7,8 @@ kayıt importları burada tutuluyor. Büyük gövdeler ilgili handler modülleri
 """
 from __future__ import annotations
 
+import ipaddress
+
 from flask import abort, current_app, jsonify, request, send_from_directory
 from flask_login import current_user, login_required
 
@@ -150,9 +152,6 @@ def _bys360_release_identity() -> dict[str, str | None]:
     }
 
 
-_LOOPBACK_ADDRESSES = {"127.0.0.1", "::1"}
-
-
 def _bys360_request_is_from_loopback() -> bool:
     """BYS360 DEFECT AF: True only for a caller connected directly over the
     raw TCP loopback interface -- e.g. cutover_bys360_candidate.ps1's own
@@ -168,9 +167,31 @@ def _bys360_request_is_from_loopback() -> bool:
     misconfiguration this check must not silently trust) could otherwise
     spoof "X-Forwarded-For: 127.0.0.1" and satisfy a request.remote_addr-
     based check with no actual loopback connection at all. The raw socket
-    peer address cannot be forged by any HTTP header."""
+    peer address cannot be forged by any HTTP header.
+
+    BYS360 DEFECT Z HOTFIX: uses canonical IP parsing (ipaddress.ip_address
+    .is_loopback), not a fixed string set -- a real production cutover's
+    self-curl to http://127.0.0.1:$AppPort observed its own raw peer as the
+    IPv4-mapped-IPv6 form "::ffff:127.0.0.1" (a legitimate representation
+    of a genuine IPv4 loopback connection on a dual-stack Windows socket),
+    which a literal {"127.0.0.1", "::1"} membership check does not
+    recognize, silently forcing source_sha/migration_head to null even for
+    a genuine loopback caller. An IPv4-mapped IPv6 address is unwrapped to its
+    embedded IPv4 form before the loopback check so it is judged by the
+    same rule as a direct IPv4 connection; every other address (public,
+    private/LAN, link-local) is correctly still non-loopback, and a
+    malformed/empty peer value fails closed to False, never raises."""
     raw_peer = request.environ.get("werkzeug.proxy_fix.orig_remote_addr", request.remote_addr)
-    return str(raw_peer or "") in _LOOPBACK_ADDRESSES
+    peer = str(raw_peer or "").strip().split("%", 1)[0]
+    if not peer:
+        return False
+    try:
+        addr = ipaddress.ip_address(peer)
+    except ValueError:
+        return False
+    if isinstance(addr, ipaddress.IPv6Address) and addr.ipv4_mapped is not None:
+        addr = addr.ipv4_mapped
+    return bool(addr.is_loopback)
 
 
 @main_bp.get("/versionz")
