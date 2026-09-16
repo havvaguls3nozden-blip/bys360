@@ -32,16 +32,27 @@ migration revision. Fixed by gating just those two fields to callers
 connecting from the loopback interface -- exactly what cutover_bys360_
 candidate.ps1's Test-ReleaseIdentityBinding needs (it always curls
 http://127.0.0.1:$AppPort directly) and nothing more; every other field
-stays public, unchanged. The gate deliberately checks the RAW TCP peer
-address (werkzeug.proxy_fix.orig_remote_addr when ProxyFix is active, which
-cannot be forged by any HTTP header) rather than request.remote_addr
-(exactly what ProxyFix REWRITES from an X-Forwarded-For header) -- an
-external caller that ever reached the app directly, bypassing the real
-reverse proxy, could otherwise spoof "X-Forwarded-For: 127.0.0.1" and
-satisfy a naive remote_addr-based check with no actual loopback connection
-at all. Tested below both with ProxyFix disabled (this app's own test
-default) and explicitly enabled with a spoofed header, to prove the second,
-stronger case too.
+stays public, unchanged.
+
+BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: the gate reads the RAW TCP
+peer address from Werkzeug ProxyFix's own real environ contract --
+environ["werkzeug.proxy_fix.orig"]["REMOTE_ADDR"] -- verified directly
+against the installed werkzeug (3.1.8) source. A prior version of this
+gate read a flat "werkzeug.proxy_fix.orig_remote_addr" key that was
+REMOVED from Werkzeug in 1.0 and therefore never existed; because that
+lookup always fell through to its own default (request.remote_addr --
+exactly what ProxyFix REWRITES from X-Forwarded-For), the gate's claimed
+resistance to a spoofed "X-Forwarded-For: 127.0.0.1" was never actually in
+effect once ProxyFix was genuinely enabled, and the regression test meant
+to prove otherwise passed for an unrelated reason: it enabled ProxyFix via
+monkeypatch.setenv("PROXY_FIX_ENABLED", ...), which cannot affect
+config.py's Config.PROXY_FIX_ENABLED (a class attribute evaluated once at
+first import, not re-read afterwards) -- so ProxyFix was never actually
+wrapped into that test's app at all. Tests below that need ProxyFix
+genuinely active use monkeypatch.setattr(Config, "PROXY_FIX_ENABLED",
+True) instead (the same pattern already established in
+tests/security/test_https_scheme_and_hsts_hardening.py), so the middleware
+truly runs and truly populates werkzeug.proxy_fix.orig.
 """
 from __future__ import annotations
 
@@ -49,6 +60,7 @@ import json
 from pathlib import Path
 
 import pytest
+from flask import request
 
 
 def _make_app(monkeypatch: pytest.MonkeyPatch):
@@ -96,6 +108,35 @@ def test_versionz_with_candidate_ready_json_exposes_release_identity(monkeypatch
         }),
         encoding="utf-8",
     )
+    monkeypatch.setattr(app, "root_path", str(fake_app_dir))
+
+    response = app.test_client().get("/versionz")
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["source_sha"] == "abc123deadbeef"
+    assert body["migration_head"] == "10858a18e9ac"
+
+
+def test_versionz_with_bom_prefixed_candidate_ready_json_exposes_release_identity(monkeypatch, tmp_path: Path):
+    """BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2 core RECEIPT proof: a
+    real production CANDIDATE_READY.json was confirmed to start with a
+    UTF-8 byte-order-mark (EF BB BF) -- prepare_bys360_candidate.ps1's old
+    receipt writer used PowerShell's "-Encoding UTF8" parameter, which
+    Windows PowerShell 5.1 (what production runs) writes WITH a BOM. The
+    reader (encoding="utf-8-sig") must still parse this exact byte layout
+    correctly, not just newly-written BOM-less receipts."""
+    app = _make_app(monkeypatch)
+
+    fake_app_dir = tmp_path / "app"
+    fake_app_dir.mkdir(parents=True, exist_ok=True)
+    candidate_ready = tmp_path / "CANDIDATE_READY.json"
+    payload = json.dumps({
+        "SOURCE_SHA": "abc123deadbeef",
+        "MIGRATION_HEAD": "10858a18e9ac",
+        "CANDIDATE_READY": "YES",
+    }).encode("utf-8")
+    candidate_ready.write_bytes(b"\xef\xbb\xbf" + payload)
+    assert candidate_ready.read_bytes().startswith(b"\xef\xbb\xbf"), "test fixture itself must genuinely carry a BOM"
     monkeypatch.setattr(app, "root_path", str(fake_app_dir))
 
     response = app.test_client().get("/versionz")
@@ -212,16 +253,33 @@ def test_versionz_from_non_loopback_caller_gets_null_release_identity(monkeypatc
     assert body["service"] == "bys360"
 
 
-def test_versionz_spoofed_x_forwarded_for_loopback_does_not_bypass_the_gate(monkeypatch, tmp_path: Path):
-    """The strongest AF proof: even with ProxyFix ENABLED (production-like)
-    and an attacker-controlled request claiming "X-Forwarded-For:
-    127.0.0.1" while the real, raw TCP connection comes from a genuine
-    external address, the gate must still return null -- proving it reads
-    the raw socket peer (werkzeug.proxy_fix.orig_remote_addr), not
-    request.remote_addr (exactly what ProxyFix rewrites FROM that header,
-    and what a naive implementation of this gate would have trusted)."""
-    monkeypatch.setenv("PROXY_FIX_ENABLED", "true")
+def _make_app_with_genuine_proxyfix_and_candidate_ready(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
+    """BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: genuinely enables
+    ProxyFix, unlike monkeypatch.setenv("PROXY_FIX_ENABLED", "true") (which
+    cannot work -- see the module docstring). config.py's
+    Config.PROXY_FIX_ENABLED is a class attribute evaluated once at first
+    import of the config module, not re-read per request or per env
+    change; monkeypatch.setattr(Config, "PROXY_FIX_ENABLED", True) is the
+    only way to make a real ProxyFix instance actually wrap app.wsgi_app
+    for this app instance -- the same pattern already established in
+    tests/security/test_https_scheme_and_hsts_hardening.py."""
+    from config import Config
+
+    monkeypatch.setattr(Config, "PROXY_FIX_ENABLED", True)
     app = _make_app_with_candidate_ready(monkeypatch, tmp_path)
+    assert app.config.get("PROXY_FIX_ENABLED") is True, "precondition: ProxyFix must genuinely be wrapped for this test to prove anything"
+    return app
+
+
+def test_versionz_spoofed_x_forwarded_for_loopback_does_not_bypass_the_gate(monkeypatch, tmp_path: Path):
+    """The strongest AF proof: even with ProxyFix genuinely ENABLED
+    (production-like) and an attacker-controlled request claiming
+    "X-Forwarded-For: 127.0.0.1" while the real, raw TCP connection comes
+    from a genuine external address, the gate must still return null --
+    proving it reads the real werkzeug.proxy_fix.orig["REMOTE_ADDR"], not
+    request.remote_addr (exactly what ProxyFix rewrites FROM that header,
+    and what the previous, incorrect key name silently fell back to)."""
+    app = _make_app_with_genuine_proxyfix_and_candidate_ready(monkeypatch, tmp_path)
     response = app.test_client().get(
         "/versionz",
         environ_overrides={"REMOTE_ADDR": "203.0.113.5"},
@@ -231,3 +289,69 @@ def test_versionz_spoofed_x_forwarded_for_loopback_does_not_bypass_the_gate(monk
     body = response.get_json()
     assert body["source_sha"] is None, "a spoofed X-Forwarded-For loopback claim must not bypass the AF gate"
     assert body["migration_head"] is None
+
+
+def test_versionz_genuine_loopback_through_real_proxyfix_still_exposes_release_identity(monkeypatch, tmp_path: Path):
+    """Real Werkzeug ProxyFix integration test (item 17 of the hotfix #2
+    regression brief): with ProxyFix genuinely active and an X-Forwarded-For
+    header present but pointing at an unrelated address, a caller whose
+    RAW peer genuinely is 127.0.0.1 must still get its release identity --
+    proving raw-peer trust survives an arbitrary X-Forwarded-For value
+    rather than being disabled outright whenever ProxyFix is on."""
+    app = _make_app_with_genuine_proxyfix_and_candidate_ready(monkeypatch, tmp_path)
+    response = app.test_client().get(
+        "/versionz",
+        environ_overrides={"REMOTE_ADDR": "127.0.0.1"},
+        headers={"X-Forwarded-For": "203.0.113.9"},
+    )
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["source_sha"] == "abc123deadbeef"
+    assert body["migration_head"] == "10858a18e9ac"
+
+
+def test_versionz_loopback_check_with_malformed_orig_remote_addr_fails_closed(monkeypatch, tmp_path: Path):
+    """Item 18: when ProxyFix is genuinely active but the raw REMOTE_ADDR
+    it captured is empty/unparseable (e.g. a misconfigured or malformed
+    upstream connection), the gate must fail closed -- non-loopback,
+    identity hidden -- never fall back to trusting request.remote_addr
+    (which ProxyFix may already have rewritten from client-controlled
+    headers)."""
+    app = _make_app_with_genuine_proxyfix_and_candidate_ready(monkeypatch, tmp_path)
+    response = app.test_client().get("/versionz", environ_overrides={"REMOTE_ADDR": ""})
+    assert response.status_code == 200
+    body = response.get_json()
+    assert body["source_sha"] is None
+    assert body["migration_head"] is None
+
+
+def test_versionz_loopback_check_with_orig_structure_missing_remote_addr_key_fails_closed(monkeypatch, tmp_path: Path):
+    """Item 19: if werkzeug.proxy_fix.orig exists but somehow lacks its own
+    REMOTE_ADDR key entirely (a malformed/incomplete orig structure), the
+    gate must not silently fall back to request.remote_addr -- it must
+    fail closed. Exercises _bys360_request_is_from_loopback directly
+    against a manually-shaped environ, since real ProxyFix always includes
+    the REMOTE_ADDR key (even if empty -- see the previous test) and so
+    cannot itself produce a dict missing the key outright."""
+    app = _make_app_with_candidate_ready(monkeypatch, tmp_path)
+    from app.routes import _bys360_request_is_from_loopback
+
+    with app.test_request_context(
+        "/versionz",
+        environ_overrides={"werkzeug.proxy_fix.orig": {"wsgi.url_scheme": "https"}},
+    ):
+        assert _bys360_request_is_from_loopback() is False
+
+
+def test_versionz_loopback_check_without_proxyfix_orig_structure_uses_remote_addr_directly(monkeypatch, tmp_path: Path):
+    """Item 20: with ProxyFix genuinely absent/disabled (this app's own
+    test default -- PROXY_FIX_ENABLED is False), there is no
+    werkzeug.proxy_fix.orig structure in the environ at all, so
+    request.remote_addr itself is the raw, unforgeable socket peer and may
+    be evaluated directly."""
+    app = _make_app_with_candidate_ready(monkeypatch, tmp_path)
+    from app.routes import _bys360_request_is_from_loopback
+
+    with app.test_request_context("/versionz", environ_overrides={"REMOTE_ADDR": "127.0.0.1"}):
+        assert "werkzeug.proxy_fix.orig" not in request.environ
+        assert _bys360_request_is_from_loopback() is True

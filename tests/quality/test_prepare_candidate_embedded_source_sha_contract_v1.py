@@ -41,6 +41,7 @@ C:\\bys360\\deploy_logs.
 """
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import tempfile
@@ -268,7 +269,109 @@ def test_cutover_still_reads_candidate_ready_source_sha_field_unchanged() -> Non
 def test_versionz_loopback_release_identity_contract_still_present() -> None:
     """AF/Z chain compatibility: app/routes.py's loopback-gated /versionz
     release-identity fields (added in Defect AF, consumed by cutover's
-    Test-ReleaseIdentityBinding) were not touched or weakened by AH."""
+    Test-ReleaseIdentityBinding) were not touched or weakened by AH.
+
+    Checks for the real werkzeug.proxy_fix.orig contract (see BYS360
+    PRODUCTION RELEASE-IDENTITY HOTFIX #2), not the flat
+    "orig_remote_addr" key name this assertion originally checked for --
+    that key was never a real Werkzeug environ key (removed in Werkzeug
+    1.0) and has been replaced with the actual contract."""
     routes_text = (ROOT / "app" / "routes.py").read_text(encoding="utf-8")
     assert "_bys360_request_is_from_loopback" in routes_text
-    assert "orig_remote_addr" in routes_text
+    assert 'werkzeug.proxy_fix.orig' in routes_text
+
+
+# ---------------------------------------------------------------------------
+# BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2 -- WRITER: Write-
+# CandidateReadyReceipt must emit deterministic UTF-8 WITHOUT a byte-order-
+# mark under Windows PowerShell 5.1 semantics (production's actual shell),
+# for both the in-candidate copy and the archived deploy-log copy. See
+# app/routes.py::_bys360_release_identity for the reader-side half of this
+# fix and tests/behavior/test_versionz_release_identity_contract.py for its
+# regression contract.
+# ---------------------------------------------------------------------------
+
+_RECEIPT_SOURCE_SHA = "a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e"
+
+
+def _run_write_receipt_check(tmp_path: Path) -> tuple[subprocess.CompletedProcess, Path, Path]:
+    candidate_dir = tmp_path / "candidate"
+    candidate_dir.mkdir(parents=True, exist_ok=True)
+    deploy_logs_root = tmp_path / "deploy_logs"
+
+    body = (
+        ". " + _ps_single_quote(str(PREPARE_SCRIPT))
+        + " -PackagePath 'dummy_test_package.zip'"
+        + " -ExpectedPackageSha256 " + ("a" * 64)
+        + " -DeployLogsRoot " + _ps_single_quote(str(deploy_logs_root))
+        + "\n"
+        + "New-Item -ItemType Directory -Force -Path $Script:DeployLogDir | Out-Null\n"
+        + f"$Script:Receipt.SOURCE_SHA = {_ps_single_quote(_RECEIPT_SOURCE_SHA)}\n"
+        + "$Script:Receipt.MIGRATION_HEAD = 'v1a2d3e4f5b6'\n"
+        + "try {\n"
+        + f"    $path = Write-CandidateReadyReceipt -CandidateDir {_ps_single_quote(str(candidate_dir))}\n"
+        + '    Write-Output ("RESULT=OK:" + $path)\n'
+        + "} catch {\n"
+        + '    Write-Output ("RESULT=FAIL:" + $_.Exception.Message)\n'
+        + "}\n"
+    )
+    result = _run_ps_snippet(body)
+    return result, candidate_dir, deploy_logs_root
+
+
+def test_candidate_ready_receipt_writer_emits_no_bom_in_candidate_dir(tmp_path: Path) -> None:
+    """WRITER item 7: the canonical candidate-tree receipt's first byte
+    must be "{" -- not the EF BB BF byte-order-mark a real production
+    CANDIDATE_READY.json was confirmed to carry under the old writer."""
+    result, candidate_dir, _ = _run_write_receipt_check(tmp_path)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    assert "RESULT=OK:" in result.stdout, result.stdout
+    raw = (candidate_dir / "CANDIDATE_READY.json").read_bytes()
+    assert not raw.startswith(b"\xef\xbb\xbf"), "receipt must not carry a UTF-8 BOM"
+    assert raw[:1] == b"{", f"expected first byte '{{', got {raw[:8]!r}"
+
+
+def test_candidate_ready_receipt_writer_emits_no_bom_in_archived_copy(tmp_path: Path) -> None:
+    """WRITER item 8: the archived deploy-log copy must be no-BOM too --
+    both Set-Content call sites were fixed, not just the candidate-tree
+    one."""
+    result, _candidate_dir, deploy_logs_root = _run_write_receipt_check(tmp_path)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    archived_copies = list(deploy_logs_root.rglob("CANDIDATE_READY.json"))
+    assert len(archived_copies) == 1, f"expected exactly one archived receipt, found {archived_copies}"
+    raw = archived_copies[0].read_bytes()
+    assert not raw.startswith(b"\xef\xbb\xbf"), "archived receipt must not carry a UTF-8 BOM"
+    assert raw[:1] == b"{"
+
+
+def test_candidate_ready_receipt_writer_output_is_powershell_convertfrom_json_compatible(tmp_path: Path) -> None:
+    """WRITER item 9: the no-BOM rewrite must not break PowerShell's own
+    ConvertFrom-Json consumers (cutover_bys360_candidate.ps1's
+    Assert-ValidCandidateReceipt)."""
+    result, candidate_dir, _ = _run_write_receipt_check(tmp_path)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    receipt_path = candidate_dir / "CANDIDATE_READY.json"
+    parse_body = (
+        "$obj = Get-Content -LiteralPath " + _ps_single_quote(str(receipt_path)) + " -Raw | ConvertFrom-Json\n"
+        + 'Write-Output ("PARSED_SOURCE_SHA=" + $obj.SOURCE_SHA)\n'
+        + 'Write-Output ("PARSED_CANDIDATE_READY=" + $obj.CANDIDATE_READY)\n'
+    )
+    parse_result = _run_ps_snippet(parse_body)
+    assert parse_result.returncode == 0, f"stdout={parse_result.stdout!r} stderr={parse_result.stderr!r}"
+    assert f"PARSED_SOURCE_SHA={_RECEIPT_SOURCE_SHA}" in parse_result.stdout
+    assert "PARSED_CANDIDATE_READY=YES" in parse_result.stdout
+
+
+def test_candidate_ready_receipt_writer_output_is_python_utf8_json_compatible(tmp_path: Path) -> None:
+    """WRITER item 10: the exact defect this hotfix closes -- Python's
+    plain encoding="utf-8" reader (matching production behavior before the
+    reader-side hotfix, and still what a genuinely BOM-less file must
+    satisfy) must be able to parse a newly-written receipt with no
+    "Unexpected UTF-8 BOM" error."""
+    result, candidate_dir, _ = _run_write_receipt_check(tmp_path)
+    assert result.returncode == 0, f"stdout={result.stdout!r} stderr={result.stderr!r}"
+    receipt_path = candidate_dir / "CANDIDATE_READY.json"
+    data = json.loads(receipt_path.read_text(encoding="utf-8"))
+    assert data["SOURCE_SHA"] == _RECEIPT_SOURCE_SHA
+    assert data["MIGRATION_HEAD"] == "v1a2d3e4f5b6"
+    assert data["CANDIDATE_READY"] == "YES"

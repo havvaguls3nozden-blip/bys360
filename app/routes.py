@@ -137,13 +137,28 @@ def _bys360_release_identity() -> dict[str, str | None]:
     promoted version lives at the same fixed C:\\bys360\\project path, so
     process/PID/path metadata alone can never distinguish WHICH release's
     code is currently loaded -- this is the one place that can. Absent in
-    local/dev environments not managed by that pipeline; never raises."""
+    local/dev environments not managed by that pipeline; never raises.
+
+    BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: reads with "utf-8-sig",
+    not "utf-8". A real production CANDIDATE_READY.json was confirmed to
+    start with a UTF-8 byte-order-mark (EF BB BF) -- prepare_bys360_
+    candidate.ps1's receipt writer used PowerShell's "-Encoding UTF8"
+    parameter, which Windows PowerShell 5.1 (what production runs) writes
+    WITH a BOM. json.loads(receipt_path.read_text(encoding="utf-8")) then
+    decodes that BOM as a literal U+FEFF character prefixed onto the JSON
+    text, which json.loads rejects (JSONDecodeError: "Unexpected UTF-8
+    BOM"), silently forcing source_sha/migration_head to null even for a
+    fully valid, correctly-promoted candidate. "utf-8-sig" transparently
+    strips a leading BOM if present and decodes identically to "utf-8"
+    when absent, so both the still-existing BOM-prefixed receipts (already
+    written by the old writer) and newly-written BOM-less receipts (see
+    prepare_bys360_candidate.ps1's Write-Utf8NoBomFile) parse correctly."""
     import json
     from pathlib import Path
 
     receipt_path = Path(current_app.root_path).parent / "CANDIDATE_READY.json"
     try:
-        data = json.loads(receipt_path.read_text(encoding="utf-8"))
+        data = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
     except Exception:
         return {"source_sha": None, "migration_head": None}
     return {
@@ -157,21 +172,49 @@ def _bys360_request_is_from_loopback() -> bool:
     raw TCP loopback interface -- e.g. cutover_bys360_candidate.ps1's own
     curl.exe call to http://127.0.0.1:$AppPort during a local cutover run.
 
-    Deliberately reads werkzeug.proxy_fix.orig_remote_addr (the RAW socket
-    peer address Werkzeug's ProxyFix middleware observed before rewriting
-    it from X-Forwarded-For -- see app/core/reverse_proxy.py) rather than
-    request.remote_addr. request.remote_addr is exactly what ProxyFix
-    rewrites TO, from an operator-configured number of trusted X-Forwarded-
-    For hops (x_for=1 here); an external caller that reaches the app
-    directly (bypassing the real reverse proxy -- a firewall/network
-    misconfiguration this check must not silently trust) could otherwise
-    spoof "X-Forwarded-For: 127.0.0.1" and satisfy a request.remote_addr-
-    based check with no actual loopback connection at all. The raw socket
-    peer address cannot be forged by any HTTP header.
+    BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: reads the RAW socket peer
+    address from Werkzeug ProxyFix's own actual environ contract. Verified
+    directly against the installed werkzeug (3.1.8) source and confirmed
+    live: ProxyFix.__call__ stores the pre-rewrite originals as a SINGLE
+    dict at environ["werkzeug.proxy_fix.orig"] (keys "REMOTE_ADDR",
+    "wsgi.url_scheme", "HTTP_HOST", "SERVER_NAME", "SERVER_PORT",
+    "SCRIPT_NAME") -- the flat "werkzeug.proxy_fix.orig_remote_addr" key
+    this function previously read was REMOVED from Werkzeug in 1.0 (see
+    werkzeug's own changelog in proxy_fix.py) and has never existed in any
+    version this app has run under. Because that key never exists, the
+    previous `environ.get("werkzeug.proxy_fix.orig_remote_addr",
+    request.remote_addr)` call silently always evaluated its *default* --
+    request.remote_addr -- which is exactly what ProxyFix REWRITES from an
+    operator-configured number of trusted X-Forwarded-For hops (x_for=1
+    here). A live probe with PROXY_FIX_ENABLED genuinely active proved
+    this concretely: a request with a real raw peer of 203.0.113.5 and a
+    forged "X-Forwarded-For: 127.0.0.1" header resulted in the previous
+    code reading "127.0.0.1" -- the previous implementation's claimed
+    raw-peer protection against exactly this spoof was never actually in
+    effect. (The pre-existing regression test for this scenario passed
+    only because it enabled ProxyFix via monkeypatch.setenv, which cannot
+    affect config.py's Config.PROXY_FIX_ENABLED -- a class attribute
+    evaluated once at first import of the module, not re-read per request
+    or per env change; see tests/security/test_https_scheme_and_hsts_
+    hardening.py's monkeypatch.setattr(Config, ...) pattern for the
+    correct way to genuinely enable it in a test. That test therefore
+    never actually exercised ProxyFix at all.)
 
-    BYS360 DEFECT Z HOTFIX: uses canonical IP parsing (ipaddress.ip_address
-    .is_loopback), not a fixed string set -- a real production cutover's
-    self-curl to http://127.0.0.1:$AppPort observed its own raw peer as the
+    Trust rule: if environ["werkzeug.proxy_fix.orig"] exists (ProxyFix is
+    genuinely wrapping this request), its own "REMOTE_ADDR" is the ONLY
+    trusted raw-peer source -- request.remote_addr is deliberately never
+    consulted in that branch, even if the dict's REMOTE_ADDR is missing or
+    malformed (fails closed to non-loopback rather than silently trusting
+    a value ProxyFix may have already rewritten from client-controlled
+    headers). Only when ProxyFix is genuinely absent/disabled -- no orig
+    dict in the environ at all -- is request.remote_addr itself the raw,
+    unforgeable socket peer, safe to evaluate directly. Under no
+    circumstance can X-Forwarded-For alone convert a genuinely non-
+    loopback raw connection into a trusted loopback one.
+
+    Canonical IP parsing (ipaddress.ip_address.is_loopback), not a fixed
+    string set -- a real production cutover's self-curl to
+    http://127.0.0.1:$AppPort observed its own raw peer as the
     IPv4-mapped-IPv6 form "::ffff:127.0.0.1" (a legitimate representation
     of a genuine IPv4 loopback connection on a dual-stack Windows socket),
     which a literal {"127.0.0.1", "::1"} membership check does not
@@ -181,7 +224,11 @@ def _bys360_request_is_from_loopback() -> bool:
     same rule as a direct IPv4 connection; every other address (public,
     private/LAN, link-local) is correctly still non-loopback, and a
     malformed/empty peer value fails closed to False, never raises."""
-    raw_peer = request.environ.get("werkzeug.proxy_fix.orig_remote_addr", request.remote_addr)
+    proxy_fix_orig = request.environ.get("werkzeug.proxy_fix.orig")
+    if proxy_fix_orig is None:
+        raw_peer = request.remote_addr
+    else:
+        raw_peer = proxy_fix_orig.get("REMOTE_ADDR") if isinstance(proxy_fix_orig, dict) else None
     peer = str(raw_peer or "").strip().split("%", 1)[0]
     if not peer:
         return False

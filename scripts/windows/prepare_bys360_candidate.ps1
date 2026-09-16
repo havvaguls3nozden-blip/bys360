@@ -1827,6 +1827,28 @@ function Invoke-ShadowRehearsalAndHealthBoot {
 # Phase 14: CANDIDATE_READY.json receipt
 # =====================================================================
 
+function Write-Utf8NoBomFile {
+    <# BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: Set-Content/Out-File's
+       "-Encoding UTF8" parameter writes UTF-8 WITH a byte-order-mark under
+       Windows PowerShell 5.1 (the shell production actually runs this
+       script under) -- confirmed directly against a real production
+       CANDIDATE_READY.json (first bytes EF BB BF, i.e. U+FEFF). Python's
+       own encoding="utf-8" reader (app/routes.py's _bys360_release_identity)
+       rejects that BOM as invalid JSON, silently forcing /versionz's
+       source_sha/migration_head to null even for a fully valid candidate.
+       [System.Text.UTF8Encoding]::new($false) / [System.IO.File]::WriteAllText
+       is raw .NET, not PowerShell's own "-Encoding" parameter (whose BOM
+       behavior differs across PowerShell versions) -- so this writes a
+       byte-identical, deterministic, BOM-less UTF-8 file under both Windows
+       PowerShell 5.1 and PowerShell 7+. #>
+    param(
+        [Parameter(Mandatory)][string]$Path,
+        [Parameter(Mandatory)][string]$Content
+    )
+    $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+    [System.IO.File]::WriteAllText($Path, $Content, $utf8NoBom)
+}
+
 function Write-CandidateReadyReceipt {
     param([Parameter(Mandatory)][string]$CandidateDir)
 
@@ -1838,8 +1860,8 @@ function Write-CandidateReadyReceipt {
     $receiptJson = $Script:Receipt | ConvertTo-Json -Depth 6
     $receiptPathInCandidate = Join-Path $CandidateDir "CANDIDATE_READY.json"
     $receiptPathInLogDir = Join-Path $Script:DeployLogDir "CANDIDATE_READY.json"
-    Set-Content -Path $receiptPathInCandidate -Value $receiptJson -Encoding UTF8
-    Set-Content -Path $receiptPathInLogDir -Value $receiptJson -Encoding UTF8
+    Write-Utf8NoBomFile -Path $receiptPathInCandidate -Content $receiptJson
+    Write-Utf8NoBomFile -Path $receiptPathInLogDir -Content $receiptJson
 
     Write-DeployLog "CANDIDATE_READY.json written: $receiptPathInCandidate"
     Write-DeployLog "(and archived at: $receiptPathInLogDir)"
