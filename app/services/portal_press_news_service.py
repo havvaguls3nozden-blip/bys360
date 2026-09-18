@@ -102,19 +102,28 @@ def _press_news_sort_key(item: dict[str, Any]) -> float:
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
-        except Exception:
-            import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
+        except (ValueError, TypeError):
+            # BYS360 HOTFIX 3: RFC/HTTP/RSS tarihleri ("Mon, 15 Dec 2025
+            # 16:01:00 GMT" gibi) ISO 8601 değildir; bu ayrıştırıcının
+            # burada başarısız olması beklenen, normal akıştır -- alttaki
+            # email.utils.parsedate_to_datetime bunları ayrıştırır. Bu
+            # yüzden burada loglama yapılmaz; aksi halde her RFC tarihli
+            # haber kaydı için sahte bir ERROR/traceback üretilir.
             pass
         try:
             dt = email.utils.parsedate_to_datetime(value)
             if dt.tzinfo is None:
                 dt = dt.replace(tzinfo=UTC)
             return float(dt.timestamp())
-        except Exception:
+        except (ValueError, TypeError):
+            # Desteklenen hiçbir biçimle (ISO veya RFC) ayrıştırılamadı --
+            # bu artık gerçekten geçersiz veri; tek, traceback'siz bir tanı
+            # kaydı yeterlidir.
             import logging
-            logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")
-            pass
+            logging.getLogger(__name__).warning(
+                "BYS360 SAFE V6: tarih alani desteklenen hicbir bicimle (ISO/RFC) ayristirilamadi, atlaniyor: %r",
+                value,
+            )
     return 0.0
 
 
