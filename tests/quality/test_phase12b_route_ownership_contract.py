@@ -38,36 +38,47 @@ class _StrategicConflict(TypedDict):
 # yeniden dogrulandi, bkz. tests/quality/test_route_conflict_runtime_contract.py
 # KNOWN_CONFLICTS guncellemesi). Endpoint isimleri ve winner/shadowed iliskisi
 # degismedi.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new GET-only
+# routes were registered on main_bp (app/settings_center/routes.py), imported
+# in app/routes.py between the portal and support route imports -- i.e.
+# strictly before every route below in main_bp's own add_url_rule order. Every
+# main_bp-owned index below therefore shifted by exactly +11, and since ALL of
+# main_bp's rules are registered (via CORE_BLUEPRINT_SEQUENCE) before the
+# separate strategic_performance_bp's rules, every shadowed
+# strategic_performance.* index shifted by the same +11 too. Mechanically
+# re-verified against a fresh app.url_map, not hand-computed. Endpoint names
+# and winner/shadowed relationships are unchanged.
 STRATEGIC_CONFLICTS: dict[str, _StrategicConflict] = {
     "/performans/stratejik/kpi-dashboard": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_dashboard_tr",
         "shadowed": "strategic_performance.kpi_dashboard",
-        "indexes": (797, 877),
+        "indexes": (808, 888),
     },
     "/performans/stratejik/hedefler": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_targets_tr",
         "shadowed": "strategic_performance.target_list",
-        "indexes": (799, 879),
+        "indexes": (810, 890),
     },
     "/performans/stratejik/yetkinlik-kutuphanesi": {
         "methods": {"GET"},
         "winner": "main.sp1_competency_library_tr",
         "shadowed": "strategic_performance.competency_library",
-        "indexes": (805, 878),
+        "indexes": (816, 889),
     },
     "/performans/stratejik/oz-degerlendirme": {
         "methods": {"GET", "POST"},
         "winner": "main.sp1_self_review_tr",
         "shadowed": "strategic_performance.self_review",
-        "indexes": (807, 882),
+        "indexes": (818, 893),
     },
     "/performans/stratejik/ai-kpi-analiz": {
         "methods": {"GET"},
         "winner": "main.sp1_ai_kpi_analysis_tr",
         "shadowed": "strategic_performance.ai_kpi_analysis",
-        "indexes": (809, 883),
+        "indexes": (820, 894),
     },
 }
 
@@ -240,17 +251,25 @@ def test_strategic_menu_endpoints_resolve_to_shadowed_names_but_main_wins(app):
 # center artik hicbir yerde kayitli degil, 880->879) dusurdu; unique path
 # sayisi (960) degismedi. Manifest indexleri de bu kaldirmadan once
 # geldikleri icin -1 kaydirildi -- mekanik olarak yeniden dogrulandi.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# main_bp routes (see STRATEGIC_CONFLICTS comment above for the full
+# rationale) shifted total rule count 984->995 (+11) and every main_bp/
+# strategic_performance_bp/pwa index below by the same +11; unique path
+# count (971) and unique endpoint count (890) both rose by exactly 11 too,
+# since these are 11 genuinely new paths/endpoints, not renamed ones.
+# Mechanically re-verified against a fresh app.url_map.
 def test_manifest_winner_and_route_snapshot_are_deterministic_across_factories(
     fresh_runtime_snapshot,
 ):
-    expected_snapshot = [984, 960, 879]
+    expected_snapshot = [995, 971, 890]
 
     for runtime in fresh_runtime_snapshot.values():
         assert runtime["counts"] == expected_snapshot
         entries = runtime["entries"]["/manifest.webmanifest"]
         assert [(entry["index"], entry["endpoint"]) for entry in entries] == [
-            (811, "main.bys360_pwa_manifest"),
-            (905, "pwa.manifest_webmanifest"),
+            (822, "main.bys360_pwa_manifest"),
+            (916, "pwa.manifest_webmanifest"),
         ]
         assert (
             runtime["winners"]["/manifest.webmanifest|GET"]
@@ -488,9 +507,14 @@ def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):
 # GORMUYOR (9 -> 8 bilinen cakisma). Karne alt-route'u
 # (/performans/baskan-onaylari/<int:approval_id>/karne) ve diger 7 bilinen
 # cakisma DEGISMEDEN kaldi -- mekanik olarak yeniden dogrulandi.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): counts rose
+# 984->995 (see the shared rationale on STRATEGIC_CONFLICTS above); the 11
+# new /settings-center/* routes are all newly-registered, non-conflicting
+# paths, so the known conflict set (8 entries) is unchanged.
 def test_phase12a_route_and_conflict_totals_remain_unchanged(fresh_runtime_snapshot):
     runtime = fresh_runtime_snapshot["first"]
-    assert runtime["counts"] == [984, 960, 879]
+    assert runtime["counts"] == [995, 971, 890]
     conflicts = set(runtime["conflicts"])
     assert len(conflicts) == 8
     assert set(STRATEGIC_CONFLICTS) <= conflicts

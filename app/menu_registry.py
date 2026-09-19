@@ -519,17 +519,24 @@ _bys360_v13_prune_removed_menu_registry()
 # BYS360_MAINTENANCE_V13_REMOVED_MENU_FILTER_END
 # BYS360_AY1_AI_PERFORMANCE_SETTINGS_INTEGRATION_V1_BEGIN
 # Ayarlar/Rol Matrisi ile sidebar aynı BYS360 Asistanı ve performans sekme anahtarlarını görsün.
-_BYS360_AY1_AI_AGENT_MENU_ITEMS = [
-    {
-        "key": "ai_agent_panel",
-        "label": "BYS360 Asistanı",
-        "icon": "fa-solid fa-shield-halved",
-        "endpoint": "ai_agent.ai_agent_panel",
-        "href": "/ai-agent/panel",
-        "active_path_prefixes": ["/ai-agent"],
-        "required_roles": ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu", "personel"],
-    },
-]
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, Blocker 2 --
+# duplicate menu key closure): this list used to carry its own "ai_agent_panel"
+# item (label "BYS360 Asistanı") into the "genel" section. That was a genuine,
+# pre-existing duplicate of the "assistant" section's own "ai_agent_panel"
+# item (label "Asistan Paneli", added later by the
+# BYS360_ASSISTANT_TABS_ROLE_MATRIX_V2 block below) -- both resolved to the
+# exact same endpoint (ai_agent.ai_agent_panel) and href (/ai-agent/panel),
+# and by the time _BYS360_ALL_MENU_ROLE_MATRIX_MENU_ATTRS's override ran,
+# both already carried the identical effective required_roles set. Two
+# sidebar entries under one key pointing at one page is not two capabilities,
+# it is one capability registered twice. Removed the "genel" section's copy
+# (this list) and kept the "assistant" section's copy, since it sits
+# correctly grouped with its sibling assistant_module/ai_agent_knowledge/
+# ai_agent_teaching_center items. No required_roles change: the surviving
+# "assistant" section item already carried the same effective role set this
+# list's item resolved to, so no role gains or loses visibility.
+_BYS360_AY1_AI_AGENT_MENU_ITEMS: list[dict] = []
 
 _BYS360_AY1_PERFORMANCE_MENU_ITEMS = [
     {"key": "performance_president_approvals", "label": "Başkan Onayları", "icon": "fa-solid fa-stamp", "endpoint": "main.performance_president_approvals", "href": "/performance/president-approvals", "active_path_prefixes": ["/performance/president-approvals"], "required_roles": ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan"]},

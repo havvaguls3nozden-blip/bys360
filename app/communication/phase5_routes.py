@@ -5,6 +5,15 @@ import logging
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): same two-key gap as phase4_routes.py. "support"
+# (support-operations, escalations) reads/writes the same SupportTicket/
+# SupportTicketStatusHistory data as the already-registered "support_all"
+# key -- repointed to reuse it. "reports" (health, audit-logs) shares the
+# new "reports" registration added for phase4_routes.py's dashboard/
+# reports/governance surface (see that file's own note) -- registered
+# once, consumed by both.
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -85,7 +94,7 @@ def communication_phase5_create_digest():
 
 @main_bp.route("/communication/faz5/support-operations")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase5_support_operations():
     payload = support_operations_snapshot()
     return safe_render("communication/phase5_support_operations.html", payload=payload)
@@ -93,7 +102,7 @@ def communication_phase5_support_operations():
 
 @main_bp.route("/communication/faz5/escalations")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase5_escalations():
     if not is_manager(current_user):
         flash("Bu ekran yönetici kullanımına yöneliktir.", "warning")
@@ -103,7 +112,7 @@ def communication_phase5_escalations():
 
 @main_bp.route("/communication/faz5/escalations/save", methods=["POST"])
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase5_save_escalation_rule():
     try:
         create_or_update_escalation_rule(current_user, request.form)

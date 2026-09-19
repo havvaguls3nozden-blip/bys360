@@ -662,4 +662,57 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/menu_registry_data_performance.py:617")
     pass
+
+# BYS360_SETTINGS_CENTER_V2_ROLE_DEFAULTS_BEGIN
+# Settings Center V2: yeni modül Ayar Merkezi sayfaları (app/settings_center/
+# routes.py, menu items registered in menu_registry_data_sections.py's
+# "settings_center_v2" section) yalnızca sistem yönetici rollerine varsayılan
+# olarak açılır. DB'deki role_menu_defaults/unit/user override kayıtları her
+# zaman bu statik varsayılanın üzerine yazabilir (canlı kaynak önceliği
+# değişmez); bu sadece kod tarafındaki başlangıç varsayılanıdır.
+_BYS360_SETTINGS_CENTER_V2_KEYS = {
+    "settings_center_home",
+    "settings_center_personnel_hr",
+    "settings_center_portal",
+    "settings_center_communication",
+    "settings_center_surveys",
+    "settings_center_support",
+    "settings_center_virtual_assistant",
+    "settings_center_dashboard",
+    "settings_center_notifications",
+    "settings_center_scheduled_jobs",
+    "settings_center_security",
+}
+try:
+    for _role in ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator"]:
+        _target = ROLE_MENU_DEFAULTS.setdefault(_role, set())  # noqa: F821 - dynamic menu registry global
+        for _key in _BYS360_SETTINGS_CENTER_V2_KEYS:
+            try:
+                _target.add(_key)
+            except AttributeError:
+                if _key not in _target:
+                    _target.append(_key)
+except Exception:
+    __import__("logging").getLogger(__name__).exception("BYS360 Settings Center V2 role defaults guard failed")
+# BYS360_SETTINGS_CENTER_V2_ROLE_DEFAULTS_END
+
+# BYS360_ORPHAN_AUTH_KEY_CLOSURE_ROLE_DEFAULTS_BEGIN
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): the item's own required_roles in menu_registry_data_sections.py
+# is only a narrowing ceiling (_role_allowed_for_menu/_apply_role_gate can
+# only flip True->False, never grant True) -- the actual grant comes from
+# ROLE_MENU_DEFAULTS, same as every other key in this file. Role sets here
+# are copied verbatim from the same evidence used for each key's menu item:
+# "reports" from communication_phase4_service.py's own MANAGER_ROLES (the
+# set its is_manager() check already enforces inside the gated routes);
+# "performance_history_import" from app/route_support.py's own
+# ADMIN_FAMILY_ROLES (the set its @admin_required already enforces).
+try:
+    for _role in ["admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "birim_sorumlusu"]:
+        ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("reports")  # noqa: F821 - dynamic menu registry global
+    for _role in ["admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir"]:
+        ROLE_MENU_DEFAULTS.setdefault(_role, set()).add("performance_history_import")  # noqa: F821 - dynamic menu registry global
+except Exception:
+    __import__("logging").getLogger(__name__).exception("BYS360 orphan auth key closure role defaults guard failed")
+# BYS360_ORPHAN_AUTH_KEY_CLOSURE_ROLE_DEFAULTS_END
 # Compatibility guard.

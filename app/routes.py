@@ -340,6 +340,7 @@ from app.performance import routes as _performance_routes  # noqa: E402,F401
 
 # BYS360_CORPORATE_PORTAL_V1_ROUTE_IMPORT
 from app.portal import routes as _portal_routes  # noqa: E402,F401
+from app.settings_center import routes as _settings_center_routes  # noqa: E402,F401
 from app.support import routes as _support_routes  # noqa: E402,F401
 
 __all__ = [

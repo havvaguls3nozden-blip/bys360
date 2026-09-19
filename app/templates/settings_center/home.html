@@ -1,0 +1,92 @@
+{% extends "settings_center/_shell.html" %}
+
+{% block sc_content %}
+<section class="settings-hero" id="sc-overview">
+    <div>
+        <div class="section-title">Ayar Merkezi</div>
+        <p class="section-text sc-hero-lead">
+            BYS360'ın tüm aktif modülleri için tek, tutarlı bir ayar ve durum merkezi. Her modülün ayar sayfası,
+            menü/yetki bağlantısı ve denetim kaydı buradan erişilebilir.
+        </p>
+        <div class="matrix-pill-row sc-hero-pills">
+            <span class="matrix-pill"><i class="fa-solid fa-layer-group"></i> Toplam modül: {{ total_modules }}</span>
+            <span class="matrix-pill"><i class="fa-solid fa-circle-check"></i> Ayar merkezi olan: {{ modules_with_settings }}</span>
+            <span class="matrix-pill"><i class="fa-solid fa-triangle-exclamation"></i> Eksik: {{ modules_missing_settings }}</span>
+        </div>
+    </div>
+</section>
+
+<div class="sc-search-row">
+    <div class="sc-search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="scModuleSearch" placeholder="Modül ara...">
+    </div>
+    <a href="{{ safe_url_for('main.settings_page') }}" class="btn-soft secondary"><i class="fa-solid fa-sliders"></i> Klasik Ayarlar (Rol Matrisi/Birim/Kişi)</a>
+    <a href="{{ safe_url_for('main.admin_role_matrix_center') }}" class="btn-soft secondary"><i class="fa-solid fa-table-list"></i> Rol Matrisi Görünümü</a>
+</div>
+
+{% for group in module_groups %}
+<section class="sc-section sc-module-group">
+    <div class="sc-section-title"><i class="{{ group.icon }}"></i> {{ group.label }}</div>
+    <div class="sc-module-grid" id="scGroup-{{ loop.index }}">
+        {% for m in group.modules %}
+        <a class="sc-module-card sc-module-searchable" data-search="{{ (m.display_name ~ ' ' ~ m.description)|lower }}"
+           href="{{ safe_url_for(m.settings_endpoint) if m.settings_endpoint else '#' }}">
+            <div class="sc-module-head">
+                <div class="sc-module-icon"><i class="{{ m.icon }}"></i></div>
+                <div class="sc-module-title">{{ m.display_name }}</div>
+            </div>
+            <div class="sc-module-desc">{{ m.description }}</div>
+            <div class="sc-module-footer">
+                {% if m.settings_available %}
+                <span class="sc-badge sc-badge-ok"><i class="fa-solid fa-check"></i> Ayar merkezi var</span>
+                {% else %}
+                <span class="sc-badge sc-badge-warn"><i class="fa-solid fa-triangle-exclamation"></i> Eksik</span>
+                {% endif %}
+                <span class="sc-badge sc-badge-{{ m.security_badge_class }}">{{ m.security_level_label }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endfor %}
+
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-heart-pulse"></i> Sistem Durumu</div>
+    <p class="sc-section-text">Kayıt bütünlüğü -- tekrar eden anahtar veya sahipsiz ayar-uç noktası olmamalıdır.</p>
+    <div class="sc-kv-grid">
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Tekrarlı modül anahtarı</div>
+            <div class="sc-kv-value">{{ duplicate_module_keys|length }}</div>
+        </div>
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Sahipsiz ayar uç noktası</div>
+            <div class="sc-kv-value">{{ orphan_settings_endpoints|length }}</div>
+        </div>
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Ayar merkezi eksik modül</div>
+            <div class="sc-kv-value">{{ modules_missing_settings }}</div>
+        </div>
+    </div>
+</section>
+
+<script>
+(function(){
+    var input = document.getElementById('scModuleSearch');
+    if (!input) return;
+    input.addEventListener('input', function(){
+        var q = input.value.trim().toLowerCase();
+        document.querySelectorAll('.sc-module-group').forEach(function(group){
+            var anyVisible = false;
+            group.querySelectorAll('.sc-module-searchable').forEach(function(card){
+                var hay = card.getAttribute('data-search') || '';
+                var visible = !q || hay.indexOf(q) !== -1;
+                card.hidden = !visible;
+                if (visible) { anyVisible = true; }
+            });
+            group.hidden = !anyVisible;
+        });
+    });
+})();
+</script>
+{% endblock %}

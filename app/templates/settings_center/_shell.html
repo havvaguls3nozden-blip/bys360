@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - BYS360{% endblock %}
+{% block page_kicker %}Ayar Merkezi{% endblock %}
+{% block page_title %}{{ page_title }}{% endblock %}
+{% block page_subtitle %}{{ page_subtitle }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/faz4_support_account_mobile.css') }}">
+{% include 'partials/settings/_settings_styles.html' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings_center.css') }}">
+
+<nav class="sc-breadcrumbs" aria-label="Ayar Merkezi gezinme yolu">
+    <a href="{{ safe_url_for('main.settings_center_home') }}"><i class="fa-solid fa-gauge"></i> Ayar Merkezi</a>
+    {% if breadcrumb_label %}
+    <span class="sc-breadcrumb-sep">/</span>
+    <span class="sc-breadcrumb-current">{{ breadcrumb_label }}</span>
+    {% endif %}
+</nav>
+
+<section class="settings-live-banner">
+    <div class="settings-live-banner-main">
+        <span class="settings-live-kicker"><i class="{{ module.icon if module else 'fa-solid fa-sliders' }}"></i> {{ module.module_type_label if module else 'Ayar Merkezi' }}</span>
+        <h3>{{ page_title }}</h3>
+        <p>{{ page_subtitle }}</p>
+    </div>
+    <div class="settings-live-banner-actions">
+        <a href="{{ safe_url_for('main.settings_center_home') }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i> Ayar Merkezi'ne dön</a>
+        {% if module and module.route_endpoint %}
+        <a href="{{ safe_url_for(module.route_endpoint) }}" class="btn-soft primary"><i class="fa-solid fa-arrow-up-right-from-square"></i> Modülü aç</a>
+        {% endif %}
+    </div>
+</section>
+
+<div class="sc-shell">
+    {% block sc_content %}{% endblock %}
+</div>
+{% endblock %}

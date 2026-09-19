@@ -91,8 +91,14 @@ _TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp" / "phase6_dead
 # changing the endpoint-list hash. This wave's own change (dead workflow
 # link removal from a template) remains unrelated to routes; the baseline
 # below is updated to the new, correct values.
-EXPECTED_ROUTE_COUNT = 984
-EXPECTED_ENDPOINT_LIST_SHA256 = "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes (app/settings_center/routes.py) raised
+# the count 984->995 and changed the endpoint-list hash accordingly --
+# mechanically re-verified against a fresh app.url_map, unrelated to this
+# wave's own dead-link-removal change.
+EXPECTED_ROUTE_COUNT = 995
+EXPECTED_ENDPOINT_LIST_SHA256 = "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
 
 TEMPLATE_PATH = REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
 
@@ -337,12 +343,19 @@ def test_remaining_hero_action_buttons_are_still_present_and_unchanged() -> None
 #    app/templates/weight_create.html and app/templates/weight_edit.html,
 #    each independently carrying one static style="..." attribute and one
 #    <style> block, dropping the totals to 1032/222 -- see that same ledger
-#    file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
+#    file's FORWARD-COMPATIBILITY FOLLOW-UP 8. A further, unrelated later
+#    wave (BYS360 Settings Center V2) added 4 new templates under
+#    app/templates/settings_center/ (_shell.html, home.html, module.html,
+#    plus the shared partial), but its CSS was authored directly as an
+#    external stylesheet (app/static/css/settings_center.css) and its 4
+#    inline style="..." spots were replaced with named classes -- 0 static,
+#    0 blocks, 0 dynamic contributed. Totals remain 1032/222/64 -- see that
+#    same ledger file's FORWARD-COMPATIBILITY FOLLOW-UP 9.
 # ---------------------------------------------------------------------------
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:

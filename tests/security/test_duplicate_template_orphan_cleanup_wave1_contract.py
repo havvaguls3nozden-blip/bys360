@@ -61,8 +61,12 @@ are therefore all 0 -- the repo-wide totals were UNCHANGED by this wave
 LATER wave, `weights_orphan_template_cleanup` (see that same file's FORWARD-
 COMPATIBILITY FOLLOW-UP 7), reduced the repo-wide totals further to
 1034/64/224, and a further later wave, `weight_create_edit_orphan_cleanup`
-(FORWARD-COMPATIBILITY FOLLOW-UP 8), reduced them again to 1032/64/222 --
-both unrelated to this wave, which remains a 0-contribution entry.
+(FORWARD-COMPATIBILITY FOLLOW-UP 8), reduced them again to 1032/64/222. A
+further later wave, BYS360 Settings Center V2 (FORWARD-COMPATIBILITY
+FOLLOW-UP 9), added 4 new templates but authored their CSS as an external
+stylesheet with no inline style="..." attributes, so the totals remain
+1032/64/222 -- all unrelated to this wave, which remains a 0-contribution
+entry.
 
 This file writes NOTHING to app/template/CSS/config sources -- only
 `Path.read_text()`/`Path.exists()`, `git show`/`git status`/`git diff`
@@ -414,7 +418,10 @@ def wave1_app():
     mp.undo()
 
 
-EXPECTED_URL_MAP_TOTAL = 984
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes raised the count 984->995 -- mechanically
+# re-verified against a fresh app.url_map, unrelated to this wave.
+EXPECTED_URL_MAP_TOTAL = 995
 
 
 def test_url_map_route_count_is_unchanged(wave1_app) -> None:
@@ -432,7 +439,7 @@ def test_url_map_route_count_is_unchanged(wave1_app) -> None:
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_repo_wide_style_inventory_totals_are_unchanged() -> None:

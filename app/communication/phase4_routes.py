@@ -5,6 +5,19 @@ import logging
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): two menu keys this file used were never declared in
+# MENU_SECTIONS, so every route using them 403'd for every role including
+# admin. "support" (communication_phase4_support_analytics) is a duplicate
+# of the already-registered "support_all" capability (same SupportTicket
+# data) -- repointed to reuse it. "reports" (dashboard/reports/export-
+# center/governance/metrics-refresh) had no existing equivalent; registered
+# it as a new menu item using this file's own pre-authored, never-wired
+# app/templates/communication/phase4_base_menu_snippet.txt for its label/
+# icon ("İletişim Faz 4 Paneli") and this file's own is_manager()/
+# MANAGER_ROLES check (communication_phase4_service.py) for its
+# required_roles -- not invented.
 from io import BytesIO
 
 from flask import flash, redirect, request, send_file, session, url_for
@@ -136,7 +149,7 @@ def communication_phase4_survey_analytics():
 
 @main_bp.route("/communication/faz4/support/analytics")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase4_support_analytics():
     days = _read_days(180)
     payload = support_analytics_snapshot(days)

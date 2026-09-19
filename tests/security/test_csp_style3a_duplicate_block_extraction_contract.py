@@ -843,7 +843,11 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 # DELETED_TEMPLATE_WAVES["daily_weather_mail_cleanup"],
 # DELETED_TEMPLATE_WAVES["executive_summary_dashboard_cleanup"], and
 # DELETED_TEMPLATE_WAVES["workflow_orphan_presentation_cleanup"] for the
-# independently re-derived evidence.
+# independently re-derived evidence. A further, unrelated later wave
+# (BYS360 Settings Center V2) added 4 new templates, but their CSS is an
+# external stylesheet with no inline style="..." attributes -- 0
+# contribution, total remains 1032. See that same ledger file's
+# FORWARD-COMPATIBILITY FOLLOW-UP 9.
 EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3A = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3A = 64
 
@@ -922,16 +926,23 @@ PRE_STYLE3A_STYLE_BLOCK_TOTAL = 270
 # weight_create_edit_orphan_cleanup wave (deleted app/templates/
 # weight_create.html and app/templates/weight_edit.html, each independently
 # carrying exactly one <style> block -- see that same ledger file's
-# FORWARD-COMPATIBILITY FOLLOW-UP 8).
-# 270 - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 = 222.
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2
+# FORWARD-COMPATIBILITY FOLLOW-UP 8). +0 from the later BYS360 Settings
+# Center V2 wave (4 new templates added, but their CSS is an external
+# stylesheet with no <style> blocks -- see that same ledger file's
+# FORWARD-COMPATIBILITY FOLLOW-UP 9). -1 from the further later BYS360
+# Settings Center V2 orphan-auth-key closure wave (deleted the confirmed-
+# dead app/templates/about_bys360.html, which independently carried
+# exactly one <style> block -- see that same ledger file's FORWARD-
+# COMPATIBILITY FOLLOW-UP 10).
+# 270 - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 - 1 = 221.
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A = PRE_STYLE3A_STYLE_BLOCK_TOTAL - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 - 1
 
 
 def test_repo_wide_style_block_total_dropped_by_exactly_10() -> None:
     inventory = compute_inventory_from_worktree()
     assert inventory.style_block_total == EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A, (
         f"Repo-wide <style> block total is {inventory.style_block_total}; expected "
-        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 = "
+        f"{PRE_STYLE3A_STYLE_BLOCK_TOTAL} - 10 - 6 - 2 - 4 - 1 - 14 - 8 - 1 - 2 - 1 = "
         f"{EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3A} (Style-3A removed exactly one "
         "<style> block from each of its 10 templates and added none; the later "
         "orphan_mail_cleanup wave deleted 6 more dead templates each with exactly "

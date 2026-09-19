@@ -57,10 +57,12 @@ classes already defined in `app/static/css/meeting_development_c_shared.css`
 count, same string) -- the repo-wide style ledger (1035/64/225 at the time
 this wave landed, later 1034/64/224 after the unrelated
 `weights_orphan_template_cleanup` wave, then 1032/64/222 after the further
-unrelated `weight_create_edit_orphan_cleanup` wave -- see
-`test_csp_style_migration_cumulative_inventory_contract.py`'s FORWARD-
-COMPATIBILITY FOLLOW-UP 7/8) is therefore completely unaffected by THIS wave;
-no CSP-manifest wave entry was needed.
+unrelated `weight_create_edit_orphan_cleanup` wave, still 1032/64/222 after
+the further unrelated BYS360 Settings Center V2 wave (4 new templates
+added, but with an external stylesheet and no inline style="..." usage, so
+0 contribution) -- see `test_csp_style_migration_cumulative_inventory_
+contract.py`'s FORWARD-COMPATIBILITY FOLLOW-UP 7/8/9) is therefore
+completely unaffected by THIS wave; no CSP-manifest wave entry was needed.
 
 This file uses real, isolated Flask apps (module-scoped, UUID-based temp
 SQLite, matching this repo's established fixture pattern) and real ORM
@@ -699,7 +701,10 @@ def test_final_gate_old_generic_shell_heading_is_not_the_main_content(final_gate
 # that always lost that URL's dispatch conflict anyway (see
 # tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
 # update), dropping the real url_map route count from 985 to 984.
-EXPECTED_URL_MAP_TOTAL = 984
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes raised the count 984->995 -- mechanically
+# re-verified against a fresh app.url_map, unrelated to this wave.
+EXPECTED_URL_MAP_TOTAL = 995
 
 
 def test_url_map_route_count_is_unchanged(final_gate_env) -> None:
@@ -714,7 +719,7 @@ def test_url_map_route_count_is_unchanged(final_gate_env) -> None:
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:

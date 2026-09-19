@@ -278,8 +278,23 @@ def build_menu_visibility_map(
     visibility = _bys360_portal_role_matrix_v2_12_apply(visibility, user, rollback=rollback)
 
     try:
+        # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2,
+        # orphan-auth-key closure): globals().get(...) here always returned
+        # the empty-set default -- it looks in THIS module's own namespace,
+        # but _BYS360_EXEC_ADMIN_ONLY_ROLES is only ever defined in
+        # app/menu_registry.py, a different module. That silently forced
+        # is_admin to False for every user, unconditionally zeroing out
+        # "executive_summary" (and the rest of the exec-only key family)
+        # below regardless of role, menu registration, or role defaults --
+        # the actual root cause of "executive_summary" being unreachable.
+        # A deferred import (matching this same file's own established
+        # cross-module pattern elsewhere) reads the real constant instead.
+        try:
+            from app.menu_registry import _BYS360_EXEC_ADMIN_ONLY_ROLES as _exec_admin_only_roles
+        except ImportError:
+            _exec_admin_only_roles = set()
         exec_role = _bys360_exec_norm(getattr(user, "role", ""))
-        is_admin = exec_role in globals().get("_BYS360_EXEC_ADMIN_ONLY_ROLES", set())
+        is_admin = exec_role in _exec_admin_only_roles
         try:
             active_items = _active_menu_items()
         except Exception:

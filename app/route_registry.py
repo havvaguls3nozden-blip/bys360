@@ -24,6 +24,7 @@ _BASE_MODULAR_ROUTE_MODULES = (
     "app.institutional.routes",
     "app.communication.routes",
     "app.support.routes",
+    "app.settings_center.routes",
 )
 
 

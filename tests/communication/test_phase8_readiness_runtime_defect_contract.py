@@ -170,7 +170,22 @@ def test_anonymous_user_still_redirected_to_login_on_all_three_routes(client) ->
 
 
 def test_authenticated_user_without_reports_or_settings_access_still_denied(app, client) -> None:
-    _create_user(app, sicil_no="p8rt_no_access", grant_menu_keys=())
+    # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-
+    # auth-key closure): this test used to rely on the default role="admin"
+    # implicitly lacking "reports" access with no explicit user_override --
+    # only true because "reports" was an undefined ORPHAN_AUTH_KEY at the
+    # time (fail-closed to False for every role, including admin, as a
+    # side effect of a bug rather than by design). "reports" is now
+    # correctly registered with a real role-default grant for admin-tier
+    # roles (matching the MANAGER_ROLES set already enforced inside the
+    # gated routes themselves -- see app/menu_registry_data_performance.py's
+    # BYS360_ORPHAN_AUTH_KEY_CLOSURE_ROLE_DEFAULTS block), so admin now
+    # correctly gets default access without needing an explicit override.
+    # Switched to role="personel" -- verified to have neither "reports" nor
+    # "settings" in ROLE_MENU_DEFAULTS -- to keep testing this test's own
+    # actual intent (an authenticated user with no menu access is denied),
+    # rather than a role that should now legitimately pass.
+    _create_user(app, sicil_no="p8rt_no_access", role="personel", grant_menu_keys=())
     _login(client, "p8rt_no_access")
 
     for name, path in _ROUTES.items():

@@ -42,6 +42,14 @@ from app.services.performance.history_import import (
 24 Aralik 2025'te bu projeyi ilk acarken aklimda boyle bir import ekrani bile yoktu.
 Simdi var. Ve artik ana routes.py icinden cikti. Faz 7'de bunu daha guvenli hale
 getirdim: gecmis veri etiketi net, aktif donem korumasi net, preview daha okunur.
+
+FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+closure): "performance_history_import" was never declared in MENU_SECTIONS,
+so this route 403'd for every role including admin, despite already being
+admin_required at the Python level (ADMIN_FAMILY_ROLES in
+app/route_support.py). Registered it as a new menu item using that exact,
+already-enforced role set (not invented) and this file's own embedded page
+title ("Geçmiş Dönem Sonuç Aktarımı") for the label.
 """
 
 logger = logging.getLogger(__name__)

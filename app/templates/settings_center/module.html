@@ -1,0 +1,85 @@
+{% extends "settings_center/_shell.html" %}
+
+{% block sc_content %}
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-circle-info"></i> Modül Durumu</div>
+    <div class="sc-kv-grid">
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Durum</div>
+            <div class="sc-kv-value">{{ 'Aktif' if module.active else 'Devre dışı' }}</div>
+        </div>
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Modül türü</div>
+            <div class="sc-kv-value">{{ module.module_type_label }}</div>
+        </div>
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Yetki kategorisi</div>
+            <div class="sc-kv-value">{{ module.permission_category_label }}</div>
+        </div>
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Güvenlik seviyesi</div>
+            <div class="sc-kv-value"><span class="sc-badge sc-badge-{{ module.security_badge_class }}">{{ module.security_level_label }}</span></div>
+        </div>
+    </div>
+</section>
+
+{% if kv_facts %}
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-chart-simple"></i> Güncel Bilgiler</div>
+    <div class="sc-kv-grid">
+        {% for fact in kv_facts %}
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">{{ fact.label }}</div>
+            <div class="sc-kv-value">{{ fact.value }}</div>
+            {% if fact.sub %}<div class="sc-kv-sub">{{ fact.sub }}</div>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-user-shield"></i> Rol / Yetki / Menü</div>
+    <p class="sc-section-text">
+        Bu modülün menü görünürlüğü ve erişim yetkisi, merkezi Ayarlar &gt; Rol Matrisi ekranındaki
+        rol varsayılanları / birim profilleri / kişi bazlı yetkilerden gelir. Tanımsız bir menü anahtarı
+        her zaman gizli kalır (fail-closed).
+    </p>
+    <div class="sc-kv-grid">
+        <div class="sc-kv-item">
+            <div class="sc-kv-label">Menü anahtarı (anchor)</div>
+            <div class="sc-kv-value">{{ module.anchor_menu_key or '-' }}</div>
+        </div>
+    </div>
+    <div class="sc-role-actions">
+        <a href="{{ safe_url_for('main.settings_page') }}#role-foundation" class="btn-soft secondary"><i class="fa-solid fa-user-shield"></i> Rol varsayılanlarını düzenle</a>
+        <a href="{{ safe_url_for('main.admin_role_matrix_center') }}" class="btn-soft secondary"><i class="fa-solid fa-table-list"></i> Rol matrisini görüntüle</a>
+    </div>
+</section>
+
+{% if related_links %}
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-link"></i> İlgili Ekranlar</div>
+    <div class="sc-kv-grid">
+        {% for link in related_links %}
+        <a class="sc-kv-item sc-kv-item-link" href="{{ link.url }}">
+            <div class="sc-kv-label">{{ link.label }}</div>
+            <div class="sc-kv-sub">{{ link.description }}</div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+<section class="sc-section">
+    <div class="sc-section-title"><i class="fa-solid fa-clock-rotate-left"></i> Değişiklik Geçmişi</div>
+    <p class="sc-section-text">Bu modülle ilgili ayar değişiklikleri, merkezi Ayarlar ekranındaki değişiklik geçmişinde görünür.</p>
+    <a href="{{ safe_url_for('main.settings_page') }}#settings-history" class="btn-soft secondary"><i class="fa-solid fa-clock-rotate-left"></i> Değişiklik geçmişini gör</a>
+</section>
+
+{% if not mutable_settings_note is none %}
+<section class="sc-empty">
+    <i class="fa-solid fa-circle-info"></i> {{ mutable_settings_note }}
+</section>
+{% endif %}
+{% endblock %}

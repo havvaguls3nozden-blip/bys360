@@ -560,6 +560,24 @@ MENU_SECTIONS: list[dict[str, Any]] = [  # noqa: F821 - dynamic menu registry gl
                 "active_path_prefixes": ["/performans/stratejik/kpi-analiz"],
                 "required_roles": ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator"],
             },
+            # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2,
+            # orphan-auth-key closure): "performance_history_import" gates a
+            # real, registered route (app/performance/history_import_
+            # routes.py) that 403'd for every role including admin despite
+            # already being @admin_required at the Python level. Label
+            # reused verbatim from that file's own embedded page title
+            # ("Geçmiş Dönem Sonuç Aktarımı"); required_roles reused
+            # verbatim from app/route_support.py's ADMIN_FAMILY_ROLES --
+            # the exact set @admin_required already enforces on this same
+            # route -- not invented.
+            {
+                "key": "performance_history_import",
+                "label": "Geçmiş Dönem Sonuç Aktarımı",
+                "icon": "fa-solid fa-file-import",
+                "endpoint": "main.performance_history_import",
+                "active_path_prefixes": ["/performance/import/history"],
+                "required_roles": ["admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir"],
+            },
         ],
     },
     {
@@ -669,15 +687,40 @@ MENU_SECTIONS: list[dict[str, Any]] = [  # noqa: F821 - dynamic menu registry gl
                 "active_endpoints": ["main.announcements_list"],
                 "active_path_prefixes": ["/announcements"],
             },
+            # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2,
+            # Blocker 3 orphan-menu-key closure): a genuinely orphaned
+            # menu item ("announcements" + "_create" concatenated, see this
+            # file's own removal history) used to live here. Mechanically
+            # confirmed zero consumers anywhere in app/ -- no decorator, no
+            # direct authorization call, no dict lookup referenced its own
+            # key string. The real route it pointed at (main.announcements_
+            # new) is actually gated by the "announcements" key (see
+            # app/communication/announcements_routes.py), and its sidebar
+            # link in app/templates/base.html is gated by that same
+            # "announcements" key. Removed the dead declaration; the live
+            # "announcements" gate above is unchanged.
+            # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2,
+            # orphan-auth-key closure): "reports" gates 13 live, registered
+            # routes across app/communication/phase4_routes.py (dashboard,
+            # report CRUD, export center, governance) and phase5_routes.py
+            # (operation health, audit logs), but was never declared here,
+            # so those routes 403'd for every role including admin. Label
+            # and icon reused verbatim from this module's own pre-authored,
+            # never-wired app/templates/communication/
+            # phase4_base_menu_snippet.txt (its first/panel-level entry,
+            # matching the dashboard route this key actually gates).
+            # required_roles reused verbatim from communication_phase4_
+            # service.py's own MANAGER_ROLES constant -- the exact set its
+            # is_manager() check already enforces inside these same routes
+            # (app/communication/phase4_routes.py lines 69, 196) -- not
+            # invented.
             {
-                "key": "announcements_create",
-                "settings_key": "announcements",
-                "label": "Duyuru Gönder",
-                "icon": "fa-solid fa-paper-plane",
-                "endpoint": "main.announcements_new",
-                "active_endpoints": ["main.announcements_new"],
-                "required_roles": sorted(ANNOUNCEMENT_TOOL_ROLES),
-                "show_in_settings": False,
+                "key": "reports",
+                "label": "İletişim Faz 4 Paneli",
+                "icon": "fa-solid fa-chart-line",
+                "endpoint": "main.communication_phase4_dashboard_view",
+                "active_path_prefixes": ["/communication/faz4", "/communication/faz5/health", "/communication/faz5/audit-logs"],
+                "required_roles": ["admin", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "birim_sorumlusu"],
             },
         ],
     },
@@ -750,6 +793,33 @@ MENU_SECTIONS: list[dict[str, Any]] = [  # noqa: F821 - dynamic menu registry gl
         "icon": "fa-solid fa-chart-pie",
         "required_roles": ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi'],
         "items": [
+            # FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2,
+            # orphan-auth-key closure): this section's own home item was
+            # missing -- app/executive_summary/routes.py's live, registered
+            # /dashboard/yonetici-ozeti route (gated by the "executive_
+            # summary" key) 403'd for every role including admin,
+            # even though this section already existed with the exact
+            # right label/icon/required_roles and app/menu_registry.py's
+            # own _BYS360_DAILY_WEATHER_MAIL_EXEC_ROLE_DEFAULTS_V1_0_7
+            # block already granted these same roles the "executive_summary"
+            # key via ROLE_MENU_DEFAULTS. Label reused from this section's
+            # own label and the page's own <h1>/title (both "Yönetici
+            # Özeti"); required_roles reused verbatim from this section's
+            # own required_roles (same set the role-defaults block already
+            # grants) -- nothing invented.
+            {
+                "key": "executive_summary",
+                "label": "Yönetici Özeti",
+                "icon": "fa-solid fa-chart-pie",
+                "endpoint": "executive_summary.yonetici_ozeti",
+                "active_endpoints": [
+                    "executive_summary.yonetici_ozeti",
+                    "executive_summary.yonetici_ozeti_data",
+                    "executive_summary.yonetici_ozeti_test_mail",
+                ],
+                "active_path_prefixes": ["/dashboard/yonetici-ozeti"],
+                "required_roles": ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi'],
+            },
             # BYS360_DAILY_WEATHER_MAIL_V1_0_7_SYSTEM_ADMIN_MENU_ITEM
             {
                 "key": "daily_weather_mail",
@@ -937,4 +1007,120 @@ except Exception:
 # portal_feed, portal_people, portal_profiles, portal_groups, portal_press_news, portal_moderation
 # Sosyal medya link havuzu sayfası bilinçli olarak geri getirilmez: portal_social_import yok.
 # BYS360_PORTAL_EXPERIENCE_V3B8C_MENU_KEYS_DOCUMENTATION_END
+
+# BYS360_SETTINGS_CENTER_V2_SECTION_BEGIN
+# Ayar Merkezi V2: her aktif modül için tek, tutarlı bir Ayar Merkezi girişi.
+# Rol varsayılanları menu_registry_data_performance.py'deki
+# _BYS360_SETTINGS_CENTER_V2_KEYS bloğunda sistem yönetici rollerine açılır;
+# DB'deki role_menu_defaults/unit/user override kayıtları her zaman üstün gelir.
+_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES = [
+    "admin", "super_admin", "system_admin", "sistem_yoneticisi", "administrator",
+]
+MENU_SECTIONS.append({  # noqa: F821 - dynamic menu registry global
+    "key": "settings_center_v2",
+    "label": "Ayar Merkezi",
+    "icon": "fa-solid fa-gears",
+    "items": [
+        {
+            "key": "settings_center_home",
+            "label": "Ayar Merkezi",
+            "icon": "fa-solid fa-gauge",
+            "endpoint": "main.settings_center_home",
+            "active_endpoints": ["main.settings_center_home"],
+            "active_path_prefixes": ["/settings-center"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_personnel_hr",
+            "label": "Personel / İK Ayarları",
+            "icon": "fa-solid fa-user-group",
+            "endpoint": "main.settings_center_personnel_hr",
+            "active_endpoints": ["main.settings_center_personnel_hr"],
+            "active_path_prefixes": ["/settings-center/personnel-hr"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_portal",
+            "label": "Portal Ayarları",
+            "icon": "fa-solid fa-stream",
+            "endpoint": "main.settings_center_portal",
+            "active_endpoints": ["main.settings_center_portal"],
+            "active_path_prefixes": ["/settings-center/portal"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_communication",
+            "label": "İletişim Ayarları",
+            "icon": "fa-solid fa-comments",
+            "endpoint": "main.settings_center_communication",
+            "active_endpoints": ["main.settings_center_communication"],
+            "active_path_prefixes": ["/settings-center/communication"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_surveys",
+            "label": "Anket Ayarları",
+            "icon": "fa-solid fa-square-poll-vertical",
+            "endpoint": "main.settings_center_surveys",
+            "active_endpoints": ["main.settings_center_surveys"],
+            "active_path_prefixes": ["/settings-center/surveys"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_support",
+            "label": "Destek Ayarları",
+            "icon": "fa-solid fa-headset",
+            "endpoint": "main.settings_center_support",
+            "active_endpoints": ["main.settings_center_support"],
+            "active_path_prefixes": ["/settings-center/support"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_virtual_assistant",
+            "label": "Sanal Asistan Ayarları",
+            "icon": "fa-solid fa-robot",
+            "endpoint": "main.settings_center_virtual_assistant",
+            "active_endpoints": ["main.settings_center_virtual_assistant"],
+            "active_path_prefixes": ["/settings-center/ai-agent"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_dashboard",
+            "label": "Dashboard Ayarları",
+            "icon": "fa-solid fa-chart-line",
+            "endpoint": "main.settings_center_dashboard",
+            "active_endpoints": ["main.settings_center_dashboard"],
+            "active_path_prefixes": ["/settings-center/dashboard"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_notifications",
+            "label": "Bildirim Ayarları",
+            "icon": "fa-regular fa-bell",
+            "endpoint": "main.settings_center_notifications",
+            "active_endpoints": ["main.settings_center_notifications"],
+            "active_path_prefixes": ["/settings-center/notifications"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_scheduled_jobs",
+            "label": "Zamanlanmış İşler",
+            "icon": "fa-solid fa-clock-rotate-left",
+            "endpoint": "main.settings_center_scheduled_jobs",
+            "active_endpoints": ["main.settings_center_scheduled_jobs"],
+            "active_path_prefixes": ["/settings-center/scheduled-jobs"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+        {
+            "key": "settings_center_security",
+            "label": "Güvenlik / CAPTCHA",
+            "icon": "fa-solid fa-shield-halved",
+            "endpoint": "main.settings_center_security",
+            "active_endpoints": ["main.settings_center_security"],
+            "active_path_prefixes": ["/settings-center/security"],
+            "required_roles": list(_BYS360_SETTINGS_CENTER_V2_ADMIN_ROLES),
+        },
+    ],
+})
+# BYS360_SETTINGS_CENTER_V2_SECTION_END
 

@@ -5,6 +5,18 @@ import logging
 # STATUS: ACTIVE
 # BYS360_ROUTE_STATUS: ACTIVE_REQUIRED
 # STATUS_SOURCE: app.communication.route_manifest REQUIRED_ROUTE_MODULES
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): this file's support-ticket routes used to be gated by the bare
+# "support" menu key -- never declared anywhere in MENU_SECTIONS, meaning
+# these live, registered routes 403'd for EVERY role
+# including admin. Confirmed these routes operate on the exact same
+# SupportTicket/SupportTicketMessage/SupportTicketStatusHistory models as
+# the already-registered, already-working "support_all" menu key (see
+# app/support/routes.py) -- a genuine duplicate capability, not a distinct
+# one. Repointed the decorator to reuse that existing canonical key rather
+# than inventing a new one, matching this same file's own established
+# pattern of reusing "notifications" for its dashboard route.
 from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
@@ -130,7 +142,7 @@ def communication_phase3_survey_remind(survey_id: int):
 
 @main_bp.route("/communication/faz3/support/queue")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_support_queue():
     filter_name = (request.args.get("filter") or "all").strip().lower()
     payload = support_queue_snapshot(current_user, filter_name=filter_name)
@@ -139,7 +151,7 @@ def communication_phase3_support_queue():
 
 @main_bp.route("/communication/faz3/support/<int:ticket_id>", methods=["GET", "POST"])
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_support_detail(ticket_id: int):
     if request.method == "POST":
         try:
@@ -173,7 +185,7 @@ def communication_phase3_support_detail(ticket_id: int):
 
 @main_bp.route("/communication/faz3/support/<int:ticket_id>/assign", methods=["POST"])
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_support_assign(ticket_id: int):
     if not is_manager(current_user):
         flash("Bu işlem için yönetici yetkisi gerekir.", "warning")
@@ -199,7 +211,7 @@ def communication_phase3_support_assign(ticket_id: int):
 
 @main_bp.route("/communication/faz3/support/<int:ticket_id>/status", methods=["POST"])
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_support_status(ticket_id: int):
     if not is_manager(current_user):
         flash("Bu işlem için yönetici yetkisi gerekir.", "warning")
@@ -223,7 +235,7 @@ def communication_phase3_support_status(ticket_id: int):
 
 @main_bp.route("/communication/faz3/help")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_help_center():
     payload = help_center_snapshot(
         current_user,
@@ -235,7 +247,7 @@ def communication_phase3_help_center():
 
 @main_bp.route("/communication/faz3/help/<slug>")
 @login_required
-@menu_key_required("support")
+@menu_key_required("support_all")
 def communication_phase3_help_article(slug: str):
     try:
         payload = help_article_detail(slug, current_user, search_term=request.args.get("q") or "")

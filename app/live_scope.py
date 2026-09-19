@@ -534,3 +534,54 @@ for _name in ["LIVE_SETTINGS_MENU_KEYS", "LIVE_ALLOWED_MENU_KEYS", "LIVE_MENU_KE
         _value.extend([_k for _k in _BYS360_MEETING_DEV_P0_NAV_FIX_KEYS if _k not in _value])
 # BYS360_MEETING_DEV_P0_NAV_FIX_LIVE_SCOPE_END
 
+# BYS360_SETTINGS_CENTER_V2_LIVE_SCOPE_BEGIN
+# Ayar Merkezi V2 sayfaları (app/settings_center/routes.py) canlı kapsama
+# eklenmezse get_grouped_menu_definitions()/flatten_menu_definitions() bu
+# anahtarları eler ve rol varsayılanları hiçbir zaman uygulanmaz (kullanıcı
+# admin olsa bile erişim reddedilir). Bu blok olmadan menu_registry_data_
+# performance.py'deki statik ROLE_MENU_DEFAULTS eklentisi etkisizdir.
+_BYS360_SETTINGS_CENTER_V2_LIVE_SCOPE_KEYS = [
+    "settings_center_home",
+    "settings_center_personnel_hr",
+    "settings_center_portal",
+    "settings_center_communication",
+    "settings_center_surveys",
+    "settings_center_support",
+    "settings_center_virtual_assistant",
+    "settings_center_dashboard",
+    "settings_center_notifications",
+    "settings_center_scheduled_jobs",
+    "settings_center_security",
+]
+
+for _name in ["LIVE_SETTINGS_MENU_KEYS", "LIVE_ALLOWED_MENU_KEYS", "LIVE_MENU_KEYS", "LIVE_PERFORMANCE_MENU_KEYS"]:
+    _value = globals().get(_name)
+    if isinstance(_value, set):
+        _value.update(_BYS360_SETTINGS_CENTER_V2_LIVE_SCOPE_KEYS)
+    elif isinstance(_value, list):
+        _value.extend([_k for _k in _BYS360_SETTINGS_CENTER_V2_LIVE_SCOPE_KEYS if _k not in _value])
+# BYS360_SETTINGS_CENTER_V2_LIVE_SCOPE_END
+
+# BYS360_ORPHAN_AUTH_KEY_CLOSURE_LIVE_SCOPE_BEGIN
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): "executive_summary" already had a static ROLE_MENU_DEFAULTS
+# grant (menu_registry.py's own _BYS360_DAILY_WEATHER_MAIL_EXEC_ROLE_
+# DEFAULTS_V1_0_7 block) that was silently inert for the exact same reason
+# documented above -- missing from this live-scope allowlist. "reports"
+# and "performance_history_import" are the two new grants added in
+# menu_registry_data_performance.py's own BYS360_ORPHAN_AUTH_KEY_CLOSURE_
+# ROLE_DEFAULTS block.
+_BYS360_ORPHAN_AUTH_KEY_CLOSURE_LIVE_SCOPE_KEYS = [
+    "executive_summary",
+    "reports",
+    "performance_history_import",
+]
+
+for _name in ["LIVE_SETTINGS_MENU_KEYS", "LIVE_ALLOWED_MENU_KEYS", "LIVE_MENU_KEYS", "LIVE_PERFORMANCE_MENU_KEYS"]:
+    _value = globals().get(_name)
+    if isinstance(_value, set):
+        _value.update(_BYS360_ORPHAN_AUTH_KEY_CLOSURE_LIVE_SCOPE_KEYS)
+    elif isinstance(_value, list):
+        _value.extend([_k for _k in _BYS360_ORPHAN_AUTH_KEY_CLOSURE_LIVE_SCOPE_KEYS if _k not in _value])
+# BYS360_ORPHAN_AUTH_KEY_CLOSURE_LIVE_SCOPE_END
+

@@ -317,3 +317,15 @@ try:
 except Exception:
     __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/menu_visibility.py)")
 # BYS360_GENERAL_SECTION_RESTORE_V4_END
+
+# BYS360_SETTINGS_CENTER_V2_NAME_COLLISION_FIX_BEGIN
+# BYS360 SETTINGS CENTER V2: this module's build_menu_visibility_map (assistant/
+# AI-agent-specific, role-matrix-driven) has the exact same name as the
+# unrelated, main-sidebar-wide app.services.settings.effective_menu.
+# build_menu_visibility_map -- two functions, two different implementations,
+# same importable name in two different modules. This alias gives this
+# module's version an unambiguous name for new call sites; the internal
+# wrapper chain above (v3/v4) and the original name are both left completely
+# untouched so no existing caller or behavior changes.
+build_assistant_menu_visibility_map = build_menu_visibility_map
+# BYS360_SETTINGS_CENTER_V2_NAME_COLLISION_FIX_END

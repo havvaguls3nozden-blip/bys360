@@ -145,8 +145,14 @@ DELETED_TEST_FILES = (
 # changing the endpoint-list hash. This wave's own change (dead workflow
 # subsystem removal) remains independently unrelated; the baseline below
 # is updated to the new, correct values.
-EXPECTED_ROUTE_COUNT = 984
-EXPECTED_ENDPOINT_LIST_SHA256 = "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes (app/settings_center/routes.py) raised
+# the count 984->995 and changed the endpoint-list hash accordingly --
+# mechanically re-verified against a fresh app.url_map, unrelated to this
+# wave's own dead-workflow-subsystem removal.
+EXPECTED_ROUTE_COUNT = 995
+EXPECTED_ENDPOINT_LIST_SHA256 = "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
 
 # The 12 routes app/workflow/routes.py used to claim -- independently
 # reproduced live in the same-process-contamination experiment during the
@@ -630,10 +636,24 @@ def test_get_runtime_route_manifest_no_longer_reports_the_dead_module() -> None:
     assert "app.workflow.routes" not in modular_route_modules
 
 
+
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): a later,
+# unrelated wave appended one new, legitimate entry to the end of the same
+# static `_BASE_MODULAR_ROUTE_MODULES` tuple -- `"app.settings_center.routes"`
+# (the real import that triggers registration of the 11 new, admin-gated
+# `/settings-center/*` routes; see `app/settings_center/routes.py`). This is
+# an intentional, evidence-based addition, not drift, so it is named here
+# explicitly and added on top of the pre-cleanup-derived expectation below
+# rather than silently widening the comparison.
+_POST_PRE_CLEANUP_LEGITIMATE_ADDITIONS: tuple[str, ...] = ("app.settings_center.routes",)
+
+
 def test_route_registry_other_manifest_entries_are_unchanged() -> None:
     """Only the single dead-module string was removed from the STATIC
     `_BASE_MODULAR_ROUTE_MODULES` tuple -- everything else in it is
-    unchanged from the fixed pre-cleanup git ref. Compares against
+    unchanged from the fixed pre-cleanup git ref, plus exactly the
+    explicitly-named, independently-documented additions made by later
+    waves (`_POST_PRE_CLEANUP_LEGITIMATE_ADDITIONS`). Compares against
     `_BASE_MODULAR_ROUTE_MODULES` directly (not the computed
     `MODULAR_ROUTE_MODULES`/manifest, which conditionally appends
     "app.portal.routes" at runtime via `_build_modular_route_modules()` --
@@ -656,7 +676,9 @@ def test_route_registry_other_manifest_entries_are_unchanged() -> None:
     before_modules = re.findall(r'"([^"]+)"', block_match.group(1))
     assert before_modules, "Extracted zero entries from the pre-cleanup _BASE_MODULAR_ROUTE_MODULES block."
 
-    expected_after = tuple(m for m in before_modules if m != "app.workflow.routes")
+    expected_after = tuple(
+        m for m in before_modules if m != "app.workflow.routes"
+    ) + _POST_PRE_CLEANUP_LEGITIMATE_ADDITIONS
     assert expected_after == _BASE_MODULAR_ROUTE_MODULES, {
         "expected": expected_after,
         "actual": _BASE_MODULAR_ROUTE_MODULES,

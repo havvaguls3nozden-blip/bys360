@@ -423,7 +423,10 @@ def test_p0_context_settings_now_genuinely_contains_seeded_fixture_rows(p0_fix_e
 # update), dropping the real url_map route count from 985 to 984.
 # ---------------------------------------------------------------------------
 
-EXPECTED_URL_MAP_TOTAL = 984
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes raised the count 984->995 -- mechanically
+# re-verified against a fresh app.url_map, unrelated to this wave.
+EXPECTED_URL_MAP_TOTAL = 995
 
 
 def test_url_map_route_count_is_unchanged(p0_fix_env) -> None:
@@ -437,11 +440,19 @@ def test_url_map_route_count_is_unchanged(p0_fix_env) -> None:
 # ---------------------------------------------------------------------------
 # 12) Repo-wide style/CSP/handler inventory totals are unchanged -- this fix
 #     touches only Python query logic, no template/CSS/JS.
+#
+#     FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): an
+#     unrelated later wave added 4 new templates (app/templates/
+#     settings_center/*.html), but their CSS is an external stylesheet
+#     (app/static/css/settings_center.css) with no inline style="..."
+#     attributes or <style> blocks -- 0 contribution, totals remain
+#     1032/64/222 -- see test_csp_style_migration_cumulative_inventory_
+#     contract.py's FORWARD-COMPATIBILITY FOLLOW-UP 9.
 # ---------------------------------------------------------------------------
 
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_repo_wide_style_and_handler_inventory_is_unchanged() -> None:

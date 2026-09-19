@@ -1,0 +1,56 @@
+/* BYS360 Settings Center V2 -- shared styles for app/templates/settings_center/*.
+   Extracted as an external stylesheet (not an inline <style> block) to keep
+   the repo-wide CSP inline-style inventory neutral -- see
+   tests/security/test_csp_style_migration_cumulative_inventory_contract.py's
+   FORWARD-COMPATIBILITY FOLLOW-UP 9. */
+.sc-breadcrumbs{display:flex;align-items:center;gap:8px;font-size:.88rem;color:#8a7d7d;margin-bottom:14px;flex-wrap:wrap;}
+.sc-breadcrumbs a{color:#7c1111;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+.sc-breadcrumbs a:hover{text-decoration:underline;}
+.sc-breadcrumb-sep{color:#cbb;}
+.sc-breadcrumb-current{color:#6d5f5f;font-weight:600;}
+
+.sc-shell{display:grid;gap:18px;}
+
+.sc-module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;}
+.sc-module-card{border:1px solid #efe2de;border-radius:18px;padding:16px;background:#fffaf9;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:box-shadow .15s ease,transform .15s ease;}
+.sc-module-card:hover{box-shadow:0 6px 18px rgba(125,17,17,.12);transform:translateY(-1px);}
+.sc-module-head{display:flex;align-items:center;gap:10px;}
+.sc-module-icon{width:40px;height:40px;border-radius:12px;background:#fff0ed;color:#7c1111;display:flex;align-items:center;justify-content:center;font-size:1.05rem;flex:none;}
+.sc-module-title{font-weight:700;color:#4a1414;font-size:.98rem;}
+.sc-module-desc{font-size:.86rem;color:#7a6c6c;line-height:1.45;flex:1;}
+.sc-module-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.8rem;}
+
+.sc-badge{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font-weight:700;font-size:.76rem;}
+.sc-badge-ok{background:#e9f7ee;color:#1c7a3d;}
+.sc-badge-warn{background:#fff4e0;color:#9a6400;}
+.sc-badge-secret{background:#f1eefc;color:#5b3fae;}
+.sc-badge-env{background:#eef3fb;color:#2c5c9c;}
+.sc-badge-restart{background:#fdeeee;color:#a12b2b;}
+.sc-badge-readonly{background:#eef0f2;color:#57626b;}
+.sc-badge-critical{background:#7c1111;color:#fff;}
+
+.sc-section{border:1px solid #efe2de;border-radius:18px;padding:16px 18px;background:#fff;}
+.sc-section-title{font-weight:700;color:#4a1414;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+.sc-section-text{font-size:.9rem;color:#75696a;line-height:1.5;margin-bottom:10px;}
+
+.sc-kv-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;}
+.sc-kv-item{border:1px solid #f0e6e3;border-radius:14px;padding:12px;background:#fffaf9;}
+.sc-kv-item-link{text-decoration:none;color:inherit;display:block;}
+.sc-kv-label{font-size:.78rem;color:#8a7d7d;text-transform:uppercase;letter-spacing:.03em;margin-bottom:4px;}
+.sc-kv-value{font-weight:700;color:#3d2222;font-size:.98rem;word-break:break-word;}
+.sc-kv-sub{font-size:.8rem;color:#8a7d7d;margin-top:2px;}
+
+.sc-empty{border:1px dashed #e0cfcb;border-radius:14px;padding:18px;text-align:center;color:#8a7d7d;font-size:.9rem;}
+
+.sc-search-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;}
+.sc-search-box{flex:1;min-width:200px;display:flex;align-items:center;gap:8px;border:1px solid #e6d7d3;border-radius:12px;padding:8px 12px;background:#fff;}
+.sc-search-box input{border:none;outline:none;flex:1;font-size:.9rem;background:transparent;}
+
+.sc-role-actions{margin-top:12px;}
+.sc-hero-lead{margin-bottom:12px;}
+.sc-hero-pills{margin-top:0;}
+
+@media (max-width: 640px){
+    .sc-module-grid{grid-template-columns:1fr;}
+    .sc-kv-grid{grid-template-columns:1fr;}
+}

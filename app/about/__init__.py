@@ -1,1 +1,0 @@
-"""BYS360 hakkında sayfası route paketi."""

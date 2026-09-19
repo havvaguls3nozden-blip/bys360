@@ -514,12 +514,16 @@ def test_repo_wide_inline_handler_and_javascript_url_totals_are_zero() -> None:
 #    app/templates/weight_create.html and app/templates/weight_edit.html,
 #    each independently carrying one static style="..." attribute and one
 #    <style> block: 1034 - 2 = 1032, 224 - 2 = 222. See that same ledger
-#    file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
+#    file's FORWARD-COMPATIBILITY FOLLOW-UP 8. A further, unrelated later
+#    wave (BYS360 Settings Center V2) added 4 new templates, but their CSS
+#    is an external stylesheet with no inline style="..." attributes or
+#    <style> blocks -- 0 contribution, totals remain 1032/222. See that
+#    same ledger file's FORWARD-COMPATIBILITY FOLLOW-UP 9.
 # ---------------------------------------------------------------------------
 
 EXPECTED_ACTIVE_STYLE_TOTAL_AFTER_STYLE3C = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL_AFTER_STYLE3C = 64
-EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 222
+EXPECTED_STYLE_BLOCK_TOTAL_AFTER_STYLE3C = 221
 
 
 def test_repo_wide_active_and_dynamic_style_attribute_totals_are_unchanged() -> None:

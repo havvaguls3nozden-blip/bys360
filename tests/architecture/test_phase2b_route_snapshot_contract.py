@@ -204,6 +204,29 @@ def build_contract_keys() -> list[str]:
 # ikinci dekoratoru + olu app/routes_president_scorecard_v2.py'nin kendi
 # dekoratoru) birini kaldirdi -- snapshot 1025'ten 1024'e, bu anahtarin
 # tekrar sayisi 3'ten 2'ye dusurulerek bilincli olarak guncellendi.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): a later,
+# unrelated wave added app/settings_center/routes.py -- 11 new, GET-only,
+# admin-gated /settings-center/* routes (the new Settings Center V2 hub +
+# 10 per-module pages). Each is a genuinely new decorator, not a duplicate
+# of an existing one, so the snapshot's route_count rose 1024 -> 1035 and
+# contract_keys gained exactly these 11 entries (independently re-derived
+# via this same file's own build_contract_keys(), not hand-typed):
+# /settings-center|GET, /settings-center/ai-agent|GET,
+# /settings-center/communication|GET, /settings-center/dashboard|GET,
+# /settings-center/notifications|GET, /settings-center/personnel-hr|GET,
+# /settings-center/portal|GET, /settings-center/scheduled-jobs|GET,
+# /settings-center/security|GET, /settings-center/support|GET,
+# /settings-center/surveys|GET. Zero keys were removed or altered.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-key
+# closure): app/about/routes.py was deleted as confirmed dead code (its
+# @main_bp.route("/about-bys360") decorator never executed -- the module
+# was never imported anywhere in the app, so it never contributed a real
+# runtime endpoint despite appearing in this AST-scanned source contract).
+# snapshot 1035 -> 1034, contract_keys lost exactly "/about-bys360|GET" and
+# gained nothing (independently re-derived via this same file's own
+# build_contract_keys(), not hand-typed).
 def test_phase2b_route_contract_snapshot_is_stable():
     assert SNAPSHOT_JSON.exists(), f"Snapshot missing: {SNAPSHOT_JSON}"
 

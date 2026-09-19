@@ -169,7 +169,10 @@ EXPECTED_FINAL_CHECKS_COUNT = 6
 # that always lost that URL's dispatch conflict anyway (see
 # tests/quality/test_route_conflict_runtime_contract.py's KNOWN_CONFLICTS
 # update), dropping the real url_map route count from 985 to 984.
-EXPECTED_URL_MAP_TOTAL = 984
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes raised the count 984->995 -- mechanically
+# re-verified against a fresh app.url_map, unrelated to this wave.
+EXPECTED_URL_MAP_TOTAL = 995
 
 
 def _normalize_line_endings(data: bytes) -> bytes:

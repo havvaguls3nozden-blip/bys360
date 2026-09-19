@@ -367,9 +367,23 @@ def test_route_snapshot_and_route_registry_have_no_workflow_entries() -> None:
 #     that same cumulative file's FORWARD-COMPATIBILITY FOLLOW-UP 8.
 # ---------------------------------------------------------------------------
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): four new
+# templates (app/templates/settings_center/_shell.html, home.html,
+# module.html, plus a shared partial) were added to back the new
+# /settings-center/* routes. Their CSS is authored directly as an external
+# stylesheet (app/static/css/settings_center.css, not an inline <style>
+# block) and all 4 spot-style needs use named classes instead of
+# style="..." attributes, so this wave contributes 0 to every bucket.
+# ACTIVE_STATIC_TOTAL, DYNAMIC_STYLE_TOTAL and STYLE_BLOCK_TOTAL are all
+# unchanged from FORWARD-COMPATIBILITY FOLLOW-UP 8's 1032/64/222.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2, orphan-auth-
+# key closure): app/templates/about_bys360.html was deleted along with the
+# confirmed-dead app/about/routes.py it backed, independently carrying 0
+# static/1 block/0 dynamic -- STYLE_BLOCK_TOTAL drops 222 -> 221.
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_style_and_handler_inventory_is_completely_unaffected() -> None:
@@ -392,6 +406,13 @@ def test_style_and_handler_inventory_is_completely_unaffected() -> None:
 # ve main.president_low_score_approvals_center endpoint'ini tamamen kayitsiz
 # birakti, ROUTE_COUNT'u 985'ten 984'e dusurdu ve ENDPOINT_SHA256'yi degistirdi
 # -- bilincli baseline guncellemesi.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): registered 11
+# new GET-only routes on main_bp (app/settings_center/routes.py: /settings-
+# center plus one page per active module), each gated by
+# @menu_key_required(...) using the existing live menu-visibility resolver.
+# ROUTE_COUNT rose from 984 to 995 (+11, exactly matching the 11 new routes)
+# and ENDPOINT_SHA256 changed accordingly -- bilinçli baseline güncellemesi.
 def test_url_map_route_count_and_hash_are_unaffected() -> None:
     probe_script = (
         "import hashlib\n"
@@ -403,8 +424,8 @@ def test_url_map_route_count_and_hash_are_unaffected() -> None:
     )
     output_lines = _run_isolated_probe(probe_script)
     values = dict(line.split("=", 1) for line in output_lines if "=" in line)
-    assert values.get("ROUTE_COUNT") == "984"
-    assert values.get("ENDPOINT_SHA256") == "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
+    assert values.get("ROUTE_COUNT") == "995"
+    assert values.get("ENDPOINT_SHA256") == "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
 
 
 # ---------------------------------------------------------------------------

@@ -42,8 +42,8 @@ def _bys360_ag2b_ai_agent_before_request():
 
     # Panel sayfası menüden gösterilmeyecek; direkt erişimde yetki varsa açılır.
     try:
-        from app.services.menu_visibility import build_menu_visibility_map
-        menu_map = build_menu_visibility_map(current_user)
+        from app.services.menu_visibility import build_assistant_menu_visibility_map
+        menu_map = build_assistant_menu_visibility_map(current_user)
         allowed = bool(menu_map.get("ai_agent_panel") or menu_map.get("assistant_module") or menu_map.get("ai_teaching_center") or menu_map.get("ai_knowledge_library") or menu_map.get("ai_agent_knowledge") or menu_map.get("ai_agent_teaching_center"))
     except Exception:
         # Menü servisi çalışmazsa sadece paneli kapat, widget API'ları zaten yukarıda açık.
@@ -315,8 +315,8 @@ def _bys360_assistant_tabs_role_matrix_v2_before_request():
     if not getattr(current_user, "is_authenticated", False):
         return None
     try:
-        from app.services.menu_visibility import build_menu_visibility_map
-        menu_map = build_menu_visibility_map(current_user)
+        from app.services.menu_visibility import build_assistant_menu_visibility_map
+        menu_map = build_assistant_menu_visibility_map(current_user)
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/ai_agent/routes.py:316")
         menu_map = {}

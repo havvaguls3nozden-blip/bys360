@@ -180,6 +180,35 @@ cleanup target, a dead Jinja-shadowed Python helper — carried no template
 markup, so it contributes 0 to this style/CSP ledger. `INITIAL_*` constants
 and all prior wave entries are unaffected.
 
+FORWARD-COMPATIBILITY FOLLOW-UP 9 (BYS360 Settings Center V2): adds four
+brand-new templates (app/templates/settings_center/_shell.html, home.html,
+module.html, plus a shared partial) backing new /settings-center/* pages.
+Unlike a typical feature landing new markup, this wave's CSS was authored
+directly as an external stylesheet (app/static/css/settings_center.css,
+linked via a normal <link rel="stylesheet">, the same pattern already used
+by app/templates/settings_center/_shell.html's faz4_support_account_mobile.
+css reference) rather than an inline <style> block, and its few spot-style
+needs (a link styled as a card, a couple of spacing tweaks) use named
+classes instead of style="..." attributes. Measured with the same canonical
+helper this file already uses for everything else
+(count_static_style_attrs_in_text / the <style>-tag regex): every file in
+this wave contributes 0 static, 0 blocks, 0 dynamic. `INITIAL_*` constants,
+`STYLE_MIGRATION_WAVES`, and `DELETED_TEMPLATE_WAVES` above are entirely
+unaffected by this wave, and no manifest entry is needed since there is
+nothing to account for.
+
+FORWARD-COMPATIBILITY FOLLOW-UP 10 (BYS360 Settings Center V2, orphan-auth-
+key closure, a DELETED_TEMPLATE_WAVES-class wave): app/about/routes.py was
+confirmed dead code as part of resolving the "about_bys360" ORPHAN_AUTH_KEY
+-- its @main_bp.route("/about-bys360") decorator never executed because the
+module was never imported anywhere in app/ (repo-wide grep, zero hits), so
+it never contributed a real runtime endpoint. Deleted along with its
+handler (app/main_handlers/about_handlers.py) and its sole template
+(app/templates/about_bys360.html, which independently carried 0 static
+style="..." attributes and exactly 1 <style> block -- see the
+"about_bys360_dead_route_cleanup" DELETED_TEMPLATE_WAVES entry below).
+Totals drop from 1032/222/64 (FOLLOW-UP 9's end state) to 1032/221/64.
+
 FORWARD-COMPATIBILITY FOLLOW-UP 8 (BYS360 Weight Template Orphan-Family
 Closure, a DELETED_TEMPLATE_WAVES-class wave): the two siblings explicitly
 left out of FOLLOW-UP 7's scope, `app/templates/weight_create.html` and
@@ -521,6 +550,20 @@ DELETED_TEMPLATE_WAVES: dict[str, _DeletedWaveManifestEntry] = {
         "removed_blocks": 2,
         "removed_dynamic": 0,
     },
+    # BYS360 Settings Center V2 orphan-auth-key closure: app/about/routes.py
+    # was confirmed dead code (its @main_bp.route("/about-bys360") decorator
+    # never executed -- the module was never imported anywhere in app/, so
+    # it never contributed a real runtime endpoint) and deleted, along with
+    # its sole template. Independently re-derived from the pre-deletion git
+    # ref below: 0 static, 1 <style> block, 0 dynamic.
+    "about_bys360_dead_route_cleanup": {
+        "templates": (
+            "app/templates/about_bys360.html",
+        ),
+        "removed_static": 0,
+        "removed_blocks": 1,
+        "removed_dynamic": 0,
+    },
 }
 
 # The fixed commit immediately BEFORE each deleted-template wave's own
@@ -534,7 +577,20 @@ DELETED_TEMPLATE_WAVES_PRE_DELETION_REF = {
     "duplicate_template_orphan_cleanup_wave1": "d4ee2043931b37cef6df2ceef898094e0eebb04d",
     "weights_orphan_template_cleanup": "2838761cdc37d3c987ca6eb1ae1d2d0d0d9a1fff",
     "weight_create_edit_orphan_cleanup": "46b468a40b00e7d0a492b5f7b511349c83a7444d",
+    "about_bys360_dead_route_cleanup": "9be1b80cc87f809cd0abefcd4121d85b37cd3487",
 }
+
+# FORWARD-COMPATIBILITY FOLLOW-UP 9 (see module docstring above): Settings
+# Center V2's four new templates are independently verified below
+# (test_settings_center_v2_templates_contribute_zero_style_debt) to
+# contribute 0 static/0 blocks/0 dynamic, so no manifest entry or formula
+# change is needed here -- INITIAL_*/CUMULATIVE_REMOVED_*/EXPECTED_* below
+# are entirely unaffected by this wave.
+_BYS360_SETTINGS_CENTER_V2_TEMPLATES: tuple[str, ...] = (
+    "app/templates/settings_center/_shell.html",
+    "app/templates/settings_center/home.html",
+    "app/templates/settings_center/module.html",
+)
 
 _STYLE_TAG_RE = re.compile(r"<style\b", re.IGNORECASE)
 # Simple raw-text dynamic-attribute matcher for git-show re-derivation only
@@ -645,6 +701,27 @@ def test_deleted_wave_removed_static_and_removed_blocks_match_pre_deletion_git_r
             f"{wave_name}: independently-derived dynamic style attribute count at "
             f"{pre_ref} is {total_dynamic}; manifest says removed_dynamic="
             f"{wave['removed_dynamic']}."
+        )
+
+
+def test_settings_center_v2_templates_contribute_zero_style_debt() -> None:
+    """FORWARD-COMPATIBILITY FOLLOW-UP 9 (see module docstring): Settings
+    Center V2's new templates use an external stylesheet
+    (app/static/css/settings_center.css) and named classes instead of
+    inline style="..."/<style> content, so they must independently measure
+    to exactly 0 static, 0 blocks, 0 dynamic -- never just trusted. If this
+    ever fails, someone added inline style content to one of these
+    templates, which would silently raise the repo-wide debt ceiling; fix
+    the template (move it to the external stylesheet) rather than updating
+    EXPECTED_ACTIVE_STYLE_TOTAL/EXPECTED_STYLE_BLOCK_TOTAL above."""
+    for relative_path in _BYS360_SETTINGS_CENTER_V2_TEMPLATES:
+        text = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        static = count_static_style_attrs_in_text(text, relative_path)
+        blocks = len(_STYLE_TAG_RE.findall(text))
+        dynamic = len(_DYNAMIC_STYLE_ATTR_RE.findall(text))
+        assert (static, blocks, dynamic) == (0, 0, 0), (
+            f"{relative_path}: expected 0 static/0 blocks/0 dynamic, found "
+            f"{static} static/{blocks} blocks/{dynamic} dynamic."
         )
 
 

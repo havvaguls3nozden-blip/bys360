@@ -126,8 +126,14 @@ RESIDUAL_TEMPLATE_FILE = "app/templates/dashboard/executive_summary.html"
 # changing the endpoint-list hash. This wave's own change (dead module
 # deletion) remains unrelated to routes; the baseline below is updated to
 # the new, correct values.
-EXPECTED_ROUTE_COUNT = 984
-EXPECTED_ENDPOINT_LIST_SHA256 = "7c0c210f14dc46d39795dadce63458b51d2e9da0108c3c2cf86f9834c413852b"
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 SETTINGS CENTER V2): 11 new
+# GET-only /settings-center/* routes (app/settings_center/routes.py) raised
+# the count 984->995 and changed the endpoint-list hash accordingly --
+# mechanically re-verified against a fresh app.url_map, unrelated to this
+# wave's own dead-module-deletion change.
+EXPECTED_ROUTE_COUNT = 995
+EXPECTED_ENDPOINT_LIST_SHA256 = "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
 
 STARTUP_FILES_THAT_MUST_NOT_REFERENCE_THE_DEAD_MODULE = (
     "app/dashboard/routes.py",
@@ -526,10 +532,14 @@ def test_daily_weather_mail_service_and_cli_scripts_still_exist_untouched() -> N
 # app/templates/weight_edit.html, each independently carrying one static
 # style="..." attribute and one <style> block: 1034 - 2 = 1032,
 # 224 - 2 = 222. See that same ledger file's FORWARD-COMPATIBILITY
-# FOLLOW-UP 8.
+# FOLLOW-UP 8. A further, unrelated later wave (BYS360 Settings Center V2)
+# added 4 new templates, but their CSS is an external stylesheet with no
+# inline style="..." attributes or <style> blocks, contributing 0 -- totals
+# remain 1032/222. See that same ledger file's FORWARD-COMPATIBILITY
+# FOLLOW-UP 9.
 EXPECTED_ACTIVE_STYLE_TOTAL = 1032
 EXPECTED_DYNAMIC_STYLE_TOTAL = 64
-EXPECTED_STYLE_BLOCK_TOTAL = 222
+EXPECTED_STYLE_BLOCK_TOTAL = 221
 
 
 def test_canonical_style_and_handler_inventory_is_unchanged() -> None:
