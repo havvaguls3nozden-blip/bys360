@@ -55,6 +55,19 @@
     });
   }
 
+  // BYS360 Assistant V2 CSRF FIX (mandate Phase D): matches the exact same
+  // established pattern app/templates/ai_agent/panel.html already uses for
+  // this same /ai-agent/api/ask endpoint (base.html always renders a
+  // site-wide <meta name="csrf-token"> for an authenticated session) --
+  // not a new security pattern, just applying the existing one to this
+  // caller too.
+  function csrfToken() {
+    var meta = document.querySelector('meta[name="csrf-token"], meta[name="csrf_token"]');
+    if (meta && meta.getAttribute('content')) return meta.getAttribute('content');
+    var input = document.querySelector('input[name="csrf_token"]');
+    return input ? input.value : '';
+  }
+
   function iconSpark() {
     return '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.7l1.9 5.1 5.1 1.9-5.1 1.9L12 16.8l-1.9-5.2L5 9.7l5.1-1.9L12 2.7Z" fill="currentColor"/><path d="M18.4 14.4l.9 2.2 2.2.9-2.2.9-.9 2.2-.9-2.2-2.2-.9 2.2-.9.9-2.2Z" fill="currentColor" opacity=".72"/></svg>';
   }
@@ -960,6 +973,7 @@
           '<div class="bys360-am-header-top">' +
             '<div class="bys360-am-mark">' + iconSpark() + '</div>' +
             '<div class="bys360-am-title"><h2>' + MODULE_NAME + '</h2><p>' + MODULE_LONG_NAME + '</p></div>' +
+            '<button class="bys360-am-icon-btn" type="button" data-new-conversation="true" title="Yeni sohbet" aria-label="Yeni sohbet">⟲</button>' +
             '<button class="bys360-am-icon-btn" type="button" data-reset-position="true" title="Konumu sıfırla" aria-label="Konumu sıfırla">⌖</button>' +
             '<button class="bys360-am-close" type="button" aria-label="Asistanı kapat">×</button>' +
           '</div>' +
@@ -1021,9 +1035,10 @@
     } catch (e) { return false; }
   }
 
-  function appendMessage(root, role, text, links, persist, transient) {
+  function appendMessage(root, role, text, links, persist, transient, extras) {
     links = safeLinks(links);
     if (role !== 'user') text = sanitizeAssistantText(text);
+    extras = extras || {};
     var kayıt = qs('[data-chat-log]', root);
     if (!kayıt) return;
     var row = document.createElement('div');
@@ -1034,7 +1049,46 @@
     avatar.textContent = role === 'user' ? 'Siz' : 'BYS';
     var bubble = document.createElement('div');
     bubble.className = 'bys360-am-bubble';
-    bubble.textContent = text || '';
+    if (role !== 'user' && extras.moduleLabel) {
+      var badge = document.createElement('span');
+      badge.className = 'bys360-am-module-badge';
+      badge.textContent = extras.moduleLabel;
+      bubble.appendChild(badge);
+    }
+    var answerText = document.createElement('div');
+    answerText.className = 'bys360-am-answer-text';
+    answerText.textContent = text || '';
+    bubble.appendChild(answerText);
+    if (role !== 'user' && Array.isArray(extras.sources) && extras.sources.length) {
+      var sourceBox = document.createElement('div');
+      sourceBox.className = 'bys360-am-sources';
+      extras.sources.slice(0, 5).forEach(function (label) {
+        var chip = document.createElement('span');
+        chip.className = 'bys360-am-source-chip';
+        chip.textContent = label;
+        sourceBox.appendChild(chip);
+      });
+      bubble.appendChild(sourceBox);
+    }
+    if (role !== 'user' && Array.isArray(extras.suggestedQuestions) && extras.suggestedQuestions.length) {
+      var suggestBox = document.createElement('div');
+      suggestBox.className = 'bys360-am-suggestions';
+      extras.suggestedQuestions.slice(0, 4).forEach(function (question) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'bys360-am-suggestion-chip';
+        chip.textContent = question;
+        chip.addEventListener('click', function () {
+          var form = qs('[data-chat-form]', root);
+          var input = qs('[data-chat-input]', root);
+          if (input) input.value = question;
+          if (form && typeof form.requestSubmit === 'function') form.requestSubmit();
+          else if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+        });
+        suggestBox.appendChild(chip);
+      });
+      bubble.appendChild(suggestBox);
+    }
     if (links && links.length) {
       var linkBox = document.createElement('div');
       linkBox.className = 'bys360-am-links';
@@ -1117,24 +1171,31 @@
 
 
   function localFallback(question) {
-    /* BYS360_ASSISTANT_LOCAL_FALLBACK_V31_3
-       Sunucu cevabı alınamazsa yalnızca güvenli yerel rehberlik döner.
-       İdari karar, performans puanı, mesaj içeriği veya yetkisiz veri göstermez. */
-    try {
-      var fallback = (typeof localAnswer === 'function') ? localAnswer(question) : null;
-      if (fallback && (fallback.text || fallback.links)) {
-        return fallback;
-      }
-    } catch (e) {}
+    /* BYS360 Assistant V2 SINGLE-INTELLIGENCE-ENGINE (mandate Phase B1):
+       this used to answer the user's actual business question from the
+       local ROUTES/localAnswer() knowledge table when the server call
+       failed -- a second active answer engine, gated on failure instead of
+       by default. It now returns exactly one fixed, deterministic
+       availability message and never calls localAnswer() for question
+       content. (This function's own live submit-handler call site is
+       currently shadowed by bys360_assistant_module_memory_v30.js's
+       capture-phase submit listener -- see that file's own handleQuestion
+       -- but the same fix is applied here too so neither file can ever
+       answer from local business knowledge, regardless of which one
+       actually handles a given request.) */
+    void question;
     return makeAnswer(
-      'BYS360 Asistanı sunucu cevabına şu an ulaşamadı. Yine de güvenli şekilde yardımcı olabilirim: yapmak istediğiniz işlemi kısa bir cümleyle yazın; ilgili modül, yetki ve kontrol adımlarını yerel rehberlik düzeyinde anlatırım. Hassas veri, performans puanı veya idari karar göstermem.',
-      [{ title: 'BYS360 Asistanı Paneli', href: '/ai-agent/panel' }]
+      "BYS360 Kurumsal Asistan'a şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.",
+      []
     );
   }
 
   function askServer(question) {
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    var token = csrfToken();
+    if (token) { headers['X-CSRFToken'] = token; headers['X-CSRF-Token'] = token; }
     return fetch('/ai-agent/api/ask', {
-      method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      method: 'POST', credentials: 'same-origin', headers: headers,
       body: JSON.stringify({ question: question, context: (typeof currentPageContext === 'function' ? currentPageContext() : {}) })
     }).then(function (response) {
       if (!response.ok) throw new Error('ask');
@@ -1147,7 +1208,10 @@
         links = actions.filter(function (a) { return a && (a.href || a.url); }).map(function (a) { return { title: a.title || a.label || 'Ekrana git', href: a.href || a.url }; });
       }
       if (!answer) throw new Error('empty');
-      return { text: sanitizeAssistantText(answer), links: safeLinks(links) };
+      var sources = Array.isArray(payload.sources) ? payload.sources.filter(function (s) { return s && s.label; }).map(function (s) { return String(s.label); }) : [];
+      var suggestedQuestions = Array.isArray(payload.suggested_questions) ? payload.suggested_questions.filter(function (q) { return q; }).map(function (q) { return String(q); }) : [];
+      var moduleLabel = (typeof payload.module === 'string' && payload.module) ? payload.module : '';
+      return { text: sanitizeAssistantText(answer), links: safeLinks(links), sources: sources, suggestedQuestions: suggestedQuestions, moduleLabel: moduleLabel };
     });
   }
 
@@ -1328,6 +1392,18 @@
 
     var launcher = qs('.bys360-am-launcher', root);
     var close = qs('.bys360-am-close', root);
+    var newConversation = qs('[data-new-conversation]', root);
+    if (newConversation) newConversation.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      // BYS360 Assistant V2 conversation_id reset (mandate Phase D):
+      // memory_v30.js owns the actual conversation_id/history state (it is
+      // the file that actually answers every live question -- see its own
+      // module docstring); this button only signals intent, so the two
+      // files stay decoupled via a plain DOM event instead of one calling
+      // the other's internals directly.
+      root.dispatchEvent(new CustomEvent('bys360-assistant-new-conversation', { bubbles: true }));
+    }, true);
     function toggleAssistant(event, forceFromPointerTap) {
       if (event) { event.preventDefault(); event.stopPropagation(); }
       if (!forceFromPointerTap && dragController && dragController.shouldSuppressLauncherClick && dragController.shouldSuppressLauncherClick()) return;
@@ -1402,7 +1478,7 @@ var form = qs('[data-chat-form]', root);
       }
       askServer(question).catch(function () { return localFallback(question); }).then(function (answer) {
         if (log && log.lastElementChild && log.lastElementChild.classList.contains('is-bot')) log.removeChild(log.lastElementChild);
-        appendMessage(root, 'bot', answer.text, answer.links);
+        appendMessage(root, 'bot', answer.text, answer.links, true, false, { sources: answer.sources, moduleLabel: answer.moduleLabel, suggestedQuestions: answer.suggestedQuestions });
       });
     });
   }

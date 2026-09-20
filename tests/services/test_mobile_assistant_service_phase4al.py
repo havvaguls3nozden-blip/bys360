@@ -1,64 +1,66 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
-import sys
-import types
-from typing import Any
-
-import pytest
-
-import app.api.mobile as mobile_pkg
 from app.api.mobile.services import assistant_service as svc
 
 
-@pytest.fixture()
-def fake_assistant_chat(monkeypatch: pytest.MonkeyPatch) -> types.ModuleType:
-    fake = types.ModuleType("app.api.mobile.domains.assistant_chat")
-    monkeypatch.setitem(sys.modules, "app.api.mobile.domains.assistant_chat", fake)
-    monkeypatch.setattr(mobile_pkg.domains, "assistant_chat", fake, raising=False)
-    return fake
+# BYS360 Assistant V2 MOBILE BACKEND CUTOVER (mandate Phase I): the two unit
+# tests that used to assert delegate_mobile_b49_assistant_v2_ask forwarded
+# its raw args/kwargs verbatim to the independent legacy rule-based handler
+# have been REPLACED below -- that forwarding behavior was the old contract
+# being cut over away from, not a regression to preserve. See
+# test_assistant_v2_mobile_cutover_contract_v1.py for the full behavioral
+# regression suite (auth, schema, denial, procedural steps).
+def test_delegate_mobile_b49_assistant_v2_ask_calls_assistant_v2_service(app, monkeypatch):
+    from app.services.assistant_v2 import service as service_module
+
+    called = {"value": False}
+    real_ask = service_module.AssistantV2Service.ask
+
+    def _tracking_ask(self, *args, **kwargs):
+        called["value"] = True
+        return real_ask(self, *args, **kwargs)
+
+    monkeypatch.setattr(service_module.AssistantV2Service, "ask", _tracking_ask)
+
+    from app.extensions import db
+    from app.models import User
+
+    with app.app_context():
+        user = User.query.filter_by(sicil_no="phase4al-delegate-unit-test").first()
+        if user is None:
+            user = User(sicil_no="phase4al-delegate-unit-test", email="phase4al-delegate-unit-test@example.invalid", ad="T", soyad="U", role="admin")
+            user.set_password("Assist_v2_Test_Pw_1!")
+            db.session.add(user)
+            db.session.commit()
+        with app.test_request_context("/api/mobile/assistant/v2/ask", json={"question": "merhaba"}):
+            svc.delegate_mobile_b49_assistant_v2_ask(user)
+
+    assert called["value"] is True
 
 
-def _recording_legacy(return_value: Any):
-    calls: list[dict[str, Any]] = []
+def test_delegate_mobile_b49_assistant_v2_ask_response_has_mobile_schema(app):
+    from app.extensions import db
+    from app.models import User
 
-    def legacy(*args: Any, **kwargs: Any) -> Any:
-        calls.append({"args": args, "kwargs": kwargs})
-        return return_value
+    with app.app_context():
+        user = User.query.filter_by(sicil_no="phase4al-delegate-schema-test").first()
+        if user is None:
+            user = User(sicil_no="phase4al-delegate-schema-test", email="phase4al-delegate-schema-test@example.invalid", ad="T", soyad="U", role="admin")
+            user.set_password("Assist_v2_Test_Pw_1!")
+            db.session.add(user)
+            db.session.commit()
+        with app.test_request_context("/api/mobile/assistant/v2/ask", json={"question": "merhaba"}):
+            response = svc.delegate_mobile_b49_assistant_v2_ask(user)
+            body = response.get_json()
 
-    legacy.calls = calls  # type: ignore[attr-defined]
-    return legacy
-
-
-def test_delegate_mobile_b49_assistant_v2_ask_forwards_to_legacy(
-    fake_assistant_chat: types.ModuleType,
-) -> None:
-    legacy = _recording_legacy({"answer": "ok"})
-    # No fixed attribute contract -- see fake_assistant_chat fixture above.
-    chat: Any = fake_assistant_chat
-    chat._bys360_legacy_mobile_b49_assistant_v2_ask = legacy
-
-    result = svc.delegate_mobile_b49_assistant_v2_ask("hello", user_id=42)
-
-    assert result == {"answer": "ok"}
-    assert legacy.calls == [
-        {"args": ("hello",), "kwargs": {"user_id": 42}}
-    ]
-
-
-def test_delegate_mobile_b49_assistant_v2_ask_raises_when_legacy_missing(
-    fake_assistant_chat: types.ModuleType,
-) -> None:
-    with pytest.raises(AttributeError, match="_bys360_legacy_mobile_b49_assistant_v2_ask"):
-        svc.delegate_mobile_b49_assistant_v2_ask()
+    for key in ("answer", "module", "route_hint", "required_roles", "steps", "warnings", "control_items", "suggested_questions", "intent", "source", "metrics", "user_label"):
+        assert key in body
 
 
 def test_assistant_v2_ask_route_end_to_end(app, client) -> None:
-    """Real /assistant/v2/ask endpoint must not 500 via the broken delegate lookup.
-
-    Regression guard for the production bug where delegate_mobile_b49_assistant_v2_ask
-    looked up the legacy handler on app.api.mobile.routes instead of
-    app.api.mobile.domains.assistant_chat, where it actually lives.
-    """
+    """Real /assistant/v2/ask endpoint must not 500, and must now answer via
+    AssistantV2Service (the mobile backend cutover), not the independent
+    rule-based engine."""
     from app.api.mobile.shared import _issue_token
     from app.extensions import db
     from app.models import User
@@ -72,6 +74,7 @@ def test_assistant_v2_ask_route_end_to_end(app, client) -> None:
                 password_hash="x",
                 ad="Test",
                 soyad="User",
+                role="admin",
             )
             db.session.add(user)
             db.session.commit()
@@ -86,3 +89,5 @@ def test_assistant_v2_ask_route_end_to_end(app, client) -> None:
     assert response.status_code == 200
     payload = response.get_json()
     assert payload["source"] == "bys360_mobile_assistant_v2_8_49"
+    assert "1. " in payload["answer"]
+    assert payload["intent"] == "PROCEDURAL_GUIDE"

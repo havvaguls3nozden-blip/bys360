@@ -199,6 +199,13 @@
   const PERF_URL = "/ai-agent/api/performance-summary";
   const KPI_URL = "/ai-agent/api/dashboard-kpi-summary";
   const ACTION_URL = "/ai-agent/api/action-queue-summary";
+  // BYS360 Assistant V2 conversation_id (mandate Phase B): page-lifetime
+  // only (a plain JS variable, not sessionStorage) -- this is a dedicated
+  // full chat page, not a persistent cross-page widget, so there is
+  // nothing to survive navigation for; a fresh page load always starts a
+  // fresh conversation, which is the safest possible default and needs no
+  // logout-specific clearing.
+  let conversationId = null;
 
   function text(value, fallback) {
     if (value === null || value === undefined || value === "") return fallback || "0";
@@ -327,15 +334,45 @@
     ].join("");
   }
 
-  function addMessage(role, message, actions) {
+  function addMessage(role, message, actions, extras) {
     const root = document.querySelector("[data-panel-messages]");
     if (!root) return;
+    extras = extras || {};
     const bubble = document.createElement("div");
     bubble.className = "ai-agent-bubble ai-agent-bubble-" + role;
+    if (role !== "user" && extras.module) {
+      const badge = document.createElement("span");
+      badge.className = "ai-agent-module-badge";
+      badge.textContent = text(extras.module, "");
+      bubble.appendChild(badge);
+    }
     const paragraph = document.createElement("p");
     paragraph.textContent = text(message, "");
     paragraph.style.whiteSpace = "pre-wrap";
     bubble.appendChild(paragraph);
+    if (role !== "user" && Array.isArray(extras.sources) && extras.sources.length) {
+      const sourceWrap = document.createElement("div");
+      sourceWrap.className = "ai-agent-answer-sources";
+      extras.sources.slice(0, 5).forEach(function (source) {
+        if (!source || !source.label) return;
+        const chip = document.createElement("span");
+        chip.textContent = text(source.label, "");
+        sourceWrap.appendChild(chip);
+      });
+      if (sourceWrap.children.length) bubble.appendChild(sourceWrap);
+    }
+    if (role !== "user" && Array.isArray(extras.suggestedQuestions) && extras.suggestedQuestions.length) {
+      const suggestWrap = document.createElement("div");
+      suggestWrap.className = "ai-agent-answer-suggestions";
+      extras.suggestedQuestions.slice(0, 4).forEach(function (question) {
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.textContent = text(question, "");
+        chip.addEventListener("click", function () { ask(question); });
+        suggestWrap.appendChild(chip);
+      });
+      if (suggestWrap.children.length) bubble.appendChild(suggestWrap);
+    }
     const list = Array.isArray(actions) ? actions : [];
     if (list.length) {
       const actionWrap = document.createElement("div");
@@ -372,12 +409,17 @@
         headers["X-CSRFToken"] = token;
         headers["X-CSRF-Token"] = token;
       }
+      const body = { question: value, context: pageContext() };
+      if (conversationId) body.conversation_id = conversationId;
       const data = await jsonFetch(ASK_URL, {
         method: "POST",
         headers: headers,
-        body: JSON.stringify({ question: value, context: pageContext() })
+        body: JSON.stringify(body)
       });
-      addMessage("assistant", data.answer || "Size nasıl yardımcı olabilirim?", data.actions || data.suggested_actions || []);
+      if (typeof data.conversation_id === "string") conversationId = data.conversation_id;
+      addMessage("assistant", data.answer || "Size nasıl yardımcı olabilirim?", data.actions || data.suggested_actions || [], {
+        sources: data.sources, module: data.module, suggestedQuestions: data.suggested_questions
+      });
     } catch (error) {
       addMessage("assistant", error.message || "Yanıt alınamadı. Lütfen tekrar deneyin.");
     } finally {

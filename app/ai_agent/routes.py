@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 from flask import Blueprint, jsonify, render_template, request
 from flask_login import current_user, login_required
 
@@ -10,7 +12,6 @@ from app.services.ai_agent import (
     build_ai_agent_health_payload,
     build_ai_agent_panel_context,
     build_ai_agent_performance_summary,
-    build_ai_agent_reply,
     build_ai_agent_security_policy,
     build_ai_agent_security_self_check,
     enqueue_ai_agent_suggestion,
@@ -105,14 +106,75 @@ def ai_agent_panel():
 @ai_agent_bp.post("/api/ask")
 @login_required
 def ai_agent_ask():
+    """BYS360 Assistant V2 WEB CUTOVER (mandate Phase F): the normal,
+    production-facing chat widget/panel path now answers via
+    `AssistantV2Service`, not the legacy `build_ai_agent_reply` chain. No
+    business logic lives here -- parse the request, call the one service
+    entry point, adapt its answer to the shape the existing (unchanged)
+    front-end already reads (`web_presentation_adapter.adapt_for_legacy_web`),
+    return it (see Phase G's legacy-deactivation proof for exactly which
+    legacy layers still have live callers elsewhere after this cutover --
+    `build_ai_agent_reply` itself is no longer imported by this file)."""
+    from app.services.assistant_v2.service import AssistantV2Service
+    from app.services.assistant_v2.web_presentation_adapter import adapt_for_legacy_web
+
     payload = request.get_json(silent=True) or {}
-    question = payload.get("question") or request.form.get("question") or ""
-    context = payload.get("context") if isinstance(payload.get("context"), dict) else {}
-    try:
-        result = build_ai_agent_reply(current_user, question, context=context)
-    except TypeError:
-        result = build_ai_agent_reply(current_user, question)
-    return jsonify(result), 200
+    question = str(payload.get("question") or request.form.get("question") or "")
+    raw_context = payload.get("context")
+    context: dict[str, Any] = raw_context if isinstance(raw_context, dict) else {}
+    raw_path = context.get("path")
+    page_path = raw_path if isinstance(raw_path, str) else None
+    # Phase B (conversation_id web integration): same optional,
+    # type-validated pass-through already used by /api/v2/ask above -- a
+    # missing/invalid value is silently treated as "start fresh", never a
+    # 400 (AssistantV2Service.ask() itself decides what a bad/foreign id
+    # means, this route never does).
+    conversation_id = payload.get("conversation_id") or None
+    if conversation_id is not None and not isinstance(conversation_id, str):
+        conversation_id = None
+
+    answer = AssistantV2Service().ask(current_user, question, conversation_id=conversation_id, page_path=page_path)
+    return jsonify(adapt_for_legacy_web(answer)), 200
+
+
+# BYS360_ASSISTANT_V2_API_ENTRY_POINT_BEGIN
+# New, additive Assistant V2 endpoint (mandate Phase D/L) -- deliberately a
+# SEPARATE path from /api/ask above, not a replacement. The legacy route
+# above is left completely untouched: this project's own Phase E/F/G
+# sequencing requires a full legacy-chain inventory and migration decision
+# BEFORE any cutover of the main assistant route, and that inventory is a
+# separate, still-in-review piece of work. All business logic lives in
+# AssistantV2Service.ask() -- this view function does nothing but parse the
+# request and serialize the response, per this project's own "no business
+# intelligence in the Flask route" rule.
+@ai_agent_bp.post("/api/v2/ask")
+@login_required
+def ai_agent_v2_ask():
+    from app.services.assistant_v2.service import AssistantV2Service
+
+    payload = request.get_json(silent=True) or {}
+    question = str(payload.get("question") or request.form.get("question") or "")
+    conversation_id = payload.get("conversation_id") or None
+    if conversation_id is not None and not isinstance(conversation_id, str):
+        conversation_id = None
+    page_path = payload.get("page_path") or None
+    if page_path is not None and not isinstance(page_path, str):
+        page_path = None
+
+    answer = AssistantV2Service().ask(current_user, question, conversation_id=conversation_id, page_path=page_path)
+    return jsonify(
+        {
+            "status": answer.status,
+            "answer": answer.answer,
+            "capability_key": answer.capability_key,
+            "module_keys": list(answer.module_keys),
+            "sources": [{"label": s.label, "url": s.url} for s in answer.sources],
+            "conversation_id": answer.conversation_id,
+            "clarification": answer.clarification,
+            "related_links": list(answer.related_links),
+        }
+    ), 200
+# BYS360_ASSISTANT_V2_API_ENTRY_POINT_END
 
 
 @ai_agent_bp.get("/api/actions")

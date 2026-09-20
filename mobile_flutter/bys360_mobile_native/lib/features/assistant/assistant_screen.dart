@@ -82,7 +82,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
       });
     } catch (_) {
       setState(() {
-        _messages.add(_AssistantMessage.assistant(data: _localFallback(question)));
+        _messages.add(_AssistantMessage.assistant(data: _offlineUnavailableResponse()));
       });
     } finally {
       if (mounted) {
@@ -103,6 +103,31 @@ class _AssistantScreenState extends State<AssistantScreen> {
     });
   }
 
+  // BYS360 Assistant V2 SINGLE-INTELLIGENCE-ENGINE (mandate Phase B2): when
+  // the real backend call fails, the app must show ONE deterministic
+  // "currently unreachable" message -- never answer the user's actual
+  // business question from a local keyword table, which would be a second,
+  // independent answer engine. `_localFallback` below is no longer called
+  // from `_ask()` (see its single call site was replaced with this
+  // method); it is kept only as dead compatibility data, exactly like the
+  // equivalent fix already applied to the web widget
+  // (bys360_assistant_module.js's own `localFallback()` and
+  // bys360_assistant_module_memory_v30.js's `handleQuestion()`).
+  Map<String, dynamic> _offlineUnavailableResponse() {
+    return const <String, dynamic>{
+      'intent': 'SYSTEM_ERROR',
+      'module': 'BYS360 Asistanı',
+      'answer': "BYS360 Kurumsal Asistan'a şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.",
+      'route_hint': '',
+      'required_roles': <String>[],
+      'steps': <String>[],
+      'warnings': <String>[],
+      'control_items': <String>[],
+      'suggested_questions': <String>[],
+    };
+  }
+
+  // ignore: unused_element
   Map<String, dynamic> _localFallback(String question) {
     final q = _normalize(question);
 

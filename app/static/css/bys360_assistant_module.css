@@ -113,6 +113,13 @@
 #bys360-assistant-module-root .bys360-am-message.is-user .bys360-am-bubble { background: linear-gradient(135deg, #7a0000, #a3141a); color: #fff; border-color: transparent; }
 #bys360-assistant-module-root .bys360-am-links { display: grid; gap: 8px; margin-top: 12px; }
 #bys360-assistant-module-root .bys360-am-links a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 9px 11px; border-radius: 14px; background: rgba(139,0,0,.055); border: 1px solid rgba(139,0,0,.12); color: var(--bys360-am-red); font-weight: 750; text-decoration: none; }
+#bys360-assistant-module-root .bys360-am-module-badge { display: inline-block; margin-bottom: 6px; padding: 2px 9px; border-radius: 999px; background: rgba(139,0,0,.08); color: var(--bys360-am-red); font-size: 10.5px; font-weight: 800; letter-spacing: .01em; }
+#bys360-assistant-module-root .bys360-am-answer-text { white-space: pre-wrap; }
+#bys360-assistant-module-root .bys360-am-sources { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#bys360-assistant-module-root .bys360-am-source-chip { padding: 3px 9px; border-radius: 999px; background: rgba(36,48,66,.06); border: 1px solid rgba(36,48,66,.12); color: #5b6472; font-size: 10.5px; font-weight: 650; }
+#bys360-assistant-module-root .bys360-am-suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+#bys360-assistant-module-root .bys360-am-suggestion-chip { padding: 6px 11px; border-radius: 999px; background: #fff; border: 1px solid rgba(139,0,0,.18); color: var(--bys360-am-red); font-size: 11.5px; font-weight: 700; cursor: pointer; }
+#bys360-assistant-module-root .bys360-am-suggestion-chip:hover { background: rgba(139,0,0,.06); }
 #bys360-assistant-module-root .bys360-am-form { flex: 0 0 auto; display: flex; flex-direction: column; gap: 9px; padding: 12px; border-radius: 20px; background: #fff; border: 1px solid rgba(139,0,0,.11); box-shadow: 0 8px 22px rgba(17,24,39,.06); }
 #bys360-assistant-module-root .bys360-am-form textarea { width: 100%; resize: none; min-height: 86px; border: 1px solid rgba(139,0,0,.14); border-radius: 16px; padding: 12px 13px; color: #263142; outline: none; line-height: 1.45; }
 #bys360-assistant-module-root .bys360-am-form-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }

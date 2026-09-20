@@ -269,11 +269,96 @@ def settings_center_support():
 @login_required
 @menu_key_required("settings_center_virtual_assistant")
 def settings_center_virtual_assistant():
+    kv_facts = [
+        {"label": "Erişim kontrolü", "value": "Rol matrisi tabanlı", "sub": "app/services/assistant_role_matrix_v10.py"},
+    ]
+    try:
+        # Defensive: a status-summary failure must not break the whole
+        # Settings Center page (same failure-isolation stance as every
+        # assistant_v2 read_adapter). get_assistant_v2_status_summary()
+        # never returns secrets -- see its own module docstring.
+        from app.services.assistant_v2.status_summary import get_assistant_v2_status_summary
+
+        status = get_assistant_v2_status_summary()
+        kv_facts.extend(
+            [
+                {
+                    "label": "BYS360 AI Core",
+                    "value": "Aktif" if status["bys360_ai_core_active"] else "Pasif",
+                    "sub": "Harici yapay zekâ servisi veya üçüncü taraf dil modeli gerektirmez",
+                },
+                {
+                    "label": "Yerli niyet motoru (Native Intent Engine)",
+                    "value": status["native_intent_engine_status"],
+                    "sub": "app/services/assistant_v2/intent_router.py + domain_vocabulary.py",
+                },
+                {
+                    "label": "Yetenek kayıt defteri (Capability Registry)",
+                    "value": f"{status['capability_count_total']} yetenek ({status['capability_count_read']} okuma / {status['capability_count_write']} yazma)",
+                    "sub": "app/services/assistant_v2/capability_registry.py",
+                },
+                {
+                    "label": "Kapsanan modüller",
+                    "value": f"{status['module_count_with_coverage']}/{status['module_count_total']} modül",
+                    "sub": f"kapsam dışı: {status['module_count_without_coverage']}",
+                },
+                {
+                    "label": "Modüller arası zekâ (Cross-Module Intelligence)",
+                    "value": f"{status['cross_module_intelligence_count']} birleşik yetenek",
+                    "sub": "app/services/assistant_v2/cross_module_orchestrator.py",
+                },
+                {
+                    "label": "Kullanım rehberleri (Procedural Guides)",
+                    "value": f"{status['procedural_guide_count']} rehber",
+                    "sub": "app/services/assistant_v2/procedural_guides.py",
+                },
+                {
+                    "label": "Web arka ucu (Web Backend)",
+                    "value": status["web_backend_status"],
+                    "sub": "app/ai_agent/routes.py -- /ai-agent/api/ask",
+                },
+                {
+                    "label": "Mobil arka uç (Mobile Backend)",
+                    "value": status["mobile_backend_status"],
+                    "sub": "app/api/mobile/services/assistant_service.py -- /api/mobile/assistant/v2/ask",
+                },
+                {
+                    "label": "Tekil zekâ motoru (Single Intelligence Engine)",
+                    "value": "Aktif" if status["single_intelligence_engine_active"] else "Pasif",
+                    "sub": "Web ve mobil istemciler, sunucu erişilemediğinde yalnızca sabit bir bilgilendirme mesajı gösterir; iş sorusu yerel olarak cevaplanmaz",
+                },
+                {
+                    "label": "Yetkilendirme uygulaması",
+                    "value": status["authorization_enforcement_status"],
+                    "sub": "app/services/assistant_v2/capability_dispatcher.py",
+                },
+                {
+                    "label": "Kaynak atıfı (Source Attribution)",
+                    "value": status["source_attribution_status"],
+                },
+                {
+                    "label": "Denetim (Audit)",
+                    "value": status["audit_status"],
+                },
+                {
+                    "label": "Konuşma bağlamı (Conversation Context)",
+                    "value": status["conversation_context_status"],
+                },
+                {
+                    "label": "Ağdan bağımsızlık (Network Independence)",
+                    "value": status["network_independence_status"],
+                },
+                {
+                    "label": "Harici AI bağımlılığı (External AI Dependency)",
+                    "value": str(status["external_ai_dependency_count"]),
+                },
+            ]
+        )
+    except Exception:
+        current_app.logger.exception("BYS360 Settings Center V2: Assistant V2 durum özeti okunamadı")
     return _render_module_page(
         "virtual_assistant",
-        kv_facts=[
-            {"label": "Erişim kontrolü", "value": "Rol matrisi tabanlı", "sub": "app/services/assistant_role_matrix_v10.py"},
-        ],
+        kv_facts=kv_facts,
         related_links=[
             {"label": "Asistan Paneli", "description": "Sanal asistan ana ekranı", "url": "/ai-agent/panel"},
         ],

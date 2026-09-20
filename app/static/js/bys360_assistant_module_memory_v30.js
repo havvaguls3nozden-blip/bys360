@@ -7,6 +7,14 @@
   var ROOT_ID = 'bys360-assistant-module-root';
   var HISTORY_KEY = 'bys360Assistant.conversation.current.v30';
   var STATE_KEY = 'bys360Assistant.conversation.state.v30';
+  // BYS360 Assistant V2 conversation_id (mandate Phase B): sessionStorage
+  // only (never localStorage) -- matches this file's own existing
+  // HISTORY_KEY/STATE_KEY convention, so it survives same-tab page
+  // navigation (needed for a real multi-turn follow-up to work while the
+  // user browses the app) but is gone the moment the browser tab closes.
+  // Cleared explicitly on logout (see the logoutForm hook below) so a
+  // second user logging in on the same tab never inherits it.
+  var CONVERSATION_ID_KEY = 'bys360Assistant.conversation.id.v30';
   var LEGACY_KEYS = [
     'bys360Assistant.conversation.current.v29',
     'bys360Assistant.history.session.v28',
@@ -35,6 +43,14 @@
     return String(value == null ? '' : value).replace(/[&<>"']/g, function (ch) {
       return ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[ch];
     });
+  }
+  // BYS360 Assistant V2 CSRF FIX (mandate Phase D): same established
+  // pattern as app/templates/ai_agent/panel.html for this same endpoint.
+  function csrfToken() {
+    var meta = document.querySelector('meta[name="csrf-token"], meta[name="csrf_token"]');
+    if (meta && meta.getAttribute('content')) return meta.getAttribute('content');
+    var input = document.querySelector('input[name="csrf_token"]');
+    return input ? input.value : '';
   }
   function safeParse(raw) {
     if (!raw) return [];
@@ -71,6 +87,29 @@
   }
   function loadState() {
     try { return JSON.parse(sessionStorage.getItem(STATE_KEY) || 'null'); } catch (e) { return null; }
+  }
+  function loadConversationId() {
+    try { return sessionStorage.getItem(CONVERSATION_ID_KEY) || null; } catch (e) { return null; }
+  }
+  function saveConversationId(id) {
+    try {
+      if (id) sessionStorage.setItem(CONVERSATION_ID_KEY, id);
+      else sessionStorage.removeItem(CONVERSATION_ID_KEY);
+    } catch (e) {}
+  }
+  function clearConversation() {
+    // Phase D (conversation reset): clears conversation_id, the visible
+    // history, and the window.name cross-navigation fallback -- never
+    // touches server-side authorization state, which AssistantV2Service
+    // re-checks independently on every call regardless of client state.
+    history = [];
+    lastTopic = '';
+    saveConversationId(null);
+    try { sessionStorage.removeItem(HISTORY_KEY); } catch (e) {}
+    try { sessionStorage.removeItem(STATE_KEY); } catch (e) {}
+    try { window.name = ''; } catch (e2) {}
+    var root = rootEl();
+    if (root) clearOnlyChatLog(root);
   }
   function rootEl() {
     return document.getElementById(ROOT_ID)
@@ -124,7 +163,40 @@
     avatar.textContent = msg.role === 'user' ? 'Siz' : 'BYS';
     var bubble = document.createElement('div');
     bubble.className = 'bys360-am-bubble';
-    bubble.innerHTML = escapeText(msg.text || '').replace(/\n/g, '<br>');
+    if (msg.role !== 'user' && msg.moduleLabel) {
+      var badge = document.createElement('span');
+      badge.className = 'bys360-am-module-badge';
+      badge.textContent = msg.moduleLabel;
+      bubble.appendChild(badge);
+    }
+    var answerText = document.createElement('div');
+    answerText.className = 'bys360-am-answer-text';
+    answerText.innerHTML = escapeText(msg.text || '').replace(/\n/g, '<br>');
+    bubble.appendChild(answerText);
+    if (msg.role !== 'user' && Array.isArray(msg.sources) && msg.sources.length) {
+      var sourceBox = document.createElement('div');
+      sourceBox.className = 'bys360-am-sources';
+      msg.sources.slice(0, 5).forEach(function (label) {
+        var chip = document.createElement('span');
+        chip.className = 'bys360-am-source-chip';
+        chip.textContent = label;
+        sourceBox.appendChild(chip);
+      });
+      bubble.appendChild(sourceBox);
+    }
+    if (msg.role !== 'user' && Array.isArray(msg.suggestedQuestions) && msg.suggestedQuestions.length) {
+      var suggestBox = document.createElement('div');
+      suggestBox.className = 'bys360-am-suggestions';
+      msg.suggestedQuestions.slice(0, 4).forEach(function (question) {
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'bys360-am-suggestion-chip';
+        chip.textContent = question;
+        chip.addEventListener('click', function () { handleQuestion(question); });
+        suggestBox.appendChild(chip);
+      });
+      bubble.appendChild(suggestBox);
+    }
     var links = toLinks(msg.links || []);
     if (links.length) {
       var linkBox = document.createElement('div');
@@ -145,7 +217,12 @@
       window.requestAnimationFrame(function () { log.scrollTop = log.scrollHeight; });
     }
     if (persist !== false) {
-      history.push({ role:msg.role === 'user' ? 'user' : 'bot', text:msg.text || '', links:links, ts:Date.now() });
+      history.push({
+        role:msg.role === 'user' ? 'user' : 'bot', text:msg.text || '', links:links, ts:Date.now(),
+        sources: Array.isArray(msg.sources) ? msg.sources : undefined,
+        moduleLabel: msg.moduleLabel || undefined,
+        suggestedQuestions: Array.isArray(msg.suggestedQuestions) ? msg.suggestedQuestions : undefined
+      });
       if (history.length > MAX_HISTORY) history = history.slice(-MAX_HISTORY);
       saveHistory();
     }
@@ -187,7 +264,10 @@
     return true;
   }
   function addUser(root, text) { return renderMessage(root, { role:'user', text:text, links:[] }, true); }
-  function addBot(root, text, links) { return renderMessage(root, { role:'bot', text:text, links:toLinks(links) }, true); }
+  function addBot(root, text, links, extras) {
+    extras = extras || {};
+    return renderMessage(root, { role:'bot', text:text, links:toLinks(links), sources:extras.sources, moduleLabel:extras.moduleLabel, suggestedQuestions:extras.suggestedQuestions }, true);
+  }
   function scheduleRestore(reason) {
     if (isRestoring || Date.now() < suppressRestoreUntil) return;
     if (restoreTimer) clearTimeout(restoreTimer);
@@ -342,14 +422,67 @@
     var cur2 = detectCurrentItem(); saveState(cur2.screen);
     return response('BYS360 yönlendirme', 'Sorunuzu BYS360 kapsamında yorumladım; doğrudan net eşleşme bulamadım. Bulunduğunuz ekran: ' + cur2.screen + ' (' + cur2.module + ').\n\nDaha net yönlendirme için günlük dille yazabilirsiniz: “kişi nasıl eklenir”, “dönem açacağım”, “karne görünmüyor”, “menü yok”, “izin nasıl girilir”, “destek talebi açacağım”, “KPI hedef kartı oluşturacağım”.\n\nGenel sınır: Yetkiniz olan ekranı anlatırım, işlem sırasını veririm; hassas veri veya idari karar üretmem.', [[cur2.screen, cur2.href || '/home']]);
   }
+  // BYS360 Assistant V2 SINGLE-INTELLIGENCE-ENGINE FIX: this layer used to
+  // answer every question entirely from the local KNOWLEDGE table above,
+  // NEVER calling the server -- meaning the real, authorized, auditable
+  // AssistantV2Service backend (see app/ai_agent/routes.py's /api/ask
+  // cutover) was silently unreachable from the live chat widget, no matter
+  // what the backend did. The local KNOWLEDGE table is now used ONLY as an
+  // offline/network-failure fallback (mirrors the exact same fallback
+  // pattern already used elsewhere in this widget), matching the mandate's
+  // "one intelligence engine" architecture goal.
+  function askServerV30(q) {
+    var context = {};
+    try { context = { path: location.pathname }; } catch (e) {}
+    var headers = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    var token = csrfToken();
+    if (token) { headers['X-CSRFToken'] = token; headers['X-CSRF-Token'] = token; }
+    // BYS360 Assistant V2 conversation_id (mandate Phase B/C): sends
+    // whatever id this tab last received from the server (or none, on the
+    // very first question) -- AssistantV2Service.ask() is the only thing
+    // that ever decides whether that id is honored, re-resolved fresh, or
+    // discarded as foreign/unknown; this file never assumes it was valid,
+    // it only ever stores back exactly what the server returns.
+    var body = { question: q, context: context };
+    var conversationId = loadConversationId();
+    if (conversationId) body.conversation_id = conversationId;
+    return fetch('/ai-agent/api/ask', {
+      method: 'POST', credentials: 'same-origin', headers: headers,
+      body: JSON.stringify(body)
+    }).then(function (response) {
+      if (!response.ok) throw new Error('ask');
+      return response.json();
+    }).then(function (payload) {
+      var text = payload.answer || payload.reply || payload.message || '';
+      if (!text) throw new Error('empty');
+      saveConversationId(typeof payload.conversation_id === 'string' ? payload.conversation_id : null);
+      var actions = payload.actions || payload.suggestions || [];
+      var links = Array.isArray(actions) ? actions.filter(function (a) { return a && (a.href || a.url); }).map(function (a) { return { title: a.title || a.label || 'Ekrana git', href: a.href || a.url }; }) : [];
+      var sources = Array.isArray(payload.sources) ? payload.sources.filter(function (s) { return s && s.label; }).map(function (s) { return String(s.label); }) : [];
+      var suggestedQuestions = Array.isArray(payload.suggested_questions) ? payload.suggested_questions.filter(function (sq) { return sq; }).map(function (sq) { return String(sq); }) : [];
+      var moduleLabel = (typeof payload.module === 'string' && payload.module) ? payload.module : '';
+      return { text: text, links: links, sources: sources, suggestedQuestions: suggestedQuestions, moduleLabel: moduleLabel };
+    });
+  }
+  // BYS360 Assistant V2 SINGLE-INTELLIGENCE-ENGINE (mandate Phase B1): on a
+  // network/server failure this NEVER falls back to the local KNOWLEDGE
+  // table's own business answer -- that would still be a second active
+  // answer engine, just gated on failure instead of by default. The only
+  // failure response is one fixed, deterministic availability message.
+  // KNOWLEDGE/answer()/scoreItem() etc. are kept as dead compatibility data
+  // (still exercised by selfTest() below, never by a real user question).
+  var SERVER_UNAVAILABLE_MESSAGE = "BYS360 Kurumsal Asistan'a şu anda ulaşılamıyor. Lütfen daha sonra tekrar deneyin.";
   function handleQuestion(q) {
     var root = rootEl();
     if (!root) return false;
     history = loadHistory();
     if (history.length) restoreIntoUi('before-question');
     addUser(root, q);
-    var result = answer(q);
-    window.setTimeout(function () { addBot(root, result.text, result.links || []); }, 40);
+    askServerV30(q).catch(function () {
+      return { text: SERVER_UNAVAILABLE_MESSAGE, links: [], sources: [], suggestedQuestions: [], moduleLabel: '' };
+    }).then(function (result) {
+      addBot(root, result.text, result.links || [], { sources: result.sources, moduleLabel: result.moduleLabel, suggestedQuestions: result.suggestedQuestions });
+    });
     return true;
   }
   function interceptSubmit(event) {
@@ -422,6 +555,20 @@
       window.setTimeout(function () { bindForm(); }, 60);
     }
   }, true);
+  // Phase D: the header's "Yeni sohbet" button (bys360_assistant_module.js)
+  // only dispatches intent; this file owns the actual conversation state.
+  document.addEventListener('bys360-assistant-new-conversation', function () {
+    suppressRestoreUntil = Date.now() + 1000;
+    clearConversation();
+  });
+  // Phase B: logout must not let a second user on the same tab inherit the
+  // first user's conversation_id/history -- base.html's hidden logoutForm
+  // is the one reliable place every logout path (menu link or the
+  // top-right dropdown) funnels through.
+  try {
+    var logoutForm = document.getElementById('logoutForm');
+    if (logoutForm) logoutForm.addEventListener('submit', function () { clearConversation(); }, true);
+  } catch (eLogout) {}
   window.addEventListener('pagehide', function () { saveHistory(); saveState(lastTopic); });
   window.addEventListener('beforeunload', function () { saveHistory(); saveState(lastTopic); });
   window.addEventListener('pageshow', function () { install(); scheduleRestore('pageshow'); });
