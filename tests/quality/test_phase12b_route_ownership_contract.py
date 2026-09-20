@@ -259,17 +259,27 @@ def test_strategic_menu_endpoints_resolve_to_shadowed_names_but_main_wins(app):
 # count (971) and unique endpoint count (890) both rose by exactly 11 too,
 # since these are 11 genuinely new paths/endpoints, not renamed ones.
 # Mechanically re-verified against a fresh app.url_map.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 ASSISTANT V2, seal-fix wave): one
+# new, additive route (POST /ai-agent/api/v2/ask, endpoint
+# ai_agent.ai_agent_v2_ask) registers on ai_agent_bp immediately after the
+# existing /ai-agent/api/ask, i.e. strictly before the pwa blueprint in
+# add_url_rule order -- so total rule count, unique path count, and unique
+# endpoint count each rose by exactly 1 (995/971/890 -> 996/972/891), and
+# the pwa.manifest_webmanifest index shifted 916 -> 917 (main.bys360_pwa_
+# manifest's index is unaffected, since it registers before ai_agent_bp).
+# Mechanically re-verified against a fresh app.url_map, not hand-computed.
 def test_manifest_winner_and_route_snapshot_are_deterministic_across_factories(
     fresh_runtime_snapshot,
 ):
-    expected_snapshot = [995, 971, 890]
+    expected_snapshot = [996, 972, 891]
 
     for runtime in fresh_runtime_snapshot.values():
         assert runtime["counts"] == expected_snapshot
         entries = runtime["entries"]["/manifest.webmanifest"]
         assert [(entry["index"], entry["endpoint"]) for entry in entries] == [
             (822, "main.bys360_pwa_manifest"),
-            (916, "pwa.manifest_webmanifest"),
+            (917, "pwa.manifest_webmanifest"),
         ]
         assert (
             runtime["winners"]["/manifest.webmanifest|GET"]
@@ -512,9 +522,14 @@ def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):
 # 984->995 (see the shared rationale on STRATEGIC_CONFLICTS above); the 11
 # new /settings-center/* routes are all newly-registered, non-conflicting
 # paths, so the known conflict set (8 entries) is unchanged.
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 ASSISTANT V2, seal-fix wave):
+# counts rose 995->996 (see the shared rationale above); the new POST
+# /ai-agent/api/v2/ask route is a newly-registered, non-conflicting path,
+# so the known conflict set (8 entries) is unchanged.
 def test_phase12a_route_and_conflict_totals_remain_unchanged(fresh_runtime_snapshot):
     runtime = fresh_runtime_snapshot["first"]
-    assert runtime["counts"] == [995, 971, 890]
+    assert runtime["counts"] == [996, 972, 891]
     conflicts = set(runtime["conflicts"])
     assert len(conflicts) == 8
     assert set(STRATEGIC_CONFLICTS) <= conflicts

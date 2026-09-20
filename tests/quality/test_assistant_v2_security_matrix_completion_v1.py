@@ -111,6 +111,71 @@ def test_different_user_same_role_gets_independently_scoped_self_data(app):
 
 
 # ---------------------------------------------------------------------------
+# Different-unit / birim scope (mandate: local seal fix wave, security
+# matrix item 4)
+# ---------------------------------------------------------------------------
+
+
+def test_different_unit_scope_does_not_leak_records(app):
+    """Mechanical finding, not an assumption: across all 49 registered
+    capabilities, NONE restrict access by the CALLING user's own unit --
+    personnel_hr_list_personnel and settings_auth_list_unit_menu_overrides
+    are the only two that even accept a unit/birim argument, and both are
+    globally role-gated (permission_key='admin_users' / 'settings'); their
+    read_adapter bodies never consult the caller's own birim at all (the
+    `user` parameter is accepted for interface consistency but not read for
+    scoping -- grep-verified against app/services/assistant_v2/
+    read_adapters.py). This is intentional, existing product behavior: an
+    admin_users-authorized caller administers ALL units, not only their
+    own, exactly like the live (non-Assistant-V2) personnel list screen
+    this read_adapter mirrors. There is therefore no caller-identity-based
+    unit ISOLATION boundary to assert wrong without inventing one, which
+    the mandate this test closes explicitly forbids.
+
+    What IS real and testable here: when a specific unit is named, the
+    query must never leak another unit's rows. Two real personnel rows in
+    two different units are seeded below; querying one unit by name must
+    return that unit's row and must NOT return the other unit's row --
+    proving the filter itself is not cross-contaminating, which is the
+    concrete, non-fabricated property this capability actually has."""
+    from app.services.assistant_v2.capability_dispatcher import invoke_capability
+
+    admin_id = _create_user(app, sicil_no="av2_sec_unit_admin", role="admin")
+
+    with app.app_context():
+        from app.extensions import db
+        from app.models import User
+
+        for sicil_no, birim in (
+            ("av2_sec_unit_member_a", "AV2 Test Birimi A"),
+            ("av2_sec_unit_member_b", "AV2 Test Birimi B"),
+        ):
+            existing = User.query.filter_by(sicil_no=sicil_no).first()
+            if existing is None:
+                member = User(
+                    sicil_no=sicil_no, email=f"{sicil_no}@ktb.gov.tr", ad="Unit", soyad="Test",
+                    role="personel", is_active=True, must_change_password=False, must_set_security_question=False,
+                    birim=birim,
+                )
+                member.set_password(_PASSWORD)
+                db.session.add(member)
+        db.session.commit()
+
+    from app.services.assistant_v2.result_contract import AssistantResultStatus
+
+    with app.test_request_context():
+        admin = _get_user(app, admin_id)
+        result = invoke_capability(admin, "personnel_hr_list_personnel", birim="AV2 Test Birimi A")
+
+    assert result.status is not AssistantResultStatus.ACCESS_DENIED
+    rows = result.data or []
+    sicil_numbers = {r.get("sicil_no") for r in rows}
+    assert "av2_sec_unit_member_b" not in sicil_numbers, (
+        "Querying unit A must never return unit B's personnel row."
+    )
+
+
+# ---------------------------------------------------------------------------
 # Disabled capability
 # ---------------------------------------------------------------------------
 

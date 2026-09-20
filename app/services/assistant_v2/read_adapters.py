@@ -180,7 +180,7 @@ def performance_mgmt_read_period_summary(user: Any, period_id: int) -> dict[str,
     try:
         from app.models.performance_models import PerformanceEvaluation, PerformancePeriod
 
-        period = PerformancePeriod.query.get(period_id)
+        period = db.session.get(PerformancePeriod, period_id)
         if period is None:
             return None
         evaluation_count = PerformanceEvaluation.query.filter(PerformanceEvaluation.period_id == period_id).count()
@@ -250,7 +250,7 @@ def portal_read_post_detail(user: Any, post_id: int) -> dict[str, Any] | None:
         from app.models.portal_models import PortalPost
         from app.services.portal_service import can_user_view_post
 
-        post = PortalPost.query.get(post_id)
+        post = db.session.get(PortalPost, post_id)
         if post is None:
             return None
         if not can_user_view_post(user, post):
@@ -439,7 +439,7 @@ def communication_read_announcement_detail(user: Any, announcement_id: int) -> d
     try:
         from app.models.announcement_popup_models import Announcement
 
-        a = Announcement.query.get(announcement_id)
+        a = db.session.get(Announcement, announcement_id)
         if a is None or not a.is_active:
             return None
         return {
@@ -528,7 +528,7 @@ def support_help_read_ticket_detail(user: Any, ticket_id: int) -> dict[str, Any]
         from app.models.support_models import SupportTicket
 
         uid = _user_id(user)
-        t = SupportTicket.query.get(ticket_id)
+        t = db.session.get(SupportTicket, ticket_id)
         if t is None:
             return None
         if uid is None or (t.created_by_user_id != uid and t.assigned_to_user_id != uid):
@@ -843,7 +843,7 @@ def notifications_read_notification_detail(user: Any, notification_id: int) -> d
         from app.models.communication_models import Notification
 
         uid = _user_id(user)
-        n = Notification.query.get(notification_id)
+        n = db.session.get(Notification, notification_id)
         if n is None or uid is None or n.user_id != uid:
             return None
         return {
@@ -1025,7 +1025,7 @@ def audit_read_change_log_detail(user: Any, change_log_id: int) -> dict[str, Any
     try:
         from app.models.settings_models import SettingsChangeLog
 
-        row = SettingsChangeLog.query.get(change_log_id)
+        row = db.session.get(SettingsChangeLog, change_log_id)
         if row is None:
             return None
         return {

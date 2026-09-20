@@ -1,5 +1,5 @@
 {
-  "route_count": 1034,
+  "route_count": 1035,
   "contract_keys": [
     "/account/change-password|GET,POST",
     "/account/photo|POST",
@@ -124,6 +124,7 @@
     "/ai-agent/api/performance-summary|GET",
     "/ai-agent/api/security-policy|GET",
     "/ai-agent/api/security-self-check|GET",
+    "/ai-agent/api/v2/ask|POST",
     "/ai-agent/healthz|GET",
     "/ai-agent/health|GET",
     "/ai-agent/knowledge/<int:entry_id>/delete|POST",

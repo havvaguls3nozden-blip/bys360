@@ -132,8 +132,14 @@ RESIDUAL_TEMPLATE_FILE = "app/templates/dashboard/executive_summary.html"
 # the count 984->995 and changed the endpoint-list hash accordingly --
 # mechanically re-verified against a fresh app.url_map, unrelated to this
 # wave's own dead-module-deletion change.
-EXPECTED_ROUTE_COUNT = 995
-EXPECTED_ENDPOINT_LIST_SHA256 = "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 ASSISTANT V2, seal-fix wave): one
+# new, additive route (POST /ai-agent/api/v2/ask) raised the count 995->996
+# and changed the endpoint-list hash accordingly -- mechanically re-verified
+# against a fresh app.url_map, unrelated to this wave's own dead-module-
+# deletion change.
+EXPECTED_ROUTE_COUNT = 996
+EXPECTED_ENDPOINT_LIST_SHA256 = "6d77723ef2dac703edf297eb04993979267b8c34c76da49d71028e01b15c39b3"
 
 STARTUP_FILES_THAT_MUST_NOT_REFERENCE_THE_DEAD_MODULE = (
     "app/dashboard/routes.py",

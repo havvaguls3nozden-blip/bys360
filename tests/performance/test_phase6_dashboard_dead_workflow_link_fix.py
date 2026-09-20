@@ -97,8 +97,14 @@ _TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360_pytest_tmp" / "phase6_dead
 # the count 984->995 and changed the endpoint-list hash accordingly --
 # mechanically re-verified against a fresh app.url_map, unrelated to this
 # wave's own dead-link-removal change.
-EXPECTED_ROUTE_COUNT = 995
-EXPECTED_ENDPOINT_LIST_SHA256 = "5976fabafaa9ec3cd1f7abfd84d801ba35047f23ea6b8efdb4344bf376411a90"
+#
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 ASSISTANT V2, seal-fix wave): one
+# new, additive route (POST /ai-agent/api/v2/ask) raised the count 995->996
+# and changed the endpoint-list hash accordingly -- mechanically re-verified
+# against a fresh app.url_map, unrelated to this wave's own dead-link-
+# removal change.
+EXPECTED_ROUTE_COUNT = 996
+EXPECTED_ENDPOINT_LIST_SHA256 = "6d77723ef2dac703edf297eb04993979267b8c34c76da49d71028e01b15c39b3"
 
 TEMPLATE_PATH = REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
 
