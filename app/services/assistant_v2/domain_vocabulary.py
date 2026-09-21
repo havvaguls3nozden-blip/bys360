@@ -29,11 +29,20 @@ _TOKEN_RE = re.compile(r"[a-zçğıöşü0-9]+", re.IGNORECASE)
 # analyzer. Stripping is applied at most once per token and only when the
 # remaining stem is at least 3 characters, to avoid over-stripping short
 # words into meaningless fragments.
+#
+# "mı"/"mi"/"mu"/"mü" and "m" (1st-person singular possessive, e.g.
+# "kotam" -> "kota", "kotamı" -> "kota") were added as a real gap found by
+# testing: a query like "dosya kotam ne kadar?" scored zero extra points
+# against the "quota" tag because "kotam"/"kotamı" never reduced to the
+# bare "kota" the tag's canonical-form bridge expands to. Placed before
+# the shorter existing single-letter suffixes so "kotamı" strips to
+# "kota" in one step rather than the incomplete "kotam".
 _SUFFIXES = (
     "lerinden", "larından", "lerinde", "larında", "lerini", "larını",
     "lerin", "ların", "leri", "ları", "nden", "ndan", "deki", "daki",
     "nin", "nın", "nun", "nün", "ler", "lar", "den", "dan", "de", "da",
-    "in", "ın", "un", "ün", "i", "ı", "u", "ü",
+    "in", "ın", "un", "ün", "mı", "mi", "mu", "mü",
+    "i", "ı", "u", "ü", "m",
 )
 
 
@@ -205,7 +214,7 @@ _CANONICAL_FORM: dict[str, str] = {
     "record": "kayıt", "list": "liste", "listele": "liste", "directory": "liste",
     "search": "arama", "read": "oku", "lookup": "bul", "summary": "özet", "discover": "keşfet",
     "portal": "portal", "post": "gönderi", "posts": "gönderiler", "moderation": "moderasyon",
-    "file_center": "dosya", "file": "dosya", "quota": "kota", "scan": "tarama",
+    "file_center": "dosya", "file": "dosya", "quota": "kota", "storage": "depolama", "scan": "tarama",
     "communication": "iletişim", "announcement": "duyuru", "message": "mesaj", "messages": "mesajlar",
     "survey": "anket", "surveys": "anketler", "result": "sonuç", "results": "sonuçlar",
     "support": "destek", "ticket": "talep", "tickets": "talepler", "article": "makale", "help": "yardım",

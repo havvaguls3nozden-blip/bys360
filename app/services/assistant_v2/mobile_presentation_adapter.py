@@ -33,9 +33,12 @@ navigation" rules):
                       topic) -- always an empty list rather than invented
                       content; a future wave could add this to
                       `ProceduralGuideEntry` if the product wants it.
-  - `suggested_questions` -- only from `clarification.candidates` on an
-                      AMBIGUOUS_REQUEST (real routing candidates, not
-                      generated text) -- empty otherwise.
+  - `suggested_questions` -- derived from `clarification.candidates` on an
+                      AMBIGUOUS_REQUEST (real routing candidates, never
+                      generated text), each mapped through
+                      `resolve_suggestion_label()` to a human-readable
+                      Turkish phrase -- the raw capability_key itself must
+                      never reach the client. Empty otherwise.
   - `intent`      -- a small, fully deterministic mapping from
                       `status`/`capability_key`, documented in
                       `_INTENT_FOR_STATUS` below -- never free text.
@@ -46,7 +49,7 @@ from typing import Any
 
 from app.admin.routes import ROLE_CHOICES
 from app.menu_registry import get_role_default_menu_keys
-from app.services.assistant_v2.capability_registry import get_capability
+from app.services.assistant_v2.capability_registry import get_capability, resolve_suggestion_label
 from app.services.assistant_v2.procedural_guides import get_guide
 from app.services.settings.module_registry import get_module
 
@@ -114,7 +117,11 @@ def adapt_for_mobile(answer: Any) -> dict[str, Any]:
     steps, warnings = _guide_steps_and_warnings(answer.capability_key)
     suggested_questions: list[str] = []
     if answer.clarification and isinstance(answer.clarification.get("candidates"), list):
-        suggested_questions = [str(c) for c in answer.clarification["candidates"]]
+        # Never the raw capability_key -- resolve_suggestion_label() always
+        # returns a human-readable Turkish phrase instead (same rule as
+        # web_presentation_adapter.py, both going through the one shared
+        # helper so this can't regress per-adapter).
+        suggested_questions = [resolve_suggestion_label(str(c)) for c in answer.clarification["candidates"]]
 
     return {
         "answer": answer.answer,

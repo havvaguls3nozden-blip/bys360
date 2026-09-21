@@ -108,6 +108,12 @@ class AssistantCapabilityEntry:
     active: bool = True
     evidence: str = ""
     extra: dict[str, Any] = field(default_factory=dict)
+    # Optional, purpose-written first-person Turkish phrase for a clickable
+    # suggestion chip (e.g. "Kota durumumu göster") -- distinct from
+    # display_name, which is a noun-phrase title used for badges/headers,
+    # not a resubmittable question. When unset, resolve_suggestion_label()
+    # falls back to display_name -- never to the raw capability_key.
+    suggestion_label: str | None = None
 
 
 _ADAPTERS = "app.services.assistant_v2.read_adapters"
@@ -359,7 +365,7 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         module_key="file_center",
         display_name="Dosya Merkezi Kota Durumu",
         description="Aktif genel kota politikasını ve tüm kullanıcılar için toplam kullanılan depolama/dosya sayısını (agrega) döndürür.",
-        intent_tags=("file_center", "quota", "storage", "policy"),
+        intent_tags=("file_center", "quota", "kota", "storage", "depolama", "policy"),
         operation_type="READ_RECORD",
         read_or_write="read",
         permission_key=None,
@@ -374,6 +380,7 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
             "documented exception per app/services/settings/module_registry.py:147"
         ),
         extra={"auth_override": "app.file_center.permissions.can_manage_file_center_settings"},
+        suggestion_label="Kota durumumu göster",
     ),
     AssistantCapabilityEntry(
         capability_key="file_center_list_recent_security_scans",
@@ -392,6 +399,7 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         supports_pagination=True,
         evidence="app/models/file_center_models.py:205 FileSecurityScan; same auth_override exception as above",
         extra={"auth_override": "app.file_center.permissions.can_manage_file_center_settings"},
+        suggestion_label="Son güvenlik taramalarını göster",
     ),
     AssistantCapabilityEntry(
         capability_key="file_center_explain_role_matrix",
@@ -409,6 +417,7 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         source_attribution_label="Dosya Merkezi Rol Matrisi",
         evidence="app/models/file_center_models.py:306 FileCenterRolePermission.is_active; same auth_override exception as above",
         extra={"auth_override": "app.file_center.permissions.can_manage_file_center_settings"},
+        suggestion_label="Dosya Merkezi yetkilerini açıkla",
     ),
 
     # ------------------------------------------------------------------
@@ -1117,6 +1126,29 @@ def get_capability(capability_key: str) -> AssistantCapabilityEntry | None:
         if entry.capability_key == capability_key:
             return entry
     return None
+
+
+_UNKNOWN_CAPABILITY_SUGGESTION_LABEL = "İlgili seçenek"
+
+
+def resolve_suggestion_label(capability_key: str) -> str:
+    """Human-readable, user-facing label for a capability_key, for
+    rendering a clickable suggestion/clarification chip -- NEVER the raw
+    capability_key itself, in any module. Every presentation adapter
+    (web, mobile) must go through this single function instead of reading
+    `clarification["candidates"]` directly, so this fix applies uniformly
+    to every module and cannot silently regress per-adapter.
+
+    Falls back to `display_name` when a capability has no purpose-written
+    `suggestion_label`, and to a generic, non-specific Turkish placeholder
+    in the defensive (should be unreachable -- every real candidate comes
+    from `resolve_intent()`, which only ever ranks currently-registered
+    capabilities) case where `capability_key` does not resolve at all.
+    Neither fallback ever exposes the raw key."""
+    entry = get_capability(capability_key)
+    if entry is None:
+        return _UNKNOWN_CAPABILITY_SUGGESTION_LABEL
+    return entry.suggestion_label or entry.display_name
 
 
 def list_capabilities_for_module(module_key: str) -> list[AssistantCapabilityEntry]:

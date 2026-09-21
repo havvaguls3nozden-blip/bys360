@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.assistant_v2.capability_registry import resolve_suggestion_label
 from app.services.settings.module_registry import get_module
 
 
@@ -40,7 +41,10 @@ def adapt_for_legacy_web(answer: Any) -> dict[str, Any]:
     adding them here can never break the existing widget."""
     suggested_questions: list[str] = []
     if answer.clarification and isinstance(answer.clarification.get("candidates"), list):
-        suggested_questions = [str(c) for c in answer.clarification["candidates"]]
+        # Never the raw capability_key (an internal identifier, e.g.
+        # "file_center_read_quota_status") -- resolve_suggestion_label()
+        # always returns a human-readable Turkish phrase instead.
+        suggested_questions = [resolve_suggestion_label(str(c)) for c in answer.clarification["candidates"]]
 
     return {
         "answer": answer.answer,
