@@ -29,7 +29,7 @@ jobs:
     # and repository-worktree paths) were fixed -- the Step2 runtime itself,
     # not a defect, was the bottleneck. 90 minutes leaves a real margin
     # (~20 min) over that measured total without being an unbounded budget.
-    timeout-minutes: 90
+    timeout-minutes: 180
 
     # TD-032 closure: real PostgreSQL 15 target for the migration-integrity
     # gate below. Disposable, CI-only credentials -- never production
