@@ -51,6 +51,30 @@ def count_phrase(count: int, noun: str) -> str:
     return f"{count} {noun}"
 
 
+_BYTE_UNITS = ("B", "KB", "MB", "GB", "TB", "PB")
+
+
+def format_bytes_tr(num_bytes: int) -> str:
+    """Deterministic byte count -> human-readable size string, base-1024
+    (KB/MB/GB naming -- matches common end-user expectation over strict
+    IEC KiB/MiB/GiB terminology). Whole bytes render with no decimal
+    ("1023 B"); KB and larger always use exactly one decimal place with a
+    Turkish comma ("27,5 KB" for 28149 bytes). Never guesses a unit
+    beyond what num_bytes actually requires; negative input is treated
+    as 0 rather than raising."""
+    if num_bytes < 0:
+        num_bytes = 0
+    if num_bytes < 1024:
+        return f"{num_bytes} B"
+    value = float(num_bytes)
+    unit_index = 0
+    while value >= 1024 and unit_index < len(_BYTE_UNITS) - 1:
+        value /= 1024
+        unit_index += 1
+    formatted = f"{value:.1f}".replace(".", ",")
+    return f"{formatted} {_BYTE_UNITS[unit_index]}"
+
+
 def format_date_tr(value: date | datetime | str | None) -> str | None:
     """ISO-ish date/datetime -> '1 Ocak 2026'. Returns None for anything it
     cannot parse (callers must handle that -- this function never guesses a
@@ -123,6 +147,7 @@ def comparison_phrase(*, label_a: str, value_a: int | float, label_b: str, value
 __all__ = [
     "locative_suffix",
     "count_phrase",
+    "format_bytes_tr",
     "format_date_tr",
     "format_list_tr",
     "yes_no_phrase",

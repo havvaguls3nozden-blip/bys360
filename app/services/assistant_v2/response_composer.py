@@ -38,6 +38,8 @@ from typing import Any
 from app.services.assistant_v2.capability_registry import get_capability
 from app.services.assistant_v2.language_helpers import (
     count_phrase,
+    format_bytes_tr,
+    format_date_tr,
     format_list_tr,
     no_data_phrase,
     source_attribution_phrase,
@@ -98,10 +100,39 @@ def _render_list_like(*, display_name: str, data: list[Any]) -> str:
     return f"{phrase} bulundu."
 
 
+# Central raw-field guard (mandate: user-facing structured result
+# humanization, Goal B). These are pure internal identifiers with no
+# narratable end-user meaning even if relabeled -- omitted entirely from
+# the generic dict-shaped fallback below, regardless of which capability
+# produced them. This is the "unknown structured fields" safety net the
+# mandate asks for; a capability whose data genuinely needs richer,
+# domain-aware phrasing gets its own entry in _CAPABILITY_FORMATTERS
+# instead (see file_center_read_quota_status below).
+_OMITTED_TECHNICAL_FIELDS = frozenset({
+    "user_id", "unit_id", "menu_key", "capability_key", "source_type",
+})
+
+# Field names with real end-user meaning but an internal snake_case name
+# -- relabeled to a Turkish phrase instead of hidden, since dropping a
+# genuine creation/update date would lose real information (e.g. for an
+# audit-log-detail capability, "when" is the whole point).
+_RELABELED_DATE_FIELDS: dict[str, str] = {
+    "created_at": "Oluşturulma",
+    "updated_at": "Güncellenme",
+}
+
+
 def _render_dict_summary(*, display_name: str, data: dict[str, Any]) -> str:
     if not data:
         return no_data_phrase(display_name)
-    parts = [f"{key}: {value}" for key, value in data.items() if value not in (None, "")]
+    parts: list[str] = []
+    for key, value in data.items():
+        if value in (None, "") or key in _OMITTED_TECHNICAL_FIELDS:
+            continue
+        if key in _RELABELED_DATE_FIELDS:
+            parts.append(f"{_RELABELED_DATE_FIELDS[key]}: {format_date_tr(value) or value}")
+            continue
+        parts.append(f"{key}: {value}")
     if not parts:
         return no_data_phrase(display_name)
     return f"{display_name}: " + ", ".join(parts) + "."
@@ -128,6 +159,32 @@ def _render_generic(*, display_name: str, operation_type: str, data: Any) -> str
     return _render_scalar(display_name=display_name, data=data)
 
 
+def _format_file_center_quota_status(data: dict[str, Any]) -> str:
+    """Domain-aware formatter for `file_center_read_quota_status` (mandate:
+    user-facing structured result humanization, Goal A). Renders only the
+    facts genuinely present in `data` -- never a quota limit, remaining
+    quota, or percentage, since the reported production result carried
+    none of those (an inactive/absent FileQuotaPolicy row)."""
+    used_bytes_raw = data.get("total_used_bytes")
+    used_bytes = int(used_bytes_raw) if isinstance(used_bytes_raw, (int, float)) else 0
+    file_count_raw = data.get("total_file_count")
+    file_count = int(file_count_raw) if isinstance(file_count_raw, (int, float)) else 0
+    return (
+        f"Dosya Merkezi'nde toplam {format_bytes_tr(used_bytes)} alan kullanılıyor.\n"
+        f"Toplam {count_phrase(file_count, 'dosya')} bulunuyor."
+    )
+
+
+# Capability-specific formatters, checked before the generic shape-based
+# renderer (mandate Goal B: "capability-specific formatter where domain
+# meaning matters"). A small dict dispatch, not a growing if/elif chain --
+# adding a new one is a one-line registration, never a change to
+# compose_response()'s own control flow.
+_CAPABILITY_FORMATTERS: dict[str, Any] = {
+    "file_center_read_quota_status": _format_file_center_quota_status,
+}
+
+
 def compose_response(result: AssistantCapabilityResult, *, question: str = "") -> ComposedResponse:
     """The single public entry point for a single-capability result. Always
     returns a `ComposedResponse` -- never raises."""
@@ -143,8 +200,13 @@ def compose_response(result: AssistantCapabilityResult, *, question: str = "") -
     display_name = entry.display_name if entry else (result.capability_key or "Sonuç")
     operation_type = entry.operation_type if entry else "LIST"
 
+    formatter = _CAPABILITY_FORMATTERS.get(result.capability_key) if result.capability_key else None
+
     try:
-        answer = _render_generic(display_name=display_name, operation_type=operation_type, data=result.data)
+        if formatter is not None and isinstance(result.data, dict):
+            answer = formatter(result.data)
+        else:
+            answer = _render_generic(display_name=display_name, operation_type=operation_type, data=result.data)
     except Exception:
         logger.exception(
             "assistant_v2 response_composer: native rendering failed for capability_key=%s",
