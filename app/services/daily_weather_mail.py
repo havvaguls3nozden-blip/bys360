@@ -295,7 +295,30 @@ def _ensure_role_menu_defaults(actor_user_id: int | None = None) -> None:
 
 
 def current_config() -> dict[str, Any]:
-    ensure_daily_weather_defaults()
+    """Pure read of the current daily-weather-mail configuration.
+
+    Deliberately does NOT call `ensure_daily_weather_defaults()` -- that
+    call writes `RoleMenuDefault` rows for this feature's own menu key,
+    and (mandate: daily-weather-mail menu visibility side-effect defect)
+    `get_role_default_menu_keys_handler`
+    (app/services/settings/menu_profile_access.py) treats the mere
+    EXISTENCE of any explicit `RoleMenuDefault` row for a role as that
+    role having fully opted out of the static/policy default menu set --
+    so a role with no prior override rows silently loses default
+    visibility into every OTHER, unrelated menu key the moment this
+    read-only function's caller triggers that write. Every value below
+    already falls back to its coded-in default via `get_setting_value`
+    when no row exists yet, so this function was never dependent on the
+    write to behave correctly. The two callers that legitimately need
+    the bootstrap-on-first-use behavior already trigger it themselves,
+    independently of this function: `save_config()` (below) and the
+    management UI route
+    (app/communication/daily_weather_mail_routes.py's
+    `daily_weather_mail_settings()`, which already calls
+    `ensure_daily_weather_defaults()` explicitly, immediately before
+    calling this function) -- so removing the call here is a pure
+    side-effect removal with no behavior change for either of them.
+    """
     return {
         "enabled": _coerce_bool(get_setting_value("daily_weather_mail.enabled"), False),
         "run_hour": _coerce_int(get_setting_value("daily_weather_mail.run_hour"), 8, 0, 23),
