@@ -634,11 +634,19 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         read_or_write="read",
         permission_key="ai_center",
         is_self_describing=False,
-        service_handler="app.services.ai.governance_settings.get_ai_governance_settings",
+        service_handler=f"{_ADAPTERS}.ai_decision_support_explain_governance_settings",
         sensitivity="critical",
         audit_required=True,
         source_attribution_label="AI Governance Ayarı",
-        evidence="REUSED existing function: app/services/ai/governance_settings.py:39 get_ai_governance_settings()",
+        evidence=(
+            "REUSED existing function: app/services/ai/governance_settings.py:39 "
+            "get_ai_governance_settings() -- routed through a thin read_adapters.py "
+            "wrapper (mandate: zero-arg capability invocation defect follow-up) "
+            "because the reused function itself takes no parameters, while "
+            "capability_dispatcher.invoke_capability always calls "
+            "handler(user, **kwargs); calling the zero-arg function directly raised "
+            "a real TypeError on every live dispatch. No computation logic changed."
+        ),
     ),
 
     # ------------------------------------------------------------------
@@ -686,13 +694,17 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         read_or_write="read",
         permission_key="ai_agent_panel",
         is_self_describing=False,
-        service_handler="app.services.assistant_role_matrix_service.build_assistant_role_matrix",
+        service_handler=f"{_ADAPTERS}.virtual_assistant_explain_role_matrix",
         sensitivity="internal",
         audit_required=False,
         source_attribution_label="Asistan Rol Matrisi",
         evidence=(
             "REUSED existing function: app/services/assistant_role_matrix_service.py:86 "
-            "build_assistant_role_matrix(); permission_key real menu_key at app/menu_registry.py:873"
+            "build_assistant_role_matrix(); permission_key real menu_key at app/menu_registry.py:873 -- "
+            "routed through a thin read_adapters.py wrapper (mandate: zero-arg capability "
+            "invocation defect follow-up) for the same reason as "
+            "ai_decision_support_explain_governance_settings above: the reused function "
+            "takes no parameters. No computation logic changed."
         ),
     ),
     AssistantCapabilityEntry(
@@ -921,12 +933,16 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         read_or_write="read",
         permission_key=None,
         is_self_describing=False,
-        service_handler="app.services.daily_weather_mail.current_config",
+        service_handler=f"{_ADAPTERS}.email_automation_explain_daily_weather_mail_settings",
         sensitivity="internal",
         audit_required=False,
         source_attribution_label="Günlük Bilgilendirme E-postası Ayarı",
         evidence=(
-            "REUSED existing function: app/services/daily_weather_mail.py:297 current_config(). "
+            "REUSED existing function: app/services/daily_weather_mail.py:297 current_config() -- "
+            "routed through a thin read_adapters.py wrapper (mandate: zero-arg capability "
+            "invocation defect follow-up) for the same reason as the other two entries "
+            "in this wave: the reused function takes no parameters. No computation "
+            "logic changed. "
             "permission_key was originally 'daily_weather_mail' (real menu_key declared at "
             "app/menu_registry_data_sections.py:825, with correct role defaults in "
             "app/menu_registry.py:1345-1348) -- Phase J's mechanical success-path matrix caught "

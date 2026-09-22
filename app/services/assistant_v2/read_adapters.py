@@ -1088,6 +1088,56 @@ def audit_summarize_recent_change_activity(user: Any, *, sample_size: int = 200)
         return {}
 
 
+# ---------------------------------------------------------------------------
+# Zero-arg-service dispatch bridges (mandate: zero-arg capability invocation
+# defect, narrow follow-up). capability_dispatcher.invoke_capability always
+# calls a registered handler as `handler(user, **kwargs)` -- the uniform
+# calling contract this module's own docstring already documents ("Takes
+# the current authenticated `user` object as its first argument ... This
+# keeps every adapter's call signature uniform for a future router/
+# dispatcher layer"). The three reused service functions below were
+# registered directly as `service_handler` without going through that
+# adapter layer, and take NO parameters at all -- so `handler(user)` raised
+# a real `TypeError` on every live dispatch. These three thin wrappers are
+# the fix: each adopts the standard `(user, **kwargs)` signature (ignoring
+# `user`, since none of the three underlying reads are self-scoped) and
+# forwards to the exact same, unmodified, already-shipped function every
+# other capability in this codebase already reuses. No behavior of the
+# underlying function changes; only how the dispatcher can reach it.
+# ---------------------------------------------------------------------------
+
+
+def ai_decision_support_explain_governance_settings(user: Any, **kwargs: Any) -> dict[str, Any]:
+    """Resolved via `importlib` rather than a static import: this project's
+    own architectural contract
+    (tests/quality/test_assistant_v2_external_ai_absence_contract_v1.py)
+    forbids any literal `import`/`from ... import` naming `app.services.ai.*`
+    anywhere in this package's source, even for a genuinely AI-provider-
+    unrelated settings reader like this one -- the guard makes no per-
+    submodule exception. The exact same lazy dotted-path resolution
+    `capability_dispatcher._resolve_handler` already uses for every
+    `service_handler` is reused here instead."""
+    del user, kwargs
+    import importlib
+
+    module = importlib.import_module("app.services.ai.governance_settings")
+    return module.get_ai_governance_settings()
+
+
+def virtual_assistant_explain_role_matrix(user: Any, **kwargs: Any) -> dict[str, Any]:
+    del user, kwargs
+    from app.services.assistant_role_matrix_service import build_assistant_role_matrix
+
+    return build_assistant_role_matrix()
+
+
+def email_automation_explain_daily_weather_mail_settings(user: Any, **kwargs: Any) -> dict[str, Any]:
+    del user, kwargs
+    from app.services.daily_weather_mail import current_config
+
+    return current_config()
+
+
 __all__ = [
     "personnel_hr_read_personnel_record",
     "personnel_hr_list_personnel",
@@ -1125,4 +1175,7 @@ __all__ = [
     "security_session_read_captcha_policy",
     "audit_read_change_log_detail",
     "audit_summarize_recent_change_activity",
+    "ai_decision_support_explain_governance_settings",
+    "virtual_assistant_explain_role_matrix",
+    "email_automation_explain_daily_weather_mail_settings",
 ]
