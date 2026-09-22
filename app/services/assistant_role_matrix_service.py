@@ -31,7 +31,24 @@ ASSISTANT_POLICY_ROLE_OPTIONS = [
     ("baskan", "Başkan"),
     ("baskan_yardimcisi", "Başkan Yardımcısı"),
     ("grup_baskani", "Grup Başkanı"),
-    ("mali_musavir", "Mali Müşavir"),
+    # Internal role key unchanged (mandate: post-production live defect --
+    # role label). Mechanical trace confirms `mali_musavir` remains a real,
+    # separately-valid, actively-used system role elsewhere in this
+    # codebase (personnel sync, communication routing, account visibility,
+    # AI visibility gating, ROLE_CHOICES) -- it is NOT obsolete and must
+    # not be renamed or removed. But the real person who holds this role
+    # in this institution's actual chain-of-command data carries the job
+    # title (unvan) "Hukuk Müşaviri", never "Mali Müşavir" -- confirmed by
+    # tests/behavior/test_hierarchy_rulebook_manager_chain_resolution_contract.py's
+    # own `infer_role_from_profile(unvan='Hukuk Müşaviri', ...) ==
+    # ('mali_musavir', 'Mali Müşavir')` assertion. Only THIS Assistant-
+    # matrix-specific display label is changed to the job title the real
+    # role-holder actually carries; the shared, centralized
+    # app.services.role_display.ROLE_DISPLAY_LABELS and
+    # app.admin.routes.ROLE_CHOICES sources are deliberately left
+    # untouched, since "Mali Müşavir" is still the correct label for those
+    # other, broader contexts.
+    ("mali_musavir", "Hukuk Müşaviri"),
     ("koordinator", "Koordinatör"),
     ("birim_sorumlusu", "Birim Sorumlusu"),
     ("personel", "Personel"),

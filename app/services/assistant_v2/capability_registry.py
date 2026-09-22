@@ -928,7 +928,10 @@ ASSISTANT_CAPABILITY_REGISTRY: list[AssistantCapabilityEntry] = [
         module_key="email_automation",
         display_name="Günlük Bilgilendirme E-postası Ayarları Açıklaması",
         description="Günlük bilgilendirme e-postasının mevcut yapılandırmasını (aktiflik, gönderim saati, kapsam) döndürür.",
-        intent_tags=("email", "daily_weather_mail", "settings", "explain"),
+        intent_tags=(
+            "email", "daily_weather_mail", "settings", "explain",
+            "hava", "günlük", "yapılandırma", "yapılandırmasını",
+        ),
         operation_type="EXPLAIN",
         read_or_write="read",
         permission_key=None,

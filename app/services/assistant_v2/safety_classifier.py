@@ -59,6 +59,18 @@ _OUT_OF_SCOPE_HINTS: tuple[str, ...] = (
     "hava durumu", "borsa", "dolar", "euro", "haber", "film", "yemek tarifi", "siyaset", "futbol", "magazin",
 )
 
+# BYS360's own "günlük bilgilendirme e-postası" feature is genuinely named
+# using the words "hava durumu" (it includes a daily weather section) --
+# a real, in-scope admin query like "Günlük hava durumu e-posta ayarlarını
+# göster" was being misclassified OUT_OF_SCOPE by the "hava durumu" hint
+# above (mandate: post-production live defect, weather-mail intent/
+# routing). This is a narrow, explicit co-occurrence exception for that
+# ONE hint only -- it does not loosen OUT_OF_SCOPE detection for genuine
+# weather chit-chat ("bugün hava durumu nasıl", with none of these
+# markers present), and none of the other hints (borsa/dolar/euro/haber/
+# film/yemek tarifi/siyaset/futbol/magazin) are touched.
+_HAVA_DURUMU_FEATURE_CONTEXT_MARKERS: tuple[str, ...] = ("e-posta", "eposta", "mail", "ayar", "yapilandirma")
+
 
 def _normalize(text: str) -> str:
     text = str(text or "").strip().lower()
@@ -78,8 +90,11 @@ def classify(text: str) -> SafetyClassification:
             return SafetyClassification(category=SafetyCategory.SENSITIVE_REQUEST, matched_rule=pattern)
 
     for hint in _OUT_OF_SCOPE_HINTS:
-        if hint in normalized:
-            return SafetyClassification(category=SafetyCategory.OUT_OF_SCOPE, matched_rule=hint)
+        if hint not in normalized:
+            continue
+        if hint == "hava durumu" and any(marker in normalized for marker in _HAVA_DURUMU_FEATURE_CONTEXT_MARKERS):
+            continue
+        return SafetyClassification(category=SafetyCategory.OUT_OF_SCOPE, matched_rule=hint)
 
     return SafetyClassification(category=SafetyCategory.SUPPORTED_BUSINESS_QUERY)
 

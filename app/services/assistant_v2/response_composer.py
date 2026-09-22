@@ -290,19 +290,26 @@ def _format_dashboard_home_panels(data: dict[str, Any]) -> str:
 
 def _format_virtual_assistant_role_matrix(data: dict[str, Any]) -> str:
     """Domain-aware formatter for `virtual_assistant_explain_role_matrix`
-    (mandate: technical-field-humanization content-loss gate, Phase B/C).
-    Every top-level field of this reused
+    (mandate: technical-field-humanization content-loss gate, Phase B/C;
+    label source corrected under the post-production live-defect role-
+    label mandate). Every top-level field of this reused
     `app.services.assistant_role_matrix_service.build_assistant_role_matrix`
     call is a nested list/dict except `item_count` -- confirmed live
     during this mandate's own content-loss audit to collapse to the
     near-empty "item_count: 1" via the generic renderer alone. `visible_roles`
     is a flat list of the app's own real role_key values -- resolved to
-    Turkish labels via the SAME existing ROLE_CHOICES mapping already
-    reused for audit_read_change_log_detail's target_role_label, not a
-    new translation invented here."""
-    from app.admin.routes import ROLE_CHOICES
+    Turkish labels via `ASSISTANT_POLICY_ROLE_OPTIONS`, the SAME role list
+    `build_assistant_role_matrix()` itself is built from (previously this
+    read the generic, centralized `app.admin.routes.ROLE_CHOICES` instead,
+    a latent bug: it silently bypassed this module's own Assistant-
+    specific label for `mali_musavir` -- "Hukuk Müşaviri", the job title
+    its real role-holder actually carries in this institution's data,
+    deliberately different from ROLE_CHOICES' broader "Mali Müşavir" label
+    used elsewhere -- with ROLE_CHOICES as a defensive fallback only for a
+    role_key genuinely absent from this capability's own list)."""
+    from app.services.assistant_role_matrix_service import ASSISTANT_POLICY_ROLE_OPTIONS
 
-    role_labels = dict(ROLE_CHOICES)
+    role_labels = dict(ASSISTANT_POLICY_ROLE_OPTIONS)
     visible_roles = data.get("visible_roles")
     if isinstance(visible_roles, list) and visible_roles:
         labels = [role_labels.get(str(role_key), str(role_key)) for role_key in visible_roles]
