@@ -263,6 +263,11 @@ def portal_read_post_detail(user: Any, post_id: int) -> dict[str, Any] | None:
             "status": post.status,
             "published_at": _iso(post.published_at),
             "author_user_id": post.author_user_id,
+            # Human-readable sibling for author_user_id -- resolved from the
+            # SAME already-authorized post's own `author` relationship (no
+            # new cross-user lookup), so response_composer can show a name
+            # instead of a raw numeric id (mandate: technical field humanization).
+            "author_name": post.author.full_name if post.author else None,
         }
     except Exception:
         current_app.logger.exception("assistant_v2 read_adapters.portal_read_post_detail failed")
@@ -447,6 +452,11 @@ def communication_read_announcement_detail(user: Any, announcement_id: int) -> d
             "title": a.title,
             "body": a.body,
             "announcement_type": a.announcement_type,
+            # Human-readable sibling -- reuses Announcement.type_label, the
+            # model's own existing, deterministic announcement_type -> Turkish
+            # label mapping (app/models/announcement_popup_models.py), not a
+            # new translation invented here.
+            "announcement_type_label": a.type_label,
             "publish_start_at": _iso(a.publish_start_at),
             "publish_end_at": _iso(a.publish_end_at),
         }
@@ -841,6 +851,7 @@ def notifications_read_notification_detail(user: Any, notification_id: int) -> d
     given user."""
     try:
         from app.models.communication_models import Notification
+        from app.services.communication_phase3_service import NOTIFICATION_TYPE_LABELS
 
         uid = _user_id(user)
         n = db.session.get(Notification, notification_id)
@@ -851,6 +862,12 @@ def notifications_read_notification_detail(user: Any, notification_id: int) -> d
             "title": n.title,
             "body": n.body,
             "notification_type": n.notification_type,
+            # Human-readable sibling -- reuses the SAME
+            # NOTIFICATION_TYPE_LABELS mapping communication_phase3_service
+            # already uses for this exact field (with its own "Genel"
+            # fallback for a type outside the mapping), not a new mapping
+            # invented here.
+            "notification_type_label": NOTIFICATION_TYPE_LABELS.get(n.notification_type or "", "Genel"),
             "priority": n.priority,
             "is_read": bool(n.is_read),
             "link_url": n.link_url,
@@ -1023,19 +1040,29 @@ def virtual_assistant_search_knowledge_bank(user: Any, question: str) -> list[di
 
 def audit_read_change_log_detail(user: Any, change_log_id: int) -> dict[str, Any] | None:
     try:
+        from app.admin.routes import ROLE_CHOICES
         from app.models.settings_models import SettingsChangeLog
 
         row = db.session.get(SettingsChangeLog, change_log_id)
         if row is None:
             return None
+        # Human-readable siblings for the three raw identifier fields below
+        # -- resolved from the SAME already-authorized row's own `actor`/
+        # `target_user` relationships (no new cross-user lookup) and from
+        # the app's real, existing role_key -> role_label list (ROLE_CHOICES,
+        # already reused elsewhere for this exact purpose), not invented here.
+        role_labels = dict(ROLE_CHOICES)
         return {
             "id": row.id,
             "change_scope": row.change_scope,
             "action_type": row.action_type,
             "summary": row.summary,
             "actor_user_id": row.actor_user_id,
+            "actor_name": row.actor.full_name if row.actor else None,
             "target_user_id": row.target_user_id,
+            "target_user_name": row.target_user.full_name if row.target_user else None,
             "target_role_name": row.target_role_name,
+            "target_role_label": role_labels.get(row.target_role_name, row.target_role_name) if row.target_role_name else None,
             "is_rollback": bool(row.is_rollback),
             "created_at": _iso(row.created_at),
         }
