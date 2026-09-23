@@ -133,19 +133,33 @@ Bu, ortak kullanım için doğrudan kopyalanıp çalıştırılabilecek bir alt 
   açık `-Apply` bayrağı gerektirir; `.env`, `instance/`, `logs/`, `uploads/` ve `reports/`
   her koşulda korunur ve asla üzerine yazılmaz (bkz. `BACKUP_RUNBOOK.md`).
 
+Geliştirme sürecinde AI destekli araçlar kullanılmış olabilir; bu, kod kabulünü tek başına
+belirlemez. Her değişiklik repo inceleme akışından, otomatik testlerden, CI kapılarından,
+exact-SHA release doğrulamasından ve açık, insan tarafından yürütülen canlıya alma
+adımlarından geçer.
+
 ## Mevcut Doğrulanmış Canlı Kaynak (Current Verified Production Source)
 
 **SHA:** `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6`
 
-Bu, en son canlıya alma (deployment) sırasında doğrulanan kaynak kod kimliğidir. Bu SHA,
-`origin/hotfix/assistant-v2-live-role-weather-routing` dalının tam ucudur ve iki zorunlu CI
-iş akışının (Score100 Kalite Kapısı V1 ve quality-gate) bu tam SHA üzerinde başarıyla
-çalıştığı ayrıca doğrulanmıştır.
+Bu, en son canlıya alma (deployment) sırasında doğrulanan kaynak kod kimliğidir. İki zorunlu
+CI iş akışının (Score100 Kalite Kapısı V1 ve quality-gate) bu tam SHA üzerinde başarıyla
+çalıştığı doğrulanmıştır.
+
+**Kararlı kaynak dalı (stable source branch):** `assistant-v2-full` — bu dal, tam olarak bu
+SHA'nın ucundadır ve production kaynak kimliğini temsil eder.
+
+**Bu inceleme dalı (`docs/ministry-review-readme`):** aynı production kaynağının üzerine yalnızca
+dokümantasyon/inceleme materyali eklenmiş halidir; dokümantasyon dalının kendisi production
+değildir -- production kimliği yukarıdaki SHA ve `assistant-v2-full` dalıdır.
 
 ## İnceleme Rehberi (Review Guidance)
 
 Dış teknik incelemeciler (Ministry review) için:
 
+- **Kaynak kod:** production kaynak kodunun kendisini incelemek için `assistant-v2-full`
+  dalını; bu dala eklenmiş inceleme/dokümantasyon materyalini görmek için bu dalı
+  (`docs/ministry-review-readme`) kullanın.
 - **Kaynak kod ve commit geçmişi:** repoyu klonlayıp `git log`, `git blame` ve tam dal/etiket
   listesiyle (`git branch -a`, `git tag`) inceleyin; hiçbir geçmiş yeniden yazılmamıştır
   (`filter-repo`/force-push kullanılmamıştır).
