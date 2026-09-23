@@ -100,10 +100,14 @@ Bu, ortak kullanım için doğrudan kopyalanıp çalıştırılabilecek bir alt 
 
 ## CI ve Deterministik Release Süreci
 
-- CI, GitHub Actions üzerinde iki zorunlu iş akışıyla çalışır: `.github/workflows/bys360-ci.yml`
-  ("quality-gate") ve `.github/workflows/bys360-score100-quality-gate-v1.yml`
-  ("BYS360 Puanı 100 Kalite Kapısı V1"). İkisi de her push/PR'da Ruff, mypy, pytest ve
-  proje-özel secret/security kapılarını çalıştırır.
+- CI, iki zorunlu kalite işinden oluşur: `.github/workflows/bys360-ci.yml` (`quality-gate`) ve
+  `.github/workflows/bys360-score100-quality-gate-v1.yml` (`score100-quality-gate`). Korunan
+  production-kaynak ve Ministry-inceleme dallarını hedefleyen pull request'ler bu iki zorunlu
+  kontrolü otomatik olarak çalıştırır. Daha geniş CI hattı Ruff, mypy, pytest, PostgreSQL
+  migration bütünlüğü, coverage ratchet, dependency audit ve projeye özel security/release
+  kapılarını kapsar -- ancak bu iki iş akışının HER BİRİ tüm bu araçları ayrı ayrı çalıştırmaz;
+  tam kapsam ve güncel tetikleyici koşulları için `.github/workflows/bys360-ci.yml` ve
+  `.github/workflows/bys360-score100-quality-gate-v1.yml` tek doğru kaynaktır.
 - Yayına alınacak paket, doğrudan klasör zip'lenerek değil, tek yetkili (canonical) builder
   ile üretilir: `scripts/release/build_bys360_safe_release.py`. Kaynak dosya listesi
   yalnızca Git'in takip ettiği dosyalardan gelir (dosya sistemine fallback yoktur); çalışma
@@ -138,6 +142,11 @@ belirlemez. Her değişiklik repo inceleme akışından, otomatik testlerden, CI
 exact-SHA release doğrulamasından ve açık, insan tarafından yürütülen canlıya alma
 adımlarından geçer.
 
+AI destekli çalışma `AGENTS.md` ile yönetilir. Repo, açık insan talimatı olmadan otonom
+production, veritabanı, migration, secret, push/deploy ve geçmiş yeniden yazma işlemlerini
+açıkça engeller ve önerilen değişiklikleri otomatik uygulamadan önce SAFE, CONTROLLED,
+REVIEW veya BLOCKED olarak sınıflandırır.
+
 ## Mevcut Doğrulanmış Canlı Kaynak (Current Verified Production Source)
 
 **SHA:** `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6`
@@ -149,9 +158,10 @@ CI iş akışının (Score100 Kalite Kapısı V1 ve quality-gate) bu tam SHA üz
 **Kararlı kaynak dalı (stable source branch):** `assistant-v2-full` — bu dal, tam olarak bu
 SHA'nın ucundadır ve production kaynak kimliğini temsil eder.
 
-**Bu inceleme dalı (`docs/ministry-review-readme`):** aynı production kaynağının üzerine yalnızca
-dokümantasyon/inceleme materyali eklenmiş halidir; dokümantasyon dalının kendisi production
-değildir -- production kimliği yukarıdaki SHA ve `assistant-v2-full` dalıdır.
+**Bu inceleme dalı (`docs/ministry-review-readme`):** doğrudan yukarıdaki doğrulanmış production
+kaynağı üzerine kuruludur ve inceleme dokümantasyonu ile korunan inceleme/kaynak dalları için CI
+governance tetikleyici hizalamasını ekler. Production dalı değildir; production kimliği yukarıdaki
+tam SHA ve `assistant-v2-full` dalıdır.
 
 ## İnceleme Rehberi (Review Guidance)
 
