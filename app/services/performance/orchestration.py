@@ -51,9 +51,9 @@ def _selected_period(period_id: int | None = None):
 
 
 def _scope_rows(rows: Iterable[dict[str, Any]], employee_ids: Iterable[int] | None = None) -> list[dict[str, Any]]:
-    allowed = {int(v) for v in (employee_ids or []) if str(v).isdigit()}
-    if not allowed:
+    if employee_ids is None:
         return list(rows or [])
+    allowed = {int(v) for v in employee_ids if str(v).isdigit()}
     result: list[dict[str, Any]] = []
     for row in rows or []:
         employee_id = row.get('employee_id')

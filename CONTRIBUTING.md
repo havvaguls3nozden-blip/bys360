@@ -33,13 +33,18 @@ Bu bölüm, projeyi ilk kez devralan geliştiricinin yerel ortamı güvenli ve t
 
 ### 1. Projeyi hazırlama
 
+Desteklenen Python sürümü: **3.12** (bkz. `.github/workflows/bys360-ci.yml` ve `bys360-score100-quality-gate-v1.yml` içindeki `actions/setup-python@v5` adımları, `pyproject.toml` `[tool.mypy] python_version` ve `[tool.ruff] target-version = "py312"`).
+
 ```powershell
 cd C:\bys360\project
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip setuptools wheel
 python -m pip install -r requirements.txt
+python -m pip install -r requirements-dev.txt
 ```
+
+`requirements-dev.txt`, CI'nin kullandığı kalite araçlarının (ruff, mypy, pytest, pytest-cov, pip-audit) tam olarak aynı, pinlenmiş sürümlerini kurar; production çalışma zamanı bağımlılıklarından (`requirements.txt`) kasıtlı olarak ayrı tutulur, böylece local kalite koşumları CI ile aynı araç sürümlerini kullanır.
 
 ### 2. Ortam dosyasını oluşturma
 
@@ -73,15 +78,34 @@ Seed işlemi canlı veritabanında çalıştırılmaz. Önce ortamın geliştirm
 
 ### 5. İlk kalite kontrol koşumu
 
-Yeni geliştirici kod yazmadan önce mevcut durumun yeşil olduğunu görmelidir.
+Yeni geliştirici kod yazmadan önce mevcut durumun yeşil olduğunu görmelidir. Aşağıdaki komutlar CI'da (`.github/workflows/bys360-ci.yml`) gerçekten çalışan adımların birebir veya (açıkça belirtilen yerlerde) sadeleştirilmiş karşılıklarıdır. Adımların tam ve güncel listesi için tek doğru kaynak her zaman o dosyadır -- CI değiştikçe burası drift edebilir.
 
 ```powershell
+# Hızlı gündelik sağlık kontrolü: derleme + syntax/import sanity + secret gate + hızlı test alt kümesi
 python -m compileall -q app config.py wsgi.py run.py scripts
 python scripts\quality\bys360_secret_repo_gate.py --root .
 python -m ruff check app config.py wsgi.py run.py scripts --select E9,F63,F7,F82
 python -m pytest tests/quality -m "ci_safe" --tb=short -q
-python -m pytest tests/integration tests/architecture --tb=short -q
-python -m mypy app/services --ignore-missing-imports --no-error-summary
+```
+
+```powershell
+# CI'daki asil ruff gate'i ("Ruff full-select gate" adimi; pyproject.toml [tool.ruff.lint]
+# select = E,F,I,UP,B,SIM kapsamini uygular -- yukaridaki --select E9,F63,F7,F82 komutundan
+# daha genis kapsamlidir)
+python -m ruff check app config.py wsgi.py run.py scripts tests
+
+# CI'daki asil mypy komutu ("Type check service layer" adimi)
+python -m mypy app tests scripts --ignore-missing-imports --no-error-summary
+
+# Coverage ile calistirma (CI'daki "Run quality tests" adiminin sadelestirilmis yerel karsiligi;
+# CI ayrica --cov-report=xml uretir ve sonucu scripts\quality\bys360_coverage_ratchet.py ile
+# bir coverage baseline'ina karsi denetler)
+python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report=term-missing --tb=short -q
+
+# Entegrasyon/mimari testleri (sadelestirilmis alt kume; CI'daki "Run integration and
+# architecture tests" adimi onlarca ek dosya/dizin ile cok daha genis kapsamlidir -- birebir
+# guncel komut icin bys360-ci.yml'e bakin)
+python -m pytest tests/integration tests/architecture tests/security tests/critical --tb=short -q
 ```
 
 ### 6. Modül haritası
@@ -102,11 +126,14 @@ Yeni özellik için önce mevcut servis, test ve script altyapısı aranır. Zor
 
 ### 8. Temiz release üretimi
 
-Teslim edilecek zip elle sıkıştırılmaz. Güvenli release üretimi ve preflight birlikte çalıştırılır.
+Teslim edilecek zip elle sıkıştırılmaz. Tek yetkili (canonical) release builder
+`scripts\release\build_bys360_safe_release.py`'dir; üretim ve doğrulama birlikte çalıştırılır.
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1 -ProjectRoot "C:\bys360\project"
+python scripts\release\build_bys360_safe_release.py --root . --output "C:\bys360\dist\bys360_release.zip"
+python scripts\release\build_bys360_safe_release.py --verify "C:\bys360\dist\bys360_release.zip"
 ```
 
-Bu işlemden sonra rapor `reports/security/release_zip_preflight_v1/` altında oluşur. Preflight PASS vermeden zip paylaşılmaz.
+`--verify` PASS vermeden zip paylaşılmaz.
+(`scripts\windows\build_bys360_secure_release_and_preflight_v1.ps1` DEPRECATED'dır.)
 

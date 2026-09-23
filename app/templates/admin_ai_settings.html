@@ -110,7 +110,7 @@
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="module_type" value="{{ editor.module_type }}">
         <input type="hidden" name="feature_type" value="{{ editor.feature_type }}">
-        <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi? Yerleşik kayıt varsa ekran varsayılana döner.')"><i class="fa-solid fa-trash-can"></i> Kayıt dosyası kaydını sil</button>
+        <button type="submit" class="ai-action-btn danger" data-confirm="Bu kayıt dosyası kaydı silinsin mi? Yerleşik kayıt varsa ekran varsayılana döner."><i class="fa-solid fa-trash-can"></i> Kayıt dosyası kaydını sil</button>
       </form>
       {% endif %}
     </section>
@@ -183,7 +183,7 @@
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <input type="hidden" name="module_type" value="{{ row.module_type }}">
             <input type="hidden" name="feature_type" value="{{ row.feature_type }}">
-            <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi?')"><i class="fa-solid fa-trash-can"></i> Sil</button>
+            <button type="submit" class="ai-action-btn danger" data-confirm="Bu kayıt dosyası kaydı silinsin mi?"><i class="fa-solid fa-trash-can"></i> Sil</button>
           </form>
           {% else %}
           <span class="ai-badge muted">Varsayılan kayıt</span>
@@ -219,7 +219,7 @@
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <input type="hidden" name="module_type" value="{{ row.module_type }}">
                 <input type="hidden" name="feature_type" value="{{ row.feature_type }}">
-                <button type="submit" class="ai-action-btn danger" onclick="return confirm('Bu kayıt dosyası kaydı silinsin mi?')"><i class="fa-solid fa-trash-can"></i> Sil</button>
+                <button type="submit" class="ai-action-btn danger" data-confirm="Bu kayıt dosyası kaydı silinsin mi?"><i class="fa-solid fa-trash-can"></i> Sil</button>
               </form>
               {% endif %}
             </div>
@@ -232,4 +232,17 @@
     </table>
   </section>
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('button[data-confirm]').forEach(function (btn) {
+        btn.addEventListener('click', function (event) {
+            const message = btn.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

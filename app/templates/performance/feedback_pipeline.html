@@ -605,7 +605,7 @@
             {# flow durumu #}
             {% if step.flow_status %}
             <span class="pm-pill {{ step.flow_status_class|default('muted') }}">
-              <i class="fa-solid fa-diagram-project"></i> {{ step.flow_status_label|default(step.flow_status) }}
+              <i class="fa-solid fa-diagram-project"></i> {{ step.flow_status_label|default('Bilinmiyor') }}
             </span>
             {% endif %}
           </div>

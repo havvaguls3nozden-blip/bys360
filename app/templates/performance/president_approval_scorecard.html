@@ -36,7 +36,7 @@
     <article class="pres-box"><div class="pres-box-label">Talep Tarihi</div><div class="pres-box-value">{{ approval.requested_at }}</div></article>
     <article class="pres-box"><div class="pres-box-label">Süreç Aşaması</div><div class="pres-box-value">{{ approval.current_stage }}</div></article>
     <article class="pres-box"><div class="pres-box-label">Kimde Bekliyor</div><div class="pres-box-value">{{ approval.current_owner_name }}</div></article>
-    <article class="pres-box"><div class="pres-box-label">Yayın Kilidi</div><div class="pres-box-value">{{ approval.publish_lock_status }}</div></article>
+    <article class="pres-box"><div class="pres-box-label">Yayın Kilidi</div><div class="pres-box-value">{{ approval.publish_lock_status|phase5_4_status_label }}</div></article>
   </section>
 
   <section class="pres-section">
@@ -44,7 +44,7 @@
     <div class="pres-list">
       {% if scoring_history %}
         {% for item in scoring_history %}
-        <div class="pres-row"><div class="pres-row-title">{{ item.scorer_name }} · {{ item.score }}</div><div class="pres-row-meta">{{ item.manager_level }}. amir · {{ item.action_at }} · {{ item.status }}<br>Sonraki aşama: {{ item.next_stage }} / {{ item.next_owner_name }}</div></div>
+        <div class="pres-row"><div class="pres-row-title">{{ item.scorer_name }} · {{ item.score }}</div><div class="pres-row-meta">{{ item.manager_level }}. amir · {{ item.action_at }} · {{ item.status|phase5_4_status_label }}<br>Sonraki aşama: {{ item.next_stage }} / {{ item.next_owner_name }}</div></div>
         {% endfor %}
       {% else %}
         <div class="pres-row"><div class="pres-row-title">Puanlama geçmişi için kayıt bulunamadı</div><div class="pres-row-meta"></div></div>
@@ -57,7 +57,7 @@
     <div class="pres-list">
       {% if flow_steps %}
         {% for step in flow_steps %}
-        <div class="pres-row"><div class="pres-row-title">{{ step.title }}</div><div class="pres-row-meta">{{ step.status }} · {{ step.date }}{% if step.summary %}<br>{{ step.summary }}{% endif %}</div></div>
+        <div class="pres-row"><div class="pres-row-title">{{ step.title }}</div><div class="pres-row-meta">{{ step.status|phase5_4_status_label }} · {{ step.date }}{% if step.summary %}<br>{{ step.summary }}{% endif %}</div></div>
         {% endfor %}
       {% else %}
         <div class="pres-row"><div class="pres-row-title">{{ approval.current_stage }}</div><div class="pres-row-meta">Süreç bu aşamada Başkan onayı bekliyor.</div></div>

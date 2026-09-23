@@ -40,7 +40,11 @@ from app.services.performance.hardening_service import (
     build_period_download_name,
     humanize_export_exception,
 )
-from app.services.performance.history import build_history_summary, get_evaluation_history
+from app.services.performance.history import (
+    build_history_summary,
+    get_evaluation_history,
+    humanize_workflow_status,
+)
 from app.services.performance.interim_notes_runtime import build_scorecard_interim_notes
 from app.services.performance.meeting_p4_development_guidance import (
     build_scorecard_development_guidance_context,
@@ -434,6 +438,7 @@ def performance_evaluation_history(evaluation_id):
         period=evaluation.period,
         history_rows=rows,
         history_summary=history_summary,
+        workflow_status_label=humanize_workflow_status(evaluation.workflow_status),
         back_url=request.referrer or url_for("main.performance_tasks"),
     )
 

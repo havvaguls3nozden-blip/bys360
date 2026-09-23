@@ -21,7 +21,7 @@
       <h5 class="mb-3">Anlık kontroller</h5>
       <ul class="list-group list-group-flush">
         {% for row in payload.synthetic_checks %}
-        <li class="list-group-item d-flex justify-content-between"><span>{{ row.check_name }}</span><strong>{{ row.status }} ({{ row.metric }})</strong></li>
+        <li class="list-group-item d-flex justify-content-between"><span>{{ row.check_name }}</span><strong>{{ row.status_label }} ({{ row.metric }})</strong></li>
         {% endfor %}
       </ul>
       <hr>
@@ -34,7 +34,7 @@
     </div></div></div>
     <div class="col-lg-7"><div class="card border-0 shadow-sm h-100"><div class="card-body">
       <h5 class="mb-3">Geçmiş sağlık kayıtları</h5>
-      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kontrol</th><th>Durum</th><th>Zaman</th></tr></thead><tbody>{% for row in payload.recent_checks %}<tr><td>{{ row.check_name }}</td><td>{{ row.status }}</td><td>{{ row.checked_at }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Kayıt bulunamadı.</td></tr>{% endfor %}</tbody></table></div>
+      <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Kontrol</th><th>Durum</th><th>Zaman</th></tr></thead><tbody>{% for row in payload.recent_checks %}<tr><td>{{ row.check_name }}</td><td>{{ row.status_label }}</td><td>{{ row.checked_at }}</td></tr>{% else %}<tr><td colspan="3" class="text-muted">Kayıt bulunamadı.</td></tr>{% endfor %}</tbody></table></div>
     </div></div></div>
   </div>
 </div>

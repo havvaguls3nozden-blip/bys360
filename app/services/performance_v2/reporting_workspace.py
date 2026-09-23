@@ -11,6 +11,7 @@ from app.core.datetime_utils import utc_now
 from app.models import EvaluationAssignment, PerformanceEvaluation
 from app.security.sql_identifiers import quote_sql_identifier
 from app.services.performance.category_stats import build_category_average_for_evaluation
+from app.services.performance.history import humanize_workflow_status
 from app.services.publish_service import (
     get_evaluation_visibility_state,
     is_evaluation_publish_exempt,
@@ -83,9 +84,11 @@ def _effective_final_total(evaluation: Any) -> float:
         return round(stored, 2)
 
 
-def _coerce_employee_ids(values: Iterable[Any] | None) -> list[int]:
+def _coerce_employee_ids(values: Iterable[Any] | None) -> list[int] | None:
+    if values is None:
+        return None
     result: list[int] = []
-    for item in values or []:
+    for item in values:
         try:
             if item is None:
                 continue
@@ -147,8 +150,11 @@ def _load_period_evaluations(period_id: int, employee_ids: list[int] | None = No
         )
         .filter_by(period_id=period_id)
     )
-    if employee_ids:
-        query = query.filter(PerformanceEvaluation.employee_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            query = query.filter(PerformanceEvaluation.employee_id.in_(employee_ids))
+        else:
+            query = query.filter(PerformanceEvaluation.employee_id == -1)
     return [evaluation for evaluation in query.all() if not _skip_publish_exempt(evaluation)]
 
 # BYS360_REPORTING_WORKSPACE_FLOW_STATUS_REPAIR_V1
@@ -195,21 +201,28 @@ _PROCESS_FLOW_ORDER_COLUMNS = (
 
 
 def _get_process_flow_columns() -> set[str]:
-    """Return available process-flow columns without making dashboard rendering fragile."""
+    """Return available process-flow columns without making dashboard rendering fragile.
+
+    BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.columns``
+    query (filtered by the PostgreSQL-only ``current_schemas(false)``
+    search-path function) replaced with SQLAlchemy's ``inspect()``, which
+    resolves the same default-schema semantics dialect-neutrally.
+    """
     global _FLOW_STATUS_COLUMN_CACHE
     if _FLOW_STATUS_COLUMN_CACHE is not None:
         return _FLOW_STATUS_COLUMN_CACHE
     try:
-        from sqlalchemy import text
+        from sqlalchemy import inspect
 
         from app.extensions import db
-        rows = db.session.execute(text("""
-            SELECT column_name
-              FROM information_schema.columns
-             WHERE table_schema = ANY (current_schemas(false))
-               AND table_name = 'performance_process_flows'
-        """)).fetchall()
-        _FLOW_STATUS_COLUMN_CACHE = {str(row[0]) for row in rows}
+        inspector = inspect(db.engine)
+        if inspector.has_table("performance_process_flows"):
+            _FLOW_STATUS_COLUMN_CACHE = {
+                str(column["name"])
+                for column in inspector.get_columns("performance_process_flows")
+            }
+        else:
+            _FLOW_STATUS_COLUMN_CACHE = set()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         _FLOW_STATUS_COLUMN_CACHE = set()
@@ -486,7 +499,9 @@ def build_period_scorecard_context(period, viewer=None, allowed_employee_ids: It
             "publish_action_label": publish_action_label,
             "publish_action_class": publish_action_class,
             "status": status,
+            "status_label": "Tamamlandı" if is_completed else ("Bekliyor" if status.lower() == "bekliyor" else humanize_workflow_status(status)),
             "workflow_status": workflow_status,
+            "workflow_status_label": humanize_workflow_status(workflow_status),
             "final_total": round(final_total, 2),
             "score_band_label": band_label,
             "score_band_class": band_class,

@@ -141,7 +141,7 @@ def _table_status(required_tables: tuple[str, ...]) -> tuple[list[dict[str, Any]
         items = [{"name": table, "ok": table in existing} for table in required_tables]
         missing = [table for table in required_tables if table not in existing]
         return items, missing
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             from app.extensions import db
@@ -150,7 +150,7 @@ def _table_status(required_tables: tuple[str, ...]) -> tuple[list[dict[str, Any]
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             import logging
             logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/performance/feedback_pipeline.py")
-        return [], [f"Veritabanı kontrolü çalıştırılamadı: {exc}"]
+        return [], ["Veritabanı kontrolü çalıştırılamadı."]
 
 
 def build_feedback_pipeline_context(user: Any) -> dict[str, Any]:

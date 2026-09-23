@@ -9,8 +9,9 @@ from flask import current_app
 
 from app.core.datetime_utils import utc_now
 from app.extensions import db
-from app.models import Survey, SurveyAssignment
+from app.models import Survey, SurveyAssignment, SurveyResponse
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import (
     automation_center_snapshot,
     escalation_snapshot,
@@ -44,6 +45,7 @@ def _pilot_gate(label: str, status: str, detail: str, owner: str, action: str | 
     return {
         'label': label,
         'status': status,
+        'status_label': gate_status_label(status),
         'detail': detail,
         'owner': owner,
         'action': action or '',
@@ -77,7 +79,8 @@ def pilot_readiness_snapshot() -> dict[str, Any]:
     recent_logs = _count_phase8_logs(72)
     pending_surveys = (
         SurveyAssignment.query
-        .filter(SurveyAssignment.status.in_(['assigned', 'atandi', 'started', 'basladi']))
+        .outerjoin(SurveyResponse, SurveyResponse.assignment_id == SurveyAssignment.id)
+        .filter(db.or_(SurveyResponse.id.is_(None), SurveyResponse.is_completed.is_(False)))
         .count()
     )
     active_surveys = Survey.query.filter(Survey.status.in_(['published', 'active', 'yayinda'])).count()
@@ -154,11 +157,11 @@ def pilot_readiness_snapshot() -> dict[str, Any]:
             'Gürültüyü azaltın, sessiz saat ve özet kullanımını teşvik edin.',
         ),
         _pilot_gate(
-            'Pilot checkpoint kaydı',
+            'Pilot kontrol noktası kaydı',
             'pass' if recent_logs >= 1 else 'warn',
             f"Son 72 saatte faz 8 kaydı: {recent_logs}",
             'Proje Ofisi',
-            'Açılış öncesi en az bir checkpoint ve bir karar notu bırakın.',
+            'Açılış öncesi en az bir kontrol noktası ve bir karar notu bırakın.',
         ),
     ]
 
@@ -256,6 +259,9 @@ def cutover_snapshot() -> dict[str, Any]:
         },
     ]
 
+    for _task in tasks:
+        _task['status_label'] = gate_status_label(_task['status'])
+
     handoff_rows = [
         {'title': 'Pilot kapsamı', 'body': 'Önce performans, izin-vekalet, bildirim ve yönetici görünürlüğü alanlarını açın.'},
         {'title': 'İlk 72 saat', 'body': 'CSRF, yönlendirme, export ve destek kuyruğu hatalarını yakın izleyin.'},
@@ -282,7 +288,7 @@ def phase8_dashboard_snapshot() -> dict[str, Any]:
             {'label': 'Hazırlık skoru', 'value': readiness['go_live']['readiness_score'], 'suffix': '/100'},
             {'label': 'Kritik blokaj', 'value': len(readiness['go_live']['blockers']), 'suffix': ''},
             {'label': 'Uyarı', 'value': readiness['counts']['warn'], 'suffix': ''},
-            {'label': 'Checkpoint kaydı', 'value': len(cutover['checkpoint_logs']), 'suffix': ''},
+            {'label': 'Kontrol noktası kaydı', 'value': len(cutover['checkpoint_logs']), 'suffix': ''},
         ],
     }
 
@@ -291,7 +297,7 @@ def record_phase8_checkpoint(actor: Any, checkpoint_key: str, status: str, note:
     checkpoint_key = safe_str(checkpoint_key)[:80] or 'genel'
     status = safe_str(status).lower()[:20] or 'pending'
     note = safe_str(note)[:500]
-    summary = f'Faz 8 checkpoint | {checkpoint_key} | {status}'
+    summary = f'Faz 8 kontrol noktası | {checkpoint_key} | {status}'
     payload = {'checkpoint_key': checkpoint_key, 'status': status, 'note': note}
     row = log_action('phase8_checkpoint', actor, 'communication_phase8', None, summary, payload, status='success')
     db.session.commit()

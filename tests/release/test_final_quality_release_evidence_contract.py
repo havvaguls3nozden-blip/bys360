@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import cast
 
 from app.refactor.final_quality_release_evidence_contract import (
@@ -10,6 +11,8 @@ from app.refactor.final_quality_release_evidence_contract import (
     get_release_evidence_category_keys,
     get_release_evidence_keys,
 )
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
 
 
 def test_release_evidence_manifest_has_required_core_items() -> None:
@@ -23,7 +26,7 @@ def test_release_evidence_manifest_has_required_core_items() -> None:
         "final_quality_faz3_live_backbone",
         "final_quality_faz4_security_compliance",
         "clean_live_release_gate",
-        "claude_10_10_gate",
+        "release_artifact_hygiene_gate",
     }
     assert required.issubset(keys)
 
@@ -40,15 +43,44 @@ def test_release_evidence_categories_cover_final_quality_dimensions() -> None:
     }.issubset(categories)
 
 
-def test_release_evidence_items_have_paths_markers_and_release_value() -> None:
+def test_release_evidence_items_have_markers_and_release_value() -> None:
+    # BYS360 DEFECT FS (Final Sweep A3-16): `required_paths` is no longer
+    # asserted non-empty here -- some items legitimately declare none now
+    # (their prior paths never existed on disk; see
+    # test_release_evidence_required_paths_actually_exist_on_disk below,
+    # which is what actually enforces accuracy).
     assert len(FINAL_RELEASE_EVIDENCE_ITEMS) >= 9
     for item in FINAL_RELEASE_EVIDENCE_ITEMS:
         assert item.key
         assert item.title
         assert item.category
-        assert item.required_paths
         assert item.command_markers
         assert item.release_value
+
+
+def test_release_evidence_required_paths_actually_exist_on_disk() -> None:
+    """BYS360 DEFECT FS (Final Sweep A3-16): this contract previously
+    declared 15 of 20 required_paths across the 3 final_quality_*.py
+    manifests that did not exist anywhere in the repository -- the tests
+    only ever checked that `required_paths` was a non-empty tuple, never
+    that any individual path resolved to a real file. Every path this
+    contract currently declares must exist; a stale/never-built reference
+    must be pruned from the manifest, not merely tolerated by the test."""
+    missing: list[str] = []
+    for item in FINAL_RELEASE_EVIDENCE_ITEMS:
+        for path in item.required_paths:
+            if not (REPO_ROOT / path).exists():
+                missing.append(f"{item.key}: {path}")
+    assert not missing, f"required_paths reference nonexistent files: {missing}"
+
+
+def test_release_evidence_manifest_has_no_development_tool_trace() -> None:
+    """BYS360 DEFECT FS (Final Sweep A3-15): keys and required_paths must
+    not carry development-tool/agent naming traces (e.g. "claude")."""
+    for item in FINAL_RELEASE_EVIDENCE_ITEMS:
+        assert "claude" not in item.key.lower()
+        for path in item.required_paths:
+            assert "claude" not in path.lower()
 
 
 def test_release_categories_reference_existing_manifest_keys() -> None:

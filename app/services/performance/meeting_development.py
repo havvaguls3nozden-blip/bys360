@@ -160,12 +160,28 @@ def _safe_select_columns(table_name: str, aliases: dict[str, str]) -> str:
     return ", ".join(select_parts)
 
 
+def _mtd_id_sql() -> str:
+    # BYS360 DEFECT AR: bu dosyadaki 5 CREATE TABLE hicbir dialect dali
+    # olmadan sabit "id SERIAL PRIMARY KEY" kullaniyordu -- SQLite bunu
+    # rowid-alias/autoincrement olarak degil, taninmayan bir tip-affinity
+    # tokeni olarak kabul eder, bu yuzden eklenen her satirin id'si SQLite'ta
+    # kalici NULL kalirdi (interim_notes_manager_routes.py'deki ayni kusur
+    # sinifi, bkz. app/services/performance/interim_notes_runtime.py::_id_sql()).
+    try:
+        dialect = db.session.get_bind().dialect.name
+    except Exception:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        dialect = "postgresql"
+    return "id INTEGER PRIMARY KEY AUTOINCREMENT" if dialect == "sqlite" else "id SERIAL PRIMARY KEY"
+
+
 def ensure_meeting_foundation_schema(seed_categories: bool = False) -> None:
     """Toplantı kararlarının canlıda beyaz sayfaya düşmeden çalışması için idempotent omurga."""
+    id_sql = _mtd_id_sql()
     ddl = [
-        """
+        f"""
         CREATE TABLE IF NOT EXISTS performance_employee_categories (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             category_name VARCHAR(120) NOT NULL UNIQUE,
             description TEXT NULL,
             is_active BOOLEAN NOT NULL DEFAULT TRUE,
@@ -174,9 +190,9 @@ def ensure_meeting_foundation_schema(seed_categories: bool = False) -> None:
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
         )
         """,
-        """
+        f"""
         CREATE TABLE IF NOT EXISTS performance_employee_category_assignments (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             employee_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             category_id INTEGER NOT NULL REFERENCES performance_employee_categories(id) ON DELETE CASCADE,
             assigned_by_user_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
@@ -187,9 +203,9 @@ def ensure_meeting_foundation_schema(seed_categories: bool = False) -> None:
             UNIQUE(employee_id, category_id)
         )
         """,
-        """
+        f"""
         CREATE TABLE IF NOT EXISTS performance_period_targets (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             period_id INTEGER NOT NULL REFERENCES performance_periods(id) ON DELETE CASCADE,
             target_type VARCHAR(40) NOT NULL DEFAULT 'all',
             target_value VARCHAR(255) NULL,
@@ -198,9 +214,9 @@ def ensure_meeting_foundation_schema(seed_categories: bool = False) -> None:
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
         )
         """,
-        """
+        f"""
         CREATE TABLE IF NOT EXISTS performance_period_observation_notes (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             period_id INTEGER NOT NULL REFERENCES performance_periods(id) ON DELETE CASCADE,
             employee_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             manager_id INTEGER NULL REFERENCES users(id) ON DELETE SET NULL,
@@ -214,9 +230,9 @@ def ensure_meeting_foundation_schema(seed_categories: bool = False) -> None:
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP
         )
         """,
-        """
+        f"""
         CREATE TABLE IF NOT EXISTS performance_legacy_scorecards (
-            id SERIAL PRIMARY KEY,
+            {id_sql},
             employee_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             period_year INTEGER NOT NULL,
             period_title VARCHAR(255) NOT NULL,

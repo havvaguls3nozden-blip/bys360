@@ -1,0 +1,86 @@
+/* BYS360 CSP Style-2A pilot -- HR personnel-operations module shared layout
+   utility classes.
+
+   Scope: shared by app/templates/hr_attendance.html AND
+   app/templates/hr_personnel_dashboard.html (both belong to the HR
+   personnel-operations module and previously carried fully-static inline
+   style="..." attributes -- no Jinja expressions inside any of the
+   converted attribute values). This file exists because, at the time of
+   this pilot, neither template loaded any page-specific external
+   stylesheet; each only had its own page-local <style> block (left
+   untouched here) plus whatever base.html loads globally, none of which is
+   a semantic fit for these small spacing / layout tweaks.
+
+   Behavior-preserving pilot: every declaration below reproduces, byte for
+   byte, a declaration that previously lived in a style="..." attribute on
+   the corresponding element. No forced-priority declarations, no ID
+   selectors, no CSS custom properties. */
+
+/* hr_attendance.html: three distinct margin-top values that were repeated
+   verbatim across multiple elements -- one shared class per value instead
+   of one class per line. */
+.block-spacing-top-xs {
+  margin-top: 10px;
+}
+
+.block-spacing-top-sm {
+  margin-top: 14px;
+}
+
+.block-spacing-top-md {
+  margin-top: 16px;
+}
+
+/* BYS360 UI refinement wave (operation-first reorder): hr_attendance.html's
+   filter/actions/list blocks became top-level reordered siblings and need
+   the same 18px top-gap .scope-strip-offset already gives .scope-strip --
+   added as its own class (not reused, to keep .scope-strip-offset's name
+   accurate) since margin-top:18px alone (no other margins) recurs across
+   several non-.scope-strip elements after the reorder. */
+.block-spacing-top-lg {
+  margin-top: 18px;
+}
+
+/* hr_attendance.html: .scope-strip previously carried style="margin:18px 0 0;"
+   (a margin shorthand, not a single margin-top declaration -- kept as its
+   own rule rather than folded into the margin-top-only scale above). */
+.scope-strip-offset {
+  margin: 18px 0 0;
+}
+
+/* hr_personnel_dashboard.html: three <div class="panel" style="padding:0;
+   border:none;box-shadow:none;background:transparent"> elements shared the
+   identical declaration set -- one reusable "flush panel" modifier. */
+.panel-flush {
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+/* hr_personnel_dashboard.html: the third flush panel additionally carried
+   margin-top:18px in the same style attribute. Composed alongside
+   .panel-flush on that one element instead of duplicating the four shared
+   properties into a second near-identical class. */
+.panel-flush-spaced {
+  margin-top: 18px;
+}
+
+/* hr_personnel_dashboard.html: three <h4 style="margin:0 0 12px"> subsection
+   headings shared the identical declaration. */
+.subsection-heading {
+  margin: 0 0 12px;
+}
+
+/* hr_personnel_dashboard.html: the quick-link row already carried
+   class="btn-soft-row" but no matching CSS rule existed anywhere in the
+   codebase (verified via grep across app/static/css and app/templates) --
+   the class name itself was unused/unstyled. Styling the existing class
+   name directly (rather than inventing a new one) removes the redundant
+   style="..." attribute without changing the element's class list. */
+.btn-soft-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}

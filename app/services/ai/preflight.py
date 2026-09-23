@@ -98,8 +98,10 @@ def _import_symbol(path: str) -> tuple[bool, str]:
         if symbol_name:
             getattr(module, symbol_name)
         return True, "Import zinciri hazır."
-    except Exception as exc:  # pragma: no cover - depends on runtime env
-        return False, str(exc)
+    except Exception:  # pragma: no cover - depends on runtime env
+        import logging
+        logging.getLogger(__name__).exception("BYS360 AI preflight import kontrolü başarısız oldu: %s", path)
+        return False, "Import zinciri şu anda doğrulanamadı."
 
 
 def build_ai_preflight_snapshot() -> dict[str, Any]:

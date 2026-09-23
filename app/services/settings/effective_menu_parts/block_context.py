@@ -50,6 +50,12 @@ def apply_role_matrix_runtime_authority_keys_block(ROLE_MATRIX_RUNTIME_AUTHORITY
             "performance_interim_notes",
             "performance_development_guidance",
             "performance_meeting_p3_reminders",
+            # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_AUTHORITY
+            "performance_meeting_development",
+            "performance_meeting_test_scenarios",
+            "performance_meeting_development_faz3",
+            "performance_meeting_final_gate",
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_AUTHORITY
             "performance_archive",
             "performance_kpi_dashboard",
             "performance_kpi_management",

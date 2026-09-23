@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -81,7 +82,7 @@ class _KpiTargetManagementScreenState extends State<KpiTargetManagementScreen> {
       _showMessage('KPI hedef kartı oluşturuldu.');
       await _refresh();
     } catch (error) {
-      _showMessage(error.toString());
+      _showMessage(BYS360Copy.error(error));
     } finally {
       if (mounted) setState(() => _saving = false);
     }
@@ -114,7 +115,7 @@ class _KpiTargetManagementScreenState extends State<KpiTargetManagementScreen> {
       _showMessage('KPI gerçekleşme değeri güncellendi.');
       await _refresh();
     } catch (error) {
-      _showMessage(error.toString());
+      _showMessage(BYS360Copy.error(error));
     }
   }
 
@@ -138,7 +139,7 @@ class _KpiTargetManagementScreenState extends State<KpiTargetManagementScreen> {
             badge: 'KPI Hedef V2.8.53',
             onRefresh: _refresh,
             children: <Widget>[
-              ApiEmptyState(message: snapshot.error.toString(), onRetry: () => setState(() => _future = _loadTargets())),
+              ApiEmptyState(message: BYS360Copy.error(snapshot.error), onRetry: () => setState(() => _future = _loadTargets())),
             ],
           );
         }

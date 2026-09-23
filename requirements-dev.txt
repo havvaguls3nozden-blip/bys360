@@ -1,1 +1,12 @@
-pytest>=8,<9
+# BYS360 CI/quality toolchain pins (2026-08-10, CI toolchain determinism wave).
+# Purpose: exact-pin the quality tools installed by CI (bys360-ci.yml,
+# bys360-score100-quality-gate-v1.yml) so tool runs are reproducible across time.
+# This is separate from requirements.txt (production runtime dependencies) --
+# do not merge the two files. Versions below reflect what this engagement's
+# regression runs were actually validated against (pip show, re-verified at
+# pin time), not an upgrade to "latest".
+mypy==2.3.0
+pip-audit==2.10.1
+pytest==9.0.3
+pytest-cov==7.1.0
+ruff==0.16.0

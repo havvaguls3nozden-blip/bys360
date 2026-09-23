@@ -52,7 +52,7 @@
           <div class="portal-person-card-top-v210">
             <div class="portal-person-avatar-v210">
               {% if person.profile_photo_url is defined and person.profile_photo_url %}
-                <img src="{{ person.profile_photo_url }}" alt="{{ person_name }} profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">
+                <img src="{{ person.profile_photo_url }}" alt="{{ person_name }} profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">
               {% else %}
                 <span>{{ (person_name[:1] or 'P')|upper }}</span>
               {% endif %}
@@ -83,6 +83,18 @@
   {% endif %}
 </div>
 <script src="{{ url_for('static', filename='js/bys360_portal.js') }}?v=portal-ajax-reactions-v1"></script>
+<script>
+(function () {
+    document.querySelectorAll('img[data-fallback-class]').forEach(function (img) {
+        img.addEventListener('error', function () {
+            img.remove();
+            if (img.parentElement) {
+                img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}
 
 <!-- BYS360_PORTAL_PROFILE_ME_LINK_V2_10_3: portal_my_profile endpoint bağlantısı portal_my_profile olarak düzeltildi. -->

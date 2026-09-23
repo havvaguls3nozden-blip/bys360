@@ -307,11 +307,11 @@
                 {% endif %}
 
                 <div class="toolbar">
-                    <button type="submit" class="btn-soft secondary" onclick="document.getElementById('quick_apply_ai').value='1';">
+                    <button type="submit" class="btn-soft secondary" id="excelQuickApplyBtn">
                         <i class="fa-solid fa-wand-magic-sparkles"></i>
                         AI düzeltmeleriyle yükle
                     </button>
-                    <button type="submit" class="btn-soft primary" onclick="document.getElementById('quick_apply_ai').value='0';">
+                    <button type="submit" class="btn-soft primary" id="excelStandardApplyBtn">
                         <i class="fa-solid fa-file-import"></i>
                         İçe Aktar
                     </button>
@@ -325,4 +325,23 @@
         </form>
     </div>
 </div>
+
+<script>
+(function () {
+    const quickBtn = document.getElementById('excelQuickApplyBtn');
+    if (quickBtn) {
+        quickBtn.addEventListener('click', function () {
+            const field = document.getElementById('quick_apply_ai');
+            if (field) field.value = '1';
+        });
+    }
+    const stdBtn = document.getElementById('excelStandardApplyBtn');
+    if (stdBtn) {
+        stdBtn.addEventListener('click', function () {
+            const field = document.getElementById('quick_apply_ai');
+            if (field) field.value = '0';
+        });
+    }
+})();
+</script>
 {% endblock %}

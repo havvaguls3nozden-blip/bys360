@@ -228,7 +228,7 @@ def personnel_toggle_active(user_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Durum güncelleme sırasında hata oluştu: {exc}", "danger")
+        flash("Durum güncelleme sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.personnel_list"))
 
@@ -250,7 +250,7 @@ def personnel_delete(user_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"Silme işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Silme işlemi sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.personnel_list"))
 

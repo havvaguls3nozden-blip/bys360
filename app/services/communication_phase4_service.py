@@ -28,6 +28,9 @@ from app.models.communication_phase4_models import (
     CommunicationGovernanceReview,
     CommunicationReportExportLog,
 )
+from app.services.communication_phase1_service import BULLETIN_PRIORITY_LABELS
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS
+from app.services.communication_phase3_service import SUPPORT_STATUS_LABELS
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +46,35 @@ MANAGER_ROLES = {
 SUPPORT_OPEN_STATUSES = {"open", "reviewing", "waiting_info", "assigned", "planned"}
 BULLETIN_PUBLISHED_STATUSES = {"published", "yayinda"}
 SURVEY_ACTIVE_STATUSES = {"published", "active", "yayinda"}
+
+REPORT_STATUS_LABELS = {
+    "draft": "Taslak",
+    "review": "İncelemede",
+    "approved": "Onaylandı",
+    "revision": "Revizyon İstendi",
+    "rejected": "Reddedildi",
+}
+
+# app/communication/phase4_routes.py'nin `report_type` form alanı yalnızca bu
+# üç değeri gönderir (bkz. app/templates/communication/phase4_reports.html'in
+# <select name="report_type"> seçenekleri) -- kapalı bir sözlük olduğu için
+# etiketler burada sabit tutulur, `.replace('_', ' ').title()` gibi ham
+# değeri yansıtan bir dönüştürme kullanılmaz.
+REPORT_TYPE_LABELS = {
+    "weekly_summary": "Haftalık Özet",
+    "executive_brief": "Yönetici Brifi",
+    "scorecard": "Skor Kartı",
+}
+
+# Phase 4 analytics rows also see the legacy ASCII-Turkish "yayinda" and the
+# generic "active" values (see SURVEY_ACTIVE_STATUSES/BULLETIN_PUBLISHED_STATUSES
+# above) alongside the standard Survey.status vocabulary -- extend the shared
+# phase2 dict rather than duplicating it.
+SURVEY_ANALYTICS_STATUS_LABELS = {
+    **SURVEY_STATUS_LABELS,
+    "active": "Aktif",
+    "yayinda": "Yayında",
+}
 
 
 class CommunicationPhase4Error(RuntimeError):
@@ -105,6 +137,15 @@ def _safe_attr(row: Any, *names: str, default=None):
             if value is not None:
                 return value
     return default
+
+
+def _labeled_counter(raw_counter: Counter, label_map: dict[str, str]) -> Counter:
+    """Re-key a raw-value Counter through a display-label map, merging counts
+    for any raw values that share the same label instead of dropping one."""
+    labeled: Counter[str] = Counter()
+    for raw_value, count in raw_counter.items():
+        labeled[label_map.get(raw_value, "Bilinmiyor")] += count
+    return labeled
 
 
 def _period_range(days: int = 30) -> tuple[datetime, datetime]:
@@ -332,6 +373,7 @@ def executive_summary_snapshot(days: int = 30) -> dict[str, Any]:
         },
         "survey_metrics": survey_metrics[:8],
         "risk_surveys": low_completion_rows[:5],
+        "survey_status_labels": SURVEY_ANALYTICS_STATUS_LABELS,
         "support_rows": support_rows[:10],
         "risk_support_rows": support_rows[:5],
         "support_status_breakdown": dict(support_status_counter),
@@ -408,12 +450,14 @@ def survey_analytics_snapshot(days: int = 180) -> dict[str, Any]:
             "average_submit_minutes": round(sum(submit_durations) / len(submit_durations), 1) if submit_durations else 0.0,
         },
         "status_breakdown": dict(status_counter),
+        "status_label_breakdown": dict(_labeled_counter(status_counter, SURVEY_ANALYTICS_STATUS_LABELS)),
         "type_breakdown": dict(type_counter),
         "band_breakdown": dict(band_counter),
         "low_completion_rows": low_completion_rows,
         "fastest_rows": fastest_rows,
         "slowest_rows": slowest_rows,
         "rows": sorted(surveys, key=lambda item: (-item["completion_rate"], -item["responses"], item["title"].lower())),
+        "survey_status_labels": SURVEY_ANALYTICS_STATUS_LABELS,
     }
 
 
@@ -477,12 +521,15 @@ def support_analytics_snapshot(days: int = 180) -> dict[str, Any]:
             "average_age_days": round(total_age / len(detailed_rows), 1) if detailed_rows else 0.0,
         },
         "status_breakdown": dict(status_counter),
+        "status_label_breakdown": dict(_labeled_counter(status_counter, SUPPORT_STATUS_LABELS)),
         "priority_breakdown": dict(priority_counter),
         "age_buckets": age_buckets,
         "top_assignees": [{"name": name, "count": count} for name, count in assignee_counter.most_common(5)],
         "risk_rows": risk_rows,
         "oldest_rows": oldest_rows,
         "rows": detailed_rows,
+        "status_labels": SUPPORT_STATUS_LABELS,
+        "priority_labels": BULLETIN_PRIORITY_LABELS,
     }
 
 
@@ -518,6 +565,7 @@ def report_history_snapshot(limit: int = 25) -> dict[str, Any]:
             "report_type": safe_str(getattr(row, "report_type", "")),
             "period_label": safe_str(getattr(row, "period_label", "")),
             "status": safe_str(getattr(row, "status", "draft")) or "draft",
+            "status_label": REPORT_STATUS_LABELS.get(safe_str(getattr(row, "status", "draft")) or "draft", safe_str(getattr(row, "status", "draft"))),
             "created_by": user_display_name(getattr(row, "created_by", None)),
             "approved_by": user_display_name(getattr(row, "approved_by", None)),
             "approved_at": getattr(row, "approved_at", None),
@@ -532,7 +580,7 @@ def create_executive_report(actor_user: Any, report_type: str = "weekly_summary"
     survey_payload = survey_analytics_snapshot(max(clean_days, 30))
     support_payload = support_analytics_snapshot(max(clean_days, 30))
     today = _now().date().isoformat()
-    title = f"İletişim ve Anket Yönetimi {report_type.replace('_', ' ').title()} Raporu"
+    title = f"İletişim ve Anket Yönetimi {REPORT_TYPE_LABELS.get(report_type, 'Bilinmiyor')} Raporu"
     summary_text = (
         f"{today} itibarıyla son {clean_days} gün görünümünde {payload['headline']['published_bulletins']} yayımlanmış duyuru, "
         f"{payload['headline']['survey_count']} anket ve {payload['headline']['open_tickets']} açık destek talebi bulunmaktadır. "

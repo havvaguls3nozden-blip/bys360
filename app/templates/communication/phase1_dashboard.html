@@ -69,7 +69,7 @@
                 {% for row in dashboard.bulletins.rows %}
                 <div class="phase-item">
                     <div class="phase-item-title">{{ row.title }}</div>
-                    <div class="phase-meta">Durum: {{ row.status }} · Öncelik: {{ row.priority }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
+                    <div class="phase-meta">Durum: {{ dashboard.bulletin_status_labels.get(row.status, 'Bilinmiyor') }} · Öncelik: {{ dashboard.bulletin_priority_labels.get(row.priority, 'Bilinmiyor') }} · Oluşturulma: {{ row.created_at.strftime('%d.%m.%Y %H:%M') if row.created_at else '-' }}</div>
                 </div>
                 {% else %}
                 <div class="phase-item"><div class="phase-meta">Henüz Kontrol 1 duyuru kaydı oluşturulmadı.</div></div>
@@ -83,7 +83,7 @@
                 {% for row in dashboard.recent_surveys %}
                 <div class="phase-item">
                     <div class="phase-item-title">{{ row.title }}</div>
-                    <div class="phase-meta">Durum: {{ row.status }} · Tür: {{ row.survey_type }} · Başlangıç: {{ row.start_at.strftime('%d.%m.%Y') if row.start_at else '-' }}</div>
+                    <div class="phase-meta">Durum: {{ dashboard.survey_status_labels.get(row.status, 'Bilinmiyor') }} · Tür: {{ dashboard.survey_type_labels.get(row.survey_type, 'Bilinmiyor') }} · Başlangıç: {{ row.start_at.strftime('%d.%m.%Y') if row.start_at else '-' }}</div>
                 </div>
                 {% else %}
                 <div class="phase-item"><div class="phase-meta">Kayıtlı anket bulunamadı.</div></div>

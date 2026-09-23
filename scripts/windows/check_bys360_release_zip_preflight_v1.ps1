@@ -1,7 +1,18 @@
 <#
+DEPRECATED (BYS360 deterministic-package-builder hardening, 2026-08-23).
+
 BYS360 Release Zip Preflight V1
 
-Kullanım:
+This wrapper depends on scripts\security\bys360_release_zip_preflight_v1.py,
+which no longer exists at that path (moved to
+scripts\archive\pre_handover_20260708\security\ by commit 4f41319). It has
+always thrown before producing a usable result since that commit.
+
+Use the canonical release builder's own verify mode instead:
+
+  python scripts\release\build_bys360_safe_release.py --verify <path\to\release.zip>
+
+Kullanım (eski, artik desteklenmeyen script):
   powershell -ExecutionPolicy Bypass -File .\scripts\windows\check_bys360_release_zip_preflight_v1.ps1 -ZipPath "C:\bys360\project\dist_secure\BYS360_SECURE_RELEASE_V1_5_*.zip"
 #>
 [CmdletBinding()]
@@ -33,7 +44,10 @@ function Resolve-BysPython {
 $ProjectRoot = (Resolve-Path -LiteralPath $ProjectRoot).Path
 $Python = Resolve-BysPython -Root $ProjectRoot
 $ScriptPath = Join-Path $ProjectRoot "scripts\security\bys360_release_zip_preflight_v1.py"
-if (-not (Test-Path -LiteralPath $ScriptPath)) { throw "Preflight script bulunamadı: $ScriptPath" }
+if (-not (Test-Path -LiteralPath $ScriptPath)) {
+    throw "DEPRECATED: preflight script bulunamadi: $ScriptPath (scripts\archive\pre_handover_20260708\security\ altina tasindi). " +
+        "Bunun yerine: python scripts\release\build_bys360_safe_release.py --verify <zip-yolu>"
+}
 
 $zipMatches = Get-ChildItem -Path $ZipPath -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending
 if (-not $zipMatches) { throw "Zip bulunamadı: $ZipPath" }

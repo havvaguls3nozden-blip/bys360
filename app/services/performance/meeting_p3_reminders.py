@@ -141,9 +141,9 @@ def ensure_reminder_queue_table() -> tuple[bool, list[str]]:
         db.session.rollback()
         warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=137")
+        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=137 | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Hatırlatma kuyruğu tablosu oluşturulamadı: {exc}")
+        warnings.append("Hatırlatma kuyruğu tablosu oluşturulamadı.")
     return _has_table(P3_REMINDER_QUEUE_TABLE), warnings
 
 def ensure_overdue_snapshot_table() -> tuple[bool, list[str]]:
@@ -163,9 +163,9 @@ def ensure_overdue_snapshot_table() -> tuple[bool, list[str]]:
         db.session.rollback()
         warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc.__class__.__name__}")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=156")
+        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=156 | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Aksatan amir özet tablosu oluşturulamadı: {exc}")
+        warnings.append("Aksatan amir özet tablosu oluşturulamadı.")
     return _has_table(P3_OVERDUE_SNAPSHOT_TABLE), warnings
 
 def _existing_live_tables() -> dict[str, bool]:
@@ -238,9 +238,9 @@ def run_p3_reminders(actor_user_id: int | None = None) -> P3ReminderResult:
         seed_demo_reminder(actor_user_id=actor_user_id)
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=228")
+        logger.exception("BYS360 V6C guarded exception | file=app/services/performance/meeting_p3_reminders.py | line=228 | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Faz 9 hatırlatma hazırlığı tamamlanamadı: {exc}")
+        warnings.append("Faz 9 hatırlatma hazırlığı tamamlanamadı.")
     checks = p3_status_checks()
     passed = sum(1 for item in checks if item["ok"])
     tables_ready = int(_has_table(P3_REMINDER_QUEUE_TABLE)) + int(_has_table(P3_OVERDUE_SNAPSHOT_TABLE))

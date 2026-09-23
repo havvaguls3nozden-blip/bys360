@@ -73,6 +73,7 @@ from app.services.personnel.import_manager_chain_sync import (
 )
 from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
 from app.services.sql_refactor_query_helpers import distinct_non_empty_values
+from app.services.ui_context.risk import _event_type_label
 from app.view_helpers import build_dashboard_context
 
 logger = logging.getLogger(__name__)
@@ -192,6 +193,7 @@ def admin_dashboard():
         "completed_evaluations": completed_evaluations,
         "published_period_count": published_period_count,
         "completion_rate": completion_rate,
+        "event_type_label": _event_type_label,
     }
 
     return safe_render(
@@ -482,7 +484,7 @@ def admin_user_create():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Personel oluşturulurken hata oluştu: {exc}", "danger")
+            flash("Personel oluşturulurken hata oluştu.", "danger")
             return safe_render(
                 "admin_user_create.html",
                 "<h3>Personel Ekle</h3>",
@@ -617,7 +619,7 @@ def admin_user_edit(user_id):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Personel güncellenirken hata oluştu: {exc}", "danger")
+            flash("Personel güncellenirken hata oluştu.", "danger")
             return redirect(url_for("main.admin_user_edit", user_id=user.id))
 
     return safe_render(
@@ -734,7 +736,7 @@ def personnel_add():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Personel ekleme sırasında hata oluştu: {exc}", "danger")
+            flash("Personel ekleme sırasında hata oluştu.", "danger")
 
     return safe_render(
         "personnel_add.html",
@@ -851,7 +853,7 @@ def personnel_edit(user_id):
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Personel güncelleme sırasında hata oluştu: {exc}", "danger")
+            flash("Personel güncelleme sırasında hata oluştu.", "danger")
 
     return safe_render(
         "personnel_edit.html",
@@ -1121,7 +1123,7 @@ def personnel_excel_upload():
         except Exception as exc:
             logger.exception("Beklenmeyen hata: %s", exc)
             db.session.rollback()
-            flash(f"Excel yükleme sırasında hata oluştu: {exc}", "danger")
+            flash("Excel yükleme sırasında hata oluştu.", "danger")
 
     return safe_render(
         "personnel_excel_upload.html",

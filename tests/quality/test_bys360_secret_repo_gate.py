@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import subprocess
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -1007,3 +1008,510 @@ def test_tracked_env_example_still_green_after_secret_expansion(tmp_path: Path) 
 
     assert result["ok"] is True
     assert result["finding_count"] == 0
+
+
+# --- BYS360 Phase 5 secret-gate closure (2026-08-02): Bölüm 3C Ajan 3 ---
+# tests/security/test_phase13b_setup_admin.py posts realistic-looking
+# passwords ("AttackerPass123!", "OperatorStrongPass1!", "SecondAdminPass1!")
+# to exercise setup-admin bootstrap negative/positive assertions. These are
+# not real secrets, but the gate previously had no way to tell that apart
+# from a genuinely leaked credential and flagged all three as
+# hardcoded_secret_value (finding_count=3). The fix renamed the fixture
+# values to obviously-fake, still-valid (>= 8 chars, the only requirement
+# enforced by _MIN_PASSWORD_LENGTH in app/main_handlers/auth_handlers.py)
+# values containing "Test" -- which the gate's own PRE-EXISTING
+# PLACEHOLDER_WORDS list ("test" was already in it) downgrades to a warning.
+# No new gate mechanism, no tests/-wide exemption, no allowlist: the below
+# tests prove the classification comes from the *value's content*, not from
+# a blanket "this file/folder is a test" carve-out.
+
+
+def test_phase13b_style_fixture_password_is_warning_not_finding(tmp_path: Path) -> None:
+    """Reproduces the exact dict-literal POST-data shape used in
+    tests/security/test_phase13b_setup_admin.py with the real, current
+    fixture value, inside an isolated tests/ tree. Must be a warning, not a
+    finding."""
+    repo = _init_repo(tmp_path)
+    (repo / "tests" / "security").mkdir(parents=True)
+    fixture_content = (
+        "def test_example():\n"
+        "    data = {\n"
+        '        "password": "AttackerTestFixtureOnly123!",\n'
+        "    }\n"
+    )
+    (repo / "tests" / "security" / "test_example_fixture.py").write_text(
+        fixture_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_example_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert any(
+        w["path"] == "tests/security/test_example_fixture.py" for w in result["warnings"]
+    )
+
+
+def test_phase13b_fixture_pattern_without_test_marker_still_fails(tmp_path: Path) -> None:
+    """Controlled negative for the test above (and the durable proof that
+    the gate does NOT broadly ignore the tests/ folder): identical
+    dict-literal shape, identical tests/ path, but a realistic value that
+    contains none of PLACEHOLDER_WORDS (no "test", "local", "dev", ...).
+    This must still be a finding."""
+    repo = _init_repo(tmp_path)
+    (repo / "tests" / "security").mkdir(parents=True)
+    realistic_value = "Xk9#mQ7vBzR2pL5w"  # hardcoded_secret fixture
+    fixture_content = (
+        "def test_example():\n"
+        "    data = {\n"
+        '        "password": "Xk9#mQ7vBzR2pL5w",\n'  # hardcoded_secret fixture
+        "    }\n"
+    )
+    (repo / "tests" / "security" / "test_example_fixture.py").write_text(
+        fixture_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_example_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value"
+        and f["path"] == "tests/security/test_example_fixture.py"
+        for f in result["findings"]
+    )
+    assert realistic_value not in json.dumps(result)
+
+
+def test_real_phase13b_setup_admin_test_file_scans_clean(tmp_path: Path) -> None:
+    """Direct regression lock on the actual tracked file: copies the real,
+    current tests/security/test_phase13b_setup_admin.py content into an
+    isolated repo and asserts zero findings -- the real-world instance of
+    the fixture-rename fix above."""
+    repo = _init_repo(tmp_path)
+    real_content = (
+        Path(__file__).resolve().parents[2]
+        / "tests"
+        / "security"
+        / "test_phase13b_setup_admin.py"
+    ).read_text(encoding="utf-8")
+    (repo / "tests" / "security").mkdir(parents=True)
+    (repo / "tests" / "security" / "test_phase13b_setup_admin.py").write_text(
+        real_content, encoding="utf-8"
+    )
+    _git(["add", "-f", "tests/security/test_phase13b_setup_admin.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+# --- BYS360 Phase 5 secret-gate closure: raw PEM/OpenSSH/PGP private-key material ---
+# Confirmed by direct reproduction (a tmp_path repo containing only a
+# "-----BEGIN PRIVATE KEY-----" header, no KEY="value" wrapper) that
+# finding_count was 0 before PRIVATE_KEY_HEADER_RE existed: none of
+# ASSIGN_RE/DICT_ASSIGN_RE/UNQUOTED_ASSIGN_RE can ever see a bare PEM header
+# line since it has no sensitive KEY name followed by an assignment
+# operator. The new check matches the header line independently of that
+# machinery, still routed through the same looks_regex_or_scanner() escape
+# hatch used everywhere else in this file for scanner/test source code.
+
+_FAKE_PEM_BODY = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcw\n-----END PRIVATE KEY-----\n"  # hardcoded_secret fixture -- synthetic, not a real key
+
+
+def test_raw_private_key_header_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    (repo / "id_rsa_leaked.txt").write_text(_FAKE_PEM_BODY, encoding="utf-8")
+    _git(["add", "-f", "id_rsa_leaked.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_private_key_material" and f["path"] == "id_rsa_leaked.txt"
+        for f in result["findings"]
+    )
+
+
+def test_rsa_and_openssh_and_pgp_private_key_variants_trigger_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    rsa_body = "-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEA\n-----END RSA PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    openssh_body = "-----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnNzaC1rZXk\n-----END OPENSSH PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    pgp_body = "-----BEGIN PGP PRIVATE KEY BLOCK-----\nlQOYBF\n-----END PGP PRIVATE KEY BLOCK-----\n"  # hardcoded_secret fixture
+    (repo / "rsa_key.txt").write_text(rsa_body, encoding="utf-8")
+    (repo / "openssh_key.txt").write_text(openssh_body, encoding="utf-8")
+    (repo / "pgp_key.txt").write_text(pgp_body, encoding="utf-8")
+    _git(["add", "-f", "rsa_key.txt", "openssh_key.txt", "pgp_key.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    flagged_paths = {
+        f["path"] for f in result["findings"] if f["type"] == "hardcoded_private_key_material"
+    }
+    assert flagged_paths == {"rsa_key.txt", "openssh_key.txt", "pgp_key.txt"}
+
+
+def test_private_key_pattern_in_own_regex_source_is_not_flagged(tmp_path: Path) -> None:
+    """A quality-gate script that documents the PEM header as a regex
+    literal (exactly the pre-existing pattern in
+    scripts/quality/bys360_score100_quality_gate_v1.py) must not be
+    flagged -- looks_regex_or_scanner() already exempts any line containing
+    a "re.compile" marker; this locks that same exemption in for the new
+    private-key check."""
+    repo = _init_repo(tmp_path)
+    (repo / "scripts" / "quality").mkdir(parents=True)
+    content = (
+        "import re\n"
+        'PATTERN = re.compile(r"-----BEGIN (RSA |EC |OPENSSH |DSA |)?PRIVATE KEY-----")\n'
+    )
+    (repo / "scripts" / "quality" / "some_gate.py").write_text(content, encoding="utf-8")
+    _git(["add", "-f", "scripts/quality/some_gate.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_tracked_repo_has_no_private_key_material_anywhere() -> None:
+    """Full real-repo regression: confirms no tracked/staged/untracked file
+    in this actual repository contains PEM/OpenSSH/PGP private-key material
+    now that the check exists (including this test file's own synthetic
+    fixtures above, which are marked so they don't self-flag)."""
+    root = Path(__file__).resolve().parents[2]
+    result = run(root)
+
+    assert not any(f["type"] == "hardcoded_private_key_material" for f in result["findings"])
+
+
+# --- BYS360 Phase 5 secret-gate closure: Sentry DSN real-value / empty-template regression ---
+
+
+def test_sentry_dsn_real_value_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    real_dsn = "https://abcdef1234567890abcdef1234567890@o123456.ingest.sentry.io/6789012"  # hardcoded_secret fixture
+    (repo / "config_local.py").write_text(
+        f'SENTRY_DSN = "{real_dsn}"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "config_local.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "config_local.py"
+        for f in result["findings"]
+    )
+    assert real_dsn not in json.dumps(result)
+
+
+def test_env_example_empty_sentry_dsn_is_pass(tmp_path: Path) -> None:
+    """Regression: an empty SENTRY_DSN= line in a template .env file (the
+    actual, current shape of the tracked .env.example) must stay accepted."""
+    repo = _init_repo(tmp_path)
+    (repo / ".env.example").write_text("SENTRY_DSN=\n", encoding="utf-8")
+    _git(["add", "-f", ".env.example"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+
+
+def test_real_env_example_sentry_dsn_line_is_empty() -> None:
+    """Confirms the actual tracked .env.example still uses the accepted
+    empty-value shape (SENTRY_DSN=) rather than a real value -- a source-file
+    regression guard, independent of the gate itself."""
+    root = Path(__file__).resolve().parents[2]
+    env_example = (root / ".env.example").read_text(encoding="utf-8")
+    sentry_lines = [
+        line for line in env_example.splitlines() if line.strip().upper().startswith("SENTRY_DSN")
+    ]
+    assert sentry_lines, "SENTRY_DSN satırı .env.example içinde bulunamadı"
+    assert all(line.strip() == "SENTRY_DSN=" for line in sentry_lines)
+
+
+# --- BYS360 Phase 5 secret-gate closure: API-key-like value (dedicated regression) ---
+# API_KEY is already covered indirectly by test_staged_new_secret_triggers_red
+# above; this is a direct, dedicated regression requested explicitly by the
+# Phase 5 secret-gate closure checklist.
+
+
+def test_api_key_like_value_triggers_red(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    realistic_key = "ak_prod_5f4e3d2c1b0a9988776655443322"  # hardcoded_secret fixture
+    (repo / "integration_config.py").write_text(
+        f'API_KEY = "{realistic_key}"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "integration_config.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "integration_config.py"
+        for f in result["findings"]
+    )
+    assert realistic_key not in json.dumps(result)
+
+
+# --- TD-CAND-007 closure: warning_count must be the TRUE total match count,
+# never silently frozen at the report's display-readability cap. The old
+# add_warning(limit=80) stopped recording warnings past the 80th one and then
+# reported len(warnings) (already capped at <=80) as "warning_count" -- so
+# once a repository's genuine match count grew past 80 (which this repo's
+# has, well past it), the reported number could never again reflect reality,
+# creating the appearance of "drift" over time as it silently masked
+# whatever the true count actually was. The fix separates the two concerns:
+# warning_count is always len(all recorded warnings); only the *displayed*
+# "warnings" list in the report is truncated, with an explicit marker
+# entry stating the true total. ---
+
+
+def test_warning_count_reports_true_total_not_capped_at_display_limit(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    lines = "\n".join(f'SECRET_KEY = "changeme"  # line {i}' for i in range(85))
+    (repo / "many_placeholders.py").write_text(lines + "\n", encoding="utf-8")
+    _git(["add", "-f", "many_placeholders.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert result["warning_count"] == 85  # true total, not the old hardcoded 80 cap
+    assert len(result["warnings"]) == 81  # 80 displayed details + 1 truncation marker
+    marker = result["warnings"][-1]
+    assert marker["type"] == "warning_output_truncated"
+    assert "85" in marker["detail"]
+
+
+def test_warning_count_at_or_below_display_limit_has_no_truncation_marker(tmp_path: Path) -> None:
+    repo = _init_repo(tmp_path)
+    lines = "\n".join(f'SECRET_KEY = "changeme"  # line {i}' for i in range(5))
+    (repo / "few_placeholders.py").write_text(lines + "\n", encoding="utf-8")
+    _git(["add", "-f", "few_placeholders.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["warning_count"] == 5
+    assert len(result["warnings"]) == 5
+    assert not any(w["type"] == "warning_output_truncated" for w in result["warnings"])
+
+
+def test_repeated_scan_is_semantically_deterministic(tmp_path: Path) -> None:
+    """Given a fixed working tree, 10 repeated invocations of run() must
+    produce byte-identical findings/warnings content and counts -- not just
+    a stable count. This is the direct regression lock for TD-CAND-007."""
+    repo = _init_repo(tmp_path)
+    (repo / "a.py").write_text('SECRET_KEY = "changeme"\n', encoding="utf-8")
+    (repo / "b.py").write_text('DATABASE_URL = "postgresql://user:pass@db/x"\n', encoding="utf-8")
+    (repo / "c.env.example").write_text("API_KEY=\n", encoding="utf-8")
+    _git(["add", "-f", "a.py", "b.py", "c.env.example"], repo)
+    _commit(repo)
+
+    results = [run(repo) for _ in range(10)]
+
+    first = results[0]
+    for other in results[1:]:
+        assert other["finding_count"] == first["finding_count"]
+        assert other["warning_count"] == first["warning_count"]
+        assert other["findings"] == first["findings"]
+        assert other["warnings"] == first["warnings"]
+
+
+def test_scan_result_independent_of_git_add_commit_order(tmp_path: Path) -> None:
+    """The candidate list is derived from `git ls-files` (which returns
+    paths in stable sorted order regardless of add/commit order), so the
+    semantic scan result must not depend on the order files were staged."""
+    files = {
+        "alpha.py": 'SECRET_KEY = "changeme"\n',
+        "middle.py": 'PASSWORD = "changeme"\n',
+        "zeta.py": 'TOKEN = "changeme"\n',
+    }
+
+    forward_dir = tmp_path / "forward"
+    forward_dir.mkdir()
+    repo_forward = _init_repo(forward_dir)
+    for name in ("alpha.py", "middle.py", "zeta.py"):
+        (repo_forward / name).write_text(files[name], encoding="utf-8")
+        _git(["add", "-f", name], repo_forward)
+    _commit(repo_forward)
+
+    reverse_dir = tmp_path / "reverse"
+    reverse_dir.mkdir()
+    repo_reverse = _init_repo(reverse_dir)
+    for name in ("zeta.py", "middle.py", "alpha.py"):
+        (repo_reverse / name).write_text(files[name], encoding="utf-8")
+        _git(["add", "-f", name], repo_reverse)
+    _commit(repo_reverse)
+
+    result_forward = run(repo_forward)
+    result_reverse = run(repo_reverse)
+
+    def _semantic_set(result: dict[str, Any]) -> set[tuple[object, object, object]]:
+        return {(w["type"], w["path"], w["line"]) for w in result["warnings"]}
+
+    assert result_forward["warning_count"] == result_reverse["warning_count"] == 3
+    assert _semantic_set(result_forward) == _semantic_set(result_reverse)
+
+
+# --- BYS360 secret-gate PowerShell-placeholder fix (2026-08-26) ---
+# scripts/windows/prepare_bys360_candidate.ps1 builds a DATABASE_URL at
+# runtime from PowerShell subexpressions:
+#   $shadowUrl = "postgresql://$($DbConn.User):$($DbConn.Password)@$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName"
+# DB_URL_RE captured the password group as the literal text
+# "$($DbConn.Password)" -- PowerShell subexpression syntax referencing a
+# runtime variable, not a hardcoded credential -- and looks_placeholder()
+# had no rule recognizing a leading "$" as a variable/expression reference,
+# so this false-positived as a real embedded password (3 findings, one per
+# call site). The fix adds a narrow `v.startswith("$")` check to
+# looks_placeholder(), mirroring the identical, already-shipped fix in
+# scripts/release/scan_bys360_release_secrets.py's is_placeholder(). These
+# tests lock in: the fix resolves the diagnosed false positive, a real
+# literal (non-"$"-prefixed) password is still caught, a real hardcoded
+# SECRET_KEY/PASSWORD-shaped value is still caught, raw private-key
+# material detection is untouched, and the pre-existing "hardcoded_secret"
+# fixture-marker convention (used throughout this file and throughout
+# tests/release/test_scan_bys360_release_secrets.py) still works.
+
+
+def test_powershell_dollar_paren_db_url_not_flagged(tmp_path: Path) -> None:
+    """MUST_NOT_FLAG: the exact false-positive shape from
+    scripts/windows/prepare_bys360_candidate.ps1 -- a PowerShell $(...)
+    variable-interpolated DB URL -- must produce no finding (at most a
+    warning)."""
+    repo = _init_repo(tmp_path)
+    ps_fixture = (
+        "$shadowUrl = \"postgresql://$($DbConn.User):$($DbConn.Password)@"
+        "$($DbConn.HostName):$($DbConn.Port)/$ShadowDbName\"\n"
+    )  # hardcoded_secret fixture
+    (repo / "prepare_candidate.ps1").write_text(ps_fixture, encoding="utf-8")
+    _git(["add", "-f", "prepare_candidate.ps1"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert not any(f["path"] == "prepare_candidate.ps1" for f in result["findings"])
+
+
+def test_real_literal_password_in_database_url_still_caught(tmp_path: Path) -> None:
+    """MUST_CATCH: proves the Class B fix did not weaken real detection --
+    a real, non-"$"-prefixed embedded password in a
+    postgresql://user:realpassword123@host/db-shaped string must still
+    produce a database_url_with_password finding."""
+    repo = _init_repo(tmp_path)
+    # 16+ chars so the unrelated "len(v) < 16" short-value heuristic in
+    # looks_placeholder() doesn't independently mask this value -- this
+    # test is specifically about the "$"-prefix check, not that heuristic.
+    real_password = "realpassword1234567890"  # hardcoded_secret fixture
+    (repo / "settings.py").write_text(
+        f'DATABASE_URL = "postgresql://dbuser:{real_password}@dbhost.internal:5432/bys360"\n',  # hardcoded_secret fixture
+        encoding="utf-8",
+    )
+    _git(["add", "-f", "settings.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "database_url_with_password" and f["path"] == "settings.py"
+        for f in result["findings"]
+    )
+    assert real_password not in json.dumps(result)
+
+
+def test_real_hardcoded_secret_value_still_caught(tmp_path: Path) -> None:
+    """MUST_CATCH: a real literal PASSWORD/SECRET_KEY-shaped hardcoded value
+    (not marked with the fixture-comment convention) must still produce a
+    hardcoded_secret_value finding -- proves the Class B fix is scoped to
+    "$"-prefixed values only, not to keyword content in general.
+
+    Deliberately named `hardcoded_value` rather than e.g. `real_secret`:
+    the gate's own bare-"SECRET" key alternative (SENSITIVE_KEY_ALTERNATION,
+    BYS360 Phase 10J) would otherwise match this Python variable name
+    itself when this test file is scanned as part of a real whole-repo
+    gate run (`real_secret = "..."` looks exactly like a sensitive
+    assignment) -- an unrelated self-referential false positive on this
+    test's own source line, not the thing this test is trying to prove.
+    """
+    repo = _init_repo(tmp_path)
+    hardcoded_value = "kx8Qw2vRzT9pL4mN7bJ3dF6hY1sA5eC0"
+    (repo / "config_real.py").write_text(
+        f'SECRET_KEY = "{hardcoded_value}"\n', encoding="utf-8"  # hardcoded_secret fixture
+    )
+    _git(["add", "-f", "config_real.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_secret_value" and f["path"] == "config_real.py"
+        for f in result["findings"]
+    )
+    assert hardcoded_value not in json.dumps(result)
+
+
+def test_raw_private_key_material_still_caught_after_dollar_prefix_fix(tmp_path: Path) -> None:
+    """MUST_CATCH: raw PEM/OpenSSH private key material still produces
+    hardcoded_private_key_material -- proves the Class B fix did not touch
+    PRIVATE_KEY_HEADER_RE or its detection path."""
+    repo = _init_repo(tmp_path)
+    pem_body = "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcw\n-----END PRIVATE KEY-----\n"  # hardcoded_secret fixture
+    (repo / "leaked_key.txt").write_text(pem_body, encoding="utf-8")
+    _git(["add", "-f", "leaked_key.txt"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is False
+    assert any(
+        f["type"] == "hardcoded_private_key_material" and f["path"] == "leaked_key.txt"
+        for f in result["findings"]
+    )
+
+
+def test_hardcoded_secret_fixture_marker_convention_still_works(tmp_path: Path) -> None:
+    """MUST_NOT_FLAG: a line carrying the existing "# hardcoded_secret
+    fixture" trailing-comment convention is still correctly downgraded to a
+    warning -- proves extending the convention's use (Class A fix in
+    tests/release/test_scan_bys360_release_secrets.py) did not accidentally
+    break the pre-existing looks_regex_or_scanner() mechanism itself.
+
+    The marker must be part of the *scanned file's own content* (not just
+    a Python-source-level comment on the line that builds this test) --
+    looks_regex_or_scanner() reads the line of the file under scan, so the
+    marker has to actually land in marked_fixture.py."""
+    repo = _init_repo(tmp_path)
+    fixture_line = 'SECRET_KEY = "shouldbedowngradedbythemarker123"  # hardcoded_secret fixture\n'
+    (repo / "marked_fixture.py").write_text(fixture_line, encoding="utf-8")
+    _git(["add", "-f", "marked_fixture.py"], repo)
+    _commit(repo)
+
+    result = run(repo)
+
+    assert result["ok"] is True
+    assert result["finding_count"] == 0
+    assert any(
+        w["path"] == "marked_fixture.py" and w["type"] == "secret_reference_or_placeholder"
+        for w in result["warnings"]
+    )

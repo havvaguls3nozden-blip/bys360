@@ -89,7 +89,7 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]
 
 def label_status(raw_status: str | None) -> str:
     key = (raw_status or "").strip()
-    return STATUS_LABELS.get(key, key.replace("_", " ").strip().title() if key else "Durum Yok")
+    return STATUS_LABELS.get(key, "Bilinmiyor" if key else "Durum Yok")
 
 
 def build_gate_summary() -> dict[str, Any]:

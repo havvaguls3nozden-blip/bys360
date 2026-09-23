@@ -67,17 +67,17 @@ def _table_exists(table_name: str) -> bool:
 
 def _operation_type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return OPERATION_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return OPERATION_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _handover_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return HANDOVER_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return HANDOVER_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _item_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return ITEM_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return ITEM_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _handover_in_scope(handover_id: int | None, scope_user_ids: set[int]) -> PersonnelHandoverRecord:
@@ -264,7 +264,7 @@ def hr_personnel_handover_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(user_id=_safe_int(request.form.get("user_id")), scope_mode=selected_scope_mode)
 
 
@@ -300,7 +300,7 @@ def hr_personnel_handover_item_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(handover_id=_safe_int(request.form.get("handover_id")), scope_mode=selected_scope_mode)
 
 
@@ -325,7 +325,7 @@ def hr_personnel_handover_item_status():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return _redirect_handover(scope_mode=selected_scope_mode)
 
 

@@ -33,7 +33,7 @@
 <div class="print-shell">
     <div class="print-card">
         <div class="toolbar">
-            <button onclick="window.print()" class="btn-soft">
+            <button type="button" id="reportsPdfPrintBtn" class="btn-soft">
                 <i class="fa-solid fa-print"></i>
                 PDF Kaydet / Yazdır
             </button>
@@ -90,4 +90,15 @@
         {% endif %}
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('reportsPdfPrintBtn');
+        if (btn) {
+            btn.addEventListener('click', function () {
+                window.print();
+            });
+        }
+    });
+</script>
 {% endblock %}

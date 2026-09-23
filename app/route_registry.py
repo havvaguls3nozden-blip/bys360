@@ -18,7 +18,6 @@ _BASE_MODULAR_ROUTE_MODULES = (
     "app.account.routes",
     "app.admin.routes",
     "app.performance.routes",
-    "app.workflow.routes",
     # performance alt modulleri (hierarchy/admin-core/evaluation-core/task/report/history/engagement)
     # paket importu ile aktif olur.
     "app.dashboard.routes",

@@ -74,7 +74,7 @@
       <tbody>
       {% for row in payload.rows %}
         <tr>
-          <td>#{{ row.id }}</td><td>{{ row.title }}</td><td>{{ row.status }}</td><td>{{ row.priority }}</td><td>{{ row.age_days }} gün</td><td>{{ row.assigned_to }}</td>
+          <td>#{{ row.id }}</td><td>{{ row.title }}</td><td>{{ payload.status_labels.get(row.status, 'Bilinmiyor') }}</td><td>{{ payload.priority_labels.get(row.priority, 'Bilinmiyor') }}</td><td>{{ row.age_days }} gün</td><td>{{ row.assigned_to }}</td>
           <td>{% if row.first_response_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
           <td>{% if row.resolution_due %}<span class="badge bg-danger">Risk</span>{% else %}<span class="badge bg-success">Uygun</span>{% endif %}</td>
         </tr>
@@ -94,7 +94,7 @@
   if (statusEl) {
     new Chart(statusEl, {
       type: 'bar',
-      data: { labels: {{ payload.status_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      data: { labels: {{ payload.status_label_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_label_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
   }

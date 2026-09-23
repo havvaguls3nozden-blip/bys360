@@ -43,12 +43,12 @@ def run_v2_1_7_period_management_center_gate() -> dict[str, Any]:
         checks.append(_check("center_fast_open", True, "Dönem Yönetim Merkezi hızlı açılış modunda çalışıyor."))
         checks.append(_check("safe_mode", True, "Görev üretimi yalnızca seçili plan ve temiz ön kontrol ile başlatılır."))
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         try:
             _db().session.rollback()
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             pass
-        schema = {"ok": False, "error": str(exc)}
-        checks.append(_check("exception", False, str(exc)))
+        schema = {"ok": False, "error": "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."}
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
     return {"ok": all(item.get("ok") for item in checks), "schema": schema, "checks": checks, "rule_version": RULE_VERSION}

@@ -20,6 +20,8 @@ from app.models.communication_phase1_models import (
     CommunicationBulletinAudience,
     CommunicationBulletinReceipt,
 )
+from app.services.communication_phase2_service import SURVEY_STATUS_LABELS, SURVEY_TYPE_LABELS
+from app.services.role_display import ROLE_DISPLAY_LABELS, UNKNOWN_ROLE_DISPLAY_LABEL
 
 MANAGER_ROLES = {
     "admin",
@@ -293,6 +295,10 @@ def communication_phase1_dashboard(user: Any) -> dict[str, Any]:
             "open_support": open_support_count,
             "help_articles": SupportHelpArticle.query.filter_by(is_published=True).count() if hasattr(SupportHelpArticle, "is_published") else SupportHelpArticle.query.count(),
         },
+        "bulletin_status_labels": BULLETIN_STATUS_LABELS,
+        "bulletin_priority_labels": BULLETIN_PRIORITY_LABELS,
+        "survey_status_labels": SURVEY_STATUS_LABELS,
+        "survey_type_labels": SURVEY_TYPE_LABELS,
     }
 
 
@@ -367,7 +373,7 @@ def manager_filter_options() -> dict[str, list[tuple[str, str]]]:
     for user in users:
         role = safe_str(getattr(user, "role", ""))
         if role and role not in seen_role_values:
-            roles_seen.append((role, role.replace("_", " ").title()))
+            roles_seen.append((role, ROLE_DISPLAY_LABELS.get(role, UNKNOWN_ROLE_DISPLAY_LABEL)))
             seen_role_values.add(role)
 
     unit_rows = OrganizationUnit.query.order_by(OrganizationUnit.name.asc()).all()

@@ -305,8 +305,8 @@ def messages_new_impl():
         except ValueError as exc:
             flash(str(exc), "warning")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=313")
-            flash(f"Mesaj gönderilirken hata oluştu: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=313 | exc=%s", exc)
+            flash("Mesaj gönderilirken hata oluştu.", "danger")
 
     selected_recipient = request.args.get("recipient_user_id", type=int)
     return _render_message_new(users=users, recent_users=recent_users, recipient_user_id=selected_recipient)
@@ -461,10 +461,10 @@ def messages_send_impl(thread_id):
             return jsonify({"ok": False, "error": "validation_error", "message": str(exc)}), 400
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=449")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=449 | exc=%s", exc)
         if _is_ajax_request():
-            return jsonify({"ok": False, "error": "server_error", "message": f"Mesaj gönderilirken hata oluştu: {exc}"}), 500
-        flash(f"Mesaj gönderilirken hata oluştu: {exc}", "danger")
+            return jsonify({"ok": False, "error": "server_error", "message": "Mesaj gönderilirken hata oluştu."}), 500
+        flash("Mesaj gönderilirken hata oluştu.", "danger")
 
     return _redirect_message_destination(thread_id=thread_id)
 
@@ -490,9 +490,9 @@ def messages_toggle_mute_impl(thread_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=475")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=475 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Sessize alma işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Sessize alma işlemi sırasında hata oluştu.", "danger")
 
     return _redirect_message_destination(thread_id=thread_id)
 
@@ -509,9 +509,9 @@ def messages_toggle_archive_impl(thread_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=492")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=492 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Arşiv işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Arşiv işlemi sırasında hata oluştu.", "danger")
 
     next_filter = request.form.get("current_filter") or request.args.get("filter") or "active"
     if archived_after_change and next_filter != "archived":
@@ -564,11 +564,11 @@ def messages_edit_impl(message_id):
             now=_utcnow(),
         )
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=544")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=544 | exc=%s", exc)
         _log_communication_exception("messages_edit", exc, message_id=message_id, user_id=getattr(current_user, "id", None))
         if _is_ajax_request():
-            return jsonify({"ok": False, "error": "server_error", "message": f"Mesaj güncellenirken hata oluştu: {exc}"}), 500
-        flash(f"Mesaj güncellenirken hata oluştu: {exc}", "danger")
+            return jsonify({"ok": False, "error": "server_error", "message": "Mesaj güncellenirken hata oluştu."}), 500
+        flash("Mesaj güncellenirken hata oluştu.", "danger")
         return _redirect_messages_view()
 
     return _message_mutation_response(result, ajax_error_key="edit_error")
@@ -583,11 +583,11 @@ def messages_delete_impl(message_id):
             now=_utcnow(),
         )
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=561")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/messages_routes.py | line=561 | exc=%s", exc)
         _log_communication_exception("messages_delete", exc, message_id=message_id, user_id=getattr(current_user, "id", None))
         if _is_ajax_request():
-            return jsonify({"ok": False, "error": "server_error", "message": f"Mesaj silinirken hata oluştu: {exc}"}), 500
-        flash(f"Mesaj silinirken hata oluştu: {exc}", "danger")
+            return jsonify({"ok": False, "error": "server_error", "message": "Mesaj silinirken hata oluştu."}), 500
+        flash("Mesaj silinirken hata oluştu.", "danger")
         return _redirect_messages_view()
 
     return _message_mutation_response(result, ajax_error_key="delete_error")

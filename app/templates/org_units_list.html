@@ -457,6 +457,9 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
     .ai-heat-item em{display:block;margin-top:6px;color:#6b7280;font-style:normal;font-size:.84rem;line-height:1.6}
     .tone-critical{box-shadow:inset 0 0 0 1px rgba(153,27,27,.18)}
     .tone-watch{box-shadow:inset 0 0 0 1px rgba(180,83,9,.18)}
+
+    .info-panel-top{margin-top:14px}
+    .collapse-body{margin-top:14px;display:grid;gap:18px}
 </style>
 
 {% set total_units = rows|length if rows is defined else 0 %}
@@ -465,26 +468,6 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
 {% set root_units = rows|selectattr('unit.parent_id', 'equalto', none)|list|length if rows is defined else 0 %}
 
 <div class="org-shell">
-    {{ management_workspace_header(
-        title='Birim ve Pozisyon Yönetimi',
-        text='Kurumsal birim, üst birim ve pozisyon kayıtlarını bu alandan görüntüleyebilir, düzenleyebilir ve yönetebilirsiniz.',
-        icon='fa-solid fa-sitemap',
-        kicker='Kurumsal yapı',
-        badges=[
-            {'text':'Hiyerarşik yapı', 'icon':'fa-solid fa-diagram-project', 'tone':'soft-red'},
-            {'text':'Personel ilişkisi', 'icon':'fa-solid fa-users-viewfinder', 'tone':'soft-blue'},
-            {'text':'Aktif kayıt takibi', 'icon':'fa-solid fa-circle-check', 'tone':'soft-green'}
-        ],
-        side_title='Yönetim özeti',
-        side_text='Birim kayıtları; personel ataması, üst birim ilişkileri ve yönetici zinciri ile doğrudan bağlantılıdır.',
-        metric_cards=[
-            {'label':'Toplam Kayıt', 'value': stats.total_count if stats is defined else total_units, 'icon':'fa-solid fa-building-circle-check'},
-            {'label':'Aktif', 'value': stats.active_count if stats is defined else active_units, 'icon':'fa-solid fa-circle-check', 'tone':'success'},
-            {'label':'Pasif', 'value': stats.passive_count if stats is defined else passive_units, 'icon':'fa-solid fa-circle-stop', 'tone':'warning'},
-            {'label':'Ana Birim', 'value': stats.root_count if stats is defined else root_units, 'icon':'fa-solid fa-landmark'}
-        ]
-    ) }}
-
     {% call premium_action_shell(title='Filtre ve işlemler', text='Arama, filtreleme ve yeni kayıt işlemleri bu alandan yapılır.', icon='fa-solid fa-sliders') %}
         <div style="display:grid;gap:16px;">
             <div style="display:flex; gap:10px; flex-wrap:wrap;">
@@ -540,34 +523,6 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
         </div>
     {% endcall %}
 
-    
-    {% if ai_org_units_risk_panel %}
-        <section class="ai-panel">
-            <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_org_units_risk_panel.badge or 'AI risk haritası' }}</div>
-            <h4 class="ai-headline">{{ ai_org_units_risk_panel.headline }}</h4>
-            <p class="ai-summary">{{ ai_org_units_risk_panel.summary }}</p>
-            <ul class="ai-bullets">
-                {% for item in ai_org_units_risk_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
-            </ul>
-            <div class="ai-action-grid">
-                {% for row in ai_org_units_risk_panel.actions or [] %}
-                    <div class="ai-action-item tone-{{ row.tone or 'calm' }}"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
-                {% endfor %}
-            </div>
-            {% if ai_org_units_risk_panel.risk_map %}
-                <div class="ai-heat-grid">
-                    {% for row in ai_org_units_risk_panel.risk_map %}
-                        <div class="ai-heat-item tone-{{ row.tone or 'watch' }}">
-                            <span>{{ row.label }}</span>
-                            <strong>Veri Kontrolü {{ row.value }}</strong>
-                            <em>{{ row.detail }}</em>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
-        </section>
-    {% endif %}
-
     {% call list_workspace_panel(title='Organizasyon kayıt listesi', text='Birim kayıtlarını üst birim, tür, personel sayısı ve durum bilgileriyle görüntüleyin.', badge=(stats.filtered_count if stats is defined else total_units) ~ ' kayıt', badge_tone='gray', icon='fa-solid fa-table-tree', note='Liste filtrelere göre güncellenir.', note_icon='fa-solid fa-circle-info') %}
         {% set unit_type_labels = {
             'baskanlik':'Başkanlık',
@@ -620,7 +575,7 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
                                 <td>{{ unit.unit_code or unit.code or '-' }}</td>
 
                                 <td>
-                                    <span class="pill type">{{ unit_type_labels.get(unit.unit_type or unit.type or 'diger', unit.unit_type or unit.type or 'Birim') }}</span>
+                                    <span class="pill type">{{ unit_type_labels.get(unit.unit_type or unit.type or 'diger', 'Diğer') }}</span>
                                 </td>
 
                                 <td>
@@ -649,7 +604,7 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
                                             Düzenle
                                         </a>
 
-                                        <form method="POST" action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}" style="display:inline;" onsubmit="return confirm('Bu kayıt silinsin mi?');">
+                                        <form method="POST" action="{{ url_for('main.admin_org_unit_delete', unit_id=unit.id) }}" style="display:inline;" data-confirm="Bu kayıt silinsin mi?">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <button type="submit" class="mini-btn danger">
                                                 <i class="fa-solid fa-trash"></i>
@@ -671,6 +626,62 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
             </div>
         {% endif %}
     {% endcall %}
+
+    <div class="glass-card panel-card info-panel-top">
+        <button class="btn-soft secondary" type="button" data-bs-toggle="collapse" data-bs-target="#orgUnitsInfoPanel" aria-expanded="false" aria-controls="orgUnitsInfoPanel">
+            <i class="fa-solid fa-circle-info"></i> Bilgilendirme
+        </button>
+        <div class="collapse" id="orgUnitsInfoPanel">
+            <div class="collapse-body">
+                {{ management_workspace_header(
+                    title='Birim ve Pozisyon Yönetimi',
+                    text='Kurumsal birim, üst birim ve pozisyon kayıtlarını bu alandan görüntüleyebilir, düzenleyebilir ve yönetebilirsiniz.',
+                    icon='fa-solid fa-sitemap',
+                    kicker='Kurumsal yapı',
+                    badges=[
+                        {'text':'Hiyerarşik yapı', 'icon':'fa-solid fa-diagram-project', 'tone':'soft-red'},
+                        {'text':'Personel ilişkisi', 'icon':'fa-solid fa-users-viewfinder', 'tone':'soft-blue'},
+                        {'text':'Aktif kayıt takibi', 'icon':'fa-solid fa-circle-check', 'tone':'soft-green'}
+                    ],
+                    side_title='Yönetim özeti',
+                    side_text='Birim kayıtları; personel ataması, üst birim ilişkileri ve yönetici zinciri ile doğrudan bağlantılıdır.',
+                    metric_cards=[
+                        {'label':'Toplam Kayıt', 'value': stats.total_count if stats is defined else total_units, 'icon':'fa-solid fa-building-circle-check'},
+                        {'label':'Aktif', 'value': stats.active_count if stats is defined else active_units, 'icon':'fa-solid fa-circle-check', 'tone':'success'},
+                        {'label':'Pasif', 'value': stats.passive_count if stats is defined else passive_units, 'icon':'fa-solid fa-circle-stop', 'tone':'warning'},
+                        {'label':'Ana Birim', 'value': stats.root_count if stats is defined else root_units, 'icon':'fa-solid fa-landmark'}
+                    ]
+                ) }}
+
+                {% if ai_org_units_risk_panel %}
+                    <section class="ai-panel">
+                        <div class="ai-kicker"><i class="fa-solid fa-sparkles"></i> {{ ai_org_units_risk_panel.badge or 'AI risk haritası' }}</div>
+                        <h4 class="ai-headline">{{ ai_org_units_risk_panel.headline }}</h4>
+                        <p class="ai-summary">{{ ai_org_units_risk_panel.summary }}</p>
+                        <ul class="ai-bullets">
+                            {% for item in ai_org_units_risk_panel.bullets or [] %}<li>{{ item }}</li>{% endfor %}
+                        </ul>
+                        <div class="ai-action-grid">
+                            {% for row in ai_org_units_risk_panel.actions or [] %}
+                                <div class="ai-action-item tone-{{ row.tone or 'calm' }}"><span>{{ row.label }}</span><strong>{{ row.value }}</strong></div>
+                            {% endfor %}
+                        </div>
+                        {% if ai_org_units_risk_panel.risk_map %}
+                            <div class="ai-heat-grid">
+                                {% for row in ai_org_units_risk_panel.risk_map %}
+                                    <div class="ai-heat-item tone-{{ row.tone or 'watch' }}">
+                                        <span>{{ row.label }}</span>
+                                        <strong>Veri Kontrolü {{ row.value }}</strong>
+                                        <em>{{ row.detail }}</em>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
 </div>
 
 {# BYS360_ORG_UNITS_TARGETED_DATA_WARNING_V2_1_BEGIN #}
@@ -756,6 +767,17 @@ Kurumsal organizasyon yapısını görüntüleyin, birim ilişkilerini izleyin v
     } else {
         normalizeWarnings();
     }
+})();
+
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 })();
 </script>
 {# BYS360_ORG_UNITS_TARGETED_DATA_WARNING_V2_1_END #}

@@ -416,7 +416,7 @@
                             <div style="font-weight:800;color:#1f2937;">{{ row.employee.full_name if row.employee and row.employee.full_name else ((row.employee.ad ~ ' ' ~ row.employee.soyad) if row.employee else 'Personel') }}</div>
                             <div style="color:#6b7280;font-size:.88rem;">{{ row.reason or 'Açıklama yok.' }}</div>
                         </div>
-                        <span class="risk-pill {% if row.event_type in ['uncovered','chain_issue'] %}critical{% else %}watch{% endif %}">{{ row.event_type|replace('_',' ')|title }}</span>
+                        <span class="risk-pill {% if row.event_type in ['uncovered','chain_issue'] %}critical{% else %}watch{% endif %}">{{ event_type_label(row.event_type) }}</span>
                     </div>
                 </div>
                 {% endfor %}

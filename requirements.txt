@@ -13,7 +13,7 @@ pandas==2.2.3
 waitress==3.0.1
 XlsxWriter==3.2.0
 Pillow==12.3.0
-cryptography==49.0.0
+cryptography==50.0.0
 # Aşağıdakiler daha önce >= ile belirtilmişti.
 # Kararlı sürümlere sabitlendi — 2026-04-27
 reportlab==4.4.10
@@ -24,4 +24,3 @@ redis==5.0.8
 rq==2.3.3
 prometheus-client==0.20.0
 Flask-Limiter==3.5.0
-pip-audit==2.7.0

@@ -72,8 +72,8 @@ def run_v2_1_5_category_period_scope_gate(create_probe: bool = False) -> dict[st
         checks.append(_check("summary", "plan_count" in summary, "Kategori dönem kapsam özeti çalışıyor."))
         plans = list_category_period_scope_plans(include_inactive=False)
         checks.append(_check("plan_list", isinstance(plans, list), f"Aktif plan sayısı: {len(plans)}"))
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        checks.append(_check("exception", False, str(exc)))
-        schema = {"ok": False, "error": str(exc)}
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
+        schema = {"ok": False, "error": "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."}
     return {"ok": all(item.get("ok") for item in checks), "schema": schema, "checks": checks, "rule_version": RULE_VERSION}

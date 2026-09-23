@@ -62,8 +62,8 @@ def performance_v2_1_3_personnel_category_card():
                 result = seed_default_categories(overwrite=False)
                 flash(f"Varsayılan kategoriler kontrol edildi. Yeni: {result.get('created', 0)}, mevcut: {result.get('unchanged', 0)}", "success")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            flash(f"Kategori işlemi tamamlanamadı: {exc}", "danger")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+            flash("Kategori işlemi tamamlanamadı.", "danger")
         return redirect(url_for("main.performance_v2_1_3_personnel_category_card", q=request.args.get("q", ""), category=request.args.get("category", "")))
 
     q = request.args.get("q") or ""

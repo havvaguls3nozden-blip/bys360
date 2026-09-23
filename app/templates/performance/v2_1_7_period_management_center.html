@@ -362,7 +362,7 @@
       {% if launch_guard.precheck_status_counts %}<div class="pmc-mini-list">{% for key,total in launch_guard.precheck_status_counts.items() %}<span class="pmc-badge {{ 'ok' if key == 'gorev_uretimi_on_hazir' else 'warn' }}">{{ label_status(key) }}: {{ total }}</span>{% endfor %}</div>{% endif %}
       <div class="pmc-actions" style="margin-top:16px">
         {% if launch_guard.can_launch %}
-        <form method="post" onsubmit="return confirm('Bu dönem için değerlendirme görevleri üretilecek. Devam edilsin mi?')">
+        <form method="post" data-confirm="Bu dönem için değerlendirme görevleri üretilecek. Devam edilsin mi?">
           {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
           <input type="hidden" name="action" value="launch_assignments"><input type="hidden" name="plan_key" value="{{ state.selected_plan.plan_key }}">
           <button class="pmc-btn primary" type="submit"><i class="fa-solid fa-play"></i> Görev Üretimini Başlat</button>
@@ -417,4 +417,17 @@
   </section>
   {% endif %}
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

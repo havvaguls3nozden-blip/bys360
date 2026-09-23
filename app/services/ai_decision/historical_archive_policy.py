@@ -130,11 +130,6 @@ DETAIL_ALLOWED_ROLES = {
 }
 
 
-SUMMARY_ALLOWED_ROLE_PARTS = (
-    "admin", "baskan", "başkan", "yonet", "yönet", "grup", "koordinat", "performans", "ik"
-)
-
-
 def user_role_text(user: Any) -> str:
     role = safe_attr(user, "role", "role_name", "rol", default="")
     if not role:
@@ -152,7 +147,13 @@ def can_view_archive_detail(user: Any, target_user_id: Any) -> bool:
 
 
 def can_view_archive_summary(user: Any) -> bool:
-    role = user_role_text(user)
-    if role in DETAIL_ALLOWED_ROLES:
-        return True
-    return any(part in role for part in SUMMARY_ALLOWED_ROLE_PARTS)
+    # BYS360 DEFECT AQ: önceden burada SUMMARY_ALLOWED_ROLE_PARTS adlı ayrı
+    # bir alt dize listesi vardı ("ik" gibi 2 karakterlik çıplak bir jeton
+    # dahil) -- rol metninde bu jetonlardan biri GEÇİYORSA (tam eşleşme
+    # olmasa bile) özet erişimi veriyordu. "İktisat Uzmanı" gibi sıradan bir
+    # unvan "ik" alt dizesini içerdiği için (iktisat) ilgisiz bir uzmana
+    # şirket geneli arşiv özeti açıyordu. Artık zaten var olan, kardeş
+    # fonksiyon can_view_archive_detail'in kullandığı tam eşleşmeli
+    # DETAIL_ALLOWED_ROLES kümesi yeniden kullanılıyor -- yeni bir liste
+    # icat edilmedi.
+    return user_role_text(user) in DETAIL_ALLOWED_ROLES

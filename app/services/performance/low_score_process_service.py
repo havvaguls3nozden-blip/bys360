@@ -752,7 +752,7 @@ def _legacy_humanize_process_status_phase1(status=None):
         "repeated_low_score_process_started": "Tekrarlayan Düşük Performans Süreci",
         "administrative_process_started": "Tekrarlayan Düşük Performans Süreci",
     }
-    return mapping.get(text, text.replace("_", " ").title() if text else "Başkan onayı bekliyor")
+    return mapping.get(text, "Bilinmiyor" if text else "Başkan onayı bekliyor")
 def _legacy_get_low_score_publish_block_reason_phase2(process=None, evaluation=None, ensure=True, *args, **kwargs):
     # BYS360_PHASE6_2_LOW_SCORE_PUBLISH_LOCK
     # BYS360_PHASE6_3_DIRECT_TO_PRESIDENT_APPROVAL
@@ -1042,7 +1042,7 @@ def humanize_low_score_status(value) -> str:
         "second_low_score_process_started": "Tekrarlayan Düşük Performans Süreci",
     }
     text = str(value or "").strip()
-    return mapping.get(text, text.replace("_", " ").title() if text else "Süreç Devam Ediyor")
+    return mapping.get(text, "Bilinmiyor" if text else "Süreç Devam Ediyor")
 
 # Yayın blokajı Başkan/Üst Onay odaklı ve İK ara kapısız.
 
@@ -1270,6 +1270,17 @@ def get_low_score_publish_block_reason(process=None, evaluation=None, ensure=Tru
             except Exception:
                 logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
                 target = None
+        else:
+            # BYS360 DEFECT AR: ensure=False dallanmasi hicbir zaman zaten
+            # var olan bir sureci kontrol etmiyordu -- Baskan onayi ve idari
+            # surec tamamlanmis bir degerlendirme bile, sirf burasi surec
+            # olusturmadigi icin, kalici olarak "onay bekliyor" gosteriliyordu.
+            # Salt-okunur arama, olusturma yapmadan mevcut kaydi bulur.
+            try:
+                target = PerformanceLowScoreProcess.query.filter_by(evaluation_id=evaluation.id).first()
+            except Exception:
+                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+                target = None
         if target is None:
             return "Başkan onayı bekliyor. Başkan/Üst Onay tamamlanmadan 70 altı karne yayınlanamaz. Başkan/Üst Onay Yayın Kilidi"
     target = _bys360_lh13_get_process(target)
@@ -1306,7 +1317,7 @@ def humanize_process_status(status=None):
     # Kullanıcı durum dili: Başkan onayı bekliyor
     mapping = {"president_pending": "Başkan onayı bekliyor", "direct_president_pending": "Başkan onayı bekliyor", "president_approval_pending": "Başkan onayı bekliyor", "blocked_president_pending": "Başkan/Üst Onay Yayın Kilidi", "president_rejected": "Başkan/Üst Onay tarafından iade edildi", "president_returned": "Başkan/Üst Onay tarafından iade edildi", "rejected_by_president": "Başkan/Üst Onay tarafından iade edildi", "president_approved": "Başkan/Üst Onay tamamlandı", "first_low_warning": "Düşük Performans Uyarısı Oluşturuldu", "warning_recorded": "Düşük Performans Uyarısı Oluşturuldu", "second_low_repeat": "Tekrarlayan Düşük Performans Süreci", "second_low_score_process_started": "Tekrarlayan Düşük Performans Süreci", "administrative_process_started": "Tekrarlayan Düşük Performans Süreci"}
     key = str(status or "").strip()
-    return mapping.get(key, key.replace("_", " ").title() if key else "Başkan onayı bekliyor")
+    return mapping.get(key, "Bilinmiyor" if key else "Başkan onayı bekliyor")
 
 
 def record_first_warning(process, *, actor=None, note=None, user_or_id=None):

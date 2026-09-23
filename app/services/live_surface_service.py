@@ -24,11 +24,17 @@ _REMOVED_LABELS: dict[str, str] = {
 
 
 def _area_label(key: str) -> str:
-    return _AREA_LABELS.get(str(key or '').strip(), str(key or '').replace('_', ' ').title())
+    text = str(key or '').strip()
+    if not text:
+        return ''
+    return _AREA_LABELS.get(text, 'Bilinmiyor')
 
 
 def _removed_label(key: str) -> str:
-    return _REMOVED_LABELS.get(str(key or '').strip(), str(key or '').replace('_', ' ').title())
+    text = str(key or '').strip()
+    if not text:
+        return ''
+    return _REMOVED_LABELS.get(text, 'Bilinmiyor')
 
 
 def build_live_dashboard_surface_context(context: dict[str, Any] | None = None) -> dict[str, Any]:

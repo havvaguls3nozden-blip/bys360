@@ -37,13 +37,17 @@ try:
     )
 except Exception:  # pragma: no cover
     logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz5_routes.py | line=30")
+
+    # BYS360 DEFECT AR: bkz. decision_support_faz4_routes.py ayni not --
+    # fail-open yerine fail-closed PermissionError firlatilir
+    # (_run_faz5_json bunu yakalayip 403 donuyor).
     def assert_center_access(user: Any) -> AIDecisionVisibilityScope:
-        return True  # type: ignore[return-value]
+        raise PermissionError("Bu sayfaya erişim yetkiniz bulunmamaktadır.")
 
     def assert_evaluation_access(
         user: Any, evaluation: Any, *, allow_own_published: bool = True
     ) -> AIDecisionVisibilityScope:
-        return True  # type: ignore[return-value]
+        raise PermissionError("Bu performans karar destek kaydına erişim yetkiniz bulunmamaktadır.")
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 
@@ -55,15 +59,17 @@ def _run_faz5_json(builder: ResponseBuilder, *args: Any) -> tuple[Any, int]:
         safe_db_rollback()
         return jsonify({"ok": False, "error": str(exc) or "Bu sayfaya erişim yetkiniz bulunmamaktadır."}), 403
     except LookupError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen LookupError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc) or "Kayıt bulunamadı."}), 404
+        return jsonify({"ok": False, "error": "Kayıt bulunamadı."}), 404
     except ValueError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen ValueError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 400
+        return jsonify({"ok": False, "error": "Geçersiz istek parametresi."}), 400
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz5_routes.py | line=52")
+        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz5_routes.py | line=52 | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": f"Karne karar destek kontrolünde beklenmeyen hata: {exc}"}), 500
+        return jsonify({"ok": False, "error": "Karne karar destek kontrolünde beklenmeyen bir hata oluştu."}), 500
 
 def _load_settings() -> dict[str, Any]:
     settings: dict[str, Any] = {}

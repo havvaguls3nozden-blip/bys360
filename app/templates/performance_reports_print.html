@@ -39,7 +39,7 @@
 <div class="print-shell">
     <div class="print-card">
         <div class="toolbar">
-            <button onclick="window.print()" class="btn-soft">
+            <button type="button" id="printReportBtn" class="btn-soft">
                 <i class="fa-solid fa-print"></i>
                 Yazdır / PDF Kaydet
             </button>
@@ -91,7 +91,7 @@
                         <td>{{ '%.2f'|format(item.level_2_total_100 or 0) }}</td>
                         {% if phase4_show_third_supervisor_column|default(period_level_3_enabled|default(false)) %}<td>{{ '%.2f'|format(item.level_3_total_100 or 0) }}</td>{% endif %}
                         <td><strong>{{ '%.2f'|format(item.report_final_score if item.report_final_score is defined else (item.final_total_100 or 0)) }}</strong></td>
-                        <td>{{ item.status or '-'|phase5_4_status_label }}</td>
+                        <td>{{ (item.status or '-')|phase5_4_status_label }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -105,3 +105,16 @@
 {% endblock %}
 
 {# BYS360_PHASE5_5_MOBILE_ACTIONS_GUARD: buton/form aksiyonları mobilde tek sütuna düşer #}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var printBtn = document.getElementById('printReportBtn');
+    if (!printBtn) return;
+
+    printBtn.addEventListener('click', function () {
+        window.print();
+    });
+})();
+</script>
+{% endblock %}

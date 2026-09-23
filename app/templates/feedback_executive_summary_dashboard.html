@@ -34,10 +34,11 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
 @media (max-width:1280px){.hero-grid,.layout-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media (max-width:768px){.stats-grid,.meter-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.btn-soft,.mini-btn{width:100%}}
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/feedback_executive_summary_workspace.css') }}">
 
 <div class="exec-shell">
     <div class="scope-strip">
-        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span style="color:#6b7280;font-size:.82rem;">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için yönetici özeti hazırlanıyor.</span></div>
+        <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}<br><span class="feedback-exec-summary-scope-note">Bu görünümde {{ scope_user_count or 0 }} personel ve {{ scope_unit_count or 0 }} birim için yönetici özeti hazırlanıyor.</span></div>
         <span class="tone-pill info"><i class="fa-solid fa-chart-pie"></i> Yönetici Özet Merkezi</span>
     </div>
 
@@ -49,9 +50,9 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
                     <a class="tab-pill {% if preset == item.value %}active{% endif %}" href="{{ url_for('main.feedback_executive_summary_dashboard', scope=selected_scope, preset=item.value) }}"><i class="fa-solid fa-calendar-day"></i> {{ item.label }} özet</a>
                     {% endfor %}
                 </div>
-                <h3 class="hero-title" style="margin-top:14px;">Yöneticilere gidecek özetin önceliklerini ve alıcılarını göndermeden önce görün</h3>
+                <h3 class="hero-title feedback-exec-summary-heading-spacing">Yöneticilere gidecek özetin önceliklerini ve alıcılarını göndermeden önce görün</h3>
                 <p class="hero-text">Bu ekran, açık talep yaşını, yaklaşan ve geciken görüşmeleri, yoğun yönetici yükünü ve önerilen alıcı listesini aynı yerde toplar. İstersen sadece uygulama içi özet üretir, istersen aynı anda e-posta denemesi de yapar.</p>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;">
+                <div class="feedback-exec-summary-chip-row">
                     <span class="pill"><i class="fa-solid fa-inbox"></i> {{ cards.open_requests or 0 }} açık talep</span>
                     <span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ cards.request_sla_risks or 0 }} SLA riski</span>
                     <span class="tone-pill watch"><i class="fa-solid fa-calendar-check"></i> {{ cards.meetings_next_7d or 0 }} 7 gün içinde görüşme</span>
@@ -60,7 +61,7 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
                     <a href="{{ url_for('main.feedback_watch_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-bell"></i> Takip ve Uyarı</a>
                     <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-halved"></i> Audit Paneli</a>
                     <a href="{{ url_for('main.performance_go_live_center', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-rocket"></i> Canlıya Çıkış</a>
-                    <form method="post" action="{{ url_for('main.feedback_executive_summary_run_digest', scope=selected_scope, preset=preset) }}" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+                    <form method="post" action="{{ url_for('main.feedback_executive_summary_run_digest', scope=selected_scope, preset=preset) }}" class="feedback-exec-summary-form-row">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="scope" value="{{ selected_scope }}">
                         <input type="hidden" name="preset" value="{{ preset }}">
@@ -99,7 +100,7 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
     </div>
 
     <div class="layout-grid">
-        <div style="display:grid;gap:18px;">
+        <div class="feedback-exec-summary-col-stack">
             <div class="glass-card">
                 <h3 class="section-title">Talep yaş dağılımı</h3>
                 <p class="section-sub">Açık taleplerin kaç gündür beklediğini tek bakışta görün.</p>
@@ -120,7 +121,7 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
                         <div class="item-top">
                             <div>
                                 <div class="tone-pill {{ item.tone }}">{{ item.kind }}</div>
-                                <h4 class="item-title" style="margin-top:10px;">{{ item.employee_name }}</h4>
+                                <h4 class="item-title feedback-exec-summary-item-title-spacing">{{ item.employee_name }}</h4>
                                 <div class="item-meta">{{ item.period_title }} · {{ item.status }} · {{ item.age_days }} gündür açık</div>
                             </div>
                             <span class="pill"><i class="fa-solid fa-user-check"></i> {{ item.manager_text }}</span>
@@ -159,7 +160,7 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
             </div>
         </div>
 
-        <div style="display:grid;gap:18px;align-content:start;">
+        <div class="feedback-exec-summary-col-stack-start">
             <div class="glass-card">
                 <h3 class="section-title">Yoğun yönetici sıralaması</h3>
                 <p class="section-sub">Özette ilk görünmesi gereken yük sahipleri burada.</p>
@@ -169,7 +170,7 @@ Günlük ve haftalık yönetici özetini tek merkezde görün, öncelikli kayıt
                     <div class="manager-row">
                         <div class="manager-top">
                             <div class="manager-name">{{ row.manager_name }}</div>
-                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                            <div class="feedback-exec-summary-chip-row-compact">
                                 <span class="pill"><i class="fa-solid fa-inbox"></i> {{ row.open_requests }}</span>
                                 {% if row.sla_risk_requests %}<span class="tone-pill critical"><i class="fa-solid fa-triangle-exclamation"></i> {{ row.sla_risk_requests }}</span>{% endif %}
                             </div>

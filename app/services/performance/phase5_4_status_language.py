@@ -26,7 +26,10 @@ _STATUS_LABELS: dict[str, str] = {
     "rejected_by_president": "Başkan Tarafından İade Edildi",
     "pending": "Bekliyor",
     "waiting": "Bekliyor",
+    "bekliyor": "Bekliyor",
     "completed": "Tamamlandı",
+    "tamamlandi": "Tamamlandı",
+    "tamamlandı": "Tamamlandı",
     "published": "Yayınlandı",
     "returned": "İade Edildi",
     "rejected": "Reddedildi",
@@ -58,14 +61,26 @@ def _normalize(value: Any) -> str:
 
 
 def phase5_4_status_label(value: Any, fallback: str = "-") -> str:
-    """Teknik durum değerini kurumsal Türkçe etikete çevirir."""
+    """Teknik durum değerini kurumsal Türkçe etikete çevirir.
+
+    Bu filtre bazı çağrı noktalarında zaten insan-tarafından-okunur bir
+    metne (örn. humanize_workflow_status() çıktısı) ikinci bir geçiş
+    olarak da uygulanır -- boşluk içeren, cümle gibi görünen bir girdi
+    zaten güvenli kabul edilip değiştirilmeden döner. Ancak ham bir
+    makine kodu gibi görünen (alt çizgili, boşluksuz) ve ne sözlükte ne
+    de kısmi metin temizliğinde eşleşmesi bulunan bir değer asla ham
+    haliyle kullanıcıya gösterilmez -- güvenli ``fallback`` değeri döner.
+    """
     text = _normalize(value)
     if not text:
         return fallback
     key = text.lower().strip()
     if key in _STATUS_LABELS:
         return _STATUS_LABELS[key]
-    cleaned = phase5_4_clean_text(text)
+    cleaned = phase5_4_clean_text(text, fallback=fallback)
+    looks_like_raw_machine_slug = "_" in text and " " not in text
+    if cleaned == text and looks_like_raw_machine_slug:
+        return fallback
     return cleaned or fallback
 
 

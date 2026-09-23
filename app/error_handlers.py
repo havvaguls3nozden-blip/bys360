@@ -160,16 +160,26 @@ def request_log_context() -> dict[str, Any]:
         return {"request_id": getattr(g, "request_id", "-")}
 
 # Compatibility guard.
+# BYS360_PHASE5_3C_A2_ERROR_HANDLERS_CSRF_REFERER_OPEN_REDIRECT_HARDENING
+# Eskiden burada `request.host_url` tabanlı bağımsız bir "aynı origin mi?"
+# kontrolü vardı (`referer.startswith(host_url)`), ardından yol kısmı elle
+# kesiliyordu. `request.host_url`, istemcinin gönderdiği `Host` başlığından
+# türer ve bir ters-proxy/IIS zincirinde yanlış yapılandırılmışsa saldırgan
+# tarafından belirlenebilir (host-header poisoning); ayrıca backslash
+# ("/\\evil.example") ve percent-encode edilmiş ayraç
+# ("/%2Fevil.example", "%5cevil.example") varyantlarına karşı da
+# savunmasızdı. Tek doğruluk kaynağı artık kanonik `APP_BASE_URL`'e dayanan
+# `app.route_support.is_safe_redirect_target`. Import fonksiyon içinde
+# tutulur: bu modül çok erken bootstrap zincirinde
+# (`app.bootstrap.application_bootstrap`) yüklenir; modül seviyesinde bir
+# import gereksiz döngüsel import riski taşır.
 def _safe_csrf_referer_target() -> str:
     """Ayni site icinde guvenli geri donus adresi uretir."""
+    from app.route_support import is_safe_redirect_target
+
     try:
-        referer = request.headers.get("Referer") or ""
-        host_url = request.host_url or "/"
-        if referer.startswith(host_url):
-            target = referer[len(host_url) - 1:]
-            if target and not target.startswith("//"):
-                return target
-        if referer.startswith("/") and not referer.startswith("//"):
+        referer = (request.headers.get("Referer") or "").strip()
+        if referer and is_safe_redirect_target(referer):
             return referer
     except Exception:
         try:
@@ -294,6 +304,10 @@ def register_error_handlers(app: Flask) -> None:
 
     @app.errorhandler(HTTPException)
     def handle_http_exception(error: HTTPException):
+        # Werkzeug'un kendi .name / .description alanları (ör. 409, 422 gibi
+        # ayrı bir errors/<kod>.html şablonu bulunmayan kodlarda) İngilizce
+        # varsayılan metin taşır; kullanıcıya asla ham haliyle gösterilmez.
+        # Operatör için gerçek ad/detay aşağıdaki log satırında korunur.
         current_app.logger.warning(
             "HTTP hata yakalandi | kod=%s | ad=%s | detay=%s",
             getattr(error, "code", 500),
@@ -302,8 +316,8 @@ def register_error_handlers(app: Flask) -> None:
         )
         return render_error_page(
             getattr(error, "code", 500) or 500,
-            getattr(error, "name", "HTTP Hatası"),
-            getattr(error, "description", "İstek işlenemedi."),
+            "İşlem Tamamlanamadı",
+            "İsteğiniz işlenirken bir sorun oluştu. Lütfen tekrar deneyin.",
         )
 
     @app.errorhandler(Exception)

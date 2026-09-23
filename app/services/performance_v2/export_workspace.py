@@ -20,6 +20,24 @@ from .reporting_workspace import (
 logger = logging.getLogger(__name__)
 
 
+def _resolve_allowed_employee_ids(viewer):
+    # BYS360 DEFECT FS (Final Sweep A2-02): reuses the canonical, already-
+    # established scope-resolution helper (same one dashboard_rebuild_
+    # service.py uses) instead of inventing a new scope policy. Returns None
+    # for a missing viewer -- build_period_scorecard_context/
+    # build_publish_workspace_context both fail closed (empty/no-access) on
+    # a viewer that is present but not globally-scoped and resolves to no ids.
+    if viewer is None:
+        return None
+    try:
+        from app.services.ui_context.scope import build_user_scope_context
+        scope = build_user_scope_context(viewer, "all") or {}
+        return scope.get("scope_user_ids") or []
+    except Exception:
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        return []
+
+
 def _safe_text(value, default='-'):
     text = str(value).strip() if value is not None else ''
     return text or default
@@ -38,7 +56,7 @@ def _autosize_columns(sheet):
         sheet.column_dimensions[get_column_letter(index)].width = min(max(max_length + 2, 12), 38)
 
 
-def build_management_dashboard_context(period):
+def build_management_dashboard_context(period, viewer=None):
     if not period:
         return {
             'period': None,
@@ -60,8 +78,9 @@ def build_management_dashboard_context(period):
     evaluations = PerformanceEvaluation.query.filter_by(period_id=period.id).all()
     overdue_assignments = [item for item in assignments if _is_assignment_overdue(item)]
     completed_assignments = [item for item in assignments if _is_assignment_completed(item)]
-    scorecard = build_period_scorecard_context(period)
-    publish_summary = build_publish_workspace_context(period)
+    allowed_employee_ids = _resolve_allowed_employee_ids(viewer)
+    scorecard = build_period_scorecard_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
+    publish_summary = build_publish_workspace_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
     manager_summary = build_manager_summary_context(period)
 
     overdue_rows = []
@@ -95,13 +114,14 @@ def build_management_dashboard_context(period):
     }
 
 
-def build_excel_export(period):
+def build_excel_export(period, viewer=None):
+    allowed_employee_ids = _resolve_allowed_employee_ids(viewer)
     wb = Workbook()
     ws = wb.active
     ws.title = 'Not Karnesi'
     ws.freeze_panes = 'A2'
     ws.append(['Sicil No', 'Ad Soyad', 'Birim', '1. Amir Puanı', '2. Amir Puanı', '3. Amir Puanı', 'Nihai Puan', 'Durum', 'Yayın Durumu', 'Görünürlük'])
-    scorecard = build_period_scorecard_context(period)
+    scorecard = build_period_scorecard_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
     for row in scorecard['rows']:
         evaluation = row['evaluation']
         ws.append([
@@ -132,7 +152,7 @@ def build_excel_export(period):
     _autosize_columns(ws2)
 
     ws3 = wb.create_sheet('Yayin Ozeti')
-    publish_summary = build_publish_workspace_context(period)
+    publish_summary = build_publish_workspace_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
     ws3.append(['Metrik', 'Değer'])
     ws3.append(['Toplam sonuç', publish_summary.get('total_count')])
     ws3.append(['Tamamlanan sonuç', publish_summary.get('completed_count')])
@@ -152,7 +172,8 @@ def build_excel_export(period):
     return buffer
 
 
-def build_csv_export(period, export_type: str = 'scorecard'):
+def build_csv_export(period, export_type: str = 'scorecard', viewer=None):
+    allowed_employee_ids = _resolve_allowed_employee_ids(viewer)
     output = StringIO()
     writer = csv.writer(output)
     if export_type == 'manager_summary':
@@ -166,7 +187,7 @@ def build_csv_export(period, export_type: str = 'scorecard'):
                 row.get('overdue'),
             ])
     elif export_type == 'publish_summary':
-        publish_summary = build_publish_workspace_context(period)
+        publish_summary = build_publish_workspace_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
         writer.writerow(['Metrik', 'Değer'])
         writer.writerow(['Toplam sonuç', publish_summary.get('total_count')])
         writer.writerow(['Tamamlanan sonuç', publish_summary.get('completed_count')])
@@ -180,7 +201,7 @@ def build_csv_export(period, export_type: str = 'scorecard'):
             writer.writerow([reason, count])
     else:
         writer.writerow(['Sicil No', 'Ad Soyad', 'Birim', '1. Amir Puanı', '2. Amir Puanı', '3. Amir Puanı', 'Nihai Puan', 'Durum', 'Yayın Durumu', 'Görünürlük'])
-        scorecard = build_period_scorecard_context(period)
+        scorecard = build_period_scorecard_context(period, viewer=viewer, allowed_employee_ids=allowed_employee_ids)
         for row in scorecard['rows']:
             evaluation = row['evaluation']
             writer.writerow([

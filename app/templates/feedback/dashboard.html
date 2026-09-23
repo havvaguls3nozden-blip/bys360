@@ -56,10 +56,10 @@
               <div class="fb-campaign">
                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:14px;">
                   <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                    <span class="fb-badge"><i class="fa-solid fa-tag"></i>{{ campaign.campaign_type|replace('_',' ')|title }}</span>
+                    <span class="fb-badge"><i class="fa-solid fa-tag"></i>{{ get_campaign_type_label(campaign) }}</span>
                     {% if campaign.is_anonymous %}<span class="fb-badge dark"><i class="fa-solid fa-user-secret"></i>Anonim</span>{% endif %}
                   </div>
-                  <span class="fb-muted" style="font-size:.8rem;font-weight:800;">{{ campaign.status }}</span>
+                  <span class="fb-muted" style="font-size:.8rem;font-weight:800;">{{ get_campaign_status_label(campaign) }}</span>
                 </div>
                 <div style="font-size:1.02rem;font-weight:900;color:#111827;margin-bottom:8px;">{{ campaign.title }}</div>
                 <div class="fb-muted" style="font-size:.88rem;line-height:1.8;min-height:50px;">{{ campaign.description or 'Açıklama eklenmemiş.' }}</div>

@@ -706,7 +706,7 @@ Tür: {{ 'Özel Dönem' if period.period_type == 'Özel' else (period.period_typ
                                 Görev Yönetimi
                             </a>
 
-                            <form method="POST" action="{{ url_for('main.performance_period_delete', period_id=period.id) }}" class="inline-form" onsubmit="return confirm('Bu dönem; görevleri, puanları, karne/snapshot kayıtları, Başkan onayı ve diğer dönem bağlantılarıyla birlikte silinecek. Devam edilsin mi?');">
+                            <form method="POST" action="{{ url_for('main.performance_period_delete', period_id=period.id) }}" class="inline-form" data-confirm="Bu dönem; görevleri, puanları, karne/snapshot kayıtları, Başkan onayı ve diğer dönem bağlantılarıyla birlikte silinecek. Devam edilsin mi?">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="btn-soft danger" title="Dönemi ilişkili kayıtlarıyla birlikte sil">
                                     <i class="fa-solid fa-trash-can"></i>
@@ -726,6 +726,17 @@ Tür: {{ 'Özel Dönem' if period.period_type == 'Özel' else (period.period_typ
         </div>
     {% endif %}
 </div>
+
+<script>
+document.querySelectorAll('form[data-confirm]').forEach(function(form){
+    form.addEventListener('submit', function(event){
+        const m = form.getAttribute('data-confirm');
+        if (m && !window.confirm(m)) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
 {% endblock %}{# BYS360_MEETING_P1_PERIOD_SCOPE_SUMMARY: Dönem kapsamı özeti periods ekranında gösterilecektir. #}
 
 {# BYS360_P2_ARCHIVE_PERIOD_HISTORY_BADGE: Geçmiş karne/puan arşivi dönem ve yıl bazlı izlenebilir. #}

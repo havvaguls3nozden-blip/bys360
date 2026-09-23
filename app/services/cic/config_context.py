@@ -294,8 +294,8 @@ def _weather() -> dict[str, str]:
             "yarin_oneri": _tomorrow_note(tomorrow),
         }
     except Exception as exc:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:426")
-        msg = f"Güncel hava durumu verisi şu anda alınamadı. Kontrol notu: {exc}"
+        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:426 | exc=%s", exc)
+        msg = "Güncel hava durumu verisi şu anda alınamadı."
         return {"bugun_hava": msg, "yarin_hava": msg, "kiyafet_onerisi": "Hava değişimlerine karşı hazırlıklı olunması önerilir.", "yarin_oneri": "Sabah çıkmadan güncel hava durumunu kontrol ediniz."}
 
 def _format_weather(current_temp: Any, daily: dict[str, Any], idx: int) -> str:

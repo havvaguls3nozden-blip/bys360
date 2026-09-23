@@ -7,6 +7,7 @@ from typing import Any
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import log_action, safe_str
 from app.services.communication_phase9_service import (
     phase9_first72_snapshot,
@@ -31,6 +32,7 @@ def _env_row(key: str, required: bool = True, expected: str = '', mask: bool = T
     return {
         'key': key,
         'status': status,
+        'status_label': gate_status_label(status),
         'required': required,
         'value': shown,
         'detail': detail,
@@ -39,10 +41,12 @@ def _env_row(key: str, required: bool = True, expected: str = '', mask: bool = T
 
 def _path_row(label: str, path_value: str | None) -> dict[str, Any]:
     exists = path_value is not None and os.path.exists(path_value)
+    path_status = 'pass' if exists else 'fail'
     return {
         'label': label,
         'path': path_value or '-',
-        'status': 'pass' if exists else 'fail',
+        'status': path_status,
+        'status_label': gate_status_label(path_status),
         'detail': 'Klasör mevcut' if exists else 'Klasör bulunamadı veya env eksik',
     }
 
@@ -114,6 +118,8 @@ def phase9a_preflight_snapshot() -> dict[str, Any]:
             'owner': 'BT / Yönetim',
         },
     ]
+    for _row in freeze_gates:
+        _row['status_label'] = gate_status_label(_row['status'])
 
     return {
         'generated_at': _now(),
@@ -154,6 +160,8 @@ def phase9a_backup_snapshot() -> dict[str, Any]:
             'detail': 'İlk 72 saatte log klasörü günlük kontrol edilmeli.',
         },
     ]
+    for _row in backup_checks:
+        _row['status_label'] = gate_status_label(_row['status'])
 
     return {
         'generated_at': _now(),

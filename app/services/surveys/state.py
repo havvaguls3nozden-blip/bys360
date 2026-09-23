@@ -115,6 +115,8 @@ def restore_survey(survey: Any, *, db_session: Any | None = None) -> SurveyState
     from app.extensions import db
 
     session = db_session or db.session
+    if (getattr(survey, "status", None) or "") != "archived":
+        raise ValueError("Anket yalnızca arşivden geri alınabilir.")
     survey.status = "draft"
     session.commit()
     return SurveyStateResult(affected=1)

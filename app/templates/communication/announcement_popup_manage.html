@@ -61,19 +61,19 @@
                         <div class="ap-title">{{ row.title }}</div>
                         <div class="ap-muted">{{ row.body[:150] }}{% if row.body|length > 150 %}...{% endif %}</div>
                     </td>
-                    <td><span class="ap-pill">{{ announcement_types.get(row.announcement_type, row.announcement_type) }}</span></td>
+                    <td><span class="ap-pill">{{ announcement_types.get(row.announcement_type, 'Bilinmiyor') }}</span></td>
                     <td>
                         {% if row.is_active %}<span class="ap-pill green">Aktif</span>{% else %}<span class="ap-pill gray">Pasif</span>{% endif %}
                         {% if row.is_required %}<div style="margin-top:6px"><span class="ap-pill red">Zorunlu</span></div>{% endif %}
                     </td>
                     <td>
-                        <span class="ap-pill gray">{{ target_scopes.get(row.target_scope, row.target_scope) }}</span>
+                        <span class="ap-pill gray">{{ target_scopes.get(row.target_scope, 'Bilinmiyor') }}</span>
                         {% if row.target_scope == 'role' and row.target_role %}<div class="ap-muted">{{ row.target_role }}</div>{% endif %}
                         {% if row.target_scope == 'unit' and row.target_unit %}<div class="ap-muted">{{ row.target_unit.name }}</div>{% endif %}
                     </td>
-                    <td>{{ show_rules.get(row.show_rule, row.show_rule) }}<div class="ap-muted">Buton: {{ row.button_text }}</div></td>
+                    <td>{{ show_rules.get(row.show_rule, 'Bilinmiyor') }}<div class="ap-muted">Buton: {{ row.button_text }}</div></td>
                     <td>
-                        <span class="ap-pill gray">{{ media_types.get(row.media_type, row.media_type) }}</span>
+                        <span class="ap-pill gray">{{ media_types.get(row.media_type, 'Bilinmiyor') }}</span>
                         {% if row.media_url %}<div class="ap-muted">Bağlantı var</div>{% endif %}{% if row.media_file_path %}<div class="ap-muted">Yüklü dosya var</div>{% endif %}
                     </td>
                     <td>

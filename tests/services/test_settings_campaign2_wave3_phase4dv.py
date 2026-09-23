@@ -344,60 +344,98 @@ class HybridList(list):
         self[:] = [value for value in self if value not in set(values)]
 
 
-class LineFailAuthority(set):
-    def __init__(self, fail_line=None):
-        super().__init__()
-        self.fail_line = fail_line
+class MarkerFailAuthority(set):
+    """Fault double for ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS.
 
-    def _maybe_fail(self):
-        import inspect
-        frame = inspect.currentframe()
-        assert frame is not None
-        caller = frame.f_back
-        assert caller is not None
-        grandcaller = caller.f_back
-        assert grandcaller is not None
-        line = grandcaller.f_lineno
-        if line == self.fail_line:
-            raise RuntimeError(f"authority line {line}")
+    Selects its failing call by the *semantic identity/value* of the argument
+    being merged in (object identity for constants imported by name, exact
+    payload equality for local literals with no importable identity) rather
+    than by the physical source line of the call site. This makes the fault
+    injection immune to line-shifting refactors of runtime_policy_context.py:
+    whichever statement merges the matched payload is the one that fails,
+    wherever in the file it physically lives.
 
-    def update(self, *values):
-        self._maybe_fail()
-        return super().update(*values)
+    `armed` disarms after the first match so a block that touches the same
+    payload twice (e.g. a guarded call followed by an unguarded re-add) only
+    fails once per test, mirroring what a single pinned line used to give for
+    free.
+    """
+
+    def __init__(self, matcher, initial=None):
+        super().__init__(initial or ())
+        self.matcher = matcher
+        self.calls: list[tuple[str, Any]] = []
+        self.raised = False
+        self.armed = True
+
+    def _maybe_fail(self, op, arg):
+        self.calls.append((op, arg))
+        if self.armed and self.matcher(arg):
+            self.armed = False
+            self.raised = True
+            raise RuntimeError(f"authority {op} fault: {arg!r}")
+
+    def update(self, *others):
+        for other in others:
+            self._maybe_fail("update", other)
+        return super().update(*others)
 
     def add(self, value):
-        self._maybe_fail()
+        self._maybe_fail("add", value)
         return super().add(value)
 
-    def difference_update(self, *values):
-        self._maybe_fail()
-        return super().difference_update(*values)
+    def difference_update(self, *others):
+        for other in others:
+            self._maybe_fail("difference_update", other)
+        return super().difference_update(*others)
 
 
-class LineFailCore(dict):
-    def __init__(self, fail_line=None):
-        super().__init__()
-        self.fail_line = fail_line
+class MarkerFailCore(dict):
+    """Fault double for CORE_MENU_VISIBILITY_POLICY.
+
+    Selects its failing `setdefault` call by the semantic identity of the key
+    being defaulted, not by physical source line — see MarkerFailAuthority
+    for the rationale.
+    """
+
+    def __init__(self, matcher, initial=None):
+        super().__init__(initial or {})
+        self.matcher = matcher
+        self.calls: list[Any] = []
+        self.raised = False
+        self.armed = True
 
     def setdefault(self, key, default=None):
-        import inspect
-        frame = inspect.currentframe()
-        assert frame is not None
-        caller = frame.f_back
-        assert caller is not None
-        line = caller.f_lineno
-        if line == self.fail_line:
-            raise RuntimeError(f"core line {line}")
+        self.calls.append(key)
+        if self.armed and self.matcher(key):
+            self.armed = False
+            self.raised = True
+            raise RuntimeError(f"core setdefault fault: {key!r}")
         return super().setdefault(key, default)
 
 
 class FailDifferenceSet(set):
+    """Already-semantic fault double: it *is* the specific constant object
+    (_BYS360_PERSONEL_DISALLOWED_POLICY_KEYS), not a line-number match, so it
+    needs no redesign for line-shift resilience -- only the same trigger-proof
+    (call count) discipline as the other doubles in this file."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.calls = 0
+
     def difference_update(self, *values):
+        self.calls += 1
         raise RuntimeError('difference')
 
 
 class FailUpdateSet(set):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.calls = 0
+
     def update(self, *values):
+        self.calls += 1
         raise RuntimeError('update')
 
 
@@ -554,33 +592,270 @@ def test_runtime_success_set_and_list_paths():
         assert 'perf_v8' in ns['PERFORMANCE_ROLE_MATRIX_KEYS']
 
 
-@pytest.mark.parametrize('fail_line', [166, 200, 249, 265, 292, 316, 345, 359, 396, 476, 503])
-def test_runtime_authority_fallbacks(fail_line):
+# BYS360 TD-008 runtime-policy test hardening: each entry below replaces one
+# of the old physical-source-line fault-injection scenarios with a semantic
+# one, keyed by the *identity/value* of the object being merged into
+# ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS. "personel_v7_difference_update" merges
+# what used to be a second, separately-pinned test (old fail_line=360) into
+# this same table, since both statements live in the same try/except and are
+# reached via the same block. See AUTHORITY_SCENARIOS below for the full
+# old-line -> new-scenario mapping (kept as a comment for audit purposes):
+#   166->v12_authority_update, 200->ag5e_ai_teaching_add,
+#   249->personel_current_scope_update, 265->all_menu_role_matrix_update,
+#   292->assistant_tab_update, 316->performance_main_switch_update,
+#   345->general_section_restore_update, 359->personel_v7_update,
+#   360->personel_v7_difference_update, 396->perf_rm_v8_update,
+#   476->corporate_portal_update, 503->portal_v2_12_update
+AUTHORITY_SCENARIOS = [
+    dict(id="v12_authority_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS),
+         fallback="log_only", contributed="v12", later_marker="ai_teaching"),
+    dict(id="ag5e_ai_teaching_add", op="add",
+         matcher=lambda c: (lambda v: v == c._BYS360_AG5E_AI_TEACHING_MENU_KEY),
+         fallback="log_only", contributed="ai_teaching", later_marker="hr_leave_tracking"),
+    dict(id="personel_current_scope_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS),
+         fallback="reassign", contributed="hr_leave_tracking", later_marker=None),
+    dict(id="all_menu_role_matrix_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS),
+         fallback="reassign", contributed="all_key", later_marker=None),
+    dict(id="assistant_tab_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_ASSISTANT_TAB_AUTHORITY_KEYS),
+         fallback="reassign", contributed="assistant_key", later_marker=None),
+    dict(id="performance_main_switch_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_PERFORMANCE_ALL_KEYS),
+         fallback="reassign", contributed="performance_all", later_marker=None),
+    dict(id="general_section_restore_update", op="update",
+         matcher=lambda c: (lambda v: set(v) == {"general_core", "performance_main_v4", "performance_child_v4"}),
+         fallback="reassign", contributed="general_core", later_marker=None),
+    dict(id="personel_v7_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS),
+         fallback="reassign", contributed="hr_v7", later_marker=None),
+    dict(id="personel_v7_difference_update", op="difference_update",
+         matcher=lambda c: (lambda v: v is c._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_OBSOLETE_KEYS),
+         fallback="reassign", contributed="hr_v7", later_marker=None),
+    dict(id="perf_rm_v8_update", op="update",
+         matcher=lambda c: (lambda v: v is c._BYS360_PERF_RM_V8_ALL_KEYS),
+         fallback="reassign", contributed="perf_v8", later_marker=None),
+    dict(id="corporate_portal_update", op="update",
+         matcher=lambda c: (lambda v: set(v) == {"portal_feed", "portal_profiles", "portal_groups", "portal_moderation"}),
+         fallback="log_only", contributed=None, later_marker="portal_people"),
+    dict(id="portal_v2_12_update", op="update",
+         matcher=lambda c: (lambda v: set(v) == {
+             "portal_feed", "portal_people", "portal_profiles", "portal_post_create", "portal_wall_post",
+             "portal_post_interact", "portal_post_report", "portal_post_delete", "portal_groups",
+             "portal_group_create", "portal_moderation"}),
+         fallback="log_only", contributed=None, later_marker=None),
+]
+
+
+@pytest.mark.parametrize("scenario", AUTHORITY_SCENARIOS, ids=[str(s["id"]) for s in AUTHORITY_SCENARIOS])
+def test_runtime_authority_fallbacks_semantic(scenario):
+    """Semantic replacement for the old line-pinned test_runtime_authority_fallbacks
+    (fail_line in [166,200,249,265,292,316,345,359,396,476,503]) plus the old
+    test_runtime_authority_difference_fallback (fail_line=360, folded in as the
+    personel_v7_difference_update scenario). Proves, for each of the 12 known
+    ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS mutation sites: (1) the call happened,
+    (2) the fault actually fired, (3) the correct fallback family (object
+    reassignment vs. catch-and-log-in-place) actually executed, not just that
+    some unrelated downstream key exists in ns."""
     with _runtime_modules() as constants:
-        ns = _ns(constants, authority=LineFailAuthority(fail_line=fail_line))
+        matcher = scenario["matcher"](constants)
+        double = MarkerFailAuthority(matcher, initial={"pre_existing_probe"})
+        ns = _ns(constants, authority=double)
         runtime.apply_runtime_policy_blocks(ns, logging=Log())
+
+        # (1) target dependency was actually called, (2) fault actually fired
+        assert any(op == scenario["op"] for op, _arg in double.calls), (
+            f"expected a {scenario['op']!r} call matching this scenario, got {double.calls!r}"
+        )
+        assert double.raised, "fault double was never triggered -- scenario is not exercising its fallback"
+
+        # (3) the expected fallback branch actually ran, proven by final-state shape
+        final_authority = ns["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"]
+        if scenario["fallback"] == "reassign":
+            assert final_authority is not double, "expected the except-block to rebind to a new set object"
+            assert type(final_authority) is set
+            assert "pre_existing_probe" not in final_authority, (
+                "reassignment fallback should discard everything accumulated before it"
+            )
+            if scenario["contributed"] is not None:
+                assert scenario["contributed"] in final_authority
+        else:
+            assert final_authority is double, "expected catch-and-log fallback to leave the same object in place"
+            assert "pre_existing_probe" in final_authority
+            if scenario["later_marker"] is not None:
+                assert scenario["later_marker"] in final_authority, (
+                    "a later, unaffected block's contribution should still have landed -- "
+                    "execution must have continued past this block's fault"
+                )
+
+
+def test_runtime_authority_ag5e_add_redundant_unguarded_readd():
+    """Additive scenario discovered while redesigning the fault-injection tests:
+    the AG5E block adds its menu key twice -- once inside its own try/except
+    (guarded), and again inside a later, unguarded for-loop over authority-like
+    ns entries. Failing the first add alone therefore does not keep the key out
+    of the final authority set; this was previously untested."""
+    with _runtime_modules() as constants:
+        def matcher(v):
+            return v == constants._BYS360_AG5E_AI_TEACHING_MENU_KEY
+        double = MarkerFailAuthority(matcher)
+        ns = _ns(constants, authority=double)
+        runtime.apply_runtime_policy_blocks(ns, logging=Log())
+        assert double.raised
+        add_calls = [arg for op, arg in double.calls if op == "add"]
+        assert add_calls.count("ai_teaching") >= 2
+        assert "ai_teaching" in ns["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"]
+
+
+CORE_SCENARIOS = [
+    dict(id="ai_agent_panel_setdefault", matcher=lambda c: (lambda k: k == "ai_agent_panel")),
+    dict(id="ag5e_ai_teaching_setdefault", matcher=lambda c: (lambda k: k == c._BYS360_AG5E_AI_TEACHING_MENU_KEY)),
+    dict(id="personel_current_scope_setdefault",
+         matcher=lambda c: (lambda k: k in c._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS)),
+    dict(id="assistant_tab_setdefault", matcher=lambda c: (lambda k: k in c._BYS360_ASSISTANT_TAB_POLICY)),
+    dict(id="personel_v7_setdefault",
+         matcher=lambda c: (lambda k: k in c._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS)),
+    dict(id="perf_rm_v8_setdefault", matcher=lambda c: (lambda k: k in c._BYS360_PERF_RM_V8_ROLE_POLICY)),
+]
+
+
+@pytest.mark.parametrize("scenario", CORE_SCENARIOS, ids=[str(s["id"]) for s in CORE_SCENARIOS])
+def test_runtime_core_policy_fallbacks_semantic(scenario):
+    """Semantic replacement for the old line-pinned test_runtime_core_policy_fallbacks
+    (fail_line in [189,204,256,299,367,403]). All six known CORE_MENU_VISIBILITY_POLICY
+    fallback sites are catch-and-log (no reassignment), so the proof is: the
+    setdefault call happened, the fault fired, and the object identity/prior
+    contents survived (execution continued past the fault)."""
+    with _runtime_modules() as constants:
+        matcher = scenario["matcher"](constants)
+        double = MarkerFailCore(matcher, initial={"pre_existing_probe": {"seed"}})
+        ns = _ns(constants, core=double)
+        runtime.apply_runtime_policy_blocks(ns, logging=Log())
+
+        assert double.calls, "expected at least one setdefault call to be observed"
+        assert double.raised, "fault double was never triggered -- scenario is not exercising its fallback"
+        final_core = ns["CORE_MENU_VISIBILITY_POLICY"]
+        assert final_core is double, "core policy fallbacks are catch-and-log; object identity must survive"
+        assert "pre_existing_probe" in final_core
+        assert "portal_feed" in final_core, "a later, unaffected block must still have run to completion"
+
+
+def test_runtime_constant_mutation_fallback_semantic():
+    """Semantic replacement for the old test_runtime_constant_mutation_fallback
+    (previously described as line-pinned at 383/384; the doubles here are
+    already identity-based -- they ARE the specific constant objects, not a
+    line match). Both statements live in the SAME try block (383:
+    difference_update, then 384: update), so failing both simultaneously (as
+    the old test did) only ever proves the FIRST statement's failure is
+    caught -- the second is never even attempted, since a raised exception
+    aborts the rest of the try immediately. This is verified as an explicit,
+    separate assertion below rather than silently assumed."""
+    with _runtime_modules(fail_constant_mutation=True) as constants:
+        ns = _ns(constants)
+        disallowed = constants._BYS360_PERSONEL_DISALLOWED_POLICY_KEYS
+        current_allowed = constants._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS
+        runtime.apply_runtime_policy_blocks(ns, logging=Log())
+        assert disallowed.calls == 1, "the difference_update call site was not attempted exactly once"
+        assert current_allowed.calls == 0, (
+            "the update call site must NOT be reached: difference_update (line 383) "
+            "raises first and the try block aborts before line 384 ever executes"
+        )
         assert 'PORTAL_MENU_VISIBILITY_POLICY' in ns
-
-
-def test_runtime_authority_difference_fallback():
-    with _runtime_modules() as constants:
-        ns = _ns(constants, authority=LineFailAuthority(fail_line=360))
-        runtime.apply_runtime_policy_blocks(ns, logging=Log())
-
-
-@pytest.mark.parametrize('fail_line', [189, 204, 256, 299, 367, 403])
-def test_runtime_core_policy_fallbacks(fail_line):
-    with _runtime_modules() as constants:
-        ns = _ns(constants, core=LineFailCore(fail_line))
-        runtime.apply_runtime_policy_blocks(ns, logging=Log())
         assert 'PORTAL_ROLE_MATRIX_V2_12_DEFAULTS' in ns
 
 
-def test_runtime_constant_mutation_fallback():
-    with _runtime_modules(fail_constant_mutation=True) as constants:
+def test_runtime_constant_mutation_partial_apply_second_statement_fails():
+    """Additive scenario: the old test always failed BOTH statements in
+    runtime_policy_context.py's Block 14 constant-mutation try at once, which
+    (per the discovery above) means only the first statement's failure was
+    ever really exercised. This test isolates the second statement
+    (_BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS.update(...), line 384)
+    failing on its own, proving the genuine partial-apply risk: the first
+    statement (difference_update on the disallowed-keys constant) succeeds
+    and its effect is retained, then the second statement raises and is
+    caught, with no rollback of the first statement's already-applied
+    mutation."""
+    with _runtime_modules() as constants:
+        constants._BYS360_PERSONEL_DISALLOWED_POLICY_KEYS = {"hr_management", "hr_reports", "hr_untouched"}
+        constants._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS = FailUpdateSet({"hr_leave_tracking"})
         ns = _ns(constants)
+        disallowed = constants._BYS360_PERSONEL_DISALLOWED_POLICY_KEYS
+        current_allowed = constants._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS
         runtime.apply_runtime_policy_blocks(ns, logging=Log())
+
+        assert current_allowed.calls == 1, "the update call site was not attempted"
+        # partial-apply proof: statement 1 (difference_update) ran to completion
+        # and its effect on the disallowed-keys constant persists even though
+        # statement 2 (update) subsequently raised.
+        assert "hr_management" not in disallowed
+        assert "hr_reports" not in disallowed
+        assert "hr_untouched" in disallowed
         assert 'PORTAL_MENU_VISIBILITY_POLICY' in ns
+        assert 'PORTAL_ROLE_MATRIX_V2_12_DEFAULTS' in ns
+
+
+def test_personel_scope_block8_9_run_before_v7_block14_mutates_constants():
+    """Order-dependency regression contract: the personel-live-scope-narrow
+    block (reads _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS) and the
+    personel-role-matrix-current-scope block (reads
+    _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS) must both run BEFORE the
+    personel-role-matrix-visibility-v7 block, which mutates those same two
+    constant objects in place. This is a behavioral proof, not a textual
+    source-position check: it seeds a probe key into the pre-mutation
+    disallowed set and asserts on its fate in the real function's final
+    output, then separately demonstrates via a test-owned mini-model (not
+    production code) that reversing the order would flip that outcome."""
+    probe = "hr_management"  # matches the literal hardcoded in runtime_policy_context.py's
+                              # Block 14 mutation: _BYS360_PERSONEL_DISALLOWED_POLICY_KEYS.difference_update(
+                              #     {"hr_management", "hr_reports"})
+
+    with _runtime_modules() as constants:
+        constants._BYS360_PERSONEL_DISALLOWED_POLICY_KEYS = {probe}
+        constants._BYS360_PERSONEL_ALLOWED_POLICY = {}
+        constants._BYS360_PERSONEL_ROLE_MATRIX_CURRENT_ALLOWED_KEYS = set()
+        constants._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS = {"hr_v7_other"}
+
+        ns = _ns(constants, authority={probe})
+        runtime.apply_runtime_policy_blocks(ns, logging=Log())
+
+        assert probe not in ns["ROLE_MATRIX_RUNTIME_AUTHORITY_KEYS"], (
+            "Block 8's difference_update must run while "
+            "_BYS360_PERSONEL_DISALLOWED_POLICY_KEYS still contains the probe, "
+            "i.e. before Block 14 (which hardcodes 'hr_management' into its own "
+            "difference_update) shrinks that constant"
+        )
+
+    # --- Mutation-sensitivity proof: a test-owned mini-model, NOT production
+    # code, showing the real assertion above would genuinely fail under a
+    # reversed block order. ---
+    def _block8_effect(seed, disallowed_keys, allowed_policy):
+        authority_set = set(seed)
+        authority_set.difference_update(disallowed_keys)
+        authority_set.update(allowed_policy.keys())
+        return authority_set
+
+    def _block14_constant_mutation(disallowed_keys, current_allowed_keys, v7_keys):
+        disallowed_keys = set(disallowed_keys)
+        current_allowed_keys = set(current_allowed_keys)
+        disallowed_keys.difference_update({"hr_management", "hr_reports"})
+        current_allowed_keys.update(v7_keys)
+        return disallowed_keys, current_allowed_keys
+
+    allowed_policy: dict[str, set[str]] = {}
+    v7_keys = {"hr_v7_other"}
+
+    right_order_result = _block8_effect({probe}, {probe}, allowed_policy)
+    assert probe not in right_order_result
+
+    disallowed_for_wrong_order, _ = _block14_constant_mutation({probe}, set(), v7_keys)
+    wrong_order_result = _block8_effect({probe}, disallowed_for_wrong_order, allowed_policy)
+    assert probe in wrong_order_result, (
+        "sanity check on the mini-model: under a reversed block order the probe "
+        "would survive -- the exact failure mode the real assertion above guards against"
+    )
+    assert (probe in wrong_order_result) != (probe in right_order_result)
 
 
 def test_apply_loop_false_paths(monkeypatch):

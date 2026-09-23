@@ -58,6 +58,18 @@ REGEX_OR_SCANNER_MARKERS = (
     "SECRET_KEY i", "DATABASE_URL i", "SQLALCHEMY_DATABASE_URI i",
 )
 
+# BYS360 Phase 5 secret-gate closure (2026-08-02): raw PEM/OpenSSH/PGP private
+# key material pasted directly into a file (not wrapped in a `KEY = "value"`
+# assignment) was invisible to every scan path above -- ASSIGN_RE/DICT_ASSIGN_RE/
+# UNQUOTED_ASSIGN_RE only ever look at a value following a sensitive KEY name
+# and an assignment operator on the same line, and a PEM block's header line
+# has neither. Confirmed by direct reproduction: a tracked file containing only
+# a "-----BEGIN PRIVATE KEY-----" header produced finding_count=0 before this
+# addition. The header line alone is a reliable, low-false-positive signal --
+# real key material is essentially the only thing that legitimately starts a
+# line this way -- so it is matched independently of the KEY=value machinery.
+PRIVATE_KEY_HEADER_RE = re.compile(r"-----BEGIN (?:[A-Z0-9]+ )?PRIVATE KEY(?: BLOCK)?-----")
+
 DB_URL_RE = re.compile(r"(?:postgresql|postgres|mysql|mariadb)://([^\s:'\"/@]+):([^\s'\"/@]+)@", re.I)
 # BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): DB_URL_RE above
 # already deliberately excludes the sqlite scheme from its embedded-
@@ -277,6 +289,21 @@ def looks_placeholder(value: str) -> bool:
         return True
     if lower.startswith("${") or lower.startswith("%") or lower.startswith("os.environ"):
         return True
+    # BYS360 secret-gate PowerShell-placeholder fix (2026-08-26): a value
+    # starting with "$" is a PowerShell variable/expression reference
+    # ($($DbConn.Password), $env:FOO, $shadowUrl, ...) -- CODE building a
+    # value at runtime, never a literal secret sitting in source. Mirrors
+    # the identical, already-shipped fix in the release-package scanner
+    # (scripts/release/scan_bys360_release_secrets.py, is_placeholder():
+    # `if v.startswith("$"): return True`), found there against this exact
+    # scripts/windows/prepare_bys360_candidate.ps1 / deploy_bys360_ec4e56b_
+    # production_v*.ps1 shape (`$shadowUrl = "postgresql://$($DbConn.User):
+    # $($DbConn.Password)@..."`). Scoped narrowly to a leading "$" -- a real
+    # credential value (e.g. "hunter2", "MyRealPassword123") never
+    # legitimately starts with a bare "$" character, so this does not widen
+    # detection past PowerShell/shell variable-reference syntax.
+    if v.startswith("$"):
+        return True
     if "<" in v and ">" in v:
         return True
     # BYS360 Phase 5 secret-gate false-positive fix (2026-07-26): real API
@@ -308,9 +335,14 @@ def looks_regex_or_scanner(line: str, path: Path) -> bool:
     return any(marker.lower() in line.lower() for marker in REGEX_OR_SCANNER_MARKERS)
 
 
-def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any], limit: int = 80) -> None:
-    if len(warnings) < limit:
-        warnings.append(item)
+def add_warning(warnings: list[dict[str, Any]], item: dict[str, Any]) -> None:
+    """Always records the warning. Report-readability truncation (if any) is
+    applied once, at serialization time in run() -- see TD-CAND-007: this
+    function used to silently cap at 80 entries here, which froze the
+    reported warning_count at exactly 80 forever once the true match count
+    grew past that threshold, masking the real (and fully reproducible,
+    given a fixed working tree) total instead of reporting it."""
+    warnings.append(item)
 
 
 def strip_inline_comment(value: str) -> str:
@@ -402,6 +434,21 @@ def scan_file(path: Path, root: Path, findings: list[dict[str, Any]], warnings: 
         stripped = line.strip()
         if not stripped or stripped.startswith("#") or stripped.startswith("//"):
             continue
+
+        # Raw PEM/OpenSSH/PGP private-key header, independent of the KEY=value
+        # assignment machinery above (see PRIVATE_KEY_HEADER_RE definition).
+        # Scanner/test code that merely documents or matches this pattern as a
+        # string (e.g. a regex literal in another quality-gate script, or a
+        # fixture line marked with the pre-existing "hardcoded_secret" comment
+        # convention used throughout tests/quality/test_bys360_secret_repo_gate.py)
+        # is excluded via the same looks_regex_or_scanner() used elsewhere.
+        if PRIVATE_KEY_HEADER_RE.search(line) and not looks_regex_or_scanner(line, path):
+            findings.append({
+                "type": "hardcoded_private_key_material",
+                "path": rel,
+                "line": lineno,
+                "detail": "Kaynak kodda gömülü özel anahtar (private key) materyali bulundu; değer rapora yazılmadı.",
+            })
 
         # Database URLs with embedded password. Regex/test/scanner placeholders are warnings, real values are findings.
         for m in DB_URL_RE.finditer(line):
@@ -532,14 +579,24 @@ def run(root: Path) -> dict[str, Any]:
     for path in candidates.values():
         scan_file(path, root, findings, warnings)
 
+    # TD-CAND-007: warning_count must always be the TRUE total match count,
+    # fully reproducible given a fixed working tree (see bys360_secret_repo_gate
+    # tests: test_warning_count_reports_true_total_not_display_cap). Only the
+    # DISPLAYED warning list (report readability) is truncated -- the count
+    # itself is never capped, so it can no longer silently freeze at the old
+    # 80-item display limit once the true match count grows past it.
     warning_count_real = len(warnings)
-    if warning_count_real >= 80:
-        warnings.append({
+    display_limit = 80
+    if warning_count_real > display_limit:
+        displayed_warnings = warnings[:display_limit]
+        displayed_warnings.append({
             "type": "warning_output_truncated",
             "path": "-",
             "line": 0,
-            "detail": f"Uyarı listesi rapor okunabilirliği için 80 kayıtla sınırlandı. Toplam uyarı: {warning_count_real}",
+            "detail": f"Uyarı listesi rapor okunabilirliği için {display_limit} kayıtla sınırlandı. Toplam uyarı: {warning_count_real}",
         })
+    else:
+        displayed_warnings = warnings
 
     reports_dir = root / "reports" / "quality"
     reports_dir.mkdir(parents=True, exist_ok=True)
@@ -560,7 +617,7 @@ def run(root: Path) -> dict[str, Any]:
             "skipped_ignored_file_count": _count_ignored_files_best_effort(root),
         },
         "findings": findings,
-        "warnings": warnings[:81],
+        "warnings": displayed_warnings,
         "report": str(report_path),
         "next_actions": [
             "finding_count 0 ise P0 güvenlik/repo hijyen gate tamamlanmış kabul edilebilir.",

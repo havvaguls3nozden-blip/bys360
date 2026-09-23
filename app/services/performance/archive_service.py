@@ -506,7 +506,7 @@ def validate_archive_excel_schema(header_row: Any) -> dict[str, Any]:
     missing = required - set(mapping.values())
     if missing:
         readable = {"result_year": "Yıl", "period_label": "Dönem", "score": "Puan"}
-        errors.append("Excel başlıkları eksik: " + ", ".join(readable.get(m, m) for m in sorted(missing)))
+        errors.append("Excel başlıkları eksik: " + ", ".join(readable.get(m, "Bilinmiyor") for m in sorted(missing)))
     if not ({"sicil_no", "employee_id", "personel"} & set(mapping.values())):
         errors.append("Personel eşleştirmesi için Sicil No, Personel ID veya Personel başlığı gereklidir.")
     if unknown:

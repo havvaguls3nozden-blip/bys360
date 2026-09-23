@@ -245,6 +245,7 @@ def save_role_menu_defaults(role_name: str, all_menu_keys: list[str], visible_ke
         role_menu_default_model=RoleMenuDefault,
         db_session=db.session,
         filter_live_menu_keys_func=_filter_live_menu_keys,
+        filter_live_menu_rows_func=_filter_live_menu_rows,
         snapshot_role_menu_state_func=_snapshot_role_menu_state,
         build_complete_visibility_map_func=_build_complete_visibility_map,
         create_settings_change_log_func=_create_settings_change_log,
@@ -287,8 +288,6 @@ def clear_user_menu_overrides(user_id: int, *, updated_by_user_id: int | None = 
         updated_by_user_id=updated_by_user_id,
         user_menu_permission_model=UserMenuPermission,
         db_session=db.session,
-        filter_live_menu_rows_func=_filter_live_menu_rows,
-        snapshot_user_override_state_func=_snapshot_user_override_state,
         create_settings_change_log_func=_create_settings_change_log,
     )
 

@@ -6,7 +6,7 @@ from typing import Any
 
 from flask import jsonify, request
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.route_registry import main_bp
@@ -38,15 +38,17 @@ def _run_faz9_json(builder: ResponseBuilder, *args: Any) -> tuple[Any, int]:
         safe_db_rollback()
         return jsonify({"ok": False, "error": str(exc) or "Bu sayfaya erişim yetkiniz bulunmamaktadır."}), 403
     except LookupError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen LookupError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc) or "Kayıt bulunamadı."}), 404
+        return jsonify({"ok": False, "error": "Kayıt bulunamadı."}), 404
     except ValueError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen ValueError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 400
+        return jsonify({"ok": False, "error": "Geçersiz istek parametresi."}), 400
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz9_routes.py | line=44")
+        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz9_routes.py | line=44 | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": f"Hatırlatma karar destek kontrolünde beklenmeyen hata: {exc}"}), 500
+        return jsonify({"ok": False, "error": "Hatırlatma karar destek kontrolünde beklenmeyen bir hata oluştu."}), 500
 
 
 def _load_settings() -> dict[str, Any]:
@@ -78,17 +80,13 @@ def _limit(default: int = 1000) -> int:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text(
-            """
-            SELECT column_name
-              FROM information_schema.columns
-             WHERE table_name = :table_name
-            """
-        ),
-        {"table_name": table_name},
-    ).scalars().all()
-    return {str(item) for item in rows}
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.columns``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction."""
+    inspector = inspect(db.engine)
+    if not inspector.has_table(table_name):
+        return set()
+    return {str(column["name"]) for column in inspector.get_columns(table_name)}
 
 
 def _select_expr(columns: set[str], name: str, aliases: tuple[str, ...] = (), fallback: str = "NULL") -> str:
@@ -133,12 +131,22 @@ def _notification_rows(limit: int = 500) -> Sequence[Any]:
     if not columns:
         return []
     message_filter = ""
+    params: dict[str, Any] = {"limit": limit}
     if "module_key" in columns:
         message_filter = "WHERE module_key IN ('performance', 'ai_decision')"
     elif "title" in columns:
-        message_filter = "WHERE title ILIKE '%performans%' OR title ILIKE '%değerlendirme%'"
+        # BYS360 DEFECT AM: PostgreSQL-only ILIKE has no SQLite equivalent.
+        # LOWER(x) LIKE LOWER(y) is ANSI-standard and preserves the same
+        # case-insensitive substring match on both dialects. Known SQLite-only
+        # limitation: SQLite's built-in LOWER() folds ASCII only, so an
+        # ALL-CAPS Turkish word with a non-ASCII letter (Ğ, İ, Ş, Ö, Ü, Ç) in
+        # the title will not match on SQLite; unaffected on PostgreSQL and on
+        # ordinary sentence-case text on both.
+        message_filter = "WHERE LOWER(title) LIKE LOWER(:kw1) OR LOWER(title) LIKE LOWER(:kw2)"
+        params["kw1"] = "%performans%"
+        params["kw2"] = "%değerlendirme%"
     sql = f"SELECT id FROM notifications {message_filter} ORDER BY id DESC LIMIT :limit"
-    return db.session.execute(text(sql), {"limit": limit}).mappings().all()
+    return db.session.execute(text(sql), params).mappings().all()
 
 
 def _mail_log_rows(limit: int = 500) -> Sequence[Any]:
@@ -146,10 +154,14 @@ def _mail_log_rows(limit: int = 500) -> Sequence[Any]:
     if not columns:
         return []
     filter_sql = ""
+    params: dict[str, Any] = {"limit": limit}
     if "subject" in columns:
-        filter_sql = "WHERE subject ILIKE '%performans%' OR subject ILIKE '%değerlendirme%'"
+        # BYS360 DEFECT AM: PostgreSQL-only ILIKE has no SQLite equivalent.
+        filter_sql = "WHERE LOWER(subject) LIKE LOWER(:kw1) OR LOWER(subject) LIKE LOWER(:kw2)"
+        params["kw1"] = "%performans%"
+        params["kw2"] = "%değerlendirme%"
     sql = f"SELECT id FROM mail_logs {filter_sql} ORDER BY id DESC LIMIT :limit"
-    return db.session.execute(text(sql), {"limit": limit}).mappings().all()
+    return db.session.execute(text(sql), params).mappings().all()
 
 
 @main_bp.route("/ai/decision-support/faz9/health")

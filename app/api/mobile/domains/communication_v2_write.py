@@ -231,10 +231,10 @@ def _bys360_legacy_mobile_b48_communication_v2_send(user: User, thread_id: int):
             __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/api/mobile/routes.py:2054)")
         db.session.commit()
         return jsonify({"message": "Mesajınız gönderildi.", "detail": _b48_thread_detail(thread_id, user) or {}})
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
         current_app.logger.exception("B48 mobile send message failed")
-        return jsonify({"message": "Mesaj gönderilemedi. Lütfen tekrar deneyin.", "warning": str(exc)[:240]}), 500
+        return jsonify({"message": "Mesaj gönderilemedi. Lütfen tekrar deneyin."}), 500
 
 
 @mobile_api_bp.get("/communication/v2/users")
@@ -332,8 +332,8 @@ def _bys360_legacy_mobile_b48_communication_v2_create_thread(user: User):
             self_participant.last_read_at = now
         db.session.commit()
         return jsonify({"message": "Konuşma başlatıldı.", "thread": _b48_thread_row(thread, user), "thread_id": thread.id, "detail": _b48_thread_detail(thread.id, user) or {}})
-    except Exception as exc:
+    except Exception:
         db.session.rollback()
         current_app.logger.exception("B48 mobile create thread failed")
-        return jsonify({"message": "Konuşma başlatılamadı. Lütfen tekrar deneyin.", "warning": str(exc)[:240]}), 500
+        return jsonify({"message": "Konuşma başlatılamadı. Lütfen tekrar deneyin."}), 500
 

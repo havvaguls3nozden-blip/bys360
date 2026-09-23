@@ -68,8 +68,8 @@ def communication_phase9a_freeze_create():
         record_phase9a_freeze(current_user, status, note)
         flash('Faz 9A teknik kilit kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9a_routes.py | line=68")
-        flash(f'Teknik kilit kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9a_routes.py | line=68 | exc=%s", exc)
+        flash('Teknik kilit kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9a_preflight_center'))
 
 
@@ -89,8 +89,8 @@ def communication_phase9a_smoke_create():
         record_phase9a_smoke(current_user, target, status, note)
         flash('Faz 9A smoke kaydı işlendi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9a_routes.py | line=88")
-        flash(f'Smoke kaydı işlenemedi: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9a_routes.py | line=88 | exc=%s", exc)
+        flash('Smoke kaydı işlenemedi.', 'danger')
     return redirect(url_for('main.communication_phase9a_preflight_center'))
 
 

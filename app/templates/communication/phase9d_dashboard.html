@@ -45,7 +45,7 @@
               {% for row in payload.gates %}
               <tr>
                 <td>{{ row.label }}</td>
-                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status_label }}</span></td>
                 <td>{{ row.owner }}</td>
                 <td>
                   <div>{{ row.detail }}</div>
@@ -66,7 +66,7 @@
           <div class="list-group-item px-0">
             <div class="d-flex justify-content-between gap-2">
               <div class="fw-semibold">{{ row.title }}</div>
-              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'secondary' if row.status == 'pending' else 'danger' }}">{{ row.status }}</span>
+              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'secondary' if row.status == 'pending' else 'danger' }}">{{ row.status_label }}</span>
             </div>
             <div class="small text-muted mt-1">{{ row.focus }}</div>
             <div class="small text-muted">Sahip: {{ row.owner }}</div>

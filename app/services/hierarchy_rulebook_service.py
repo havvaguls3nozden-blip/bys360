@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.services.personnel_sync_service import canonical_role_value
+from app.services.role_display import ROLE_DISPLAY_LABELS, UNKNOWN_ROLE_DISPLAY_LABEL
 
 # --- BYS360 third-manager Excel import compatibility patch ---
 
@@ -125,9 +126,15 @@ def is_president(user: Any) -> bool:
 
 
 def is_vice_president(user: Any) -> bool:
+    # BYS360 DEFECT FS (Final Sweep NEW-FS-R3): 'baskan yardim' in title
+    # previously matched any compound title containing that phrase as a
+    # modifier (e.g. "Başkan Yardımcılığı Özel Kalem Uzmanı" -- a
+    # vice-presidency-office specialist, not the vice president), the same
+    # collision class already fixed for infer_role_from_profile() (FS-R1).
+    # Fixed: exact normalized-title match only.
     role = _role(user)
     title = _norm(getattr(user, 'unvan', ''))
-    return role == 'baskan_yardimcisi' or 'baskan yardim' in title
+    return role == 'baskan_yardimcisi' or title == 'baskan yardimcisi'
 
 
 def is_hukuk_context(user: Any) -> bool:
@@ -193,6 +200,28 @@ def is_direct_to_president_role(user: Any) -> bool:
     return birim in DIRECT_TO_PRESIDENT_UNIT_KEYS or ust_birim in DIRECT_TO_PRESIDENT_UNIT_KEYS
 
 
+# BYS360 DEFECT FS (Final Sweep FS-R1): the title-only checks for the three
+# top-leadership roles previously used privilege-producing substring matching
+# ('baskan' in title, 'baskan yardim' in title, 'grup baskan' in title). In
+# this institution's naming convention, "başkan"/"başkanlık" is also used as
+# a *modifier* inside many subordinate titles (e.g. "Başkanlık Danışmanı",
+# "Grup Başkanlığı Veri Analisti", "Başkan Yardımcılığı Özel Kalem Uzmanı"),
+# so the substring checks silently promoted advisors/analysts/specialists to
+# the literal president/vice-president/group-president role. Fixed: exact
+# normalized-title match only, for these three roles specifically. Unlike
+# "başkan", the other title-based branches below (direct-to-president,
+# hukuk, koordinator) route to lower-tier roles via key phrases that are not
+# used as modifiers inside unrelated titles in this institution's real title
+# inventory (confirmed against this file's own existing regression contract,
+# e.g. "Saha Koordinatörü" -> koordinator is intentional compound-title
+# tolerance, not a collision) -- left unchanged.
+_EXACT_LEADERSHIP_TITLES: dict[str, str] = {
+    'baskan': 'baskan',
+    'baskan yardimcisi': 'baskan_yardimcisi',
+    'grup baskani': 'grup_baskani',
+}
+
+
 def infer_role_from_profile(*, raw_role: Any = None, unvan: Any = None, birim: Any = None, ust_birim: Any = None) -> tuple[str, str]:
     role = _norm(raw_role)
     title = _norm(unvan)
@@ -203,15 +232,14 @@ def infer_role_from_profile(*, raw_role: Any = None, unvan: Any = None, birim: A
         final = canonical_role_value(role)
         return final, role_label(final)
 
-    if title == 'baskan' or ('baskan' in title and 'yardim' not in title):
-        return 'baskan', role_label('baskan')
-    if 'baskan yardim' in title:
-        return 'baskan_yardimcisi', role_label('baskan_yardimcisi')
+    exact_leadership_role = _EXACT_LEADERSHIP_TITLES.get(title)
+    if exact_leadership_role:
+        return exact_leadership_role, role_label(exact_leadership_role)
     if is_direct_title(title) or unit in DIRECT_TO_PRESIDENT_UNIT_KEYS:
         return 'birim_sorumlusu', role_label('birim_sorumlusu')
     if any(token in title for token in HUKUK_TITLE_KEYS):
         return 'mali_musavir', role_label('mali_musavir')
-    if 'grup baskan' in title or (unit.endswith('grup baskanligi') and 'calisma grubu' not in unit):
+    if unit.endswith('grup baskanligi') and 'calisma grubu' not in unit:
         return 'grup_baskani', role_label('grup_baskani')
     if 'koordinator' in title:
         return 'koordinator', role_label('koordinator')
@@ -225,17 +253,9 @@ def is_direct_title(title: str) -> bool:
 
 
 def role_label(value: str) -> str:
-    labels = {
-        'admin': 'Admin',
-        'baskan': 'Başkan',
-        'baskan_yardimcisi': 'Başkan Yardımcısı',
-        'grup_baskani': 'Grup Başkanı',
-        'mali_musavir': 'Mali Müşavir',
-        'birim_sorumlusu': 'Birim Sorumlusu',
-        'koordinator': 'Koordinatör',
-        'personel': 'Personel',
-    }
-    return labels.get(value, value.replace('_', ' ').title())
+    if not value:
+        return ''
+    return ROLE_DISPLAY_LABELS.get(value, UNKNOWN_ROLE_DISPLAY_LABEL)
 
 
 def build_lookup(users: Iterable[Any]) -> Lookup:

@@ -210,12 +210,12 @@ def _role_key(user_or_role: Any) -> str:
 
 
 def _role_label(role_key: str) -> str:
-    return ROLE_LABELS.get(role_key, role_key.replace("_", " ").title())
+    return ROLE_LABELS.get(role_key, "Bilinmiyor")
 
 
 def _module_label(module_type: Any) -> str:
     key = _clean_key(module_type)
-    return MODULE_LABELS.get(key, key.replace("_", " ").title())
+    return MODULE_LABELS.get(key, "Bilinmiyor")
 
 
 def _visible_module_filter(query, column):

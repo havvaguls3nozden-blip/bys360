@@ -5,7 +5,7 @@ from typing import Any
 
 from flask import abort, render_template, render_template_string, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.routes import main
@@ -20,25 +20,25 @@ PHASE12_PRESIDENT_APPROVALS_MENU_CARD_ACCESS = True
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text("""
-            SELECT 1 FROM information_schema.tables
-            WHERE table_schema = 'public' AND table_name = :table_name LIMIT 1
-        """),
-        {"table_name": table_name},
-    ).first()
-    return bool(row)
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction.
+
+    BYS360 DEFECT AR: previously raised straight through on any inspect()
+    failure, unlike ~20 other table-existence helpers doing the identical
+    conceptual check elsewhere in this codebase, which all log and return
+    False. Aligned to that dominant convention."""
+    try:
+        return bool(inspect(db.engine).has_table(table_name))
+    except Exception:
+        logger.exception("BYS360 president low score card _table_exists guvenli fallback | table=%s", table_name)
+        return False
 
 
 def _columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text("""
-            SELECT column_name FROM information_schema.columns
-            WHERE table_schema = 'public' AND table_name = :table_name
-        """),
-        {"table_name": table_name},
-    ).all()
-    return {str(r[0]) for r in rows}
+    if not _table_exists(table_name):
+        return set()
+    return {str(column["name"]) for column in inspect(db.engine).get_columns(table_name)}
 
 
 def _display_name(user_id: Any) -> str:
@@ -345,7 +345,17 @@ CARD_TEMPLATE = """
 {% endblock %}
 """
 
-@main.route("/performans/baskan-onaylari", methods=["GET"])
+# BYS360 DEFECT AQ: bu URL, app/performance/__init__.py'nin import
+# sırası nedeniyle her zaman process_engine_phase6_president_approvals_
+# routes.py'deki performance_president_approvals tarafından
+# karşılanıyordu (Flask/Werkzeug aynı statik yola birden fazla Rule
+# eklenmesine izin verir; ilk kaydedilen, o yolu isteyen her HTTP
+# metodunda kazanır). Bu fonksiyon hiçbir zaman gerçek bir istek
+# karşılamadı -- kendi route kaydı, tespit edilen ve
+# tests/quality/test_route_conflict_runtime_contract.py ile önceden
+# kilitlenen çakışmayı kaldırmak için buradan çıkarıldı. Fonksiyonun
+# kendisi ve yardımcıları (bazıları ayrı testlerle doğrudan test
+# ediliyor) korunuyor.
 @login_required
 def president_low_score_approvals_center():
     if not _can_view_president_approvals():

@@ -15,6 +15,9 @@ from app.services.performance.low_score_process_service import (
     ensure_low_score_process_for_evaluation,
 )
 from app.services.performance.period_state_guard import ensure_scoring_window_open
+from app.services.performance.process_engine_phase4_flow import (
+    ensure_process_flow_for_evaluation,
+)
 from app.services.performance.visibility_guard import build_evaluation_form_visibility_context
 
 from .chain import build_resolved_chain
@@ -531,6 +534,9 @@ def submit_assignment(assignment_id: int, form_data):
         evaluation.status = 'tamamlandi'
     _update_level_totals(evaluation=evaluation, employee=assignment.employee, period=assignment.period)
     if (getattr(evaluation, "status", "") or "").strip().lower() in {"tamamlandi", "tamamlandı", "completed", "published"}:
+        # BYS360 DEFECT AP: değerlendirme tamamlandığında, düşük puan
+        # durumundan bağımsız olarak genel süreç takip kaydı oluşur/güncellenir.
+        ensure_process_flow_for_evaluation(evaluation, flush=False)
         # BYS360_PHASE6_1_LOW_SCORE_AUTO_ON_SUBMIT
         ensure_low_score_process_for_evaluation(evaluation, actor_user_id=getattr(assignment, "evaluator_id", None), flush=False)
     db.session.flush()

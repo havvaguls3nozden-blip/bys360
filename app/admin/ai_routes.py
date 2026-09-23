@@ -1136,7 +1136,7 @@ def admin_ai_recommendation_status(recommendation_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"AI öneri durumu güncellenemedi: {exc}", "danger")
+        flash("AI öneri durumu güncellenemedi.", "danger")
     return redirect(request.referrer or url_for("main.admin_ai_recommendations"))
 
 
@@ -1175,7 +1175,7 @@ def admin_ai_redaction_rules():
             except Exception as exc:
                 logger.exception("Beklenmeyen hata: %s", exc)
                 db.session.rollback()
-                flash(f"AI maskeleme kuralı kaydedilemedi: {exc}", "danger")
+                flash("AI maskeleme kuralı kaydedilemedi.", "danger")
 
     redaction_query = _live_rule_query()
     rows = redaction_query.order_by(AIRedactionRule.module_type.asc(), AIRedactionRule.field_name.asc()).all()
@@ -1212,5 +1212,5 @@ def admin_ai_redaction_toggle(rule_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         db.session.rollback()
-        flash(f"AI maskeleme kuralı güncellenemedi: {exc}", "danger")
+        flash("AI maskeleme kuralı güncellenemedi.", "danger")
     return redirect(url_for("main.admin_ai_redaction_rules"))

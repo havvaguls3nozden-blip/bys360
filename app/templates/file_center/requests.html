@@ -192,7 +192,7 @@ Bağlantı süreli ve kayıtlıdır; yüklenen dosya BYS360 Dosya Merkezi’ne g
          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
          <button class="btn btn-sm btn-outline-secondary">Kapat</button>
         </form>
-        <form method="post" action="{{ url_for('main.file_center_revoke_request', request_id=req.id) }}" onsubmit="return confirm('Bu dosya isteği iptal edilsin mi? Misafir yükleme bağlantısı kapanır.');">
+        <form method="post" action="{{ url_for('main.file_center_revoke_request', request_id=req.id) }}" data-confirm="Bu dosya isteği iptal edilsin mi? Misafir yükleme bağlantısı kapanır.">
          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
          <button class="btn btn-sm btn-outline-danger">İptal Et</button>
         </form>
@@ -212,4 +212,15 @@ Bağlantı süreli ve kayıtlıdır; yüklenen dosya BYS360 Dosya Merkezi’ne g
   </div>
  </div>
 </div>
+
+<script>
+document.querySelectorAll('form[data-confirm]').forEach(function(form){
+    form.addEventListener('submit', function(event){
+        const m = form.getAttribute('data-confirm');
+        if (m && !window.confirm(m)) {
+            event.preventDefault();
+        }
+    });
+});
+</script>
 {% endblock %}

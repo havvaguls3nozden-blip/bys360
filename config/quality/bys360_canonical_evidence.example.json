@@ -1,0 +1,145 @@
+{
+  "schema_version": "1.0",
+  "sample_type": "HISTORICAL_SAMPLE_NON_RUNTIME",
+  "evidence_manifest_name": "BYS360 Canonical Commit-Bound Evidence Manifest -- EXAMPLE / HISTORICAL SAMPLE, NOT LIVE RUNTIME TRUTH",
+  "generated_or_recorded_at": "2026-08-19T00:00:00Z",
+  "repository_branch": "phase5-critical-lint-clean-v1",
+  "policy_note": "THIS FILE IS AN EXAMPLE / HISTORICAL SAMPLE. It is never auto-loaded by the calculator: scripts/quality/bys360_score_reconcile_v1.py only consults external evidence when --evidence-file (or the BYS360_CANONICAL_EVIDENCE_FILE environment variable) explicitly points at a file, and this file is not the default for either. It is kept committed for two reasons only: (1) as a schema-valid worked example a new maintainer can read to understand the evidence-file shape, and (2) as a documented, honestly-labeled historical record of what remote evidence was actually reported for commit 9def579 during an earlier governance wave -- useful for tests/demos of the resolver mechanism, never for scoring current HEAD. A prior version of this file lived at config/quality/bys360_canonical_evidence.json with no such marker and was, in effect, treated as though it could be live runtime evidence -- but a version-controlled file describing commit X can never itself describe the commit that contains the file's own addition/edit (adding or changing the file creates a new commit Y, at which point the file's evidence for X is stale relative to HEAD=Y). This is the self-attestation/bootstrap defect this rename and marker exist to make impossible to fall into by accident: actual current remote CI evidence must be supplied at runtime via --evidence-file pointing at an untracked, externally-produced file, never by editing this committed example.",
+  "sources": [
+    {
+      "id": "github_actions_bys360_ci",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "description": "GitHub Actions workflow(s) for this repository, as reported to this tooling by the project owner in chat for a specific commit SHA. Not fetched via the GitHub API by this tooling -- see provenance on each gate entry below.",
+      "trust_level": "TRUSTED_WITH_DISCLOSED_PROVENANCE"
+    }
+  ],
+  "gates": [
+    {
+      "id": "quality9_gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'BYS360 Quality 9 CI contract gate = PASS' for this commit -- verbatim name match to this gate's own description ('BYS360 Quality 9 CI contract gate'), not an inference."
+    },
+    {
+      "id": "coverage_ratchet",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Coverage ratchet gate = PASS' for this commit -- verbatim name match, not an inference."
+    },
+    {
+      "id": "ruff_syntax_import_sanity",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": "0.16.0",
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Ruff syntax/import sanity = PASS' for this commit -- verbatim name match. Does NOT cover ruff_full_select (Code Quality's broader gate) -- the user's list did not report a full-select Ruff result, so ruff_full_select has no remote evidence entry here and must not be conflated with this one."
+    },
+    {
+      "id": "postgres_migration_integrity_gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": "PostgreSQL 15",
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI results: 'Create disposable PostgreSQL 15 migration-test database = PASS' and 'PostgreSQL 15 migration integrity gate = PASS' -- verbatim name match, corroborated by 4 sub-checks the user named (POSTGRES15_EMPTY_TO_HEAD, POSTGRES15_HEAD_MATCH, POSTGRES15_SECOND_UPGRADE, POSTGRES15_SCHEMA_INTROSPECTION). The calculator has one gate id for this whole check; the sub-checks are recorded here as corroborating detail only, not as separate resolvable ids."
+    },
+    {
+      "id": "dependency_audit",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": "vulnerabilities=0",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'Dependency vulnerability audit = PASS' for this commit -- descriptive (not verbatim job-name) match, but unambiguous: this is the only dependency-audit gate in the methodology (no competing narrower/broader-scoped variant), unlike the mypy/handover cases below."
+    },
+    {
+      "id": "ops_audit",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "evidence_type": "REMOTE_CI_VERIFIED",
+      "source": "github_actions_bys360_ci",
+      "remote": true,
+      "tool_version_if_relevant": null,
+      "value_if_relevant": null,
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF",
+      "notes": "User-reported CI result: 'BYS360 operations audit = PASS' for this commit -- verbatim name match to this gate's own description ('operations audit')."
+    }
+  ],
+  "deliberately_unmapped_gates": [
+    {
+      "id": "secret_repo_gate",
+      "reason": "The user's reported remote-evidence list for commit 9def579247637390b7635c02f606449a2692ef99 did not include a secret-scan gate result. No entry was fabricated for it; it simply has no manifest match and falls through to local/no-evidence resolution like any other unlisted gate."
+    },
+    {
+      "id": "ruff_full_select",
+      "reason": "The user's reported remote evidence covers only 'Ruff syntax/import sanity' (mapped to ruff_syntax_import_sanity), not a full-select Ruff run. ruff_full_select (Code Quality) therefore has no manifest match and is never satisfied by the syntax/import-sanity entry."
+    },
+    {
+      "id": "mypy_full_scope",
+      "reason": "See non_gate_context_only 'Type check service layer' below -- scope mismatch (service-layer-only vs. whole-repo), deliberately not mapped."
+    },
+    {
+      "id": "handover_docs_contract",
+      "reason": "REMOVED after a strict remote-gate provenance re-audit (governance wave: external evidence / self-attestation closure). An earlier version of this file mapped this gate to the user's reported 'BYS360 Score 100 Quality Gate V1 = PASS' CI result, reasoning that the gate's args run tests/test_score100_handover_docs_contract_v1.py, a filename containing 'score100'. On re-audit this was judged an INFERENCE, not a direct, unambiguous name/identity match: the user's reported job name does not mention 'handover', 'docs', or 'contract' anywhere, and 'BYS360 Score 100 Quality Gate V1' is not established to be the exact, sole CI step that runs exactly this one pytest file with no broader scope. Per the no-umbrella-proof-expansion policy, an inferred filename correlation is not sufficient grounds for REMOTE_CI_VERIFIED credit. The mapping is removed; this gate now resolves via LOCAL_VERIFIED (it is a version-unpinned pytest invocation, so a correct local run still yields canonical PASS) or UNKNOWN, per the resolver's normal tier-2/tier-3 policy -- never preserved merely to keep a historical replay score unchanged."
+    }
+  ],
+  "non_gate_context_only": [
+    {
+      "label": "Run tests / quality-gate",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Umbrella/overall CI job name; does not correspond to a single calculator gate id. Recorded for human audit trail only -- never consulted by resolve_evidence().",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Run quality tests",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Corresponds to the Step1 (tests/quality -m ci_safe) pytest run, not to any single scored quality-gate id. Recorded for human audit trail only.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Run integration and architecture tests",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "Corresponds to (part of) the Step2 broader-scope pytest run, not to any single scored quality-gate id. Recorded for human audit trail only.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "Type check service layer",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "SCOPE MISMATCH, deliberately not mapped to mypy_full_scope: this CI job type-checks the service layer only, while mypy_full_scope scores mypy across app + tests + scripts (the whole repo). Treating a narrower-scope PASS as equivalent evidence for the broader-scope gate would silently overstate verified coverage, so it is recorded here as context only and does not satisfy mypy_full_scope's canonical evidence requirement.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    },
+    {
+      "label": "BYS360 Score 100 Quality Gate V1",
+      "commit_sha": "9def579247637390b7635c02f606449a2692ef99",
+      "status": "PASS",
+      "reason_not_mapped": "INFERRED-ONLY MATCH, removed from gates[] on re-audit: no exact, unambiguous CI step identity confirms this is the same thing as handover_docs_contract (tests/test_score100_handover_docs_contract_v1.py). The prior mapping relied on a filename-pattern inference ('score100'), not a stated job/gate-name correspondence. Recorded here as context only, not as canonical evidence for any gate id.",
+      "provenance": "USER_SUPPLIED_REMOTE_PROOF"
+    }
+  ]
+}

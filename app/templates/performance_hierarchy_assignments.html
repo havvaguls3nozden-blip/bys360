@@ -271,7 +271,8 @@
             <input type="text" name="q" value="{{ q }}" placeholder="Ad, soyad, sicil no, birim">
 <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
     <form method="post" action="{{ url_for('main.performance_hierarchy_assignments') }}"
-          onsubmit="return confirm('Filtrelenen kayıtlar için otomatik amir ataması yapılsın mı?');">
+          id="autoAssignFilteredForm"
+          data-confirm="Filtrelenen kayıtlar için otomatik amir ataması yapılsın mı?">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="hidden" name="action" value="auto_assign_filtered">
         <input type="hidden" name="q" value="{{ q }}">
@@ -442,4 +443,20 @@
         </div>
     {% endif %}
 </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+    var autoAssignForm = document.getElementById('autoAssignFilteredForm');
+    if (!autoAssignForm) return;
+
+    autoAssignForm.addEventListener('submit', function (event) {
+        var message = autoAssignForm.getAttribute('data-confirm');
+        if (message && !window.confirm(message)) {
+            event.preventDefault();
+        }
+    });
+})();
+</script>
 {% endblock %}

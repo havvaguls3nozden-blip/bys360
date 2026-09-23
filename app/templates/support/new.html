@@ -30,9 +30,9 @@
         <div class="request-card">
             <form method="post" enctype="multipart/form-data">
 
-                <div class="privacy-box" style="margin-bottom:16px;">
+                <div class="privacy-box section-spacing-bottom-md">
                     <strong>Nasıl doldurulur?</strong>
-                    <div style="margin-top:6px;color:#6b7280;line-height:1.65;font-size:.9rem;">Talep Türü = işlem nedeni. Talep Konusu / İlgili Alan = hangi ekran veya süreçle ilgili olduğu. Kategori ayrıca seçilmez; sistem bunu talep türüne göre otomatik işler.</div>
+                    <div class="field-helper-text">Talep Türü = işlem nedeni. Talep Konusu / İlgili Alan = hangi ekran veya süreçle ilgili olduğu. Kategori ayrıca seçilmez; sistem bunu talep türüne göre otomatik işler.</div>
                 </div>
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="form-grid">
@@ -70,8 +70,8 @@
                     </div>
                 </div>
                 <div class="privacy-box">
-                    <label style="display:inline-flex;align-items:center;gap:8px;font-weight:850;color:#374151;"><input type="checkbox" name="is_private" value="1"> Sadece yetkili kullanıcılar görsün</label>
-                    <div style="margin-top:6px;color:#6b7280;line-height:1.65;font-size:.9rem;">Performans, personel, güvenlik veya hassas kurum içi bilgi içeren kayıtlar için bu seçenek kullanılmalıdır.</div>
+                    <label class="checkbox-inline checkbox-inline--emphasis"><input type="checkbox" name="is_private" value="1"> Sadece yetkili kullanıcılar görsün</label>
+                    <div class="field-helper-text">Performans, personel, güvenlik veya hassas kurum içi bilgi içeren kayıtlar için bu seçenek kullanılmalıdır.</div>
                 </div>
                 <div class="request-actions">
                     <button type="submit" class="support-btn"><i class="fa-solid fa-paper-plane"></i> Talebi Kaydet</button>

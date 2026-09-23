@@ -1,8 +1,23 @@
 """add communication phase3 runtime tables
 
 Revision ID: e3f1a2b3c4d7
-Revises: d2f1a2b3e4f6
+Revises: a3d8f1c9b6e2
 Create Date: 2026-04-10 10:15:00
+
+TD-032: down_revision repointed from d2f1a2b3e4f6 to a3d8f1c9b6e2 (a newly
+inserted, straight-line predecessor that creates support_tickets and
+support_help_articles, which this revision's FKs at lines 71/113 require).
+a3d8f1c9b6e2 itself chains to the original parent, d2f1a2b3e4f6, so no other
+revision's ancestry changes. No DDL/FK in this file was modified or removed.
+
+TD-032 (survey graph repair): depends_on added for 8d5e7f31c002, which is a
+sibling branch off fae32fb68b1b (not an ancestor via down_revision) that
+creates surveys/survey_assignments required by the FKs on
+communication_survey_reminder_logs (lines 96-97). depends_on is Alembic's
+documented mechanism for a cross-branch ordering requirement that is not a
+direct down_revision parent; it does not alter down_revision, head count, or
+downgrade semantics of the a3d8f1c9b6e2 chain, and does not create a merge
+revision. No DDL/FK in this file was modified or removed.
 """
 
 from alembic import op
@@ -11,9 +26,9 @@ import sqlalchemy as sa
 
 
 revision = "e3f1a2b3c4d7"
-down_revision = "d2f1a2b3e4f6"
+down_revision = "a3d8f1c9b6e2"
 branch_labels = None
-depends_on = None
+depends_on = "8d5e7f31c002"
 
 
 def _has_table(inspector, table_name: str) -> bool:

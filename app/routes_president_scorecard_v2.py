@@ -123,7 +123,7 @@ def _label(value, default="—") -> str:
     if value in (None, ""):
         return default
     raw = str(value)
-    return STATUS_LABELS.get(raw, raw)
+    return STATUS_LABELS.get(raw, "Bilinmiyor")
 
 
 def _score(value):

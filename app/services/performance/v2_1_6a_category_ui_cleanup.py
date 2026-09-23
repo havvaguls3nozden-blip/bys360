@@ -182,7 +182,7 @@ def label_status(value: Any) -> str:
         "detail_allowed": "Yetkili Detay",
         "assignment_precheck_status": "Ön Kontrol Durumu",
     }
-    return mapping.get(raw, str(value or "-").replace("_", " ").title())
+    return mapping.get(raw, "Bilinmiyor" if value else "-")
 
 
 def corporate_gate_label(value: Any) -> str:
@@ -204,4 +204,4 @@ def corporate_gate_label(value: Any) -> str:
         "plan_items_table": "Plan personel listesi",
         "preview_service": "Ön izleme",
     }
-    return mapping.get(raw, str(value or "-").replace("_", " ").title())
+    return mapping.get(raw, "Bilinmiyor" if value else "-")

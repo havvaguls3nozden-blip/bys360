@@ -15,7 +15,7 @@ from app.services.performance.hardening_service import (
     build_period_download_name,
     humanize_export_exception,
 )
-from app.services.performance_admin_service import create_publish_log
+from app.services.performance_admin_service import create_publish_log, humanize_publish_log_action
 from app.services.performance_snapshot_service import (
     backfill_snapshots_for_published_periods,
     create_snapshot_for_evaluation,
@@ -69,9 +69,9 @@ def performance_snapshot_backfill():
             "success",
         )
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Snapshot backfill sırasında hata oluştu: {exc}", "danger")
+        flash("Snapshot backfill sırasında hata oluştu.", "danger")
 
     selected_scope = (request.form.get("scope") or request.args.get("scope") or "").strip()
     q = (request.form.get("q") or request.args.get("q") or "").strip()
@@ -139,9 +139,9 @@ def performance_publish_period(period_id):
                 pieces = [f"{reason}: {count}" for reason, count in skip_reason_summary[:4]]
                 flash("Blok nedenleri: " + " | ".join(pieces), "info")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Toplu yayın sırasında hata oluştu: {exc}", "danger")
+        flash("Toplu yayın sırasında hata oluştu.", "danger")
 
     return _redirect_publish_dashboard(period_id=period.id, selected_scope=selected_scope, q=q, status=status)
 
@@ -175,9 +175,9 @@ def performance_unpublish_period(period_id):
         else:
             flash("Yayından kaldırılacak kayıt bulunamadı.", "warning")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Toplu yayından kaldırma sırasında hata oluştu: {exc}", "danger")
+        flash("Toplu yayından kaldırma sırasında hata oluştu.", "danger")
 
     return _redirect_publish_dashboard(period_id=period.id, selected_scope=selected_scope, q=q, status=status)
 
@@ -221,9 +221,9 @@ def performance_publish_evaluation(evaluation_id):
         flash("Sonuç personele yayımlandı.", "success")
         flash(f"Bilgilendirme e-postası sonucu: başarılı {notification_result.get('success_count', 0)}, hatalı {notification_result.get('failed_count', 0)}.", "info")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Tekil yayın sırasında hata oluştu: {exc}", "danger")
+        flash("Tekil yayın sırasında hata oluştu.", "danger")
 
     return _redirect_publish_dashboard(period_id=evaluation.period_id, selected_scope=selected_scope, q=q, status=status)
 
@@ -252,9 +252,9 @@ def performance_unpublish_evaluation(evaluation_id):
         db.session.commit()
         flash("Sonuç yayından kaldırıldı.", "success")
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Tekil yayından kaldırma sırasında hata oluştu: {exc}", "danger")
+        flash("Tekil yayından kaldırma sırasında hata oluştu.", "danger")
 
     return _redirect_publish_dashboard(period_id=evaluation.period_id, selected_scope=selected_scope, q=q, status=status)
 
@@ -300,7 +300,7 @@ def performance_publish_logs_export_excel():
             period_title = log.period.title if log.period else "-"
             excel_rows.append([
                 log.created_at.strftime("%d.%m.%Y %H:%M") if log.created_at else "-",
-                log.action_type or "-",
+                humanize_publish_log_action(log.action_type),
                 period_title,
                 employee_name,
                 employee_sicil,

@@ -4,7 +4,8 @@ import logging
 from dataclasses import dataclass
 from typing import Any
 
-from sqlalchemy import inspect, text
+from sqlalchemy import bindparam, inspect, text
+from sqlalchemy.sql.elements import TextClause
 
 from app.extensions import db
 
@@ -103,9 +104,10 @@ def _scalar(sql: str, params: dict[str, Any] | None = None, default: Any = None)
         return default
 
 
-def _rows(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+def _rows(sql: str | TextClause, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
     try:
-        return [dict(row) for row in db.session.execute(text(sql), params or {}).mappings().all()]
+        statement = sql if isinstance(sql, TextClause) else text(sql)
+        return [dict(row) for row in db.session.execute(statement, params or {}).mappings().all()]
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         return []
@@ -168,9 +170,9 @@ def ensure_p0_foundation() -> dict[str, Any]:
         seeded += ensure_p0_settings()
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"P0 temel veri hazırlığı tamamlanamadı: {exc}")
+        warnings.append("P0 temel veri hazırlığı tamamlanamadı.")
     return {
         "settings_seeded": seeded,
         "category_count": int(_scalar("SELECT COUNT(*) FROM performance_employee_categories", default=0) or 0) if _has_table("performance_employee_categories") else 0,
@@ -221,7 +223,13 @@ def build_p0_completion_context(viewer: Any | None = None) -> dict[str, Any]:
         "cards": p0_summary_cards(),
         "scenarios": p0_test_scenarios(),
         "categories": _rows("SELECT category_name, description, sort_order, is_active FROM performance_employee_categories ORDER BY sort_order ASC, category_name ASC LIMIT 50") if _has_table("performance_employee_categories") else [],
-        "settings": _rows("SELECT setting_key, label, value_text, description FROM module_settings WHERE module_key='performance' AND setting_key IN :keys ORDER BY setting_key", {"keys": tuple(P0_REQUIRED_SETTINGS.keys())}) if _has_table("module_settings") else [],
+        "settings": _rows(
+            text(
+                "SELECT setting_key, label, value_text, description FROM module_settings "
+                "WHERE module_key='performance' AND setting_key IN :keys ORDER BY setting_key"
+            ).bindparams(bindparam("keys", expanding=True)),
+            {"keys": tuple(P0_REQUIRED_SETTINGS.keys())},
+        ) if _has_table("module_settings") else [],
         "warnings": foundation.get("warnings") or [],
         "viewer": viewer,
     }
@@ -237,8 +245,8 @@ def run_p0_completion(actor_user_id: int | None = None) -> P0CompletionResult:
         repaired_low_score_locks = int(getattr(result, "repaired_low_score_locks", 0) or 0)
         warnings.extend(getattr(result, "warnings", None) or [])
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        warnings.append(f"Kural uygulama servisi çalıştırılamadı: {exc}")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+        warnings.append("Kural uygulama servisi çalıştırılamadı.")
 
     scenarios = p0_test_scenarios()
     passed = sum(1 for item in scenarios if item["ok"])

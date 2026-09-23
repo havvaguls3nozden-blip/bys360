@@ -11,6 +11,7 @@ import app.models as models
 from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import log_action, safe_str
 from app.services.config_hardening_service import build_safe_env_patch
 from app.services.go_live_readiness_service import build_go_live_readiness_context
@@ -57,6 +58,7 @@ def _gate(key: str, label: str, status: str, detail: str, owner: str, action: st
         'key': key,
         'label': label,
         'status': status,
+        'status_label': gate_status_label(status),
         'detail': detail,
         'owner': owner,
         'action': action,
@@ -199,7 +201,16 @@ def phase9b_transition_center_snapshot() -> dict[str, Any]:
     migration = _migration_summary()
     data_quality = _data_quality_summary()
     env_snapshot = _env_snapshot()
-    recent_logs = _recent_phase9b_logs(30)
+    recent_logs = [
+        {
+            'action_type': row.action_type,
+            'status': row.status,
+            'status_label': gate_status_label(row.status),
+            'summary': row.summary,
+            'executed_at': row.executed_at,
+        }
+        for row in _recent_phase9b_logs(30)
+    ]
 
     backup_files = len((go_live.get('backup_summary') or {}).get('recent_files') or [])
     log_files = len((go_live.get('log_summary') or {}).get('recent_files') or [])
@@ -269,6 +280,7 @@ def phase9b_transition_center_snapshot() -> dict[str, Any]:
         {
             'title': 'Veri geçişi kontrolü',
             'status': gates[0]['status'],
+            'status_label': gates[0]['status_label'],
             'items': [
                 'Eksik veya tekrar eden sicil numaraları kapatılmalı.',
                 'Pilot kullanıcı havuzu ile canlı kullanıcı havuzu ayrımı net olmalı.',
@@ -278,6 +290,7 @@ def phase9b_transition_center_snapshot() -> dict[str, Any]:
         {
             'title': 'Migration ve SQL hotfix sırası',
             'status': gates[1]['status'],
+            'status_label': gates[1]['status_label'],
             'items': [
                 'Alembic head ve SQL klasörü kontrol edilmeli.',
                 'Elle çalıştırılacak script varsa runbook içine yazılmalı.',
@@ -287,6 +300,7 @@ def phase9b_transition_center_snapshot() -> dict[str, Any]:
         {
             'title': 'Güvenlik ve görünürlük',
             'status': gates[3]['status'],
+            'status_label': gates[3]['status_label'],
             'items': [
                 'CAPTCHA, gizli soru, cookie ve CSRF ayarları tekrar test edilmeli.',
                 'Sicil temelli görünürlük ve export erişimi role göre doğrulanmalı.',
@@ -331,7 +345,7 @@ def build_phase9b_markdown() -> str:
         '',
     ]
     for row in payload['gates']:
-        lines.append(f"- [{row['status']}] {row['label']} — {row['detail']}")
+        lines.append(f"- [{row['status_label']}] {row['label']} — {row['detail']}")
     lines.extend([
         '',
         '## Veri kalitesi',

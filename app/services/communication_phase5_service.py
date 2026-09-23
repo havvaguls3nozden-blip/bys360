@@ -17,6 +17,7 @@ from app.models.communication_phase5_models import (
     CommunicationRetentionPolicy,
 )
 from app.models.support_models import SupportTicketStatusHistory
+from app.services.communication_gate_status_labels import gate_status_label
 
 MANAGER_ROLES = {
     "admin",
@@ -211,6 +212,9 @@ def _ticket_owner_snapshot(ticket: Any) -> str:
 
 
 def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
+    from app.support.routes import SUPPORT_STATUS_CHOICES
+
+    status_labels = dict(SUPPORT_STATUS_CHOICES)
     now = _now()
     tickets = SupportTicket.query.order_by(SupportTicket.created_at.desc()).limit(limit).all()
     open_rows = []
@@ -274,6 +278,7 @@ def support_operations_snapshot(limit: int = 200) -> dict[str, Any]:
         "unassigned_rows": unassigned_rows[:20],
         "assignee_load": assignee_load[:20],
         "recent_history": recent_history,
+        "status_labels": status_labels,
     }
 
 
@@ -291,6 +296,7 @@ def automation_center_snapshot() -> dict[str, Any]:
     enabled_weekly = CommunicationNotificationPreference.query.filter_by(weekly_digest_enabled=True).count()
     quiet_hours = CommunicationNotificationPreference.query.filter_by(quiet_hours_enabled=True).count()
     recent_failures = CommunicationAutomationLog.query.filter_by(status="failed").order_by(CommunicationAutomationLog.executed_at.desc()).limit(10).all()
+    recent_jobs = CommunicationDigestJob.query.order_by(CommunicationDigestJob.executed_at.desc().nullslast(), CommunicationDigestJob.created_at.desc()).limit(12).all()
     coverage_rate = round((prefs_total / active_users) * 100, 1) if active_users else 0.0
     return {
         "summary": {
@@ -306,8 +312,25 @@ def automation_center_snapshot() -> dict[str, Any]:
             "weekly_enabled_count": enabled_weekly,
             "quiet_hours_count": quiet_hours,
         },
-        "recent_logs": logs,
-        "recent_jobs": CommunicationDigestJob.query.order_by(CommunicationDigestJob.executed_at.desc().nullslast(), CommunicationDigestJob.created_at.desc()).limit(12).all(),
+        "recent_logs": [
+            {
+                "action_type": row.action_type,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "executed_at": row.executed_at,
+            }
+            for row in logs
+        ],
+        "recent_jobs": [
+            {
+                "user_id": row.user_id,
+                "digest_type": row.digest_type,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "result_summary": row.result_summary,
+            }
+            for row in recent_jobs
+        ],
         "recent_failures": recent_failures,
         "rules": rules,
         "policies": policies,
@@ -390,6 +413,15 @@ def create_or_update_escalation_rule(actor: Any, form: Any) -> CommunicationEsca
     return row
 
 
+RETENTION_SCOPE_LABELS = {
+    "notifications": "Bildirimler",
+    "support": "Destek",
+    "surveys": "Anketler",
+    "digest_logs": "Özet Logları",
+    "automation_logs": "Otomasyon Logları",
+}
+
+
 def retention_snapshot() -> dict[str, Any]:
     policies = CommunicationRetentionPolicy.query.order_by(CommunicationRetentionPolicy.data_scope.asc()).all()
     now = _now()
@@ -412,10 +444,19 @@ def retention_snapshot() -> dict[str, Any]:
             old = CommunicationAutomationLog.query.filter(CommunicationAutomationLog.created_at < now - timedelta(days=365)).count()
         ratio = round((old / total) * 100, 1) if total else 0.0
         status = "warning" if old > 0 and ratio >= 50 else "ok"
-        stats.append({"scope": scope, "total": total, "older_than_1y": old, "old_ratio": ratio, "status": status})
+        stats.append({
+            "scope": scope,
+            "scope_label": RETENTION_SCOPE_LABELS.get(scope, "Bilinmiyor"),
+            "total": total,
+            "older_than_1y": old,
+            "old_ratio": ratio,
+            "status": status,
+            "status_label": gate_status_label(status),
+        })
     return {
         "policies": policies,
         "stats": stats,
+        "scope_labels": RETENTION_SCOPE_LABELS,
         "summary": {
             "policy_count": len(policies),
             "warning_scope_count": sum(1 for item in stats if item["status"] == "warning"),
@@ -448,7 +489,7 @@ def create_or_update_retention_policy(actor: Any, form: Any) -> CommunicationRet
 
 
 def health_snapshot() -> dict[str, Any]:
-    unread_total = Notification.query.filter_by(is_read=False, is_hidden=False).count()
+    unread_total = Notification.query.filter_by(is_read=False).count()
     tickets_open = SupportTicket.query.filter(SupportTicket.status.in_(list(OPEN_TICKET_STATUSES))).count()
     survey_active = Survey.query.filter(Survey.status.in_(["published", "active", "yayinda"])).count()
     failed_logs = CommunicationAutomationLog.query.filter_by(status="failed").count()
@@ -465,6 +506,8 @@ def health_snapshot() -> dict[str, Any]:
         {"check_name": "Aktif anket", "status": "ok", "metric": survey_active},
         {"check_name": "Başarısız otomasyon", "status": "warning" if failed_logs > 0 else "ok", "metric": failed_logs},
     ]
+    for item in synthetic:
+        item["status_label"] = gate_status_label(item["status"])
     action_items = []
     if failed_logs > 0:
         action_items.append("Başarısız otomasyon loglarını kontrol edip aynı gün yeniden çalıştırma kararı verin.")
@@ -485,7 +528,15 @@ def health_snapshot() -> dict[str, Any]:
             "risk_score": risk_score,
         },
         "synthetic_checks": synthetic,
-        "recent_checks": recent_checks,
+        "recent_checks": [
+            {
+                "check_name": row.check_name,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "checked_at": row.checked_at,
+            }
+            for row in recent_checks
+        ],
         "action_items": action_items,
         "support_ops": support_ops,
     }
@@ -521,10 +572,25 @@ def audit_logs_snapshot(limit: int = 100, status_filter: str = "", action_filter
     rows = query.order_by(CommunicationAutomationLog.executed_at.desc()).limit(limit).all()
     counter = Counter(safe_str(getattr(row, "action_type", "genel")) for row in rows)
     status_counter = Counter(safe_str(getattr(row, "status", "success")) for row in rows)
+    status_label_counter: Counter[str] = Counter()
+    for raw_status, count in status_counter.items():
+        status_label_counter[gate_status_label(raw_status)] += count
     return {
-        "rows": rows,
+        "rows": [
+            {
+                "action_type": row.action_type,
+                "status": row.status,
+                "status_label": gate_status_label(row.status),
+                "target_table": row.target_table,
+                "target_id": row.target_id,
+                "summary": row.summary,
+                "executed_at": row.executed_at,
+            }
+            for row in rows
+        ],
         "action_breakdown": dict(counter),
         "status_breakdown": dict(status_counter),
+        "status_label_breakdown": dict(status_label_counter),
         "filters": {"status": safe_str(status_filter), "action": safe_str(action_filter)},
         "actions": sorted(counter.keys()),
     }

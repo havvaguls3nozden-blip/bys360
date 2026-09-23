@@ -46,14 +46,18 @@ from app.institutional.hr_scope_helpers import (
     _current_user_id,
     _date_range_weekday_count,
     _delegation_health,
+    _delegation_status_label,
     _empty_overview,
     _endpoint_registered,
     _fallback_scope_context,
     _filter_users_in_scope,
     _full_name,
     _hr_scope_context,
+    _leave_date_range_label,
+    _leave_duration_label,
     _leave_overlaps,
     _leave_overview,
+    _leave_status_label,
     _leave_type_label,
     _model_ready,
     _parse_date,
@@ -172,6 +176,11 @@ def _leave_page_context() -> dict[str, Any]:
         "leave_status_choices": LEAVE_STATUS_CHOICES,
         "performance_mode_label": _performance_mode_label,
         "leave_type_label": _leave_type_label,
+        "leave_status_label": _leave_status_label,
+        "delegation_status_label": _delegation_status_label,
+        "delegation_scope_label": _scope_label,
+        "leave_date_range_label": _leave_date_range_label,
+        "leave_duration_label": _leave_duration_label,
         "leave_create_submit_token": issue_form_token("hr_management", scope="leave_create"),
         "leave_balance_submit_token": issue_form_token("hr_management", scope="leave_balance"),
         "can_view_ai_admin": False,
@@ -270,7 +279,7 @@ def _set_status(model: Any, row_id: int, status: str, redirect_endpoint: str) ->
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Durum güncellenemedi: {exc}", "danger")
+        flash("Durum güncellenemedi.", "danger")
     return redirect(url_for(redirect_endpoint, scope=request.form.get("scope") or request.args.get("scope") or "personal"))
 
 
@@ -289,7 +298,7 @@ def _delete_row(model: Any, row_id: int, redirect_endpoint: str) -> Any:
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f"Kayıt silinemedi: {exc}", "danger")
+        flash("Kayıt silinemedi.", "danger")
     return redirect(url_for(redirect_endpoint, scope=request.form.get("scope") or request.args.get("scope") or "personal"))
 
 

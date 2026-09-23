@@ -154,8 +154,8 @@ def _support_tables_ready() -> bool:
         return cached
     try:
         existing = set(inspect(db.engine).get_table_names())
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=133")
+    except Exception as exc:
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=133 | exc=%s", exc)
         safe_db_rollback()
         return _store_ready_value("tables", False)
     return _store_ready_value("tables", SUPPORT_ALLOWED_TABLES.issubset(existing))
@@ -166,8 +166,8 @@ def _support_help_tables_ready() -> bool:
         return cached
     try:
         existing = set(inspect(db.engine).get_table_names())
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=146")
+    except Exception as exc:
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=146 | exc=%s", exc)
         safe_db_rollback()
         return _store_ready_value("help", False)
     return _store_ready_value("help", SUPPORT_HELP_ALLOWED_TABLES.issubset(existing))
@@ -520,9 +520,9 @@ def support_help_admin():
         if not _support_help_tables_ready():
             _ensure_support_help_tables_for_current_db()
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=515")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=515 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Yardım merkezi yönetim tabloları hazırlanamadı: {exc}", "danger")
+        flash("Yardım merkezi yönetim tabloları hazırlanamadı.", "danger")
     search_query = sanitize_free_text(request.args.get("q"), limit=120)
     status_filter = (request.args.get("status") or "all").strip().lower()
     items: list[SupportHelpArticle] = []
@@ -581,9 +581,9 @@ def support_help_admin_seed():
         db.session.commit()
         flash(f"Hazır yardım makaleleri veritabanına aktarıldı. Yeni eklenen kayıt: {inserted}", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=575")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=575 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Hazır makaleler aktarılırken hata oluştu: {exc}", "danger")
+        flash("Hazır makaleler aktarılırken hata oluştu.", "danger")
     return redirect(url_for("main.support_help_admin"))
 
 
@@ -596,9 +596,9 @@ def support_help_admin_new():
         if not _support_help_tables_ready():
             _ensure_support_help_tables_for_current_db()
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=589")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=589 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Yardım merkezi yönetim tablosu hazırlanamadı: {exc}", "danger")
+        flash("Yardım merkezi yönetim tablosu hazırlanamadı.", "danger")
         return redirect(url_for("main.support_help_admin"))
 
     if request.method == "POST":
@@ -641,9 +641,9 @@ def support_help_admin_new():
             flash("Yardım makalesi oluşturuldu.", "success")
             return redirect(url_for("main.support_help_admin"))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=633")
+            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=633 | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Makale oluşturulamadı: {exc}", "danger")
+            flash("Makale oluşturulamadı.", "danger")
 
     return safe_render(
         "support/help_admin_form.html",
@@ -662,9 +662,9 @@ def support_help_admin_edit(article_id: int):
         try:
             _ensure_support_help_tables_for_current_db()
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=653")
+            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=653 | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Yardım merkezi yönetim tablosu hazırlanamadı: {exc}", "danger")
+            flash("Yardım merkezi yönetim tablosu hazırlanamadı.", "danger")
             return redirect(url_for("main.support_help_admin"))
     article = SupportHelpArticle.query.get_or_404(article_id)
     if request.method == "POST":
@@ -699,9 +699,9 @@ def support_help_admin_edit(article_id: int):
             flash("Makale güncellendi.", "success")
             return redirect(url_for("main.support_help_admin"))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=689")
+            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=689 | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Makale güncellenemedi: {exc}", "danger")
+            flash("Makale güncellenemedi.", "danger")
     return safe_render(
         "support/help_admin_form.html",
         "<h3>Makale düzenleme formu yüklenemedi.</h3>",
@@ -724,9 +724,9 @@ def support_help_admin_toggle_publish(article_id: int):
         db.session.commit()
         flash("Makale yayın durumu güncellendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=713")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=713 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Makale yayın durumu güncellenemedi: {exc}", "danger")
+        flash("Makale yayın durumu güncellenemedi.", "danger")
     return redirect(url_for("main.support_help_admin"))
 
 
@@ -743,9 +743,9 @@ def support_help_admin_delete(article_id: int):
         db.session.commit()
         flash("Makale silindi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=731")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=731 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Makale silinemedi: {exc}", "danger")
+        flash("Makale silinemedi.", "danger")
     return redirect(url_for("main.support_help_admin"))
 
 
@@ -762,9 +762,9 @@ def support_setup():
             flash("Destek ve Talep Yönetimi tabloları kuruldu; yardım merkezi yönetim tablosu da hazırlandı.", "success")
             return redirect(url_for("main.support_index"))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=749")
+            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=749 | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Destek modülü kurulamadı: {exc}", "danger")
+            flash("Destek modülü kurulamadı.", "danger")
             is_ready = _support_tables_ready()
     return safe_render(
         "support/setup.html",
@@ -846,9 +846,9 @@ def support_new():
             safe_db_rollback()
             flash(str(exc), "danger")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=832")
+            logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=832 | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Talep oluşturulamadı: {exc}", "danger")
+            flash("Talep oluşturulamadı.", "danger")
 
     categories = SupportCategory.query.filter_by(is_active=True).order_by(SupportCategory.sort_order.asc(), SupportCategory.name.asc()).limit(SUPPORT_CATEGORY_LIMIT).all() if _support_tables_ready() else []
     return safe_render(
@@ -968,6 +968,7 @@ def support_detail(ticket_id: int):
         ticket=ticket,
         categories=categories,
         status_choices=SUPPORT_STATUS_CHOICES,
+        status_labels=_status_map(),
         assignable_users=assignable_users,
         can_manage=_can_use_all_support_view(),
     )
@@ -1008,9 +1009,9 @@ def support_comment(ticket_id: int):
         safe_db_rollback()
         flash(str(exc), "danger")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=993")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=993 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Yorum kaydedilemedi: {exc}", "danger")
+        flash("Yorum kaydedilemedi.", "danger")
     return redirect(url_for("main.support_detail", ticket_id=ticket.id))
 
 
@@ -1057,9 +1058,9 @@ def support_status(ticket_id: int):
         db.session.commit()
         flash("Talep durumu güncellendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1041")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1041 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Durum güncellenemedi: {exc}", "danger")
+        flash("Durum güncellenemedi.", "danger")
     return redirect(url_for("main.support_detail", ticket_id=ticket.id))
 
 
@@ -1094,9 +1095,9 @@ def support_assign(ticket_id: int):
         db.session.commit()
         flash("Talep ataması güncellendi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1077")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1077 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Atama güncellenemedi: {exc}", "danger")
+        flash("Atama güncellenemedi.", "danger")
     return redirect(url_for("main.support_detail", ticket_id=ticket.id))
 
 
@@ -1130,9 +1131,9 @@ def support_rate(ticket_id: int):
         db.session.commit()
         flash("Destek değerlendirme notunuz kaydedildi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1112")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1112 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Değerlendirme kaydedilemedi: {exc}", "danger")
+        flash("Değerlendirme kaydedilemedi.", "danger")
     return redirect(url_for("main.support_detail", ticket_id=ticket.id))
 
 
@@ -1207,8 +1208,8 @@ def support_help_admin_sync():
         db.session.commit()
         flash(f"Hazır rehberler eşitlendi. Yeni: {inserted} | Güncellenen: {updated} | Atlanan(manuel): {skipped}", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1190")
+        logger.exception("BYS360 V6C guarded exception | file=app/support/routes.py | line=1190 | exc=%s", exc)
         safe_db_rollback()
-        flash(f"Hazır rehberler güncellenemedi: {exc}", "danger")
+        flash("Hazır rehberler güncellenemedi.", "danger")
     return redirect(url_for("main.support_help_admin"))
 # BYS360_SUPPORT_NEW_REQUEST_TAXONOMY_V1: Yeni talep ekranında kategori kullanıcıdan kaldırıldı; iç kategori talep türünden otomatik eşlenir.

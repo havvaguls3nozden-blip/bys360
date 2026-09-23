@@ -29,8 +29,8 @@ try:
         save_config,
     )
 except Exception as exc:  # Service yoksa sayfa yine açılsın, sistem düşmesin.
-    logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=24")
-    _SERVICE_ERROR = str(exc)
+    logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=24 | exc=%s", exc)
+    _SERVICE_ERROR = "Günlük hava maili servisi şu anda kullanılamıyor."
     DAILY_WEATHER_MENU_KEY = "executive_summary_daily_weather_mail"
 
     def ensure_daily_weather_defaults(actor_user_id: int | None = None) -> None:
@@ -140,8 +140,8 @@ def daily_weather_mail_settings():
         try:
             preview = preview_daily_weather_mail(selected_users[0] if selected_users else current_user)
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=132")
-            preview_error = str(exc)
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=132 | exc=%s", exc)
+            preview_error = "Önizleme oluşturulamadı."
     try:
         return render_template("executive_summary/mail_center/overview.html",
             config=config,
@@ -180,8 +180,8 @@ def daily_weather_mail_save_settings():
         save_config(payload, actor_user_id=getattr(current_user, "id", None))
         flash("Günlük personel bilgilendirme maili ayarları kaydedildi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=171")
-        flash(f"Ayarlar kaydedilemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=171 | exc=%s", exc)
+        flash("Ayarlar kaydedilemedi.", "danger")
     return redirect("/executive-summary/daily-weather-mail")
 
 
@@ -201,8 +201,8 @@ def daily_weather_mail_send_now():
         else:
             flash(f"Gönderim tamamlandı ancak hata var. Başarılı: {result.get('sent', 0)}, Hatalı: {result.get('failed', 0)}", "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=191")
-        flash(f"Gönderim başlatılamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=191 | exc=%s", exc)
+        flash("Gönderim başlatılamadı.", "danger")
     return redirect("/executive-summary/daily-weather-mail")
 
 
@@ -220,7 +220,7 @@ def daily_weather_mail_dry_run():
         else:
             flash(f"Kuru çalışma tamamlandı. Alıcı sayısı: {result.get('recipient_count', 0)}. Gerçek mail gönderilmedi.", "info")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=209")
-        flash(f"Kuru çalışma başlatılamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/daily_weather_mail_routes.py | line=209 | exc=%s", exc)
+        flash("Kuru çalışma başlatılamadı.", "danger")
     return redirect("/executive-summary/daily-weather-mail")
 

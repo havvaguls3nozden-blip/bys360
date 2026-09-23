@@ -64,7 +64,7 @@
           <article class="home-v251-showcase-card">
             <div class="home-v251-showcase-icon"><i class="fa-regular fa-star"></i></div>
             <div class="home-v251-showcase-body">
-              <span>{% if post and post.post_type == 'instagram' %}Instagram{% else %}{{ (post.post_type if post and post.post_type else 'Paylaşım')|replace('_',' ')|title }}{% endif %}</span>
+              <span>{% if post and post.post_type == 'instagram' %}Instagram{% else %}{{ item.post_type_label if item.post_type_label is defined else 'Paylaşım' }}{% endif %}</span>
               <h4>{{ _post_title(item) }}</h4>
               <p>{{ _post_body(item) }}</p>
             </div>

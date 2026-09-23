@@ -112,7 +112,7 @@
     <section class="rm-tools" aria-label="Rol matrisi araçları">
         <input id="rmSearch" class="rm-search" type="search" placeholder="Sekme, modül, rol veya anahtar kelime ara..." autocomplete="off">
         <div class="rm-tool-buttons">
-            <button class="rm-small-btn" type="button" onclick="window.print()"><i class="fa-solid fa-print"></i> Yazdır</button>
+            <button class="rm-small-btn" type="button" id="rmPrintButton"><i class="fa-solid fa-print"></i> Yazdır</button>
             <button class="rm-small-btn" type="button" id="rmClearSearch"><i class="fa-solid fa-eraser"></i> Aramayı Temizle</button>
             <button class="rm-small-btn" type="button" id="rmCopySummary"><i class="fa-solid fa-copy"></i> Özeti Kopyala</button>
         </div>
@@ -213,6 +213,7 @@
     const clearButton = document.getElementById('rmClearSearch');
     const copyButton = document.getElementById('rmCopySummary');
     const noResults = document.getElementById('rmNoResults');
+    const printButton = document.getElementById('rmPrintButton');
     const rows = Array.from(document.querySelectorAll('[data-rm-row]'));
     const cards = Array.from(document.querySelectorAll('[data-rm-group]'));
     const roleCards = Array.from(document.querySelectorAll('[data-role-card]'));
@@ -242,6 +243,7 @@
         if(noResults){ noResults.classList.toggle('show', q.length > 0 && visibleRowCount === 0); }
     }
 
+    if(printButton){ printButton.addEventListener('click', function(){ window.print(); }); }
     if(searchInput){ searchInput.addEventListener('input', applySearch); }
     if(clearButton){ clearButton.addEventListener('click', function(){ if(searchInput){ searchInput.value=''; applySearch(); searchInput.focus(); } }); }
     if(copyButton){ copyButton.addEventListener('click', function(){

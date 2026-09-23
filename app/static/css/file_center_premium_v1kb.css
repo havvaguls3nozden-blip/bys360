@@ -282,3 +282,21 @@ body:has(.wrap .card .head){
   .fc-card,.fc-stat,.fc-linkbox,.fc-empty,.fc-soft{border-radius:20px !important;}
   .fc-settings-shell .fc-grid{grid-template-columns:1fr !important;}
 }
+
+/* BYS360 CSP Style-2A pilot -- index.html-only layout/color utility classes.
+   Behavior-preserving: each declaration reproduces, byte for byte, a
+   declaration that previously lived in a style="..." attribute on the
+   corresponding element. No forced-priority declarations, no ID
+   selectors, no new CSS custom properties (kept as a literal color value
+   rather than referencing the existing --fc-primary custom property,
+   which currently resolves to the same #8B0000, to guarantee an exact,
+   order-independent match with the attribute it replaces). */
+.fc-hero-copy{
+  max-width:820px;
+}
+.fc-hero-security-box{
+  min-width:250px;
+}
+.fc-upload-icon-color{
+  color:#8B0000;
+}

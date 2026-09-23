@@ -13,7 +13,6 @@ Kritik sınırlar:
 """
 from __future__ import annotations
 
-import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime
@@ -350,136 +349,8 @@ def phase12_build_report(root: str | Path, phase_statuses: list[Phase12PhaseStat
     }
 
 
-def ensure_phase12_tables(db: Any | None = None) -> dict[str, Any]:
-    try:
-        if db is None:
-            from app import db as flask_db
-            db = flask_db
-        from sqlalchemy import text
-        db.session.execute(text(f"""
-            CREATE TABLE IF NOT EXISTS {PHASE12_REPORT_TABLE_NAME} (
-                id SERIAL PRIMARY KEY,
-                run_key VARCHAR(120),
-                generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                completion_score NUMERIC(6,2),
-                status_label VARCHAR(255),
-                report_json TEXT,
-                created_by VARCHAR(120)
-            )
-        """))
-        db.session.commit()
-        return {"ok": True, "table": PHASE12_REPORT_TABLE_NAME}
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        try:
-            if db is not None:
-                db.session.rollback()
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:372")
-        return {"ok": False, "error": str(exc), "table": PHASE12_REPORT_TABLE_NAME}
-
-
-def seed_phase12_final_gate_settings(db: Any | None = None) -> dict[str, Any]:
-    try:
-        if db is None:
-            from app import db as flask_db
-            db = flask_db
-        from sqlalchemy import inspect, text
-        table_result = ensure_phase12_tables(db)
-        bind = db.session.get_bind()
-        inspector = inspect(bind)
-        if "module_settings" not in inspector.get_table_names():
-            return {"ok": False, "error": "module_settings tablosu bulunamadı", "table": table_result}
-        columns = {col["name"] for col in inspector.get_columns("module_settings")}
-        required = {"module_key", "setting_key"}
-        if not required.issubset(columns):
-            return {"ok": False, "error": "module_settings tablo kolonları eksik", "columns": sorted(columns), "table": table_result}
-        created: list[str] = []
-        updated: list[str] = []
-        for module_key, setting_key, label, value_type, default_value, description in PHASE12_SETTING_ROWS:
-            existing = db.session.execute(
-                text("SELECT id FROM module_settings WHERE module_key=:module_key AND setting_key=:setting_key LIMIT 1"),
-                {"module_key": module_key, "setting_key": setting_key},
-            ).mappings().first()
-            payload: dict[str, Any] = {}
-            if "module_key" in columns:
-                payload["module_key"] = module_key
-            if "setting_key" in columns:
-                payload["setting_key"] = setting_key
-            if "label" in columns:
-                payload["label"] = label
-            if "value_type" in columns:
-                payload["value_type"] = value_type
-            if "description" in columns:
-                payload["description"] = description
-            if "is_active" in columns:
-                payload["is_active"] = True
-            if "value_text" in columns:
-                payload["value_text"] = str(default_value)
-            if "value" in columns:
-                payload["value"] = str(default_value)
-            if "default_value" in columns:
-                payload["default_value"] = str(default_value)
-            if existing:
-                update_cols = [key for key in payload if key not in {"module_key", "setting_key"}]
-                if update_cols:
-                    set_sql = ", ".join(f"{col}=:{col}" for col in update_cols)
-                    params = {col: payload[col] for col in update_cols}
-                    params["row_id"] = existing["id"]
-                    db.session.execute(text(f"UPDATE module_settings SET {set_sql} WHERE id=:row_id"), params)
-                updated.append(f"{module_key}.{setting_key}")
-            else:
-                insert_cols = list(payload.keys())
-                col_sql = ", ".join(insert_cols)
-                val_sql = ", ".join(f":{col}" for col in insert_cols)
-                db.session.execute(text(f"INSERT INTO module_settings ({col_sql}) VALUES ({val_sql})"), payload)
-                created.append(f"{module_key}.{setting_key}")
-        db.session.commit()
-        return {"ok": bool(table_result.get("ok")), "created": created, "updated": updated, "table": table_result}
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        try:
-            if db is not None:
-                db.session.rollback()
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:428")
-        return {"ok": False, "error": str(exc)}
-
-
-def save_phase12_final_gate_report(report: dict[str, Any], db: Any | None = None, created_by: str = "system") -> dict[str, Any]:
-    try:
-        if db is None:
-            from app import db as flask_db
-            db = flask_db
-        from sqlalchemy import text
-        table_result = ensure_phase12_tables(db)
-        if not table_result.get("ok"):
-            return {"ok": False, "table": table_result}
-        run_key = "phase12-" + datetime.now().strftime("%Y%m%d%H%M%S")
-        db.session.execute(
-            text(f"""
-                INSERT INTO {PHASE12_REPORT_TABLE_NAME}
-                (run_key, completion_score, status_label, report_json, created_by)
-                VALUES (:run_key, :completion_score, :status_label, :report_json, :created_by)
-            """),
-            {
-                "run_key": run_key,
-                "completion_score": report.get("completion_score", 0),
-                "status_label": report.get("status_label", ""),
-                "report_json": json.dumps(report, ensure_ascii=False, default=str),
-                "created_by": created_by,
-            },
-        )
-        db.session.commit()
-        return {"ok": True, "run_key": run_key, "table": PHASE12_REPORT_TABLE_NAME}
-    except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        try:
-            if db is not None:
-                db.session.rollback()
-        except Exception:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            logging.getLogger(__name__).exception("BYS360 suppressed exception captured in app/services/performance/phase12_performance_final_gate_center.py:462")
-        return {"ok": False, "error": str(exc), "table": PHASE12_REPORT_TABLE_NAME}
+# BYS360 DEFECT AR: ensure_phase12_tables()/seed_phase12_final_gate_settings()/
+# save_phase12_final_gate_report() kaldirildi -- repo genelinde (app/,
+# tests/, scripts/) hicbir gercek cagirani yoktu (yalnizca artik silinmis
+# olan performance_completion_final_gate.py bridge dosyasi re-export
+# ediyordu, o da hicbir yerden import edilmiyordu).

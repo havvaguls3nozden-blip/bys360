@@ -236,6 +236,14 @@ def create_or_update_period_from_plan(plan_key: str, *, created_by: int | None =
     period = _find_period(existing.get("period_id") if existing else None)
     action = "updated"
     if period is None:
+        # BYS360 DEFECT AD: this new row is ALWAYS flushed (real INSERT)
+        # below, before the deactivate-others step further down runs.
+        # Constructing it with is_active=True directly would momentarily
+        # coexist with any already-active period at flush time -- fine
+        # under the old no-DB-constraint world, but a real IntegrityError
+        # once the AD single-active-period partial unique index exists.
+        # is_active is set to True only after that deactivation has run
+        # (see below), never here.
         period = PerformancePeriod(
             title=title,
             name=title,
@@ -243,7 +251,7 @@ def create_or_update_period_from_plan(plan_key: str, *, created_by: int | None =
             start_date=start,
             end_date=end,
             description="BYS360 V2.1.6 kategori kapsam planından local ortamda oluşturuldu.",
-            is_active=bool(activate_period),
+            is_active=False,
         )
         _db().session.add(period)
         _db().session.flush()
@@ -254,8 +262,6 @@ def create_or_update_period_from_plan(plan_key: str, *, created_by: int | None =
         period.period_type = _safe_text(plan.get("period_type")) or "special"
         period.start_date = start
         period.end_date = end
-        if activate_period:
-            period.is_active = True
         if not _safe_text(getattr(period, "description", "")):
             period.description = "BYS360 V2.1.6 kategori kapsam planı bağlantısı."
 
@@ -266,6 +272,29 @@ def create_or_update_period_from_plan(plan_key: str, *, created_by: int | None =
     _set_if_has(period, "special_scenario_type", "category_scope")
     _set_if_has(period, "results_published", False)
     _set_if_has(period, "is_locked", False)
+
+    if activate_period:
+        # BYS360 DEFECT W: reuses the same canonical single-active-period
+        # invariant enforced by performance_period_toggle_active
+        # (app/performance/admin_core_routes.py) -- activating a period
+        # through this integration path must not leave two periods active.
+        #
+        # BYS360 DEFECT AD: this deactivation MUST be issued, and its
+        # autoflush-triggered SQL MUST execute, before `period.is_active`
+        # is set to True in Python below. SQLAlchemy autoflushes ALL
+        # pending object changes before running a new Query.update() --
+        # if `period.is_active = True` were already pending when this
+        # runs, that autoflush would emit period's own UPDATE ... is_active=1
+        # BEFORE the deactivation UPDATE below, momentarily leaving two
+        # active rows and violating the AD unique index. Setting it True
+        # only after this call keeps every emitted statement at
+        # zero-or-one active rows, never two.
+        (
+            PerformancePeriod.query
+            .filter(PerformancePeriod.is_active.is_(True), PerformancePeriod.id != period.id)
+            .update({PerformancePeriod.is_active: False}, synchronize_session=False)
+        )
+        period.is_active = True
 
     _db().session.flush()
     payload = {

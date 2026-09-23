@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.models import EvaluationAssignment
+
 
 def phase3c_mobile_performance_in_period_notes_v2853_service(user: Any, deps: dict[str, Any]):
     PerformancePeriod = deps['PerformancePeriod']
@@ -77,6 +79,7 @@ def phase3c_mobile_performance_in_period_notes_v2853_service(user: Any, deps: di
 
 
 def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, deps: dict[str, Any]):
+    _has_global_scope = deps['_has_global_scope']
     _v2853_ensure_interim_notes_table = deps['_v2853_ensure_interim_notes_table']
     _v2853_note_bool = deps['_v2853_note_bool']
     _v2853_note_type_label = deps['_v2853_note_type_label']
@@ -101,8 +104,25 @@ def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, de
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         employee_id = None
+    requesting_user_id = int(getattr(user, 'id', 0) or 0)
     if not employee_id:
-        employee_id = int(getattr(user, 'id', 0) or 0)
+        employee_id = requesting_user_id
+    # BYS360 SECURITY FIX (Defect N): a caller may only create an in-period
+    # note about themselves (self-note, pre-existing default behavior),
+    # about anyone if they hold global scope, or about an employee they are
+    # a real EvaluationAssignment evaluator for. Any other target is denied
+    # BEFORE the INSERT/commit -- fail closed on lookup errors.
+    if employee_id != requesting_user_id and not _has_global_scope(user):
+        try:
+            has_relationship = EvaluationAssignment.query.filter_by(
+                evaluator_id=requesting_user_id,
+                employee_id=employee_id,
+            ).first() is not None
+        except Exception:
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            has_relationship = False
+        if not has_relationship:
+            return jsonify({'message': 'Bu personel için not oluşturma yetkiniz bulunmamaktadır.'}), 403
     note_type = str(payload.get('note_type') or 'genel_gozlem').strip()[:80] or 'genel_gozlem'
     title = str(payload.get('title') or _v2853_note_type_label(note_type)).strip()[:255]
     remind = _v2853_note_bool(payload.get('remind_during_scoring'), True)
@@ -129,10 +149,10 @@ def phase3c_mobile_performance_create_in_period_note_v2853_service(user: Any, de
             'include': include,
         })
         db.session.commit()
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
-        return jsonify({'message': f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}'}), 500
+        return jsonify({'message': 'Dönem içi not kaydedilemedi. Lütfen tekrar deneyin.'}), 500
     return jsonify({'source': 'real_api', 'ok': True, 'message': 'Dönem içi not kaydedildi.'})
 
 
@@ -156,14 +176,32 @@ def phase3c_mobile_performance_note_scorecard_v2863a_service(user: Any, deps: di
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/api/mobile/performance_routes.py:1699)")
-    from sqlalchemy import text as _sql_text
+    from sqlalchemy import inspect as _sql_inspect, text as _sql_text
+    # BYS360 DEFECT AJ: "ADD COLUMN IF NOT EXISTS" is PostgreSQL-only --
+    # SQLite raises sqlite3.OperationalError: near "EXISTS": syntax error
+    # unconditionally (confirmed empirically, identical to Defect AI's
+    # finding in process_engine_phase8_tracking.py), which the broad except
+    # below silently swallowed on every SQLite call. Existence is now
+    # checked first via SQLAlchemy's dialect-neutral inspect(), then a
+    # plain ADD COLUMN (portable to both dialects) runs only when missing.
     try:
-        db.session.execute(_sql_text('ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS include_in_scorecard BOOLEAN DEFAULT FALSE'))
-        db.session.execute(_sql_text('ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT TRUE'))
-        db.session.execute(_sql_text('ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS title VARCHAR(255) NULL'))
-        db.session.execute(_sql_text('ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS note TEXT NULL'))
-        db.session.execute(_sql_text('ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS note_body TEXT NULL'))
-        db.session.execute(_sql_text("ALTER TABLE performance_interim_notes ADD COLUMN IF NOT EXISTS note_type VARCHAR(80) NOT NULL DEFAULT 'genel_gozlem'"))
+        _existing_note_cols = (
+            {c["name"] for c in _sql_inspect(db.engine).get_columns('performance_interim_notes')}
+            if _sql_inspect(db.engine).has_table('performance_interim_notes')
+            else set()
+        )
+        _note_columns_needed = {
+            'include_in_scorecard': 'BOOLEAN DEFAULT FALSE',
+            'is_active': 'BOOLEAN DEFAULT TRUE',
+            'title': 'VARCHAR(255) NULL',
+            'note': 'TEXT NULL',
+            'note_body': 'TEXT NULL',
+            'note_type': "VARCHAR(80) NOT NULL DEFAULT 'genel_gozlem'",
+        }
+        for _col_name, _col_ddl in _note_columns_needed.items():
+            if _col_name in _existing_note_cols:
+                continue
+            db.session.execute(_sql_text(f'ALTER TABLE performance_interim_notes ADD COLUMN {_col_name} {_col_ddl}'))
         db.session.commit()
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
@@ -188,7 +226,7 @@ def phase3c_mobile_performance_note_scorecard_v2863a_service(user: Any, deps: di
             type_label = _v2853_note_type_label(row.get('note_type'))
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            type_label = str(row.get('note_type') or 'Not').replace('_', ' ').title()
+            type_label = 'Not' if not row.get('note_type') else 'Bilinmiyor'
         title = str(row.get('title') or type_label or 'Karne Notu').strip()
         body = str(row.get('note') or row.get('note_body') or '').strip()
         meta = []

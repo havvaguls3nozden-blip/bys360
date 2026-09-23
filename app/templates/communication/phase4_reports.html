@@ -43,7 +43,7 @@
                 <td>{{ row.assignments }}</td>
                 <td>{{ row.completed }}</td>
                 <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td>
-                <td>{{ row.status }}</td>
+                <td>{{ payload.survey_status_labels.get(row.status, 'Bilinmiyor') }}</td>
               </tr>
               {% else %}
               <tr><td colspan="5" class="text-muted">Kayıt bulunamadı.</td></tr>
@@ -63,7 +63,7 @@
               {% for row in history.rows %}
               <tr>
                 <td>{{ row.title }}</td>
-                <td>{{ row.status }}</td>
+                <td>{{ row.status_label }}</td>
                 <td>{{ row.created_by }}</td>
                 <td>{{ row.created_at }}</td>
                 <td><a class="btn btn-sm btn-outline-secondary" href="{{ url_for('main.communication_phase4_report_detail', report_id=row.id) }}">Aç</a></td>

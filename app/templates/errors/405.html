@@ -4,54 +4,7 @@
   <meta charset="utf-8">
   <title>BYS360 - İzin Verilmeyen İşlem</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      margin: 0;
-      min-height: 100vh;
-      font-family: Arial, sans-serif;
-      background: #f5f7fb;
-      color: #1f2937;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      box-sizing: border-box;
-    }
-    .bys360-error-card {
-      max-width: 620px;
-      width: 100%;
-      background: #ffffff;
-      border: 1px solid #e5e7eb;
-      border-radius: 18px;
-      box-shadow: 0 16px 40px rgba(15, 23, 42, 0.08);
-      padding: 30px;
-    }
-    .bys360-error-code {
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: .12em;
-      color: #64748b;
-      text-transform: uppercase;
-      margin-bottom: 10px;
-    }
-    h1 {
-      font-size: 26px;
-      margin: 0 0 12px;
-      color: #0f172a;
-    }
-    p {
-      font-size: 16px;
-      line-height: 1.55;
-      margin: 0 0 10px;
-    }
-    a {
-      display: inline-block;
-      margin-top: 16px;
-      color: #1d4ed8;
-      text-decoration: none;
-      font-weight: 700;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/error_pages_shared.css') }}">
 </head>
 <body>
   <main class="bys360-error-card">

@@ -17,7 +17,7 @@ _BYS360_PROCESS_MENU_KEYS = ['performance_process_tracking', 'performance_proces
 
 _BYS360_PROCESS_MENU_ROLES = set(['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'])
 
-_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY = {'performance_process_tracking': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_process_reports': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_interim_notes': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_development_guidance': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_p3_reminders': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_archive': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'], 'performance_personnel_support_publish_approval': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani'], 'performance_president_approvals': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan']}
+_BYS360_PERFORMANCE_ROLE_MATRIX_NEW_TAB_POLICY = {'performance_process_tracking': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_process_reports': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_interim_notes': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_development_guidance': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_p3_reminders': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_development': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_test_scenarios': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_development_faz3': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_meeting_final_gate': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'], 'performance_archive': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'], 'performance_personnel_support_publish_approval': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'grup_baskani'], 'performance_president_approvals': ['admin', 'super_admin', 'system_admin', 'sistem_yoneticisi', 'baskan']}
 
 _BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS = {
     "support_index", "support_new", "support_my_tickets", "support_assigned", "support_all",
@@ -29,6 +29,10 @@ _BYS360_ROLE_MATRIX_V12_AUTHORITY_KEYS = {
     "performance_process_tracking", "performance_process_reports", "performance_personnel_support_publish_approval",
     "performance_president_approvals", "performance_archive", "performance_interim_notes", "performance_development_guidance",
     "performance_meeting_p3_reminders",
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_AUTHORITY
+    "performance_meeting_development", "performance_meeting_test_scenarios",
+    "performance_meeting_development_faz3", "performance_meeting_final_gate",
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_AUTHORITY
 }
 
 _BYS360_ROLE_MATRIX_V12_POLICY = {
@@ -72,7 +76,7 @@ _BYS360_PERSONEL_ROLE_MATRIX_CURRENT_MANAGER_ROLES = {
     "koordinator", "koordinatör", "birim_sorumlusu",
 }
 
-_BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS = {'home', 'dashboard', 'notifications', 'announcements', 'account', 'settings', 'db_check', 'logout', 'support_index', 'support_new', 'support_my_tickets', 'support_assigned', 'support_all', 'support_help_admin', 'admin_users', 'org_units', 'hr_leave_tracking', 'performance_scorecard', 'my_performance_comparison', 'performance_reports', 'performance_tasks', 'performance_criteria', 'performance_periods', 'performance_evaluation_tasks', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_performance_comparison_history', 'performance_feedback_meetings', 'performance_publish', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_process_tracking', 'performance_process_reports', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_archive', 'performance_history_import', 'performance_mail_settings', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'messages', 'surveys', 'survey_manage', 'survey_results', 'feedback_dashboard', 'feedback_pulse', 'feedback_campaigns', 'feedback_results', 'feedback_actions', 'feedback_manager', 'feedback_admin', 'ai_center', 'ai_agent_panel', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
+_BYS360_ALL_MENU_ROLE_MATRIX_AUTHORITY_KEYS = {'home', 'dashboard', 'notifications', 'announcements', 'account', 'settings', 'db_check', 'logout', 'support_index', 'support_new', 'support_my_tickets', 'support_assigned', 'support_all', 'support_help_admin', 'admin_users', 'org_units', 'hr_leave_tracking', 'performance_scorecard', 'my_performance_comparison', 'performance_reports', 'performance_tasks', 'performance_criteria', 'performance_periods', 'performance_evaluation_tasks', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_performance_comparison_history', 'performance_feedback_meetings', 'performance_publish', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_process_tracking', 'performance_process_reports', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_meeting_development', 'performance_meeting_test_scenarios', 'performance_meeting_development_faz3', 'performance_meeting_final_gate', 'performance_archive', 'performance_history_import', 'performance_mail_settings', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'messages', 'surveys', 'survey_manage', 'survey_results', 'feedback_dashboard', 'feedback_pulse', 'feedback_campaigns', 'feedback_results', 'feedback_actions', 'feedback_manager', 'feedback_admin', 'ai_center', 'ai_agent_panel', 'ai_teaching_center', 'assistant_center', 'assistant_quick_help', 'assistant_my_summary', 'assistant_support_routing', 'assistant_performance_guidance', 'assistant_president_approval_guidance', 'assistant_publish_preapproval_guidance', 'assistant_interim_notes_guidance', 'assistant_development_guidance', 'assistant_archive_guidance', 'assistant_process_alerts', 'assistant_my_reminders', 'assistant_scheduled_tasks', 'assistant_report_generate', 'assistant_report_share', 'assistant_ai_summary', 'assistant_logs', 'assistant_settings'}
 
 _BYS360_ALL_MENU_ROLE_MATRIX_POLICY = {
     'performance_scorecard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
@@ -96,6 +100,12 @@ _BYS360_ALL_MENU_ROLE_MATRIX_POLICY = {
     'performance_interim_notes': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_meeting_p3_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_POLICY
+    'performance_meeting_development': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_test_scenarios': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_development_faz3': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_final_gate': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_POLICY
     'performance_archive': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel'},
     'performance_history_import': {'admin'},
     'performance_mail_settings': {'admin'},
@@ -146,7 +156,7 @@ _BYS360_ASSISTANT_TAB_POLICY = {
 
 _BYS360_PERFORMANCE_MAIN_KEYS = {'performance_module', 'performance_management', 'performans_yonetimi'}
 
-_BYS360_PERFORMANCE_CHILD_KEYS = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}
+_BYS360_PERFORMANCE_CHILD_KEYS = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_meeting_development', 'performance_meeting_test_scenarios', 'performance_meeting_development_faz3', 'performance_meeting_final_gate', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis'}
 
 _BYS360_PERFORMANCE_ALL_KEYS = set(_BYS360_PERFORMANCE_MAIN_KEYS) | set(_BYS360_PERFORMANCE_CHILD_KEYS)
 
@@ -184,6 +194,12 @@ _BYS360_PERFORMANCE_MAIN_SWITCH_POLICY = {
     'performance_interim_notes': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_development_guidance': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_meeting_p3_reminders': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_MAIN_SWITCH_POLICY
+    'performance_meeting_development': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_test_scenarios': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_development_faz3': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    'performance_meeting_final_gate': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_MAIN_SWITCH_POLICY
     'performance_kpi_dashboard': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
     'performance_kpi_management': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator'},
     'performance_competency_library': {'admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu'},
@@ -199,7 +215,7 @@ _BYS360_PERFORMANCE_MAIN_KEYS_V4 = {'performance_module', 'performance_managemen
 
 _BYS360_PERFORMANCE_GENERAL_SHORTCUT_KEYS_V4 = {'performance_tasks', 'performance_scorecard', 'performance_archive', 'my_performance_comparison', 'performance_reports'}
 
-_BYS360_PERFORMANCE_CHILD_KEYS_V4 = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'performance_feedback_aftercare', 'performance_feedback_aftercare_new', 'performance_feedback_meeting_guide', 'performance_feedback_followup'}
+_BYS360_PERFORMANCE_CHILD_KEYS_V4 = {'performance_tasks', 'performance_scorecard', 'scorecards', 'my_performance_comparison', 'performance_dashboard', 'performance_reports', 'performance_criteria', 'criteria', 'performance_periods', 'periods', 'performance_evaluation_tasks', 'assignments', 'performance_task_management', 'performance_hierarchy_tree', 'performance_hierarchy_assignments', 'performance_team_compare', 'team_analysis', 'team_performance_comparison_history', 'performance_feedback_meetings', 'feedback_meetings', 'performance_publish', 'publish', 'performance_mail_settings', 'performance_mail', 'performance_process_tracking', 'performance_process_reports', 'performance_president_approvals', 'performance_personnel_support_publish_approval', 'performance_archive', 'performance_interim_notes', 'performance_development_guidance', 'performance_meeting_p3_reminders', 'performance_meeting_development', 'performance_meeting_test_scenarios', 'performance_meeting_development_faz3', 'performance_meeting_final_gate', 'performance_kpi_dashboard', 'performance_kpi_management', 'performance_competency_library', 'performance_self_assessment', 'performance_kpi_analysis', 'performance_feedback_aftercare', 'performance_feedback_aftercare_new', 'performance_feedback_meeting_guide', 'performance_feedback_followup'}
 
 _BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS = {"admin_users", "org_units", "hr_management", "hr_leave_tracking", "hr_reports"}
 
@@ -246,6 +262,12 @@ _BYS360_PERF_RM_V8_ALIAS_GROUPS = {
     "performance_interim_notes": ["performance_interim_notes"],
     "performance_development_guidance": ["performance_development_guidance"],
     "performance_meeting_p3_reminders": ["performance_meeting_p3_reminders"],
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ALIAS_GROUPS
+    "performance_meeting_development": ["performance_meeting_development"],
+    "performance_meeting_test_scenarios": ["performance_meeting_test_scenarios"],
+    "performance_meeting_development_faz3": ["performance_meeting_development_faz3"],
+    "performance_meeting_final_gate": ["performance_meeting_final_gate"],
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ALIAS_GROUPS
     "performance_feedback_aftercare": ["performance_feedback_aftercare"],
     "performance_feedback_aftercare_new": ["performance_feedback_aftercare_new"],
     "performance_feedback_meeting_guide": ["performance_feedback_meeting_guide"],
@@ -310,6 +332,12 @@ _BYS360_PERF_RM_V8_ROLE_POLICY = {
     "performance_interim_notes": _BYS360_PERF_RM_V8_MANAGER_ROLES,
     "performance_development_guidance": _BYS360_PERF_RM_V8_MANAGER_ROLES,
     "performance_meeting_p3_reminders": _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_POLICY
+    "performance_meeting_development": _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    "performance_meeting_test_scenarios": _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    "performance_meeting_development_faz3": _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    "performance_meeting_final_gate": _BYS360_PERF_RM_V8_MANAGER_ROLES,
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_POLICY
     "performance_feedback_aftercare": _BYS360_PERF_RM_V8_MANAGER_ROLES,
     "performance_feedback_aftercare_new": _BYS360_PERF_RM_V8_MANAGER_ROLES,
     "performance_feedback_meeting_guide": _BYS360_PERF_RM_V8_MANAGER_ROLES,

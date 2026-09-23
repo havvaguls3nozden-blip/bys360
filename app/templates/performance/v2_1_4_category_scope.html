@@ -37,7 +37,7 @@
               <td>{{ cat.total_links }}<div class="bys-small">Personel, kapsam veya dönem bağlantısı varsa geçmiş kayıt korunur.</div></td>
               <td class="bys-actions">
                 {% if cat.is_active %}
-                <form method="post" onsubmit="return confirm('Bu kategori silinsin mi? Bağlı kayıt varsa kategori pasife alınır ve geçmiş korunur.');">{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<input type="hidden" name="action" value="delete_category"><input type="hidden" name="category_key" value="{{ cat.category_key }}"><button class="bys-btn danger" type="submit">{{ cat.delete_label }}</button></form>
+                <form method="post" data-confirm="Bu kategori silinsin mi? Bağlı kayıt varsa kategori pasife alınır ve geçmiş korunur.">{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<input type="hidden" name="action" value="delete_category"><input type="hidden" name="category_key" value="{{ cat.category_key }}"><button class="bys-btn danger" type="submit">{{ cat.delete_label }}</button></form>
                 {% else %}
                 <form method="post">{% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}<input type="hidden" name="action" value="restore_category"><input type="hidden" name="category_key" value="{{ cat.category_key }}"><button class="bys-btn soft" type="submit">Aktifleştir</button></form>
                 {% endif %}
@@ -78,4 +78,17 @@
     <table class="bys-table"><thead><tr><th>Kontrol</th><th>Durum</th><th>Açıklama</th></tr></thead><tbody>{% for item in gate.checks %}<tr><td>{{ corporate_gate_label(item.name) }}</td><td><span class="bys-badge {{ 'ok' if item.ok else 'warn' }}">{{ 'Geçti' if item.ok else 'Kontrol Gerekli' }}</span></td><td>{{ item.message }}</td></tr>{% endfor %}</tbody></table>
   </section>
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

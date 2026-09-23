@@ -56,22 +56,13 @@ class _KnownConflict(TypedDict):
 # Her girdi Phase 12A (Koordinatör + 3 ajan) tarafından runtime `app.url_map`
 # + `MapAdapter.match()` ile bağımsız doğrulandı (3/3 ajan aynı sonucu üretti).
 KNOWN_CONFLICTS: dict[str, _KnownConflict] = {
-    "/performans/baskan-onaylari": {
-        "methods": ["GET"],
-        "endpoints": [
-            "main.performance_president_approvals",
-            "main.president_low_score_approvals_center",
-        ],
-        "winners": {"GET": "main.performance_president_approvals"},
-        "note": (
-            "app/performance/process_engine_phase6_president_approvals_routes.py:31 kazanıyor "
-            "(app/performance/__init__.py çekirdek import sırasında erken yüklenir). "
-            "app/performance/president_low_score_card_routes.py:348 kayıtlı ama runtime'da hiç "
-            "seçilmiyor (farklı gövdeli fonksiyon, ayrı/kopya yetki implementasyonu, ham SQL "
-            "sorgu -> AGENTS.md 'farklı gövdeli fonksiyonlar SAFE kabul edilemez' eşiğini "
-            "geçmiyor; bu fazda kaldırılmadı, yalnız kilitlendi)."
-        ),
-    },
+    # BYS360 DEFECT AQ: /performans/baskan-onaylari kaydı burada kapatıldı --
+    # app/performance/president_low_score_card_routes.py'nin bu URL için
+    # kendi route kaydı kaldırıldı (fonksiyon ve yardımcıları korunarak),
+    # çünkü zaten hiçbir HTTP isteğinde seçilmiyordu. Artık bu URL için tek
+    # endpoint (main.performance_president_approvals) kayıtlı, bu yüzden
+    # aşağıdaki dedektör bu URL'yi çakışma olarak görmüyor -- bilinçli
+    # baseline güncellemesi.
     "/performans/baskan-onaylari/<int:approval_id>/karne": {
         "methods": ["GET"],
         "endpoints": [

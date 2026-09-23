@@ -26,7 +26,9 @@ from app.services.feedback_service import (
     change_campaign_status,
     create_action_plan,
     create_campaign_from_form,
+    get_action_priority_label,
     get_campaign_or_404,
+    get_campaign_status_label,
     get_campaign_type_label,
     get_pulse_history,
     get_today_pulse_entry,
@@ -63,7 +65,13 @@ def _can_export_feedback_now() -> bool:
 @menu_key_required('feedback_dashboard')
 def feedback_dashboard():
     context = build_dashboard_data(current_user)
-    return safe_render('feedback/dashboard.html', '<h3>Kurumsal Geri Bildirim ekranı yüklenemedi</h3>', **context)
+    return safe_render(
+        'feedback/dashboard.html',
+        '<h3>Kurumsal Geri Bildirim ekranı yüklenemedi</h3>',
+        get_campaign_type_label=get_campaign_type_label,
+        get_campaign_status_label=get_campaign_status_label,
+        **context,
+    )
 
 
 @main_bp.route('/feedback/pulse', methods=['GET', 'POST'])
@@ -85,9 +93,9 @@ def feedback_pulse():
             flash('Günlük nabız kaydınız kaydedildi.', 'success')
             return redirect(url_for('main.feedback_pulse'))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=89")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=89 | exc=%s", exc)
             safe_db_rollback()
-            flash(f'Nabız kaydı oluşturulamadı: {exc}', 'danger')
+            flash('Nabız kaydı oluşturulamadı.', 'danger')
     today_entry = get_today_pulse_entry(current_user)
     history_preview = get_pulse_history(current_user, 7)
     ai_pulse_guidance = build_pulse_form_guidance(today_entry, history_preview)
@@ -178,9 +186,9 @@ def feedback_campaign_detail(campaign_id: int):
             flash('Geri bildirim kaydınız alındı.', 'success')
             return redirect(url_for('main.feedback_campaigns'))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=188")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=188 | exc=%s", exc)
             safe_db_rollback()
-            flash(str(exc), 'danger')
+            flash('Geri bildirim kaydedilemedi.', 'danger')
     return safe_render(
         'feedback/campaign_take.html',
         '<h3>Kampanya ekranı yüklenemedi</h3>',
@@ -231,13 +239,20 @@ def feedback_actions():
             flash('Aksiyon durumu güncellendi.', 'success')
             return redirect(url_for('main.feedback_actions'))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=244")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=244 | exc=%s", exc)
             safe_db_rollback()
-            flash(f'Aksiyon güncellenemedi: {exc}', 'danger')
+            flash('Aksiyon güncellenemedi.', 'danger')
     actions = list_action_plans_for_user(current_user)
     campaigns = list_manageable_campaigns()
     managers = User.query.order_by(User.ad.asc(), User.soyad.asc()).all()
-    return safe_render('feedback/action_list.html', '<h3>Aksiyon listesi yüklenemedi</h3>', actions=actions, campaigns=campaigns, managers=managers)
+    return safe_render(
+        'feedback/action_list.html',
+        '<h3>Aksiyon listesi yüklenemedi</h3>',
+        actions=actions,
+        campaigns=campaigns,
+        managers=managers,
+        get_action_priority_label=get_action_priority_label,
+    )
 
 
 @main_bp.route('/feedback/actions/new', methods=['POST'])
@@ -249,9 +264,9 @@ def feedback_action_new():
         create_action_plan(actor=current_user, form=request.form)
         flash('İyileştirme aksiyonu oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=261")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=261 | exc=%s", exc)
         safe_db_rollback()
-        flash(f'Aksiyon oluşturulamadı: {exc}', 'danger')
+        flash('Aksiyon oluşturulamadı.', 'danger')
     return redirect(url_for('main.feedback_actions'))
 
 
@@ -265,7 +280,13 @@ def feedback_manager():
 
     summary = build_manager_summary(current_user)
     ai_manager_support = build_manager_decision_support(summary)
-    return safe_render('feedback/manager_view.html', '<h3>Yönetici görünümü yüklenemedi</h3>', summary=summary, ai_manager_support=ai_manager_support)
+    return safe_render(
+        'feedback/manager_view.html',
+        '<h3>Yönetici görünümü yüklenemedi</h3>',
+        summary=summary,
+        ai_manager_support=ai_manager_support,
+        get_campaign_status_label=get_campaign_status_label,
+    )
 
 
 @main_bp.route('/feedback/admin/campaigns')
@@ -279,6 +300,7 @@ def feedback_campaign_manage():
         '<h3>Kampanya yönetimi yüklenemedi</h3>',
         campaigns=campaigns,
         get_campaign_type_label=get_campaign_type_label,
+        get_campaign_status_label=get_campaign_status_label,
         campaign_includes_pulse=campaign_includes_pulse,
     )
 
@@ -294,9 +316,9 @@ def feedback_campaign_new():
             flash('Kampanya taslağı oluşturuldu.', 'success')
             return redirect(url_for('main.feedback_campaign_manage', campaign_id=campaign.id))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=308")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=308 | exc=%s", exc)
             safe_db_rollback()
-            flash(f'Kampanya oluşturulamadı: {exc}', 'danger')
+            flash('Kampanya oluşturulamadı.', 'danger')
     return safe_render('feedback/campaign_form.html', '<h3>Kampanya formu yüklenemedi</h3>')
 
 
@@ -310,9 +332,9 @@ def feedback_campaign_status(campaign_id: int):
         change_campaign_status(campaign=campaign, target_status=request.form.get('target_status') or 'draft')
         flash('Kampanya durumu güncellendi.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=323")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=323 | exc=%s", exc)
         safe_db_rollback()
-        flash(f'Kampanya durumu değiştirilemedi: {exc}', 'danger')
+        flash('Kampanya durumu değiştirilemedi.', 'danger')
     return redirect(url_for('main.feedback_campaign_manage'))
 
 
@@ -326,9 +348,9 @@ def feedback_campaign_publish(campaign_id: int):
         change_campaign_status(campaign=campaign, target_status='published')
         flash('Kampanya yayınlandı.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=338")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=338 | exc=%s", exc)
         safe_db_rollback()
-        flash(f'Kampanya yayınlanamadı: {exc}', 'danger')
+        flash('Kampanya yayınlanamadı.', 'danger')
     return redirect(url_for('main.feedback_campaign_manage'))
 
 
@@ -342,9 +364,9 @@ def feedback_campaign_close(campaign_id: int):
         change_campaign_status(campaign=campaign, target_status='closed')
         flash('Kampanya kapatıldı.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=353")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/feedback_routes.py | line=353 | exc=%s", exc)
         safe_db_rollback()
-        flash(f'Kampanya kapatılamadı: {exc}', 'danger')
+        flash('Kampanya kapatılamadı.', 'danger')
     return redirect(url_for('main.feedback_campaign_manage'))
 
 

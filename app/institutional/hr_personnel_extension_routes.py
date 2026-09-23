@@ -61,6 +61,13 @@ REMINDER_TYPE_LABELS = {
     "expired": "Süresi Dolan",
 }
 
+REMINDER_LOG_STATUS_LABELS = {
+    "queued": "Kuyrukta",
+    "sent": "Gönderildi",
+    "delivered": "İletildi",
+    "failed": "Başarısız",
+}
+
 DEFAULT_CHECKLIST_ITEMS = [
     {"code": "kimlik_bilgisi", "label": "Kimlik ve temel profil kontrolü", "category": "ozluk", "description": "Ad, soyad, sicil, e-posta ve birim bilgileri doğrulandı.", "sort_order": 10},
     {"code": "atama_yazisi", "label": "Atama / görevlendirme yazısı", "category": "gorev", "description": "Aktif görev veya son atama yazısı dosyada mevcut.", "sort_order": 20},
@@ -80,17 +87,22 @@ def _table_exists(table_name: str) -> bool:
 
 def _asset_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return ASSET_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return ASSET_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _checklist_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return CHECKLIST_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return CHECKLIST_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _reminder_type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return REMINDER_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return REMINDER_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
+
+
+def _reminder_log_status_label(value: str | None) -> str:
+    raw = (value or "").strip().lower()
+    return REMINDER_LOG_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _ensure_checklist_seed() -> None:
@@ -271,7 +283,7 @@ def hr_personnel_asset_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
         return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -294,7 +306,7 @@ def hr_personnel_asset_return(asset_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -315,7 +327,7 @@ def hr_personnel_asset_delete(asset_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_assets_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -436,7 +448,7 @@ def hr_personnel_checklist_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -457,7 +469,7 @@ def hr_personnel_checklist_delete(review_id: int):
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_checklist_center", scope=(request.form.get("scope") or "").strip() or None, user_id=_safe_int(request.form.get("user_id")) or None))
 
 
@@ -517,6 +529,7 @@ def hr_personnel_reminder_center():
                 "reminder_type": row.reminder_type or "manual",
                 "reminder_type_label": _reminder_type_label(row.reminder_type),
                 "status": row.status or "queued",
+                "status_label": _reminder_log_status_label(row.status or "queued"),
                 "due_date": row.due_date,
                 "created_at": row.created_at,
             })
@@ -569,7 +582,7 @@ def hr_personnel_reminder_run():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))
 
 
@@ -616,5 +629,5 @@ def hr_personnel_reminder_bulk():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_reminder_center", scope=(request.form.get("scope") or "").strip() or None, severity=(request.form.get("severity") or "all").strip() or None))

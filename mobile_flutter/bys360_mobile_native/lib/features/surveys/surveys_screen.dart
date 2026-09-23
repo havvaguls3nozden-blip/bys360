@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys360_logo.dart';
 import '../../core/widgets/bys_page.dart';
@@ -86,7 +87,7 @@ class _SurveysScreenState extends State<SurveysScreen> {
             onRefresh: _refresh,
             children: [
               ApiEmptyState(
-                message: snapshot.error.toString(),
+                message: BYS360Copy.error(snapshot.error),
                 onRetry: () => setState(() => _future = _load()),
               ),
             ],

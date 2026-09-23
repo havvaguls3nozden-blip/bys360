@@ -357,7 +357,7 @@ def make_effective_module():
 
 def test_build_no_user_and_success(monkeypatch):
     m = make_effective_module()
-    sys.modules[m.__name__] = m
+    monkeypatch.setitem(sys.modules, m.__name__, m)
     out = build.build_menu_visibility_map(None)
     assert out["home"] and out["account"] and out["logout"]
 
@@ -373,7 +373,7 @@ def test_build_no_user_and_success(monkeypatch):
 
 def test_build_fallback_rows_and_errors(monkeypatch):
     m = make_effective_module()
-    sys.modules[m.__name__] = m
+    monkeypatch.setitem(sys.modules, m.__name__, m)
     removed.clear()
     removed.add("gone")
     m.build_effective_user_menu_context = lambda *a, **k: (_ for _ in ()).throw(RuntimeError("x"))
@@ -420,7 +420,7 @@ def test_build_survey_and_exec_edge_paths(monkeypatch):
 
 def test_build_inline_state_and_exception_paths(monkeypatch):
     m = make_effective_module()
-    sys.modules[m.__name__] = m
+    monkeypatch.setitem(sys.modules, m.__name__, m)
     build._BYS360_EXEC_ADMIN_ONLY_ROLES = set()
     build._BYS360_EXEC_KNOWN_KEYS = {"executive_summary"}
     m._BYS360_PERSONEL_ROLE_MATRIX_VISIBILITY_V7_KEYS = {"admin_users", "custom"}

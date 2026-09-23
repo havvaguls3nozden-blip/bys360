@@ -28,22 +28,14 @@ THIRD_MANAGER_HEADER_ALIASES = [
 try:
     from app.services.personnel_sync_service import canonical_role_label, canonical_role_value
 except Exception:  # pragma: no cover
+    from app.services.role_display import ROLE_DISPLAY_LABELS, UNKNOWN_ROLE_DISPLAY_LABEL
+
     def canonical_role_value(raw_role: Any) -> str:
         return str(raw_role or 'personel').strip().lower().replace(' ', '_') or 'personel'
 
     def canonical_role_label(raw_role: Any) -> str:
         role = canonical_role_value(raw_role)
-        labels = {
-            'admin': 'Admin',
-            'baskan': 'Başkan',
-            'baskan_yardimcisi': 'Başkan Yardımcısı',
-            'grup_baskani': 'Grup Başkanı',
-            'mali_musavir': 'Mali Müşavir',
-            'birim_sorumlusu': 'Birim Sorumlusu',
-            'koordinator': 'Koordinatör',
-            'personel': 'Personel',
-        }
-        return labels.get(role, role.replace('_', ' ').title())
+        return ROLE_DISPLAY_LABELS.get(role, UNKNOWN_ROLE_DISPLAY_LABEL)
 
 
 @dataclass(slots=True)

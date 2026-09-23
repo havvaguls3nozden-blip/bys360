@@ -150,7 +150,7 @@
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
                   <button type="submit">{{ 'Pasifleştir' if item.is_active else 'Aktifleştir' }}</button>
                 </form>
-                <form method="post" action="{{ url_for('.ag5_knowledge_delete', entry_id=item.id) }}" onsubmit="return confirm('Bu bilgi kaydı silinsin mi?');">
+                <form method="post" action="{{ url_for('.ag5_knowledge_delete', entry_id=item.id) }}" data-confirm="Bu bilgi kaydı silinsin mi?">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
                   <button type="submit" class="danger">Sil</button>
                 </form>
@@ -166,4 +166,17 @@
     {% endif %}
   </section>
 </div>
+
+<script>
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
+})();
+</script>
 {% endblock %}

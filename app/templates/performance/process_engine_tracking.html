@@ -529,7 +529,7 @@
 
     <form class="bys-process-toolbar" method="get" action="/performans/surec-takibi">
         <input id="bysProcessSearch" class="bys-process-input" type="search" name="q" value="{{ search }}" placeholder="Personel, sorumlu, dönem veya işlem ara...">
-        <select class="bys-process-select" name="status" onchange="this.form.submit()">
+        <select class="bys-process-select" name="status" data-autosubmit="1">
             <option value="all" {% if status_filter in ['', 'all'] %}selected{% endif %}>Tüm süreçler</option>
             <option value="waiting" {% if status_filter in ['waiting', 'pending', 'bekleyen'] %}selected{% endif %}>Bekleyenler</option>
             <option value="overdue" {% if status_filter in ['overdue', 'geciken'] %}selected{% endif %}>Gecikenler</option>
@@ -569,7 +569,7 @@
                     </button>
                 </form>
                 {% if can_manage_process_tracking %}
-                <form method="post" action="/performans/surec-takibi/listeyi-temizle" style="margin:0;" onsubmit="return confirm('Görünen süreç takip kayıtları listeden kaldırılacak. Karne ve değerlendirme kayıtları silinmez. Devam edilsin mi?');">
+                <form method="post" action="/performans/surec-takibi/listeyi-temizle" style="margin:0;" data-confirm="Görünen süreç takip kayıtları listeden kaldırılacak. Karne ve değerlendirme kayıtları silinmez. Devam edilsin mi?">
                     {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
                     <input type="hidden" name="q" value="{{ search }}">
                     <input type="hidden" name="status" value="{{ status_filter }}">
@@ -720,7 +720,7 @@
                                     </a>
                                     {% endif %}
                                     {% if can_manage_process_tracking and item.get('flow_id') %}
-                                    <form method="post" action="/performans/surec-takibi/kayit-sil" style="margin:0;" onsubmit="return confirm('Bu kayıt yalnızca süreç takip listesinden kaldırılacak. Devam edilsin mi?');">
+                                    <form method="post" action="/performans/surec-takibi/kayit-sil" style="margin:0;" data-confirm="Bu kayıt yalnızca süreç takip listesinden kaldırılacak. Devam edilsin mi?">
                                         {% if csrf_token is defined %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endif %}
                                         <input type="hidden" name="flow_id" value="{{ item.get('flow_id') }}">
                                         <input type="hidden" name="q" value="{{ search }}">
@@ -782,6 +782,25 @@
     }
 
     if (search) search.addEventListener("input", applyLocalSearch);
+})();
+
+(function () {
+    document.querySelectorAll('[data-autosubmit]').forEach(function (el) {
+        el.addEventListener('change', function () {
+            if (this.form) this.form.submit();
+        });
+    });
+})();
+
+(function () {
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 })();
 </script>
 {% endblock %}

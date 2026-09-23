@@ -21,6 +21,19 @@
 .faz4-mobile-field__value .btn-soft,
 .faz4-mobile-field__value .support-btn{width:100%;justify-content:center}
 
+/* CSP style-2A pilot: static inline styles extracted from support templates (help_admin_list.html, detail.html, new.html) */
+.panel-heading{margin:0;font-size:1.12rem;font-weight:900;color:#111827}
+.panel-subtitle{margin:8px 0 0;color:#6b7280;line-height:1.8}
+.header-actions-row{display:flex;gap:10px;flex-wrap:wrap}
+.section-spacing-top-md{margin-top:16px}
+.section-spacing-top-lg{margin-top:18px}
+.section-spacing-bottom-md{margin-bottom:16px}
+.attachment-filename{font-weight:900;color:#111827}
+.checkbox-inline{display:inline-flex;align-items:center;gap:8px}
+.checkbox-inline--emphasis{font-weight:850;color:#374151}
+.section-divider{margin:18px 0;border:none;border-top:1px solid rgba(15,23,42,.08)}
+.field-helper-text{margin-top:6px;color:#6b7280;line-height:1.65;font-size:.9rem}
+
 @media (max-width: 991.98px){
   .settings-shell,
   .security-setup-shell,

@@ -13,6 +13,19 @@ Also locks in the follow-up Critical Operational CI Coverage Expansion
 across 2 isolated runs + 1 combined run) were added via the same Policy A
 single-invocation approach.
 
+``tests/workflow`` was later deleted in commit 5401195 ("remove orphan
+presentation subsystem", ORPHAN_CONFIRMED -- see that commit's message) along
+with the dead ``app/workflow/`` package it tested. The CI workflow's pytest
+command kept the now-nonexistent ``tests/workflow`` path for 5 days/12
+commits afterward, which made pytest exit 4 ("file or directory not found")
+on that step's ENTIRE positional-argument list -- zeroing out ~3400 tests and
+this step's coverage.xml output, and making every step after it (coverage
+ratchet, mypy, ops audit, Quality9, pip-audit) unreachable in real CI. The
+"BYS360 CI Coverage Gate Drift Closure" section below removes the stale path,
+wires in its replacement contract test file explicitly, and adds a
+filesystem-existence check over every CI-referenced test path so this class
+of drift cannot recur silently again.
+
 Also locks in the follow-up Communication/Behavior/Mobile CI Coverage
 Expansion (2026-07-27): ``tests/communication``, ``tests/behavior`` and
 ``tests/mobile`` (29 tests total, 0 cross-scope duplicate node IDs, 0
@@ -23,13 +36,21 @@ coverage, kept as required structural gates); tests/behavior imports real
 app.services/app.models and does contribute measurable app/ coverage.
 
 These are pure contract/parsing tests -- they read real repo files, they do
-not run the workflow or any subprocess.
+not run the workflow or any subprocess, with one deliberate exception: the
+BYS360 CI Coverage Gate Drift Closure section's
+``test_workflow_orphan_cleanup_contract_collects_exactly_82_tests`` runs a
+real ``pytest --collect-only`` subprocess against the replacement contract
+file, because only a real pytest collection pass -- not static AST parsing --
+can prove that file actually collects, given it mixes plain and
+``@pytest.mark.parametrize`` tests.
 """
 from __future__ import annotations
 
 import ast
 import json
 import re
+import subprocess
+import sys
 import tomllib
 from pathlib import Path
 
@@ -54,7 +75,7 @@ PRE_CLOSURE_BASELINE_COMBINED_PCT = 18.85
 # can never be silently lowered back toward it by a future edit.
 PRE_CRITICAL_EXPANSION_BASELINE_COMBINED_PCT = 23.27
 
-CRITICAL_OPERATIONAL_TEST_PATHS = ("tests/migrations", "tests/workflow", "tests/release")
+CRITICAL_OPERATIONAL_TEST_PATHS = ("tests/migrations", "tests/release")
 
 # The baseline in effect before the Communication/Behavior/Mobile CI Coverage
 # Expansion (2026-07-27) -- locked here so the ratchet can never be silently
@@ -674,3 +695,567 @@ def test_no_stale_quality_or_top_level_excluded_claim_in_workflow() -> None:
     ]
     for pattern in stale_patterns:
         assert pattern not in lowered, f"stale exclusion claim found in workflow: {pattern!r}"
+
+
+# =====================================================================
+# BYS360 CI Coverage Gate Drift Closure
+#
+# tests/workflow was deleted in commit 5401195 (dead app/workflow/ package,
+# ORPHAN_CONFIRMED) but the CI workflow kept referencing it as a pytest
+# positional path for 5 days/12 commits, which made pytest exit 4 ("file or
+# directory not found") on that step's ENTIRE argument list -- not just
+# skipping 7 tests, but silently zeroing out the whole ~3400-test coverage
+# step and every step after it (ratchet, mypy, ops audit, Quality9,
+# pip-audit). The pre-existing lock above (CRITICAL_OPERATIONAL_TEST_PATHS)
+# did not catch this because it only asserts the *string* "tests/workflow"
+# is present in the command -- true even after the directory no longer
+# existed on disk. This section closes both gaps: it removes the stale
+# path + wires in its replacement contract file, and it adds a
+# filesystem-existence check over every CI-referenced test path so this
+# class of drift (a real, once-valid path silently going stale) cannot
+# recur undetected for ANY path in this command, not just this one.
+# =====================================================================
+
+WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH = (
+    "tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_contract.py"
+)
+
+# Reviewed, human-verified collection count as of the drift-closure commit
+# (2026-08-11) -- an exact lock, not a >= floor, because this file's test
+# count is a known, reviewed contract value (consistent with this file's
+# existing test_exactly_33_.../test_exactly_14_... convention above): if a
+# future edit silently adds or removes parametrized cases, this test must
+# fail loudly and force a deliberate review of this constant, not pass
+# quietly on "at least as many as before".
+EXPECTED_WORKFLOW_ORPHAN_CLEANUP_CONTRACT_TEST_COUNT = 82
+
+# This wave (CI Coverage Gate Drift Closure) intentionally does not change
+# the coverage ratchet baseline -- see reports/quality/coverage_baseline.json
+# and its KEEP_24_16_BASELINE decision (a separate, human-reviewed action).
+#
+# The BYS360 Coverage Baseline Ratchet Elevation wave (2026-08-11) later DID
+# raise this baseline, deliberately and human-reviewed, after 3 independent
+# zero-variance fresh measurements (see coverage_baseline.json's own
+# _history entry for the full evidence trail) -- so this constant is kept
+# as the durable historical floor this baseline must never silently drop
+# back to, matching the PRE_*_EXPANSION_BASELINE_COMBINED_PCT convention
+# used elsewhere in this file, rather than an exact-equality lock.
+PRE_BASELINE_ELEVATION_COMBINED_PCT = 24.16
+
+
+def _coverage_instrumented_broad_step_tokens() -> list[str]:
+    return _coverage_instrumented_broad_step_command().split()
+
+
+def _ci_safe_step_tokens() -> list[str]:
+    return _ci_safe_step_command().split()
+
+
+def _referenced_test_paths(tokens: list[str]) -> list[str]:
+    """Positional pytest path arguments in a CI command -- tokens that look
+    like a tests/ path and are not an option flag or an option's value
+    (heuristic: preceded by another tests/-looking or bare token, not a
+    ``--flag``). Good enough for this workflow's simple space-separated,
+    no-shell-quoting command lines."""
+    paths = []
+    for index, token in enumerate(tokens):
+        if not token.startswith("tests/"):
+            continue
+        previous = tokens[index - 1] if index > 0 else ""
+        if previous.startswith("--") and "=" not in previous:
+            continue
+        paths.append(token)
+    return paths
+
+
+# --- Test: the stale tests/workflow path is gone from every CI-run command ---
+
+
+def test_tests_workflow_path_is_not_referenced_as_a_pytest_argument_anywhere() -> None:
+    for command in _ci_workflow_commands():
+        assert "tests/workflow" not in command.split(), (
+            f"tests/workflow no longer exists on disk (deleted in commit 5401195) and must not "
+            f"be a pytest positional argument in any CI command: {command!r}"
+        )
+
+
+# --- Test: every CI-referenced test path actually exists on disk (the check ---
+# --- that would have caught this exact class of drift) ---
+
+
+def test_every_referenced_test_path_in_the_coverage_instrumented_ci_step_exists_on_disk() -> None:
+    for path in _referenced_test_paths(_coverage_instrumented_broad_step_tokens()):
+        assert (ROOT / path).exists(), (
+            f"CI references {path!r} as a pytest path but it does not exist in the repo -- "
+            "this is exactly the drift class that broke this step for tests/workflow"
+        )
+
+
+def test_every_referenced_test_path_in_the_ci_safe_step_exists_on_disk() -> None:
+    for path in _referenced_test_paths(_ci_safe_step_tokens()):
+        assert (ROOT / path).exists(), f"CI references {path!r} as a pytest path but it does not exist in the repo"
+
+
+# --- Test: the replacement contract file is wired in explicitly ---
+
+
+def test_workflow_orphan_cleanup_contract_is_explicitly_named_in_the_coverage_instrumented_ci_step() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH in command.split(), (
+        "tests/quality/ is not swept as a whole directory by this step (it is scoped separately, "
+        "with a ci_safe marker filter, by the 'Run quality tests' step) -- the replacement contract "
+        "file must be named explicitly here to actually execute"
+    )
+
+
+def test_workflow_orphan_cleanup_contract_file_exists_on_disk() -> None:
+    assert (ROOT / WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH).is_file()
+
+
+def test_workflow_orphan_cleanup_contract_is_not_also_selected_by_the_ci_safe_step() -> None:
+    """Guards against double execution: if this file ever gains a module-level
+    ci_safe pytestmark, the 'Run quality tests' step (tests/quality -m
+    "ci_safe") would start collecting it too, on top of the explicit mention
+    in the broad step added here."""
+    tree = ast.parse((ROOT / WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH).read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "pytestmark" for target in node.targets
+        ):
+            raise AssertionError(
+                f"{WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH} must not declare a module-level "
+                "pytestmark -- it is already explicitly named in the broad coverage step; a "
+                "ci_safe marker would make the 'Run quality tests' step collect it a second time"
+            )
+
+
+def test_workflow_orphan_cleanup_contract_appears_in_exactly_one_ci_workflow_run_command() -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH in c.split()]
+    assert len(hits) == 1, (
+        f"expected {WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH} in exactly one CI run command, "
+        f"found {len(hits)}: {hits}"
+    )
+
+
+def test_workflow_orphan_cleanup_contract_collects_exactly_82_tests() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    match = re.search(r"(\d+) tests? collected", result.stdout)
+    assert match is not None, f"could not parse a collected-test count from pytest output: {result.stdout!r}"
+    collected = int(match.group(1))
+    assert collected == EXPECTED_WORKFLOW_ORPHAN_CLEANUP_CONTRACT_TEST_COUNT, (
+        f"{WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH} now collects {collected} tests, expected "
+        f"{EXPECTED_WORKFLOW_ORPHAN_CLEANUP_CONTRACT_TEST_COUNT} -- if this is a deliberate change, "
+        "update EXPECTED_WORKFLOW_ORPHAN_CLEANUP_CONTRACT_TEST_COUNT with a documented reason"
+    )
+
+
+# --- Test: coverage command semantics and downstream gate reachability preserved ---
+
+
+def test_coverage_command_semantics_unchanged_by_drift_closure() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert "--cov=app" in command
+    assert "--cov-append" in command
+    assert "--cov-report=xml:reports/quality/coverage.xml" in command
+    assert "--cov-fail-under=0" in command
+
+
+def test_coverage_ratchet_step_still_present_after_drift_closure() -> None:
+    commands = _ci_workflow_commands()
+    ratchet_hits = [
+        c
+        for c in commands
+        if "scripts/quality/bys360_coverage_ratchet.py" in c
+        and "--coverage-xml reports/quality/coverage.xml" in c
+        and "--baseline reports/quality/coverage_baseline.json" in c
+    ]
+    assert len(ratchet_hits) == 1, "coverage ratchet step must still be invoked with its exact XML/baseline paths"
+
+
+def test_mypy_step_still_present_and_ordered_after_ratchet_step() -> None:
+    workflow_text = CI_WORKFLOW.read_text(encoding="utf-8")
+    step_names = re.findall(r"^\s*- name:\s*(.+)$", workflow_text, flags=re.MULTILINE)
+    assert "Coverage ratchet gate" in step_names
+    assert "Type check service layer" in step_names
+    assert step_names.index("Coverage ratchet gate") < step_names.index("Type check service layer"), (
+        "the mypy step must remain reachable AFTER the coverage ratchet gate, not before it "
+        "(both are useless if a step earlier in the job silently aborts the whole job)"
+    )
+
+
+def test_quality9_ci_gate_reports_no_coverage_related_findings_after_drift_closure() -> None:
+    """Re-runs the same structural gate CI itself calls
+    (scripts/quality/bys360_quality9_ci_gate.py) against the fixed workflow --
+    none of its coverage/ratchet-related finding codes may appear."""
+    coverage_related_codes = {
+        "pytest_not_enforced",
+        "coverage_measurement_not_enforced",
+        "coverage_xml_not_enforced",
+        "coverage_ratchet_not_enforced",
+        "missing_coverage_ratchet_script",
+        "missing_coverage_baseline",
+    }
+    findings = quality9.check_workflow(ROOT, max_broad_except=2300)
+    found_codes = {finding.code for finding in findings if finding.code in coverage_related_codes}
+    assert not found_codes, f"drift closure introduced new Quality9 coverage findings: {found_codes}"
+
+
+def test_no_continue_on_error_introduced_by_drift_closure() -> None:
+    """Duplicates the intent of test_coverage_step_has_no_failure_suppression
+    above (whole-file check) as an explicit, drift-closure-scoped assertion:
+    fixing the stale path must not come with a quietly loosened gate."""
+    workflow_text = CI_WORKFLOW.read_text(encoding="utf-8")
+    assert "continue-on-error" not in workflow_text
+
+
+# --- Test: this wave's own explicit non-goal -- the coverage baseline is unchanged ---
+
+
+def test_coverage_ratchet_baseline_was_raised_past_pre_elevation_wave_value() -> None:
+    """CI Coverage Gate Drift Closure itself did not touch the baseline
+    (KEEP_24_16_BASELINE); the later Coverage Baseline Ratchet Elevation wave
+    is the one that deliberately raised it -- this must never silently drop
+    back to (or below) the pre-elevation floor."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    new_combined_pct = float(data["combined_pct"])
+    assert new_combined_pct > PRE_BASELINE_ELEVATION_COMBINED_PCT, (
+        f"new coverage_baseline.json combined_pct ({new_combined_pct}) must be strictly greater "
+        f"than the pre-elevation baseline ({PRE_BASELINE_ELEVATION_COMBINED_PCT})"
+    )
+
+
+# =====================================================================
+# BYS360 Coverage Baseline Ratchet Elevation (2026-08-11)
+# =====================================================================
+
+
+def test_coverage_baseline_tolerance_unchanged_by_elevation() -> None:
+    """The elevation wave's own stated non-goal: tolerance_pct is a separate,
+    already-reviewed safety-margin mechanism and must not be silently
+    widened or narrowed alongside a baseline raise."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    assert float(data["tolerance_pct"]) == 0.5
+
+
+def test_coverage_baseline_effective_threshold_still_well_above_pre_elevation_floor() -> None:
+    """Locks in that raising the baseline actually tightened real regression
+    protection: the new effective pass threshold (baseline - tolerance) must
+    itself sit comfortably above the pre-elevation baseline, not just above
+    the pre-elevation baseline's own (looser) effective threshold."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    effective_threshold = float(data["combined_pct"]) - float(data["tolerance_pct"])
+    assert effective_threshold > PRE_BASELINE_ELEVATION_COMBINED_PCT, (
+        f"new effective threshold ({effective_threshold}) must exceed the pre-elevation "
+        f"baseline ({PRE_BASELINE_ELEVATION_COMBINED_PCT}) for this to be a real tightening"
+    )
+
+
+# =====================================================================
+# BYS360 OpenAPI CI Assurance Debt Closure
+#
+# tests/quality/test_openapi_workflow_drift_cleanup_contract.py (44 tests,
+# added in commit 7a605b2 alongside docs/api/openapi_draft.json's removal of
+# 12 dead app/workflow/ OpenAPI path entries) carried no ci_safe marker and
+# was named nowhere in either CI workflow -- 0 of its 44 tests ever ran in
+# real CI. Unlike the tests/workflow drift closed above, this was not a
+# stale-path bug (the file's own path was always valid); it was simply never
+# wired in when it was written.
+#
+# Ownership: of tests/quality's 28 files, 26 (93%) already carry the
+# ci_safe marker and are collected by Step1 (`tests/quality -m "ci_safe"`)
+# with zero YAML changes -- this file and its 82-test sibling
+# (test_workflow_orphan_presentation_subsystem_cleanup_contract.py, already
+# wired into Step2 in the prior wave) were the only two exceptions. Four
+# other ci_safe-marked tests/quality files already use the identical
+# subprocess/isolated-create_app()-probe pattern this file uses
+# (test_phase12b_route_ownership_contract.py, test_route_conflict_runtime_
+# contract.py, test_president_approvals_route_contract.py, test_app_
+# factory_registers_routes_without_duplicate_endpoints.py) -- proving no
+# technical barrier to Step1. This file's own measured runtime (~0.12s/test)
+# is faster than Step1's current average (~0.30s/test). OPENAPI_CONTRACT_
+# CANONICAL_CI_OWNER = STEP1: the fix was a single pytestmark line in the
+# test file itself, not a workflow YAML change -- the Step1 command
+# (`tests/quality -m "ci_safe"`) is unchanged by this wave.
+# =====================================================================
+
+OPENAPI_CLEANUP_CONTRACT_PATH = "tests/quality/test_openapi_workflow_drift_cleanup_contract.py"
+EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT = 44
+
+
+def test_openapi_cleanup_contract_declares_ci_safe_pytestmark() -> None:
+    tree = ast.parse((ROOT / OPENAPI_CLEANUP_CONTRACT_PATH).read_text(encoding="utf-8"))
+    found = False
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign) and any(
+            isinstance(target, ast.Name) and target.id == "pytestmark" for target in node.targets
+        ):
+            found = True
+            break
+    assert found, f"{OPENAPI_CLEANUP_CONTRACT_PATH} must declare a module-level pytestmark (pytest.mark.ci_safe)"
+
+
+def test_openapi_cleanup_contract_file_exists_on_disk() -> None:
+    assert (ROOT / OPENAPI_CLEANUP_CONTRACT_PATH).is_file()
+
+
+def test_openapi_cleanup_contract_is_selected_by_the_unchanged_ci_safe_command() -> None:
+    """Mirrors test_quality_candidate_file_is_selected_by_the_unchanged_ci_safe_command
+    above (Phase 7 precedent): the file itself is never named in the ci_safe
+    command (whole-directory-plus-marker collection) -- this asserts it still
+    lives under the exact tests/quality tree that command scopes to, and that
+    the ci_safe command itself is untouched."""
+    commands = _ci_workflow_commands()
+    matches = [c for c in commands if "tests/quality" in c and '"ci_safe"' in c]
+    assert len(matches) == 1
+    assert OPENAPI_CLEANUP_CONTRACT_PATH.startswith("tests/quality/")
+
+
+def test_openapi_cleanup_contract_is_not_explicitly_named_in_the_coverage_instrumented_ci_step() -> None:
+    """Guards against double execution the other way around: since this file
+    is Step1-owned (via ci_safe marker, not explicit naming), it must never
+    also be named in Step2's command -- that would run all 44 tests twice
+    per CI run."""
+    command = _coverage_instrumented_broad_step_command()
+    assert OPENAPI_CLEANUP_CONTRACT_PATH not in command.split()
+
+
+def test_openapi_cleanup_contract_collects_exactly_44_tests() -> None:
+    result = subprocess.run(
+        [sys.executable, "-m", "pytest", "--collect-only", "-q", OPENAPI_CLEANUP_CONTRACT_PATH],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
+    match = re.search(r"(\d+) tests? collected", result.stdout)
+    assert match is not None, f"could not parse a collected-test count from pytest output: {result.stdout!r}"
+    collected = int(match.group(1))
+    assert collected == EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT, (
+        f"{OPENAPI_CLEANUP_CONTRACT_PATH} now collects {collected} tests, expected "
+        f"{EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT} -- if this is a deliberate change, "
+        "update EXPECTED_OPENAPI_CLEANUP_CONTRACT_TEST_COUNT with a documented reason"
+    )
+
+
+# =====================================================================
+# BYS360 Coverage Baseline Metadata Consistency Fix (2026-08-11)
+#
+# The elevation wave above correctly updated the ACTIVE combined_pct/lines/
+# branches/measured_at, but left coverage_baseline.json's own commands/
+# test_counts/repeatability fields describing the superseded Phase 9
+# measurement (stale tests/workflow token; Phase-9-era counts and
+# reproducibility numbers under a now-27.62 baseline). Unlike
+# previous_baseline (whose entire purpose is to hold the immediately-
+# preceding, historical snapshot), commands/test_counts/repeatability
+# describe the ACTIVE baseline and must track it. This section locks that
+# in going forward -- distinct from the existing tests above, which check
+# the CI *workflow YAML*, not coverage_baseline.json's own recorded copy
+# of those commands.
+# =====================================================================
+
+
+def test_coverage_baseline_pinned_at_current_elevated_value() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    assert data["combined_pct"] == 27.62
+    assert data["combined_pct_precise"] == pytest.approx(27.619308622802812)
+
+
+def test_coverage_baseline_recorded_commands_reference_no_stale_tests_workflow_path() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    for command in data.get("commands", []):
+        assert "tests/workflow" not in command.split(), (
+            "coverage_baseline.json's own recorded 'commands' must not reference the deleted "
+            "tests/workflow path -- it describes the ACTIVE baseline measurement, not a historical one"
+        )
+
+
+def test_coverage_baseline_recorded_commands_paths_exist_on_disk() -> None:
+    """coverage_baseline.json's own 'commands' field, not the CI workflow YAML
+    (already covered above) -- these must independently stay truthful."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    for command in data.get("commands", []):
+        for token in command.split():
+            if token.startswith("tests/") and not (token.startswith("--")):
+                assert (ROOT / token).exists(), f"coverage_baseline.json references {token!r} but it does not exist"
+
+
+def test_coverage_baseline_recorded_commands_include_current_workflow_cleanup_contract() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(WORKFLOW_ORPHAN_CLEANUP_CONTRACT_PATH in c.split() for c in commands)
+
+
+def test_coverage_baseline_recorded_commands_do_not_explicitly_name_the_step1_owned_openapi_contract() -> None:
+    """The OpenAPI contract is Step1-owned via ci_safe marker (see the
+    OPENAPI_CONTRACT_CANONICAL_CI_OWNER = STEP1 section above) -- it must
+    never appear as an explicit token in the recorded Step2 command, which
+    would misrepresent its real wiring mechanism."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert not any(OPENAPI_CLEANUP_CONTRACT_PATH in c.split() for c in commands)
+
+
+def test_coverage_baseline_test_counts_match_current_step_totals() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    counts = data["test_counts"]
+    assert counts["step1_ci_safe_passed"] + counts["step1_ci_safe_skipped"] == counts["step1_ci_safe_selected"]
+    assert (
+        counts["step2_broader_scope_passed"] + counts["step2_broader_scope_skipped"]
+        == counts["step2_broader_scope_selected"]
+    )
+    step2_sub_total = sum(v for k, v in counts.items() if k.startswith("step2_") and k.endswith("_contribution"))
+    assert step2_sub_total == counts["step2_broader_scope_selected"], (
+        f"step2_*_contribution fields sum to {step2_sub_total}, expected "
+        f"{counts['step2_broader_scope_selected']} (step2_broader_scope_selected)"
+    )
+
+
+def test_coverage_baseline_repeatability_is_zero_variance_across_all_recorded_runs() -> None:
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    rep = data["repeatability"]
+    run_values = [v for k, v in rep.items() if k.startswith("run_") and k.endswith("_combined_pct_precise")]
+    assert len(run_values) >= 3, "expected at least 3 recorded independent runs for the elevated baseline"
+    assert min(run_values) == max(run_values) == data["combined_pct_precise"], (
+        "all recorded repeatability runs must be identical to each other and to the active "
+        "combined_pct_precise -- zero variance is the elevation wave's own documented finding"
+    )
+
+
+# =====================================================================
+# BYS360 P0 Critical Coverage Hotspot Wave (2026-08-12) --
+# APPROVED_MINIMAL_CI_WIRING_EXCEPTION
+#
+# tests/test_performance_publish_preflight_rules_behavior.py (20 real
+# behavioral tests, 0%->87.4% line / 0%->89.3% branch on
+# app/services/performance/publish_preflight_rules.py) was written as a
+# brand-new top-level tests/test_*.py file -- unlike the tests/quality/
+# files above, it cannot be wired in via a ci_safe pytestmark (Step1's
+# positional scope is only `tests/quality`, so a marker on a file outside
+# that directory is a no-op); the only real wiring mechanism for a
+# top-level file is explicit naming in Step2's command, same as its
+# decoy sibling test_performance_publish_preflight_static.py already
+# is. File-existence-on-disk is already covered generically by
+# test_every_referenced_test_path_in_the_coverage_instrumented_ci_step_exists_on_disk
+# above; only the two wave-specific facts below are new.
+# =====================================================================
+
+PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH = "tests/test_performance_publish_preflight_rules_behavior.py"
+
+
+def test_publish_preflight_rules_behavior_is_explicitly_named_in_the_coverage_instrumented_ci_step() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in command.split()
+
+
+def test_publish_preflight_rules_behavior_appears_in_exactly_one_ci_workflow_run_command() -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in c.split()]
+    assert len(hits) == 1, (
+        f"expected {PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH} in exactly one CI run command, "
+        f"found {len(hits)}: {hits}"
+    )
+
+
+# =====================================================================
+# BYS360 AE Coverage Metadata Drift Closure (AA-AH Final Closure Phase 1)
+#
+# Mechanically confirmed gap: the P0 Critical Coverage Hotspot Wave
+# (2026-08-12, section above) added BOTH the "tests/performance" directory
+# and PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH to the live workflow's
+# Step2 command, and the tests immediately above lock their presence in
+# the LIVE WORKFLOW -- but nothing anywhere in this file, until now, ever
+# checked that reports/quality/coverage_baseline.json's own recorded
+# "commands" field (a separate, hand-maintained copy -- see the "BYS360
+# Coverage Baseline Metadata Consistency Fix" precedent in that file's own
+# _history for why this field exists and must track the ACTIVE baseline)
+# also reflects them. It didn't: "tests/performance" was never in
+# commands[1] at all, and PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH's own
+# addition to the live workflow was checked here (the two tests directly
+# above) but never cross-checked against the baseline's own copy. This
+# section closes both the drift (coverage_baseline.json's commands field,
+# fixed via the same workflow_run_commands() re-extraction the 2026-08-11
+# Metadata Consistency Fix already established as this project's canonical
+# mechanism -- see that file's _history) and the test gap that let it go
+# undetected (the tests below, which fail loudly the next time either the
+# live workflow or coverage_baseline.json's commands field changes without
+# the other following).
+#
+# NUMERIC_BASELINE_UNCHANGED: this closure did not re-run coverage or
+# touch combined_pct/lines_covered/branches_covered/tolerance_pct -- see
+# coverage_baseline.json's own _history entry for the full disclosure of
+# why the existing floor remains valid (the live command only ever ADDS
+# test scope on top of the same invocation, a strict superset).
+# =====================================================================
+
+TESTS_PERFORMANCE_DIRECTORY = "tests/performance"
+
+
+def test_tests_performance_directory_is_included_in_coverage_instrumented_ci_step() -> None:
+    command = _coverage_instrumented_broad_step_command()
+    assert TESTS_PERFORMANCE_DIRECTORY in command.split()
+
+
+def test_tests_performance_directory_is_not_also_run_in_the_ci_safe_step() -> None:
+    ci_safe_command = _ci_safe_step_command()
+    assert TESTS_PERFORMANCE_DIRECTORY not in ci_safe_command.split()
+
+
+def test_tests_performance_directory_appears_in_exactly_one_ci_workflow_run_command() -> None:
+    commands = _ci_workflow_commands()
+    hits = [c for c in commands if TESTS_PERFORMANCE_DIRECTORY in c.split()]
+    assert len(hits) == 1, f"expected {TESTS_PERFORMANCE_DIRECTORY} in exactly one CI run command, found {len(hits)}: {hits}"
+
+
+def test_tests_performance_directory_exists_on_disk() -> None:
+    assert (ROOT / TESTS_PERFORMANCE_DIRECTORY).is_dir()
+
+
+def test_coverage_baseline_commands_include_tests_performance_directory() -> None:
+    """The specific assertion that was missing and let AE drift silently:
+    coverage_baseline.json's OWN recorded commands[1] (not the workflow
+    YAML, already checked above) must also list tests/performance."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(TESTS_PERFORMANCE_DIRECTORY in c.split() for c in commands), (
+        "coverage_baseline.json's recorded 'commands' must reflect the real live-workflow "
+        f"scope, including {TESTS_PERFORMANCE_DIRECTORY}"
+    )
+
+
+def test_coverage_baseline_commands_include_publish_preflight_rules_behavior_path() -> None:
+    """Same class of check as the one above, for the OTHER path the P0
+    Critical Coverage Hotspot Wave added to the live workflow but never
+    cross-checked against coverage_baseline.json's own commands field."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    commands = data.get("commands", [])
+    assert any(PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH in c.split() for c in commands), (
+        "coverage_baseline.json's recorded 'commands' must reflect the real live-workflow "
+        f"scope, including {PUBLISH_PREFLIGHT_RULES_BEHAVIOR_TEST_PATH}"
+    )
+
+
+def test_coverage_baseline_commands_step2_exactly_matches_live_workflow_step2_command() -> None:
+    """The strongest possible AE regression lock: coverage_baseline.json's
+    commands[1] must be BYTE-IDENTICAL to the live workflow's own Step2
+    command, not merely a superset/substring check. If a future workflow
+    edit changes Step2 in ANY way (add, remove, reorder a path or flag)
+    without a matching, deliberate update to coverage_baseline.json's
+    commands field, this test fails immediately -- the exact class of
+    silent drift this closure fixed."""
+    data = json.loads(COVERAGE_BASELINE.read_text(encoding="utf-8"))
+    baseline_step2 = data["commands"][1]
+    live_step2 = _coverage_instrumented_broad_step_command()
+    assert baseline_step2 == live_step2, (
+        "coverage_baseline.json's commands[1] has drifted from the live workflow's Step2 "
+        "command again. If this is a deliberate, reviewed workflow change: update "
+        "commands[1] via scripts.quality.bys360_quality9_ci_gate.workflow_run_commands "
+        "(do NOT hand-edit or touch combined_pct/lines_covered/etc.) and add a new "
+        "_history entry documenting why the existing numeric floor still holds."
+    )

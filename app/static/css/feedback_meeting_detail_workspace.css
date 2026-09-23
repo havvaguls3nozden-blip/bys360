@@ -1,0 +1,6 @@
+.feedback-meeting-scope-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc}
+.feedback-meeting-spacing-top-md{margin-top:16px}
+.feedback-meeting-main-grid{display:grid;gap:18px}
+.feedback-meeting-spacing-top-xs{margin-top:6px}
+.feedback-meeting-spacing-top-sm{margin-top:8px}
+.feedback-meeting-side-grid{display:grid;gap:18px;align-content:start}

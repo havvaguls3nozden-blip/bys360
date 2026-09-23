@@ -45,7 +45,7 @@
             <thead><tr><th>Başlık</th><th>Atama</th><th>Oran</th><th>Durum</th></tr></thead>
             <tbody>
             {% for row in payload.low_completion_rows %}
-              <tr><td>{{ row.title }}</td><td>{{ row.assignments }}</td><td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ row.status }}</td></tr>
+              <tr><td>{{ row.title }}</td><td>{{ row.assignments }}</td><td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ payload.survey_status_labels.get(row.status, 'Bilinmiyor') }}</td></tr>
             {% else %}
               <tr><td colspan="4" class="text-muted">Düşük katılım eşiğinde kayıt yok.</td></tr>
             {% endfor %}
@@ -82,7 +82,7 @@
       {% for row in payload.rows %}
         <tr>
           <td>{{ row.title }}</td><td>{{ row.type }}</td><td>{{ row.assignments }}</td><td>{{ row.completed }}</td>
-          <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ row.avg_submit_minutes }} dk</td><td>{% if row.anonymous %}Evet{% else %}Hayır{% endif %}</td><td>{{ row.status }}</td>
+          <td>%{{ '%.1f'|format(row.completion_rate or 0) }}</td><td>{{ row.avg_submit_minutes }} dk</td><td>{% if row.anonymous %}Evet{% else %}Hayır{% endif %}</td><td>{{ payload.survey_status_labels.get(row.status, 'Bilinmiyor') }}</td>
         </tr>
       {% else %}
         <tr><td colspan="8" class="text-muted">Analiz edilecek anket bulunamadı.</td></tr>
@@ -100,7 +100,7 @@
   if (statusEl) {
     new Chart(statusEl, {
       type: 'bar',
-      data: { labels: {{ payload.status_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
+      data: { labels: {{ payload.status_label_breakdown.keys()|list|tojson }}, datasets: [{ label: 'Durum', data: {{ payload.status_label_breakdown.values()|list|tojson }}, borderWidth: 1 }] },
       options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
     });
   }

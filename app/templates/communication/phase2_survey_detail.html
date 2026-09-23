@@ -14,7 +14,7 @@
 <div class="row g-3">
   <div class="col-xl-4">
     <div class="card shadow-sm border-0 rounded-4 h-100"><div class="card-body p-4">
-      <div class="d-flex justify-content-between align-items-start gap-2"><div><h5 class="fw-bold mb-1">{{ payload.survey.title }}</h5><div class="text-muted small">{{ payload.survey.description or '-' }}</div></div><span class="badge text-bg-dark">{{ status_labels.get(payload.survey.status, payload.survey.status) }}</span></div>
+      <div class="d-flex justify-content-between align-items-start gap-2"><div><h5 class="fw-bold mb-1">{{ payload.survey.title }}</h5><div class="text-muted small">{{ payload.survey.description or '-' }}</div></div><span class="badge text-bg-dark">{{ status_labels.get(payload.survey.status, 'Bilinmiyor') }}</span></div>
       <div class="small text-muted mt-3">Tür: {{ payload.survey.survey_type }} · Anonim: {{ 'Evet' if payload.survey.is_anonymous else 'Hayır' }}</div>
       <div class="small text-muted mt-2">Başlangıç: {{ payload.survey.start_at.strftime('%d.%m.%Y %H:%M') if payload.survey.start_at else '—' }}</div>
       <div class="small text-muted mt-1">Bitiş: {{ payload.survey.end_at.strftime('%d.%m.%Y %H:%M') if payload.survey.end_at else 'Süresiz' }}</div>
@@ -48,7 +48,7 @@
         {% for question in payload.questions %}
         <div class="list-group-item px-0 py-3">
           <div class="fw-bold">{{ loop.index }}. {{ question.question_text }}</div>
-          <div class="small text-muted mt-1">Tür: {{ question_type_labels.get(question.question_type, question.question_type) }} · {{ 'Zorunlu' if question.is_required else 'Opsiyonel' }}</div>
+          <div class="small text-muted mt-1">Tür: {{ question_type_labels.get(question.question_type, 'Bilinmiyor') }} · {{ 'Zorunlu' if question.is_required else 'Opsiyonel' }}</div>
           {% if question.options.count() %}
           <div class="small text-muted mt-2">Seçenekler: {% for option in question.options.order_by('sort_order').all() %}{{ option.option_text }}{% if not loop.last %}, {% endif %}{% endfor %}</div>
           {% endif %}

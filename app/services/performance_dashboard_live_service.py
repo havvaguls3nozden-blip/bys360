@@ -338,7 +338,7 @@ def _category_averages(period_id: int | None, scope_user_ids: list[int]) -> list
         count = base[category]["count"]
         avg = round(base[category]["score_sum"] / count, 1) if count else 0.0
         output.append({
-            "label": CATEGORY_SHORT_LABEL.get(category, category),
+            "label": CATEGORY_SHORT_LABEL.get(category, "Diğer"),
             "full_label": category,
             "score": avg,
             "count": count,

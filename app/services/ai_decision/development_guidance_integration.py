@@ -46,14 +46,12 @@ def _rows_as_dicts(result: Any) -> list[dict[str, Any]]:
 
 
 def _table_exists(db_session: Any, table_name: str) -> bool:
-    if text is None or db_session is None:
-        return False
+    # BYS360 DEFECT AL: raw PostgreSQL-only information_schema/current_schema()
+    # query replaced with SQLAlchemy's inspect(), which is dialect-neutral by
+    # construction.
     try:
-        result = db_session.execute(text(
-            "SELECT 1 FROM information_schema.tables "
-            "WHERE table_schema = current_schema() AND table_name = :table_name LIMIT 1"
-        ), {"table_name": table_name}).scalar()
-        return bool(result)
+        from sqlalchemy import inspect
+        return bool(inspect(db_session.get_bind()).has_table(table_name))
     except Exception:
         import logging
         logging.getLogger(__name__).exception("BYS360 SAFE V6: sessiz yakalanan hata loglandi.")

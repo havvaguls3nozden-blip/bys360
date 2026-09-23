@@ -97,6 +97,34 @@ def _register_pwa_routes(app: Flask) -> None:
         app.register_blueprint(pwa_bp)
 
 
+# BYS360_PHASE5_3C_A2_INIT_CSRF_REFERRER_OPEN_REDIRECT_HARDENING
+# Eskiden burada bağımsız, `request.host_url` tabanlı bir "aynı origin mi?"
+# kontrolü vardı: `referrer.startswith(host_url) or referrer.startswith("/")`.
+# `request.host_url`, istemcinin gönderdiği `Host` başlığından türer (bir
+# ters-proxy/IIS zincirinde yanlış yapılandırılmışsa saldırgan tarafından
+# belirlenebilir) ve bu kontrol backslash/encoded-separator varyantlarına
+# (`/\\evil.example`, `/%2Fevil.example`) karşı da savunmasızdı. Tek doğruluk
+# kaynağı artık kanonik `APP_BASE_URL`'e dayanan ve bu saldırı ailesine karşı
+# test edilmiş `app.route_support.is_safe_redirect_target`. Import fonksiyon
+# içinde tutulur: bu modül `app/__init__.py`nin kendisidir ve çok erken
+# bootstrap zincirinde (`app.bootstrap.application_bootstrap`) yüklenir;
+# modül seviyesinde bir import döngüsel import riski taşır. Ayrı, isimli bir
+# yardımcı fonksiyon olarak tutulur ki döngüsel import olmadan doğrudan
+# test edilebilsin.
+def _bys360_b77_safe_csrf_referrer_target(referrer: str | None) -> str | None:
+    """CSRF sonrası güvenli geri dönüş için doğrulanmış referrer'ı döndürür.
+
+    Referrer boş/None ya da güvensizse ``None`` döner (çağıran taraf
+    fallback zincirine devam eder).
+    """
+    from app.route_support import is_safe_redirect_target
+
+    target = (referrer or "").strip()
+    if target and is_safe_redirect_target(target):
+        return target
+    return None
+
+
 def _register_csrf_refresh_handler(app: Flask) -> None:
     from flask import flash, jsonify, redirect, request, url_for
 
@@ -127,10 +155,9 @@ def _register_csrf_refresh_handler(app: Flask) -> None:
         # geldiği ekrana güvenli şekilde dönsün. Böylece mail test gibi POST ekranları
         # kullanıcı dostu biçimde yeniden denenebilir.
         try:
-            referrer = request.referrer or ""
-            host_url = (request.host_url or "").rstrip("/")
-            if referrer and (referrer.startswith(host_url) or referrer.startswith("/")):
-                return redirect(referrer)
+            safe_target = _bys360_b77_safe_csrf_referrer_target(request.referrer)
+            if safe_target:
+                return redirect(safe_target)
             if request.path.startswith("/dashboard/"):
                 return redirect(request.path)
         except Exception:

@@ -58,6 +58,21 @@ SURVEY_STATUS_LABELS = {
     "archived": "Arşiv",
 }
 
+SURVEY_TYPE_LABELS = {
+    "kurum_ici": "Kurum İçi",
+    "memnuniyet": "Memnuniyet",
+    "egitim": "Eğitim",
+    "nabiz": "Nabız",
+    "geri_bildirim": "Geri Bildirim",
+}
+
+SURVEY_TARGET_TYPE_LABELS = {
+    "all": "Tüm Personel",
+    "user": "Kullanıcı",
+    "role": "Rol",
+    "unit": "Birim",
+}
+
 BULLETIN_STATUS_LABELS = {
     "draft": "Taslak",
     "published": "Yayında",
@@ -873,4 +888,8 @@ def phase2_dashboard_snapshot() -> dict[str, Any]:
         "latest_surveys": survey_rows,
         "latest_templates": CommunicationSurveyTemplate.query.order_by(CommunicationSurveyTemplate.updated_at.desc()).limit(6).all(),
         "latest_revisions": CommunicationBulletinRevision.query.order_by(CommunicationBulletinRevision.created_at.desc()).limit(8).all(),
+        "survey_status_labels": SURVEY_STATUS_LABELS,
+        "survey_type_labels": SURVEY_TYPE_LABELS,
+        "bulletin_status_labels": BULLETIN_STATUS_LABELS,
+        "bulletin_priority_labels": BULLETIN_PRIORITY_LABELS,
     }

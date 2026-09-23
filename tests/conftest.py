@@ -33,6 +33,33 @@ os.environ.setdefault("WTF_CSRF_ENABLED", "false")
 os.environ.setdefault("MAIL_SUPPRESS_SEND", "true")
 os.environ.setdefault("SCHEDULER_ENABLED", "false")
 
+# BYS360_PHASE5_PYTEST_TEMP_CONTRACT_START
+# Tam pytest paketi (özellikle tests/quality -m ci_safe ve tests/critical)
+# çalıştırılırken, bu makinede pytest'in yerleşik `tmp_path` fixture'ı
+# Windows kullanıcı adındaki Türkçe karakterler ("Havva Gülsen ÖZDEN") ile
+# `%LOCALAPPDATA%\Temp` altındaki derin/uzun varsayılan yol birleşimi
+# yüzünden `PermissionError` ile başarısız olabilir. Bu davranış bu
+# dosyadaki hiçbir koddan kaynaklanmaz ve burada otomatik olarak
+# düzeltilmez (bilinçli tercih: TEMP/TMP'yi kalıcı olarak burada veya
+# kullanıcının global ortamında değiştirmek, worktree dışı bir yan etki
+# olur).
+#
+# Sözleşme: tam paket çalıştırılırken TEMP/TMP, şu üç koşulu birden
+# sağlayan kısa bir dizine ayarlanmalıdır -- yalnızca test process'i için
+# (örn. `set TEMP=C:\bys360_pytest_tmp` / `$env:TEMP = "C:\bys360_pytest_tmp"`
+# çalıştırma öncesinde, kalıcı `setx` DEĞİL):
+#   1) worktree'nin (bu repo kökünün) DIŞINDA olmalı -- worktree içine
+#      koymak farklı testleri kırar (git-repo tespiti, `.gitignore`
+#      kapsamı vb. karışır);
+#   2) `AppData\Local\Temp` altındaki derin/varsayılan yoldan kaçınmalı;
+#   3) git-dışı olmalı (git repository OLMAMALI).
+# Doğrulanmış örnek: `C:\bys360_pytest_tmp`. Bununla tests/quality -m
+# ci_safe 214/214 ve tests/critical 29/29 PASS elde edilmiştir (BYS360
+# Phase 5 Bölüm 3C Ajan 3 doğrulaması, 2026-08-02). Bu not, koordinatörün
+# ve gelecekteki turların bu ortam kısıtını her seferinde yeniden
+# keşfetmesini önlemek için buraya kaydedilmiştir.
+# BYS360_PHASE5_PYTEST_TEMP_CONTRACT_END
+
 # BYS360_QUALITY9_CI_SAFE_SCOPE_DISCIPLINE_START
 # CI-safe kapsamı artık burada ayrıca zorlanmıyor: `-m ci_safe` doğrudan
 # pytest'in kendi marker ifadesi (bkz. pytest.ini `markers = ci_safe: ...`,

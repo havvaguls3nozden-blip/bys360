@@ -135,10 +135,10 @@ def ensure_settings_phase1_seeded_handler(
 
         db_session.commit()
         return summary
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 V6B guarded exception | file=app/services/settings/foundation_access.py | line=137")
         safe_rollback()
-        return {**summary, "ok": False, "error": str(exc)}
+        return {**summary, "ok": False, "error": "Ayarlar omurgası hazırlanırken beklenmeyen bir hata oluştu."}
 
 
 def build_settings_foundation_context_handler(

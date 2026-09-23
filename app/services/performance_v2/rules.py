@@ -139,9 +139,20 @@ def normalize_role_token(*values: object) -> str:
         return 'hukuk_musaviri'
     if any(token in blob for token in ('birim sorumlusu', 'birim amiri', 'sorumlu')):
         return 'birim_sorumlusu'
-    if 'baskan' in blob and 'yardimci' not in blob:
+    # BYS360 DEFECT FS (Final Sweep A2-03): these two were previously bare
+    # substring checks (`'baskan' in blob`), which matched "Başkanlığı Uzmanı"
+    # ("Specialist OF the Presidency [department]" -- an ordinary specialist,
+    # not the president) because "baskanligi" contains "baskan" as its first
+    # six characters. None of the specific multi-word phrases above matched,
+    # so this ordinary employee fell through to the presidency-tier token,
+    # misrouting their evaluation chain to PRESIDENCY_POLICY. Exact-word
+    # (whitespace-delimited token) matching prevents this: "baskanligi" and
+    # "baskan" are different tokens, but the real "Başkan"/"Başkan (Vekil)"/
+    # "admin" values (single distinct words) still match exactly as before.
+    blob_tokens = set(blob.split())
+    if 'baskan' in blob_tokens and 'yardimci' not in blob:
         return 'baskan'
-    if 'admin' in blob:
+    if 'admin' in blob_tokens:
         return 'admin'
     return 'personel'
 

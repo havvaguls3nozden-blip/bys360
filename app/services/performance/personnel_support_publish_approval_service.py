@@ -88,8 +88,13 @@ def _now() -> datetime:
 
 
 def _normalize(value: Any) -> str:
-    raw = str(value or "").strip().lower()
-    tr_map = str.maketrans("çğıöşüâîûİ", "cgiosuaiui")
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa aşağıdaki tr_map'teki 'İ' anahtarı
+    # asla eşleşmez. 'İ' burada .lower() çağrılmadan ÖNCE, tek kod noktalı
+    # haldeyken ayrı olarak 'i'ye çevrilir.
+    raw = str(value or "").strip().replace("İ", "i").lower()
+    tr_map = str.maketrans("çğıöşüâîû", "cgiosuaiu")
     return raw.translate(tr_map).replace(" ", "_").replace("-", "_")
 
 
@@ -202,6 +207,17 @@ def is_hr_publish_user(user: Any) -> bool:
 
 
 def is_personnel_support_group_chair_user(user: Any) -> bool:
+    # BYS360 DEFECT AQ: burada önceden, tam eşleşme kümesi (explicit)
+    # başarısız olduğunda, TÜM rol/unvan alanları birleştirilip "personel",
+    # ("destek" veya "idari"), "grup", "baskan" alt dizelerinin HER BİRİNİN
+    # (dağınık biçimde, farklı alanlarda) metinde geçip geçmediğine bakan bir
+    # substring-kombinasyon fallback'i vardı. Bu, ör. Grup Başkan
+    # YARDIMCISI'nı (role="personel", unvan="destek hizmetleri",
+    # title="grup başkan yardımcısı") gerçek Grup Başkanı ile karıştırıp
+    # yayın onay yetkisi veriyordu ("başkan" alt dizesi "başkan yardımcısı"
+    # içinde de geçiyor). explicit küme zaten bilinen tüm yazım
+    # varyasyonlarını numaralandırdığı için fallback tamamen kaldırıldı --
+    # yeni bir substring/allowlist icat edilmedi.
     role_values = {
         _normalize(getattr(user, attr, None))
         for attr in ("role", "role_name", "user_type", "unvan", "title", "position", "gorev")
@@ -212,15 +228,7 @@ def is_personnel_support_group_chair_user(user: Any) -> bool:
         "personel_ve_idari_isler_grup_baskani",
         "personel_idari_isler_grup_baskani",
     }
-    if role_values & explicit:
-        return True
-    combined = "_".join(sorted(v for v in role_values if v))
-    return (
-        "personel" in combined
-        and ("destek" in combined or "idari" in combined)
-        and "grup" in combined
-        and "baskan" in combined
-    )
+    return bool(role_values & explicit)
 
 
 def can_view_personnel_support_publish_approvals(user: Any) -> bool:

@@ -14,7 +14,7 @@
       <h2>{{ publication.title }}</h2>
       {% if publication.subtitle %}<p class="pub-view-sub">{{ publication.subtitle }}</p>{% endif %}
       <div class="pub-badge-row">
-        <span class="pub-badge status-{{ publication.status }}">{{ publication.status|replace('_', ' ')|title }}</span>
+        <span class="pub-badge status-{{ publication.status }}">{{ status_label }}</span>
         {% if publication.issue_no %}<span class="pub-badge">{{ publication.issue_no }}</span>{% endif %}
         {% if publication.publication_period %}<span class="pub-badge">{{ publication.publication_period }}</span>{% endif %}
         {% if publication.publication_date %}<span class="pub-badge">{{ publication.publication_date.strftime('%d.%m.%Y') }}</span>{% endif %}
@@ -33,7 +33,7 @@
     <div class="pub-view-side">
       <div class="pub-side-card">
         <div class="pub-side-line"><span>Tür</span><strong>{{ type_label }}</strong></div>
-        <div class="pub-side-line"><span>Durum</span><strong>{{ publication.status|replace('_', ' ')|title }}</strong></div>
+        <div class="pub-side-line"><span>Durum</span><strong>{{ status_label }}</strong></div>
         <div class="pub-side-line"><span>Görüntüleme</span><strong>{% if renderer_available %}Yerel Çift Sayfa{% else %}Ham PDF Yedek{% endif %}</strong></div>
         <div class="pub-side-line"><span>İndirme</span><strong>{% if publication.allow_download %}Açık{% else %}Kapalı{% endif %}</strong></div>
       </div>

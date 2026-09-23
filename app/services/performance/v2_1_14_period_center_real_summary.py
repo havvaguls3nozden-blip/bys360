@@ -161,7 +161,7 @@ def _status_label(raw: Any) -> str:
         "revize": "Revizyon Bekliyor",
         "revision": "Revizyon Bekliyor",
     }
-    return labels.get(key, key.replace("_", " ").title() if key else "Bekliyor")
+    return labels.get(key, "Bilinmiyor" if key else "Bekliyor")
 
 
 def _status_class(raw: Any) -> str:

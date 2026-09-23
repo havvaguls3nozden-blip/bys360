@@ -234,8 +234,9 @@ def announcement_popup_new():
             flash("Duyuru kaydı oluşturuldu. Video destekli pop-up akışı aktif.", "success")
             return redirect(url_for("main.announcement_popup_manage"))
         except SQLAlchemyError as exc:
+            logger.exception("Duyuru kaydı oluşturulurken veritabanı hatası: %s", exc)
             safe_db_rollback()
-            flash(f"Duyuru kaydı oluşturulamadı: {exc}", "danger")
+            flash("Duyuru kaydı oluşturulamadı.", "danger")
 
     return safe_render(
         "communication/announcement_popup_form.html",
@@ -271,8 +272,9 @@ def announcement_popup_edit(announcement_id: int):
             flash("Duyuru kaydı güncellendi.", "success")
             return redirect(url_for("main.announcement_popup_manage"))
         except SQLAlchemyError as exc:
+            logger.exception("Duyuru kaydı güncellenirken veritabanı hatası: %s", exc)
             safe_db_rollback()
-            flash(f"Duyuru kaydı güncellenemedi: {exc}", "danger")
+            flash("Duyuru kaydı güncellenemedi.", "danger")
 
     return safe_render(
         "communication/announcement_popup_form.html",
@@ -294,8 +296,9 @@ def announcement_popup_toggle(announcement_id: int):
         db.session.commit()
         flash("Duyuru durumu güncellendi.", "success")
     except SQLAlchemyError as exc:
+        logger.exception("Duyuru durumu güncellenirken veritabanı hatası: %s", exc)
         safe_db_rollback()
-        flash(f"Duyuru durumu güncellenemedi: {exc}", "danger")
+        flash("Duyuru durumu güncellenemedi.", "danger")
     return redirect(url_for("main.announcement_popup_manage"))
 
 

@@ -63,11 +63,12 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
     @media (max-width:1180px){.hero-grid,.content-grid{grid-template-columns:1fr}.stats-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
     @media (max-width:768px){.stats-grid,.info-grid{grid-template-columns:1fr}.hero-actions,.btn-soft,.mini-btn{width:100%}}
 </style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/feedback_meeting_detail_workspace.css') }}">
 
 <div class="detail-shell">
     {% set related_manager_ids = [meeting.feedback_request.level_1_manager_id if meeting.feedback_request else None, meeting.feedback_request.level_2_manager_id if meeting.feedback_request else None, meeting.feedback_request.level_3_manager_id if meeting.feedback_request else None] %}
     {% set can_manage_meeting = current_user.role == "admin" or current_user.id == meeting.manager_id or current_user.id in related_manager_ids %}
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid rgba(15,23,42,.08);border-radius:18px;background:#f8fafc;">
+    <div class="feedback-meeting-scope-bar">
         <div><strong>{{ scope_role_title or "Kapsam görünümü" }}</strong> · {{ scope_label or "Kurum geneli" }}</div>
         <span class="soft-pill"><i class="fa-solid fa-calendar-days"></i> Randevu #{{ meeting.id }}</span>
     </div>
@@ -77,11 +78,11 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
                 <h2 class="hero-title">{{ meeting.employee.ad }} {{ meeting.employee.soyad }} için geri bildirim görüşmesi</h2>
                 <div class="hero-sub">Yönetici: {{ meeting.manager.ad }} {{ meeting.manager.soyad }} · Randevu ID: #{{ meeting.id }}{% if meeting.feedback_request and meeting.feedback_request.period %} · Dönem: {{ meeting.feedback_request.period.title }}{% endif %}{% if meeting.employee.sicil_no %} · Sicil: {{ meeting.employee.sicil_no }}{% endif %}</div>
                 <div class="pill-row">
-                    <span class="status-pill {{ meeting.status }}"><i class="fa-solid fa-calendar-check"></i> {{ meeting.status }}</span>
+                    <span class="status-pill {{ meeting.status }}"><i class="fa-solid fa-calendar-check"></i> {{ get_feedback_meeting_status_label(meeting) }}</span>
                     <span class="soft-pill"><i class="fa-solid fa-user-group"></i> {{ meeting.meeting_type or 'Tür girilmedi' }}</span>
                     <span class="soft-pill"><i class="fa-solid fa-location-dot"></i> {{ meeting.location or 'Konum girilmedi' }}</span>
                 </div>
-                <div class="hero-actions" style="margin-top:16px;">
+                <div class="hero-actions feedback-meeting-spacing-top-md">
                     <a href="{{ url_for('main.feedback_meetings_list', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-arrow-left"></i> Randevu Listesi</a>
                     <a href="{{ url_for('main.feedback_audit_dashboard', scope=selected_scope) }}" class="btn-soft secondary"><i class="fa-solid fa-shield-halved"></i> Denetim Paneli</a>
                     {% if can_manage_meeting %}
@@ -99,12 +100,12 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
     <div class="stats-grid">
         <div class="glass-card stat-card"><div class="stat-label">Tarih</div><div class="stat-value">{{ meeting.meeting_date.strftime('%d.%m.%Y') if meeting.meeting_date else '-' }}</div><div class="stat-sub">Planlanan gün.</div></div>
         <div class="glass-card stat-card"><div class="stat-label">Saat Aralığı</div><div class="stat-value">{{ meeting.meeting_start.strftime('%H:%M') if meeting.meeting_start else '--:--' }}{% if meeting.meeting_end %} - {{ meeting.meeting_end.strftime('%H:%M') }}{% endif %}</div><div class="stat-sub">Toplantı penceresi.</div></div>
-        <div class="glass-card stat-card"><div class="stat-label">Talep Durumu</div><div class="stat-value">{{ meeting.feedback_request.status if meeting.feedback_request else 'Bağlı talep yok' }}</div><div class="stat-sub">Kaynağın şu anki durumu.</div></div>
+        <div class="glass-card stat-card"><div class="stat-label">Talep Durumu</div><div class="stat-value">{{ get_feedback_request_status_label(meeting.feedback_request) if meeting.feedback_request else 'Bağlı talep yok' }}</div><div class="stat-sub">Kaynağın şu anki durumu.</div></div>
         <div class="glass-card stat-card"><div class="stat-label">Görüşme Tipi</div><div class="stat-value">{{ meeting.meeting_type or '-' }}</div><div class="stat-sub">Yüz yüze, online veya telefon.</div></div>
     </div>
 
     <div class="content-grid">
-        <div class="detail-main" style="display:grid; gap:18px;">
+        <div class="detail-main feedback-meeting-main-grid">
             <div class="glass-card panel-card">
                 <h3 class="section-title">Temel bilgiler</h3>
                 <div class="info-grid">
@@ -137,8 +138,8 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
                     <div class="timeline-card">
                         <div class="timeline-label">{{ item.entity_label }}</div>
                         <div class="timeline-value">{{ item.action_label }}</div>
-                        <div class="helper" style="margin-top:6px;">{{ item.summary }}</div>
-                        <div class="helper" style="margin-top:8px;">{{ item.actor_name }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '-' }}</div>
+                        <div class="helper feedback-meeting-spacing-top-xs">{{ item.summary }}</div>
+                        <div class="helper feedback-meeting-spacing-top-sm">{{ item.actor_name }} · {{ item.created_at.strftime('%d.%m.%Y %H:%M') if item.created_at else '-' }}</div>
                     </div>
                     {% endfor %}
                 </div>
@@ -148,7 +149,7 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
             </div>
         </div>
 
-        <div class="detail-side" style="display:grid; gap:18px; align-content:start;">
+        <div class="detail-side feedback-meeting-side-grid">
             {% if can_manage_meeting %}
             <div class="glass-card panel-card" id="update-panel">
                 <h3 class="section-title">Randevu durumu güncelle</h3>
@@ -171,7 +172,7 @@ Planlanan geri bildirim görüşmesinin detaylarını görüntüleyebilir, yetki
                         <label for="meeting_type">Toplantı tipi</label>
                         <select id="meeting_type" name="meeting_type">
                             <option value="yuz_yuze" {% if meeting.meeting_type == 'yuz_yuze' %}selected{% endif %}>Yüz Yüze</option>
-                            <option value="online" {% if meeting.meeting_type == 'online' %}selected{% endif %}>Online</option>
+                            <option value="online" {% if meeting.meeting_type == 'online' %}selected{% endif %}>Çevrimiçi</option>
                             <option value="telefon" {% if meeting.meeting_type == 'telefon' %}selected{% endif %}>Telefon</option>
                         </select>
                     </div>

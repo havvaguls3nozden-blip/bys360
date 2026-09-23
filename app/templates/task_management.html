@@ -769,7 +769,7 @@ Aktif dönem için görev üretimi, kapsama durumu ve eksik amir zincirlerinin k
                     {% elif row.event_type == 'delegated' %}Vekâlet
                     {% elif row.event_type == 'warning' and is_assignment_log_special_case(row.reason, row.event_type) %}İstisna Uygulandı
                     {% elif row.event_type == 'warning' %}Uyarı
-                    {% else %}{{ row.event_type }}{% endif %}
+                    {% else %}Bilinmiyor{% endif %}
                   </span>
                 </td>
                 <td>{% if row.manager_level %}{{ row.manager_level }}. Amir{% else %}-{% endif %}</td>
@@ -860,7 +860,7 @@ Aktif dönem için görev üretimi, kapsama durumu ve eksik amir zincirlerinin k
                   {% elif row.status == 'tamamlandi' %}
                     <span class="pill done"><i class="fa-solid fa-check"></i> Tamamlandı</span>
                   {% else %}
-                    <span class="pill">{{ row.status }}</span>
+                    <span class="pill">Bilinmiyor</span>
                   {% endif %}
                 </td>
               </tr>

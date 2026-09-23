@@ -28,6 +28,13 @@ def register_mobile_utility_routes_v1(mobile_bp, route_globals) -> None:
         if PerformanceTarget is not None:
             try:
                 q = PerformanceTarget.query.order_by(PerformanceTarget.updated_at.desc().nullslast())
+                # BYS360 SECURITY FIX (Defect P): reuse the same PerformanceTarget
+                # visibility contract as GET /kpi/target-management -- global-scope
+                # callers keep the unscoped view, everyone else is restricted to
+                # their own owner_user_id. Applied before both the row list AND
+                # the active-count metric so neither leaks organization-wide data.
+                if not _has_global_scope(user) and hasattr(PerformanceTarget, "owner_user_id"):
+                    q = q.filter(PerformanceTarget.owner_user_id == int(getattr(user, "id", 0) or 0))
                 active = _safe_count(q)
                 rates = []
                 for t in q.limit(40).all():

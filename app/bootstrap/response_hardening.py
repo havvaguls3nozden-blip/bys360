@@ -28,10 +28,20 @@ def register_response_hardening(app: Flask) -> None:
         request_id = getattr(g, "request_id", None) or request.headers.get("X-Request-ID") or request.environ.get("HTTP_X_REQUEST_ID") or os.urandom(8).hex()
         csp_nonce = getattr(g, "csp_nonce", None)
         response = inject_csp_nonce_into_html(response, csp_nonce=csp_nonce)
+        # BYS360 guvenlik sertlestirmesi: X-Forwarded-Proto burada dogrudan
+        # okunmaz -- istemci tarafindan sahtelenebilir. Guvenilir tek proxy
+        # sinyali ProxyFix middleware'inden gecmis request.is_secure'dur
+        # (bkz. app/core/reverse_proxy.py, PROXY_FIX_ENABLED). PREFERRED_URL_SCHEME
+        # APP_BASE_URL'den tureyen, istemcinin etkileyemeyecegi sunucu-tarafli
+        # ikinci sinyaldir; dev'de APP_BASE_URL varsayilani http oldugundan bu
+        # sinyal dev'de otomatik False kalir.
+        is_secure = bool(
+            request.is_secure or app.config.get("PREFERRED_URL_SCHEME") == "https"
+        )
         return apply_default_security_headers(
             response,
             config=app.config,
             request_id=request_id,
-            is_secure=bool(request.is_secure or (request.headers.get("X-Forwarded-Proto", "").lower() == "https")),
+            is_secure=is_secure,
             csp_nonce=csp_nonce,
         )

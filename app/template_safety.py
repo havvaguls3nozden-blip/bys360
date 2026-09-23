@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, TypedDict
 
-from flask import Flask, url_for
+from flask import Flask
 from jinja2 import ChainableUndefined
 
 
@@ -95,23 +95,6 @@ def _build_about_modal_context() -> dict[str, Any]:
         return dict(defaults)
 
 
-def safe_url_for(endpoint: str, **kwargs: Any) -> str:
-    """Şablonlarda güvenli bağlantı üretir.
-
-    Yeni performans geri bildirim ekranları url_for çağrısını doğrudan
-    kullanmak yerine bu yardımcıdan geçer. Endpoint eksikliği, yetki
-    varyasyonu veya opsiyonel route sırası gibi durumlarda sayfanın 500
-    vermesi yerine güvenli bir bağlantı değeri döndürülür.
-    """
-    try:
-        if not endpoint:
-            return "#"
-        return url_for(str(endpoint), **kwargs)
-    except Exception:
-        __import__("logging").getLogger(__name__).exception("BYS360 SAFE V4: sessiz except loglandi: app/template_safety.py:101")
-        return "#"
-
-
 def register_template_safety(app: Flask) -> None:
     """Jinja guvenli render yardimcilarini ve AI etiket filtrelerini kaydeder."""
     app.jinja_env.undefined = ChainableUndefined
@@ -167,7 +150,6 @@ def register_template_safety(app: Flask) -> None:
 
     app.jinja_env.globals.setdefault("or_dash", or_dash)
     app.jinja_env.globals.setdefault("safe_len", safe_len)
-    app.jinja_env.globals.setdefault("safe_url_for", safe_url_for)
     app.jinja_env.globals.setdefault("ai_module_label", ai_module_label)
     app.jinja_env.globals.setdefault("ai_feature_label", ai_feature_label)
     app.jinja_env.globals.setdefault("ai_target_label", ai_target_label)

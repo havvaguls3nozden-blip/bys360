@@ -5,6 +5,11 @@
 .faz3-mobile-hidden{display:none}
 .faz3-mobile-stack{display:grid;gap:12px}
 
+/* CSP style-2A pilot: static inline styles extracted from notifications_list.html */
+.section-spacing-top-sm{margin-top:14px}
+.empty-state-heading{margin:0;color:#111827;font-size:1rem;font-weight:900}
+.empty-state-text{margin:0;line-height:1.8}
+
 /* Bildirimler */
 @media (max-width: 991.98px){
   .notification-page{gap:14px}

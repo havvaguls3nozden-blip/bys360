@@ -11,6 +11,7 @@ from flask_login import current_user, login_required
 from app.models import Notification
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
+from app.services.communication_phase1_service import BULLETIN_PRIORITY_LABELS
 from app.services.communication_phase3_service import (
     SUPPORT_STATUS_LABELS,
     CommunicationPhase3Error,
@@ -95,8 +96,8 @@ def communication_phase3_survey_take(survey_id: int):
         except CommunicationPhase3Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=95")
-            flash(f"Anket kaydedilemedi: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=95 | exc=%s", exc)
+            flash("Anket kaydedilemedi.", "danger")
 
     try:
         payload = get_survey_for_user(survey_id, current_user)
@@ -122,8 +123,8 @@ def communication_phase3_survey_remind(survey_id: int):
         else:
             flash(f"{result['created']} kullanıcıya anket hatırlatması gönderildi.", "success")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=121")
-        flash(f"Hatırlatma oluşturulamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=121 | exc=%s", exc)
+        flash("Hatırlatma oluşturulamadı.", "danger")
     return redirect(request.referrer or url_for("main.communication_phase3_my_surveys"))
 
 
@@ -153,8 +154,8 @@ def communication_phase3_support_detail(ticket_id: int):
         except CommunicationPhase3Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=151")
-            flash(f"Talep mesajı kaydedilemedi: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=151 | exc=%s", exc)
+            flash("Talep mesajı kaydedilemedi.", "danger")
 
     try:
         payload = support_detail_payload(ticket_id, current_user)
@@ -162,7 +163,12 @@ def communication_phase3_support_detail(ticket_id: int):
         flash(str(exc), "warning")
         return redirect(url_for("main.communication_phase3_support_queue"))
 
-    return safe_render("communication/phase3_support_detail.html", payload=payload, status_labels=SUPPORT_STATUS_LABELS)
+    return safe_render(
+        "communication/phase3_support_detail.html",
+        payload=payload,
+        status_labels=SUPPORT_STATUS_LABELS,
+        priority_labels=BULLETIN_PRIORITY_LABELS,
+    )
 
 
 @main_bp.route("/communication/faz3/support/<int:ticket_id>/assign", methods=["POST"])
@@ -186,8 +192,8 @@ def communication_phase3_support_assign(ticket_id: int):
     except CommunicationPhase3Error as exc:
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=183")
-        flash(f"Atama yapılamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=183 | exc=%s", exc)
+        flash("Atama yapılamadı.", "danger")
     return redirect(url_for("main.communication_phase3_support_detail", ticket_id=ticket_id))
 
 
@@ -210,8 +216,8 @@ def communication_phase3_support_status(ticket_id: int):
     except CommunicationPhase3Error as exc:
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=206")
-        flash(f"Durum güncellenemedi: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase3_routes.py | line=206 | exc=%s", exc)
+        flash("Durum güncellenemedi.", "danger")
     return redirect(url_for("main.communication_phase3_support_detail", ticket_id=ticket_id))
 
 

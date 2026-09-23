@@ -29,7 +29,7 @@
               {% for row in payload.env_rows %}
               <tr>
                 <td>{{ row.key }}</td>
-                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status }}</span></td>
+                <td><span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'warning' if row.status == 'warn' else 'danger' }}">{{ row.status_label }}</span></td>
                 <td><code>{{ row.value }}</code></td>
                 <td>{{ row.detail }}</td>
               </tr>
@@ -47,10 +47,10 @@
           <div>
             <label class="form-label">Durum</label>
             <select class="form-select" name="status">
-              <option value="pass">pass</option>
-              <option value="warn">warn</option>
-              <option value="fail">fail</option>
-              <option value="pending" selected>pending</option>
+              <option value="pass">Geçti</option>
+              <option value="warn">Uyarı</option>
+              <option value="fail">Başarısız</option>
+              <option value="pending" selected>Bekliyor</option>
             </select>
           </div>
           <div>
@@ -71,10 +71,10 @@
           <div>
             <label class="form-label">Durum</label>
             <select class="form-select" name="status">
-              <option value="pass">pass</option>
-              <option value="warn">warn</option>
-              <option value="fail">fail</option>
-              <option value="pending" selected>pending</option>
+              <option value="pass">Geçti</option>
+              <option value="warn">Uyarı</option>
+              <option value="fail">Başarısız</option>
+              <option value="pending" selected>Bekliyor</option>
             </select>
           </div>
           <div>
@@ -100,7 +100,7 @@
                 <div class="small"><code>{{ row.path }}</code></div>
                 <div class="small text-muted">{{ row.detail }}</div>
               </div>
-              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'danger' }}">{{ row.status }}</span>
+              <span class="badge text-bg-{{ 'success' if row.status == 'pass' else 'danger' }}">{{ row.status_label }}</span>
             </div>
           </li>
           {% endfor %}

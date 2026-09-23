@@ -142,5 +142,5 @@ def admin_ai_review_queue_bulk():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(f'AI toplu işleminde hata oluştu: {exc}', 'danger')
+        flash('AI toplu işleminde hata oluştu.', 'danger')
     return redirect(redirect_url)

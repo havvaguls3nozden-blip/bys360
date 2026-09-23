@@ -301,6 +301,118 @@ MENU_SECTIONS: list[dict[str, Any]] = [  # noqa: F821 - dynamic menu registry gl
                 "active_path_prefixes": ["/performance/meeting-development/faz10", "/performans/toplanti-gelistirme/faz10-gelisim-rehberi"],
                 "required_roles": ["admin", "super_admin", "system_admin", "sistem_yoneticisi", "baskan", "baskan_yardimcisi", "grup_baskani", "mali_musavir", "koordinator", "birim_sorumlusu"],
             },
+            # BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_1
+            {
+                "key": "performance_meeting_development",
+                "label": "Toplantı Geliştirme",
+                "icon": "fa-solid fa-chalkboard-user",
+                "endpoint": "main.performance_meeting_development",
+                "active_endpoints": [
+                    "main.performance_meeting_development",
+                    "main.performance_meeting_development_tr",
+                ],
+                "active_path_prefixes": [
+                    "/performance/meeting-development",
+                    "/performans/toplanti-gelistirme",
+                ],
+                "required_roles": [
+                    "admin",
+                    "super_admin",
+                    "system_admin",
+                    "sistem_yoneticisi",
+                    "baskan",
+                    "baskan_yardimcisi",
+                    "grup_baskani",
+                    "mali_musavir",
+                    "koordinator",
+                    "birim_sorumlusu",
+                ],
+            },
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_1
+            # BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_2
+            {
+                "key": "performance_meeting_test_scenarios",
+                "label": "Toplantı Testleri",
+                "icon": "fa-solid fa-vial",
+                "endpoint": "main.performance_meeting_test_scenarios",
+                "active_endpoints": [
+                    "main.performance_meeting_test_scenarios",
+                    "main.performance_meeting_test_scenarios_tr",
+                ],
+                "active_path_prefixes": [
+                    "/performance/meeting-development/test-scenarios",
+                    "/performans/toplanti-test-senaryolari",
+                ],
+                "required_roles": [
+                    "admin",
+                    "super_admin",
+                    "system_admin",
+                    "sistem_yoneticisi",
+                    "baskan",
+                    "baskan_yardimcisi",
+                    "grup_baskani",
+                    "mali_musavir",
+                    "koordinator",
+                    "birim_sorumlusu",
+                ],
+            },
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_2
+            # BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_3
+            {
+                "key": "performance_meeting_development_faz3",
+                "label": "Toplantı Derinleştirme",
+                "icon": "fa-solid fa-diagram-project",
+                "endpoint": "main.performance_meeting_development_faz3",
+                "active_endpoints": [
+                    "main.performance_meeting_development_faz3",
+                    "main.performance_meeting_development_faz3_tr",
+                ],
+                "active_path_prefixes": [
+                    "/performance/meeting-development/faz3",
+                    "/performans/toplanti-gelistirme/derinlestirme",
+                ],
+                "required_roles": [
+                    "admin",
+                    "super_admin",
+                    "system_admin",
+                    "sistem_yoneticisi",
+                    "baskan",
+                    "baskan_yardimcisi",
+                    "grup_baskani",
+                    "mali_musavir",
+                    "koordinator",
+                    "birim_sorumlusu",
+                ],
+            },
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_3
+            # BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_4
+            {
+                "key": "performance_meeting_final_gate",
+                "label": "Final Kontrol",
+                "icon": "fa-solid fa-shield-halved",
+                "endpoint": "main.performance_meeting_final_gate",
+                "active_endpoints": [
+                    "main.performance_meeting_final_gate",
+                    "main.performance_meeting_final_gate_tr",
+                ],
+                "active_path_prefixes": [
+                    "/performance/meeting-development/final-gate",
+                    "/performans/toplanti-gelistirme/final-kontrol",
+                ],
+                "required_roles": [
+                    "admin",
+                    "super_admin",
+                    "system_admin",
+                    "sistem_yoneticisi",
+                    "baskan",
+                    "baskan_yardimcisi",
+                    "grup_baskani",
+                    "mali_musavir",
+                    "koordinator",
+                    "birim_sorumlusu",
+                ],
+            },
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_ITEM_4
             {
                 "key": "performance_task_management",
                 "label": "Görev Yönetimi",

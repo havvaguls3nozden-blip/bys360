@@ -69,27 +69,32 @@ def _announcement_recipient_users(target_type: str, target_values) -> list[User]
     if normalized_type == "all":
         return query.order_by(User.ad.asc(), User.soyad.asc(), User.id.asc()).all()
 
+    # BYS360 DEFECT AR: veritabaninin LOWER() uygulamasina guvenmek yerine
+    # (SQLite Turkce buyuk/kucuk harf donusumunu ASCII disinda uygulamaz,
+    # PostgreSQL davranisi dogrulanamaz), rol/birim degeri Turkce icerdiginde
+    # hedef kullanicilar sessizce disarida kalmasin diye esitlik Python
+    # tarafinda tutarli sekilde kontrol edilir.
     if normalized_type == "role":
         cleaned = [str(value).strip().lower() for value in (target_values or []) if str(value).strip()]
         if not cleaned:
             return []
-        return (
-            query
-            .filter(func.lower(func.trim(func.coalesce(User.role, ""))).in_(cleaned))
-            .order_by(User.ad.asc(), User.soyad.asc(), User.id.asc())
-            .all()
-        )
+        matched = [
+            user for user in query.all()
+            if (user.role or "").strip().lower() in cleaned
+        ]
+        matched.sort(key=lambda user: (user.ad or "", user.soyad or "", user.id))
+        return matched
 
     if normalized_type == "unit":
         cleaned = [str(value).strip().lower() for value in (target_values or []) if str(value).strip()]
         if not cleaned:
             return []
-        return (
-            query
-            .filter(func.lower(func.trim(func.coalesce(User.birim, ""))).in_(cleaned))
-            .order_by(User.ad.asc(), User.soyad.asc(), User.id.asc())
-            .all()
-        )
+        matched = [
+            user for user in query.all()
+            if (user.birim or "").strip().lower() in cleaned
+        ]
+        matched.sort(key=lambda user: (user.ad or "", user.soyad or "", user.id))
+        return matched
 
     if normalized_type == "user":
         cleaned_ids: list[int] = []
@@ -443,7 +448,7 @@ def announcements_new():
             flash(f"Duyuru {len(recipient_users)} kullanıcıya gönderildi. Okunma takibi birazdan duyurular ekranına düşer.", "success")
             return redirect(url_for("main.messages_inbox", thread_id=announcement_thread.id))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/announcements_routes.py | line=435")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/announcements_routes.py | line=435 | exc=%s", exc)
             db.session.rollback()
             _log_communication_exception(
                 "announcements_new",
@@ -452,7 +457,7 @@ def announcements_new():
                 target_type=target_type,
                 user_id=getattr(current_user, "id", None),
             )
-            flash(f"Duyuru gönderilirken hata oluştu: {exc}", "danger")
+            flash("Duyuru gönderilirken hata oluştu.", "danger")
             return _render_announcement_form(
                 subject=subject,
                 body=body,

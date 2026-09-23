@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from collections.abc import Callable
 from typing import Any
 
@@ -30,6 +31,8 @@ from app.services.ai.recommendation_actions import (
     bulk_apply_recommendations,
     list_target_recommendation_payloads,
 )
+
+logger = logging.getLogger(__name__)
 
 ResponseBuilder = Callable[..., dict[str, Any]]
 
@@ -64,20 +67,25 @@ def _run_json_service(builder: ResponseBuilder, *args: Any, commit: bool = True)
         safe_db_rollback()
         return jsonify({"ok": False, "error": str(exc)}), 403
     except PermissionError as exc:
+        logger.exception("BYS360 AI: beklenmeyen PermissionError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 403
+        return jsonify({"ok": False, "error": "Bu işlem için yetkiniz bulunmamaktadır."}), 403
     except AIResourceNotFound as exc:
         safe_db_rollback()
         return jsonify({"ok": False, "error": str(exc)}), 404
     except (AIInputError, ValueError) as exc:
+        if not isinstance(exc, AIInputError):
+            logger.exception("BYS360 AI: beklenmeyen ValueError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 400
+        return jsonify({"ok": False, "error": str(exc) if isinstance(exc, AIInputError) else "Geçersiz istek parametresi."}), 400
     except LookupError as exc:
+        logger.exception("BYS360 AI: beklenmeyen LookupError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 404
+        return jsonify({"ok": False, "error": "Kayıt bulunamadı."}), 404
     except Exception as exc:  # pragma: no cover
+        logger.exception("BYS360 AI işleminde beklenmeyen hata | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": f"AI işleminde beklenmeyen hata: {exc}"}), 500
+        return jsonify({"ok": False, "error": "AI işleminde beklenmeyen bir hata oluştu."}), 500
 
 
 # Güncel canlı AI uçları: performans, dashboard/genel, personel izin-vekalet,

@@ -54,7 +54,7 @@ Anket sorularını dikkatlice yanıtlayın ve formu tamamlayarak gönderin.
         text=(survey.description or 'Bu anket için açıklama bulunmuyor.'),
         icon='fa-solid fa-square-poll-vertical',
         badges=[
-            {'icon': 'fa-solid fa-layer-group', 'text': (survey.survey_type or 'kurum_ici')|replace('_', ' ')|title},
+            {'icon': 'fa-solid fa-layer-group', 'text': survey_type_label},
             {'icon': 'fa-solid fa-list-ol', 'text': 'Soru: ' ~ (questions|length)},
             {'icon': 'fa-solid fa-user-shield', 'text': 'Anonim' if survey.is_anonymous else 'Ad bazlı'}
         ],
@@ -90,7 +90,7 @@ Anket sorularını dikkatlice yanıtlayın ve formu tamamlayarak gönderin.
             </div>
             <div class="summary-box">
                 <div class="summary-label">Atama</div>
-                <div class="summary-value">{{ matched_assignment.target_type|replace('_', ' ')|title if matched_assignment else 'Genel atama' }}</div>
+                <div class="summary-value">{{ target_type_label }}</div>
                 <div class="summary-sub">Sorular arasında hızlı gezinti için aşağıdaki numara çubuğunu kullanabilirsiniz.</div>
             </div>
         </div>

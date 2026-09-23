@@ -302,7 +302,7 @@ Dönem bazlı sonuç yayınlarını yönetin, toplu veya tekil yayın işlemleri
                         <button type="submit" class="btn-soft success"><i class="fa-solid fa-bullhorn"></i>Seçili Kapsamı Yayınla</button>
                     </form>
 
-                    <form method="POST" action="{{ url_for('main.performance_unpublish_period', period_id=selected_period.id) }}" class="inline-form" onsubmit="return confirm('Bu dönemin tüm yayınlarını geri çekmek istediğinize emin misiniz?');">
+                    <form method="POST" action="{{ url_for('main.performance_unpublish_period', period_id=selected_period.id) }}" class="inline-form" id="unpublishPeriodForm" data-confirm="Bu dönemin tüm yayınlarını geri çekmek istediğinize emin misiniz?">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <input type="hidden" name="scope" value="{{ selected_scope or 'mine' }}">
                         <input type="hidden" name="q" value="{{ q or '' }}">
@@ -665,6 +665,18 @@ Dönem bazlı sonuç yayınlarını yönetin, toplu veya tekil yayın işlemleri
 
 {% block extra_scripts %}
 <script>
+(function () {
+    const unpublishForm = document.getElementById("unpublishPeriodForm");
+    if (unpublishForm) {
+        unpublishForm.addEventListener("submit", function (event) {
+            const message = unpublishForm.getAttribute("data-confirm");
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    }
+})();
+
 (function () {
     const modal = document.getElementById("previewModal");
     if (!modal) return;

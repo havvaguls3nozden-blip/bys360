@@ -9,10 +9,11 @@ operator explicitly opts in via ``SETUP_ADMIN_ENABLED``.
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
-_PHASE13B_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase13b/test_dbs")
+_PHASE13B_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase13b" / "test_dbs"
 
 
 def _make_app(monkeypatch, *, app_env: str = "testing", setup_admin_enabled: bool | None = None):
@@ -106,7 +107,12 @@ def test_setup_admin_disabled_by_default_in_production(monkeypatch):
             "soyad": "Bootstrap",
             "sicil_no": "90000",
             "email": "attacker@ktb.gov.tr",
-            "password": "AttackerPass123!",
+            # BYS360 secret-gate closure: not a real credential -- an obviously
+            # fake, test-only fixture value (contains "Test", matched
+            # case-insensitively by the gate's own PLACEHOLDER_WORDS list in
+            # scripts/quality/bys360_secret_repo_gate.py), still >= 8 chars to
+            # satisfy _MIN_PASSWORD_LENGTH in app/main_handlers/auth_handlers.py.
+            "password": "AttackerTestFixtureOnly123!",
         },
         follow_redirects=False,
     )
@@ -130,7 +136,9 @@ def test_setup_admin_requires_explicit_flag_in_production(monkeypatch):
             "soyad": "Bootstrap",
             "sicil_no": "90001",
             "email": "ops.bootstrap@ktb.gov.tr",
-            "password": "OperatorStrongPass1!",
+            # Fake test-only fixture value; see comment on the attacker-path
+            # password above.
+            "password": "OperatorTestFixtureOnly1!",
         },
         follow_redirects=False,
     )
@@ -177,7 +185,9 @@ def test_setup_admin_blocked_when_user_exists(monkeypatch):
             "soyad": "Admin",
             "sicil_no": "10001",
             "email": "second.admin@ktb.gov.tr",
-            "password": "SecondAdminPass1!",
+            # Fake test-only fixture value; see comment on the attacker-path
+            # password above.
+            "password": "SecondAdminTestFixtureOnly1!",
         },
         follow_redirects=False,
     )

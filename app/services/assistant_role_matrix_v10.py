@@ -304,13 +304,14 @@ def assistant_role_matrix_v10_save_endpoint():
         if flash:  # type: ignore[truthy-function]
             flash(f"Sanal Asistan Rol Matrisi kaydedildi. Güncellenen alan: {changed}", "success")
     except Exception as exc:
+        import logging
+        logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1: Sanal Asistan Rol Matrisi kaydedilemedi | exc=%s", exc)
         try:
             session.rollback()
         except Exception:
-            import logging
             logging.getLogger(__name__).exception("BYS360_MAINTENANCE_V13_P1_SILENT_EXCEPTION_LOGGER | app/services/assistant_role_matrix_v10.py")
         if flash:  # type: ignore[truthy-function]
-            flash(f"Sanal Asistan Rol Matrisi kaydedilemedi: {exc}", "danger")
+            flash("Sanal Asistan Rol Matrisi kaydedilemedi.", "danger")
 
     return redirect(request.referrer or "/settings")
 

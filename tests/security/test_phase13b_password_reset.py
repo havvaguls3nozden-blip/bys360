@@ -23,10 +23,11 @@ a claimed fix.
 """
 from __future__ import annotations
 
+import tempfile
 import uuid
 from pathlib import Path
 
-_PHASE13B_TEST_DB_ROOT = Path("C:/bys360/audit_tmp/phase13b/test_dbs")
+_PHASE13B_TEST_DB_ROOT = Path(tempfile.gettempdir()) / "bys360" / "audit_tmp" / "phase13b" / "test_dbs"
 
 
 def _make_app(monkeypatch, **config_overrides):
@@ -101,6 +102,7 @@ def _password_hash(app, sicil_no):
 
     with app.app_context():
         user = db.session.query(User).filter_by(sicil_no=sicil_no).first()
+        assert user is not None
         return user.password_hash
 
 
@@ -156,6 +158,7 @@ def test_reset_throttle_blocks_excessive_attempts(monkeypatch):
 
     with app.app_context():
         user = db.session.query(User).filter_by(sicil_no="13c001").first()
+        assert user is not None
         assert user.check_password("OldPassword1!")
 
 
@@ -186,6 +189,7 @@ def test_reset_answer_from_other_account_is_rejected(monkeypatch):
 
     with app.app_context():
         victim = db.session.query(User).filter_by(sicil_no="13c002").first()
+        assert victim is not None
         assert victim.check_password("VictimOldPass1!")
         assert not victim.check_password("AttackerPass1!")
 

@@ -15,12 +15,9 @@ from app.main_handlers.account_communication_helpers import (
     _BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_V2_1_23B,
     _PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_KEYS,
     _PORTAL_ROLE_MATRIX_V2_12_CONFIG,
-    ASSISTANT_DEFAULT_VISIBLE_ROLES,
-    ASSISTANT_POLICY_ROLE_OPTIONS,
     ASSISTANT_ROLE_MATRIX_ITEMS,
     ASSISTANT_ROLE_MATRIX_KEYS,
     ASSISTANT_ROLE_MATRIX_RECOMMENDED,
-    ASSISTANT_ROLE_MATRIX_ROWS,
     COMMUNICATION_POLICY_ROLE_OPTIONS,
     PERFORMANCE_ROLE_MATRIX_V12_ITEMS,
     PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS,
@@ -31,8 +28,6 @@ from app.main_handlers.account_communication_helpers import (
     SystemSetting,
     User,
     UserMenuPermission,
-    _assistant_visible_roles_from_settings,
-    _build_assistant_role_matrix,
     _build_communication_policy_items,
     _build_communication_role_matrix,
     _build_role_matrix_group,
@@ -48,7 +43,6 @@ from app.main_handlers.account_communication_helpers import (
     _role_matrix_form_field_name,
     _role_matrix_policy_config_map,
     _save_profile_photo,
-    _upsert_assistant_module_setting,
     build_effective_user_menu_context,
     build_settings_foundation_context,
     build_settings_profile_context,
@@ -74,10 +68,8 @@ from app.main_handlers.account_communication_helpers import (
     re,
     redirect,
     request,
-    reset_assistant_role_matrix_defaults,
     rollback_settings_change,
     safe_render,
-    save_assistant_role_matrix_from_form,
     save_module_settings_from_form,
     save_role_menu_defaults,
     save_system_settings_from_form,
@@ -459,22 +451,6 @@ def _resolve_bulk_profile_keys(profile_key: str, user, grouped_menu_definitions)
     return []
 
 
-def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):
-    UserMenuPermission.query.filter_by(user_id=user.id).delete()
-    for item in flat_menu_items:
-        db.session.add(
-            UserMenuPermission(
-                user_id=user.id,
-                menu_key=item["key"],
-                is_visible=item["key"] in visible_keys,
-                source_type="user_override",
-            )
-        )
-
-def _collect_form_visible_keys(form, flat_menu_items):
-    return {item["key"] for item in flat_menu_items if form.get(f"menu_{item['key']}") == "on"}
-
-
 SETTINGS_ARCHIVE_GROUP_KEY = "settings_template_archive"
 SETTINGS_ARCHIVE_KEY_PREFIX = "settings_archive::"
 
@@ -515,7 +491,7 @@ def _list_settings_template_archives(flat_menu_items) -> list[dict]:
         visible_keys = _normalize_visible_keys(payload.get("visible_keys") or [], flat_menu_items)
         if not visible_keys and isinstance(payload.get("effective_rule_map"), dict):
             visible_keys = sorted({key for key, visible in payload.get("effective_rule_map", {}).items() if visible and key in label_map})
-        preview_labels = [label_map.get(key, key) for key in visible_keys[:4]]
+        preview_labels = [label_map.get(key, "Bilinmiyor") for key in visible_keys[:4]]
         archives.append({
             "setting_key": row.setting_key,
             "archive_name": payload.get("archive_name") or row.label,
@@ -562,7 +538,7 @@ def _save_settings_template_archive(
         "target_role": (target_role or "").strip(),
         "target_birim": (target_birim or "").strip(),
         "visible_keys": visible_key_list,
-        "labels": {key: label_map.get(key, key) for key in visible_key_list},
+        "labels": {key: label_map.get(key, "Bilinmiyor") for key in visible_key_list},
         "source_user": {
             "id": getattr(source_user, "id", None),
             "sicil_no": getattr(source_user, "sicil_no", None),
@@ -651,7 +627,7 @@ def _build_visibility_template_payload(user, flat_menu_items, selected_profile_r
         },
         "visible_keys": visible_keys,
         "effective_rule_map": effective_rule_map,
-        "labels": {key: label_map.get(key, key) for key in effective_rule_map},
+        "labels": {key: label_map.get(key, "Bilinmiyor") for key in effective_rule_map},
     }
 
 
@@ -692,7 +668,7 @@ def _build_user_visibility_diff(selected_user, compare_user, flat_menu_items) ->
             continue
         rows.append({
             "key": key,
-            "label": label_map.get(key, key),
+            "label": label_map.get(key, "Bilinmiyor"),
             "group_name": grouped_labels.get(key, "Genel"),
             "selected_visible": selected_visible,
             "compare_visible": compare_visible,
@@ -725,12 +701,9 @@ __all__ = [
     "_BYS360_PREVIOUS_EXTEND_FLAT_MENU_ITEMS_V2_1_23B",
     "_PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_KEYS",
     "_PORTAL_ROLE_MATRIX_V2_12_CONFIG",
-    "ASSISTANT_DEFAULT_VISIBLE_ROLES",
-    "ASSISTANT_POLICY_ROLE_OPTIONS",
     "ASSISTANT_ROLE_MATRIX_ITEMS",
     "ASSISTANT_ROLE_MATRIX_KEYS",
     "ASSISTANT_ROLE_MATRIX_RECOMMENDED",
-    "ASSISTANT_ROLE_MATRIX_ROWS",
     "COMMUNICATION_POLICY_ROLE_OPTIONS",
     "PERFORMANCE_ROLE_MATRIX_V12_ITEMS",
     "PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS",
@@ -741,8 +714,6 @@ __all__ = [
     "SystemSetting",
     "User",
     "UserMenuPermission",
-    "_assistant_visible_roles_from_settings",
-    "_build_assistant_role_matrix",
     "_build_communication_policy_items",
     "_build_communication_role_matrix",
     "_build_role_matrix_group",
@@ -758,7 +729,6 @@ __all__ = [
     "_role_matrix_form_field_name",
     "_role_matrix_policy_config_map",
     "_save_profile_photo",
-    "_upsert_assistant_module_setting",
     "build_effective_user_menu_context",
     "build_settings_foundation_context",
     "build_settings_profile_context",
@@ -784,10 +754,8 @@ __all__ = [
     "re",
     "redirect",
     "request",
-    "reset_assistant_role_matrix_defaults",
     "rollback_settings_change",
     "safe_render",
-    "save_assistant_role_matrix_from_form",
     "save_module_settings_from_form",
     "save_role_menu_defaults",
     "save_system_settings_from_form",
@@ -835,7 +803,7 @@ def _bys360_pf_v14_dedupe_flat_menu_items(items):
     return result
 
 
-def _collect_form_visible_keys(form, flat_menu_items):  # type: ignore[no-redef]
+def _collect_form_visible_keys(form, flat_menu_items):
     visible = set()
     for item in _bys360_pf_v14_dedupe_flat_menu_items(flat_menu_items):
         key = str(item.get("key") or "").strip()
@@ -847,7 +815,7 @@ def _collect_form_visible_keys(form, flat_menu_items):  # type: ignore[no-redef]
     return visible
 
 
-def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):  # type: ignore[no-redef]
+def _apply_visibility_keys_to_user(user, flat_menu_items, visible_keys: set[str]):
     UserMenuPermission.query.filter_by(user_id=user.id).delete()
     allowed_items = _bys360_pf_v14_dedupe_flat_menu_items(flat_menu_items)
     visible_keys = {str(key).strip() for key in (visible_keys or set()) if str(key).strip()}

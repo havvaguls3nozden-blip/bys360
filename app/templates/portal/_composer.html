@@ -1,15 +1,16 @@
 {# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_BEGIN #}
 <section class="portal-card portal-composer-card portal-composer-accordion portal-v2c-composer" aria-label="Yeni portal paylaşımı" data-portal-composer-accordion>
   <details class="portal-composer-details" data-portal-composer-details>
-    <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat">
+    <summary class="portal-composer-summary" aria-label="Yeni paylaşım alanını aç veya kapat. Fotoğraf, video dosyası veya YouTube/Vimeo video bağlantısı da ekleyebilirsiniz.">
       <div class="portal-composer-summary-left">
         <div class="portal-avatar portal-avatar-ring">
-          {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" onerror="this.remove(); this.parentElement.classList.add('is-photo-missing');">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
+          {% if current_user.profile_photo_url %}<img src="{{ current_user.profile_photo_url }}" alt="Profil fotoğrafı" loading="lazy" data-fallback-class="is-photo-missing">{% else %}<i class="fa-regular fa-user"></i>{% endif %}
         </div>
         <div class="portal-composer-title compact-title">
           <span class="portal-kicker"><i class="fa-solid fa-pen-nib"></i> Paylaşım</span>
           <h2>Ne paylaşmak istersiniz?</h2>
           <p>Duyuru, bilgilendirme, teşekkür, iyi uygulama veya etkinlik notu paylaşabilirsiniz.</p>
+          <span class="portal-badge soft"><i class="fa-brands fa-youtube"></i> Video bağlantısı ekleyebilirsiniz</span>
         </div>
       </div>
       <span class="portal-composer-summary-action"><i class="fa-solid fa-plus"></i> Paylaş</span>
@@ -144,8 +145,9 @@
         </div>
         <div class="portal-media-field portal-media-field-wide">
           <label class="portal-field-label" for="portal-video-url"><i class="fa-brands fa-youtube"></i> Video bağlantısı <small>isteğe bağlı</small></label>
-          <input id="portal-video-url" class="portal-input" type="url" name="video_url" maxlength="700" placeholder="YouTube veya Vimeo bağlantısı yapıştırın">
+          <input id="portal-video-url" class="portal-input" type="url" name="video_url" maxlength="700" placeholder="YouTube veya Vimeo bağlantısı yapıştırın" data-portal-video-url>
           <div class="portal-video-link-help"><i class="fa-solid fa-shield-halved"></i><span>Dosya yüklemeden güvenli YouTube/Vimeo bağlantısı da ekleyebilirsiniz.</span></div>
+          <div class="portal-video-link-preview" data-portal-video-preview hidden aria-live="polite"></div>
         </div>
       </div>
       {# BYS360_PORTAL_MEDIA_COMMENTS_MENTIONS_V2_12_1_COMPOSER #}
@@ -162,6 +164,18 @@
     </form>
   </details>
 </section>
+<script>
+(function () {
+    document.querySelectorAll('img[data-fallback-class]').forEach(function (img) {
+        img.addEventListener('error', function () {
+            img.remove();
+            if (img.parentElement) {
+                img.parentElement.classList.add(img.getAttribute('data-fallback-class'));
+            }
+        });
+    });
+})();
+</script>
 {# BYS360_PORTAL_COMPOSER_ACCORDION_V2_6_END #}
 
 {# BYS360_PORTAL_AVATAR_FALLBACK_V2_17_73 #}

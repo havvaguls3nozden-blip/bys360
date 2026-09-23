@@ -62,7 +62,7 @@
                 <div class="col-md-3"><strong>1. Amir:</strong> {{ "%.2f"|format(evaluation.level_1_total_100 or 0) }}</div>
                 <div class="col-md-3"><strong>2. Amir:</strong> {{ "%.2f"|format(evaluation.level_2_total_100 or 0) }}</div>
                 <div class="col-md-3"><strong>3. Amir:</strong> {{ "%.2f"|format(evaluation.level_3_total_100 or 0) }}</div>
-                <div class="col-md-3"><strong>İş Akışı:</strong> {{ evaluation.workflow_status or '-' }}</div>
+                <div class="col-md-3"><strong>İş Akışı:</strong> {{ workflow_status_label }}</div>
             </div>
         </div>
     </div>

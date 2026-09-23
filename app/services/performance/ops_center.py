@@ -67,15 +67,25 @@ def _coerce_scope_ids(values: Iterable[Any] | None) -> list[int]:
     return result
 
 
+def _normalize_scope_ids(scope_user_ids: Iterable[int] | None) -> list[int] | None:
+    if scope_user_ids is None:
+        return None
+    return _coerce_scope_ids(scope_user_ids)
+
+
 def _collect_feedback_data(period, scope_user_ids: Iterable[int] | None) -> tuple[list[Any], list[Any]]:
     if not period:
         return [], []
-    employee_ids = _coerce_scope_ids(scope_user_ids)
+    employee_ids = _normalize_scope_ids(scope_user_ids)
     request_query = FeedbackRequest.query.filter_by(period_id=period.id)
     meeting_query = FeedbackMeeting.query
-    if employee_ids:
-        request_query = request_query.filter(FeedbackRequest.employee_id.in_(employee_ids))
-        meeting_query = meeting_query.filter(FeedbackMeeting.employee_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            request_query = request_query.filter(FeedbackRequest.employee_id.in_(employee_ids))
+            meeting_query = meeting_query.filter(FeedbackMeeting.employee_id.in_(employee_ids))
+        else:
+            request_query = request_query.filter(FeedbackRequest.employee_id == -1)
+            meeting_query = meeting_query.filter(FeedbackMeeting.employee_id == -1)
     requests_list = request_query.order_by(FeedbackRequest.requested_at.desc(), FeedbackRequest.id.desc()).all()
     meetings = meeting_query.order_by(FeedbackMeeting.created_at.desc(), FeedbackMeeting.id.desc()).all()
     return requests_list, meetings
@@ -84,10 +94,13 @@ def _collect_feedback_data(period, scope_user_ids: Iterable[int] | None) -> tupl
 def _build_assignment_log_rows(period, scope_user_ids: Iterable[int] | None, limit: int = 8) -> list[dict[str, Any]]:
     if not period:
         return []
-    employee_ids = _coerce_scope_ids(scope_user_ids)
+    employee_ids = _normalize_scope_ids(scope_user_ids)
     query = AssignmentCoverageLog.query.filter_by(period_id=period.id)
-    if employee_ids:
-        query = query.filter(AssignmentCoverageLog.employee_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            query = query.filter(AssignmentCoverageLog.employee_id.in_(employee_ids))
+        else:
+            query = query.filter(AssignmentCoverageLog.employee_id == -1)
     rows = query.order_by(desc(AssignmentCoverageLog.created_at), desc(AssignmentCoverageLog.id)).limit(max(int(limit or 0), 1)).all()
     payload: list[dict[str, Any]] = []
     for row in rows:
@@ -109,10 +122,13 @@ def _build_assignment_log_rows(period, scope_user_ids: Iterable[int] | None, lim
 def _build_publish_log_rows(period, scope_user_ids: Iterable[int] | None, limit: int = 8) -> list[dict[str, Any]]:
     if not period:
         return []
-    employee_ids = _coerce_scope_ids(scope_user_ids)
+    employee_ids = _normalize_scope_ids(scope_user_ids)
     query = EvaluationPublishLog.query.filter_by(period_id=period.id)
-    if employee_ids:
-        query = query.filter(EvaluationPublishLog.employee_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            query = query.filter(EvaluationPublishLog.employee_id.in_(employee_ids))
+        else:
+            query = query.filter(EvaluationPublishLog.employee_id == -1)
     rows = query.order_by(desc(EvaluationPublishLog.acted_at), desc(EvaluationPublishLog.id)).limit(max(int(limit or 0), 1)).all()
     payload: list[dict[str, Any]] = []
     for row in rows:
@@ -128,10 +144,13 @@ def _build_publish_log_rows(period, scope_user_ids: Iterable[int] | None, limit:
 def _build_mail_log_rows(period, scope_user_ids: Iterable[int] | None, limit: int = 8) -> list[dict[str, Any]]:
     if not period:
         return []
-    employee_ids = _coerce_scope_ids(scope_user_ids)
+    employee_ids = _normalize_scope_ids(scope_user_ids)
     query = MailLog.query.filter_by(related_period_id=period.id)
-    if employee_ids:
-        query = query.filter(MailLog.related_user_id.in_(employee_ids))
+    if employee_ids is not None:
+        if employee_ids:
+            query = query.filter(MailLog.related_user_id.in_(employee_ids))
+        else:
+            query = query.filter(MailLog.related_user_id == -1)
     rows = query.order_by(desc(MailLog.sent_at), desc(MailLog.id)).limit(max(int(limit or 0), 1)).all()
     payload: list[dict[str, Any]] = []
     for row in rows:
@@ -190,18 +209,19 @@ def build_performance_operations_snapshot(*, period=None, viewer=None, scope_use
     hazır kart, uyarı ve log blokları alabilmesidir.
     """
     period = period or get_period()
-    scope_ids = _coerce_scope_ids(scope_user_ids)
-    scorecard = build_period_scorecard_context(period, viewer=viewer, allowed_employee_ids=scope_ids or None)
-    publish_summary = build_publish_workspace_context(period, viewer=viewer, allowed_employee_ids=scope_ids or None)
-    task_preflight = build_task_management_preflight_report(period, scope_ids or None)
-    health_report = build_performance_task_health_report(period, scope_ids or None)
+    normalized_scope_user_ids = _normalize_scope_ids(scope_user_ids)
+    scorecard = build_period_scorecard_context(period, viewer=viewer, allowed_employee_ids=normalized_scope_user_ids)
+    publish_summary = build_publish_workspace_context(period, viewer=viewer, allowed_employee_ids=normalized_scope_user_ids)
+    task_preflight = build_task_management_preflight_report(period, normalized_scope_user_ids)
+    health_report = build_performance_task_health_report(period, normalized_scope_user_ids)
     publish_preflight = build_publish_preflight_report(period=period, scorecard=scorecard, publish_summary=publish_summary)
-    requests_list, meetings = _collect_feedback_data(period, scope_ids or None)
+    requests_list, meetings = _collect_feedback_data(period, normalized_scope_user_ids)
     go_live = build_performance_go_live_center(
         active_period=period,
         requests_list=requests_list,
         meetings=meetings,
         now=now or utc_now(),
+        scope_employee_ids=normalized_scope_user_ids,
     )
 
     blocker_rows = (
@@ -237,19 +257,19 @@ def build_performance_operations_snapshot(*, period=None, viewer=None, scope_use
         ),
         'critical_feedback_requests': _safe_int((go_live.get('cards') or {}).get('critical_feedback_requests')),
         'recent_log_events': (
-            len(_build_assignment_log_rows(period, scope_ids or None, 6))
-            + len(_build_publish_log_rows(period, scope_ids or None, 6))
-            + len(_build_mail_log_rows(period, scope_ids or None, 6))
+            len(_build_assignment_log_rows(period, normalized_scope_user_ids, 6))
+            + len(_build_publish_log_rows(period, normalized_scope_user_ids, 6))
+            + len(_build_mail_log_rows(period, normalized_scope_user_ids, 6))
         ),
     }
 
-    assignment_logs = _build_assignment_log_rows(period, scope_ids or None, 10)
-    publish_logs = _build_publish_log_rows(period, scope_ids or None, 10)
-    mail_logs = _build_mail_log_rows(period, scope_ids or None, 10)
+    assignment_logs = _build_assignment_log_rows(period, normalized_scope_user_ids, 10)
+    publish_logs = _build_publish_log_rows(period, normalized_scope_user_ids, 10)
+    mail_logs = _build_mail_log_rows(period, normalized_scope_user_ids, 10)
     service_snapshot = build_performance_service_snapshot(
         period_id=getattr(period, 'id', None),
         manager_id=getattr(viewer, 'id', None),
-        employee_ids=scope_ids or None,
+        employee_ids=normalized_scope_user_ids,
     )
 
     return {

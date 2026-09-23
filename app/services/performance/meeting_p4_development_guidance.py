@@ -301,9 +301,9 @@ def ensure_recommendation_table() -> tuple[bool, list[str]]:
             db.session.rollback()
             warnings.append(f"Gelişim önerisi tablosu oluşturulamadı: {exc.__class__.__name__}")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             db.session.rollback()
-            warnings.append(f"Gelişim önerisi tablosu oluşturulamadı: {exc}")
+            warnings.append("Gelişim önerisi tablosu oluşturulamadı.")
 
     if _has_table(P4_RECOMMENDATION_TABLE):
         existing = _columns(P4_RECOMMENDATION_TABLE)
@@ -364,7 +364,7 @@ def _recommendation_rows_for_evaluation(evaluation: Any, limit: int = 20) -> lis
         recommendation_type = str(row.get("recommendation_type") or "")
         visibility_scope = str(row.get("visibility_scope") or "")
         status = str(row.get("status") or "")
-        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, recommendation_type or "Gelişim Önerisi")
+        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, "Gelişim Önerisi")
         row["visibility_label"] = P4_VISIBILITY_LABELS.get(visibility_scope, "Yetkili görünürlük")
         row["status_label"] = P4_STATUS_LABELS.get(status, "Kontrol Bekliyor")
         row["created_display"] = _safe_text(row.get("created_at"))[:16].replace("T", " ") or "-"
@@ -557,7 +557,7 @@ def build_p4_development_guidance_context(viewer: Any | None = None) -> dict[str
         recommendation_type = str(row.get("recommendation_type") or "")
         visibility_scope = str(row.get("visibility_scope") or "")
         status = str(row.get("status") or "")
-        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, recommendation_type or "Gelişim Önerisi")
+        row["type_label"] = P4_TYPE_LABELS.get(recommendation_type, "Gelişim Önerisi")
         row["visibility_label"] = P4_VISIBILITY_LABELS.get(visibility_scope, "Yetkili görünürlük")
         row["status_label"] = P4_STATUS_LABELS.get(status, "Kontrol Bekliyor")
     return {
@@ -584,9 +584,9 @@ def run_p4_development_guidance(actor_user_id: int | None = None) -> P4Developme
         seed_demo_recommendation(actor_user_id=actor_user_id)
         db.session.commit()
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        warnings.append(f"Aşama 10 gelişim/rehberlik hazırlığı tamamlanamadı: {exc}")
+        warnings.append("Aşama 10 gelişim/rehberlik hazırlığı tamamlanamadı.")
     checks = p4_status_checks()
     passed = sum(1 for item in checks if item["ok"])
     tables_ready = int(_has_table(P4_RECOMMENDATION_TABLE))

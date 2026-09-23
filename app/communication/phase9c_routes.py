@@ -74,8 +74,8 @@ def communication_phase9c_gate_create():
         record_phase9c_gate(current_user, gate_key, status, note)
         flash('Faz 9C kapı kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=75")
-        flash(f'Kapı kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=75 | exc=%s", exc)
+        flash('Kapı kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9c_pilot_opening_center'))
 
 
@@ -95,8 +95,8 @@ def communication_phase9c_decision_create():
         record_phase9c_decision(current_user, decision, status, note)
         flash('Faz 9C karar kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=95")
-        flash(f'Karar kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=95 | exc=%s", exc)
+        flash('Karar kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9c_pilot_opening_center'))
 
 
@@ -116,8 +116,8 @@ def communication_phase9c_incident_create():
         record_phase9c_incident(current_user, title, severity, note)
         flash('Pilot olay kaydı oluşturuldu.', 'success')
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=115")
-        flash(f'Olay kaydı oluşturulamadı: {exc}', 'danger')
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase9c_routes.py | line=115 | exc=%s", exc)
+        flash('Olay kaydı oluşturulamadı.', 'danger')
     return redirect(url_for('main.communication_phase9c_pilot_opening_center'))
 
 

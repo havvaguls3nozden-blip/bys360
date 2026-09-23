@@ -161,23 +161,23 @@ class AIDecisionVisibilityScope:
 
 
 def role_group_for(user_or_role: Any) -> str:
+    # BYS360 DEFECT AQ: burada önceden bir "esnek eşleştirme" bloğu vardı --
+    # rol metninde "admin", "baskan" (grup hariç) gibi alt dizeler geçiyorsa
+    # tam rol kodu eşleşmese bile "global" (şirket geneli, kısıtlanmamış
+    # performans değerlendirme görünürlüğü) veya "performance_authority"
+    # kapsamı veriyordu. Bu, "Başkanlığı Uzmanı" gibi unvanı sadece "baskan"
+    # alt dizesini İÇEREN sıradan bir uzmanı gerçek Başkan ile aynı
+    # yetkiye taşıyordu (bkz. process_engine_phase6_president_approvals.py
+    # is_president_user'ın kendi yorumu: "kurum adı veya 'Başkanlığı' metni
+    # yetki vermez"). Kanonik rol kodu dışındaki her girdi artık güvenli
+    # varsayılan olan "own_scope"a düşer -- yeni bir substring/allowlist
+    # icat edilmedi, yalnızca zaten var olan tam-eşleşme kümeleri kullanılıyor.
     role = normalize_role_name(getattr(user_or_role, "role", user_or_role))
     if role in {normalize_role_name(item) for item in _FULL_SCOPE_ROLES}:
         return "global"
     if role in {normalize_role_name(item) for item in _HR_PERFORMANCE_SCOPE_ROLES}:
         return "performance_authority"
     if role in {normalize_role_name(item) for item in _MANAGER_SCOPE_ROLES}:
-        return "manager_scope"
-    if role in {normalize_role_name(item) for item in _PERSONNEL_ROLES}:
-        return "own_scope"
-    # Kurumda rol adları farklı girilmişse, etiket içinde geçen kelimelerle güvenli eşleştirme yapılır.
-    if "admin" in role or "yonetici" in role and "sistem" in role:
-        return "global"
-    if "baskan" in role and "grup" not in role:
-        return "global"
-    if "performans" in role or "personel" in role and "destek" in role:
-        return "performance_authority"
-    if "grup" in role or "koordinator" in role or "amir" in role or "mudur" in role:
         return "manager_scope"
     return "own_scope"
 

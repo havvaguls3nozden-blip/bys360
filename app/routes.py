@@ -7,6 +7,8 @@ kayıt importları burada tutuluyor. Büyük gövdeler ilgili handler modülleri
 """
 from __future__ import annotations
 
+import ipaddress
+
 from flask import abort, current_app, jsonify, request, send_from_directory
 from flask_login import current_user, login_required
 
@@ -127,16 +129,145 @@ def bys360_profile_photo_file(filename: str):
 # BYS360_PROFILE_PHOTO_VISIBILITY_V2_17_73_END
 
 
+def _bys360_release_identity() -> dict[str, str | None]:
+    """BYS360 DEFECT Z: reads THIS running process's own bundled
+    CANDIDATE_READY.json (written by prepare_bys360_candidate.ps1, verified
+    and carried across promotion by cutover_bys360_candidate.ps1) to expose
+    the release this specific process was actually promoted from. Every
+    promoted version lives at the same fixed C:\\bys360\\project path, so
+    process/PID/path metadata alone can never distinguish WHICH release's
+    code is currently loaded -- this is the one place that can. Absent in
+    local/dev environments not managed by that pipeline; never raises.
+
+    BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: reads with "utf-8-sig",
+    not "utf-8". A real production CANDIDATE_READY.json was confirmed to
+    start with a UTF-8 byte-order-mark (EF BB BF) -- prepare_bys360_
+    candidate.ps1's receipt writer used PowerShell's "-Encoding UTF8"
+    parameter, which Windows PowerShell 5.1 (what production runs) writes
+    WITH a BOM. json.loads(receipt_path.read_text(encoding="utf-8")) then
+    decodes that BOM as a literal U+FEFF character prefixed onto the JSON
+    text, which json.loads rejects (JSONDecodeError: "Unexpected UTF-8
+    BOM"), silently forcing source_sha/migration_head to null even for a
+    fully valid, correctly-promoted candidate. "utf-8-sig" transparently
+    strips a leading BOM if present and decodes identically to "utf-8"
+    when absent, so both the still-existing BOM-prefixed receipts (already
+    written by the old writer) and newly-written BOM-less receipts (see
+    prepare_bys360_candidate.ps1's Write-Utf8NoBomFile) parse correctly."""
+    import json
+    from pathlib import Path
+
+    receipt_path = Path(current_app.root_path).parent / "CANDIDATE_READY.json"
+    try:
+        data = json.loads(receipt_path.read_text(encoding="utf-8-sig"))
+    except Exception:
+        return {"source_sha": None, "migration_head": None}
+    return {
+        "source_sha": data.get("SOURCE_SHA"),
+        "migration_head": data.get("MIGRATION_HEAD"),
+    }
+
+
+def _bys360_request_is_from_loopback() -> bool:
+    """BYS360 DEFECT AF: True only for a caller connected directly over the
+    raw TCP loopback interface -- e.g. cutover_bys360_candidate.ps1's own
+    curl.exe call to http://127.0.0.1:$AppPort during a local cutover run.
+
+    BYS360 PRODUCTION RELEASE-IDENTITY HOTFIX #2: reads the RAW socket peer
+    address from Werkzeug ProxyFix's own actual environ contract. Verified
+    directly against the installed werkzeug (3.1.8) source and confirmed
+    live: ProxyFix.__call__ stores the pre-rewrite originals as a SINGLE
+    dict at environ["werkzeug.proxy_fix.orig"] (keys "REMOTE_ADDR",
+    "wsgi.url_scheme", "HTTP_HOST", "SERVER_NAME", "SERVER_PORT",
+    "SCRIPT_NAME") -- the flat "werkzeug.proxy_fix.orig_remote_addr" key
+    this function previously read was REMOVED from Werkzeug in 1.0 (see
+    werkzeug's own changelog in proxy_fix.py) and has never existed in any
+    version this app has run under. Because that key never exists, the
+    previous `environ.get("werkzeug.proxy_fix.orig_remote_addr",
+    request.remote_addr)` call silently always evaluated its *default* --
+    request.remote_addr -- which is exactly what ProxyFix REWRITES from an
+    operator-configured number of trusted X-Forwarded-For hops (x_for=1
+    here). A live probe with PROXY_FIX_ENABLED genuinely active proved
+    this concretely: a request with a real raw peer of 203.0.113.5 and a
+    forged "X-Forwarded-For: 127.0.0.1" header resulted in the previous
+    code reading "127.0.0.1" -- the previous implementation's claimed
+    raw-peer protection against exactly this spoof was never actually in
+    effect. (The pre-existing regression test for this scenario passed
+    only because it enabled ProxyFix via monkeypatch.setenv, which cannot
+    affect config.py's Config.PROXY_FIX_ENABLED -- a class attribute
+    evaluated once at first import of the module, not re-read per request
+    or per env change; see tests/security/test_https_scheme_and_hsts_
+    hardening.py's monkeypatch.setattr(Config, ...) pattern for the
+    correct way to genuinely enable it in a test. That test therefore
+    never actually exercised ProxyFix at all.)
+
+    Trust rule: if environ["werkzeug.proxy_fix.orig"] exists (ProxyFix is
+    genuinely wrapping this request), its own "REMOTE_ADDR" is the ONLY
+    trusted raw-peer source -- request.remote_addr is deliberately never
+    consulted in that branch, even if the dict's REMOTE_ADDR is missing or
+    malformed (fails closed to non-loopback rather than silently trusting
+    a value ProxyFix may have already rewritten from client-controlled
+    headers). Only when ProxyFix is genuinely absent/disabled -- no orig
+    dict in the environ at all -- is request.remote_addr itself the raw,
+    unforgeable socket peer, safe to evaluate directly. Under no
+    circumstance can X-Forwarded-For alone convert a genuinely non-
+    loopback raw connection into a trusted loopback one.
+
+    Canonical IP parsing (ipaddress.ip_address.is_loopback), not a fixed
+    string set -- a real production cutover's self-curl to
+    http://127.0.0.1:$AppPort observed its own raw peer as the
+    IPv4-mapped-IPv6 form "::ffff:127.0.0.1" (a legitimate representation
+    of a genuine IPv4 loopback connection on a dual-stack Windows socket),
+    which a literal {"127.0.0.1", "::1"} membership check does not
+    recognize, silently forcing source_sha/migration_head to null even for
+    a genuine loopback caller. An IPv4-mapped IPv6 address is unwrapped to its
+    embedded IPv4 form before the loopback check so it is judged by the
+    same rule as a direct IPv4 connection; every other address (public,
+    private/LAN, link-local) is correctly still non-loopback, and a
+    malformed/empty peer value fails closed to False, never raises."""
+    proxy_fix_orig = request.environ.get("werkzeug.proxy_fix.orig")
+    if proxy_fix_orig is None:
+        raw_peer = request.remote_addr
+    else:
+        raw_peer = proxy_fix_orig.get("REMOTE_ADDR") if isinstance(proxy_fix_orig, dict) else None
+    peer = str(raw_peer or "").strip().split("%", 1)[0]
+    if not peer:
+        return False
+    try:
+        addr = ipaddress.ip_address(peer)
+    except ValueError:
+        return False
+    if isinstance(addr, ipaddress.IPv6Address) and addr.ipv4_mapped is not None:
+        addr = addr.ipv4_mapped
+    return bool(addr.is_loopback)
+
+
 @main_bp.get("/versionz")
 def versionz():
     runtime_manifest = current_app.extensions.get("runtime_route_manifest") or {}
     schema_errors = list(current_app.extensions.get("schema_check_errors", []) or [])
-    return jsonify({
+    payload = {
         "service": "bys360",
         "app_env": current_app.config.get("APP_ENV", "development"),
         "route_count": len(runtime_manifest) if isinstance(runtime_manifest, dict) else 0,
         "schema_error_count": len(schema_errors),
-    }), 200
+    }
+    # BYS360 DEFECT AF: source_sha/migration_head identify the exact
+    # deployed git commit and Alembic revision -- real, if low-severity,
+    # deployment-fingerprinting information. /versionz has no @login_
+    # required (matching /healthz and /readyz, an intentional, pre-existing
+    # design this fix does not change), so these two fields are exposed
+    # only to callers connecting from the loopback interface -- exactly
+    # what cutover_bys360_candidate.ps1's own Test-ReleaseIdentityBinding
+    # needs (it always curls http://127.0.0.1:$AppPort directly) and
+    # nothing more. Every other field above remains public, unchanged.
+    if _bys360_request_is_from_loopback():
+        release = _bys360_release_identity()
+        payload["source_sha"] = release["source_sha"]
+        payload["migration_head"] = release["migration_head"]
+    else:
+        payload["source_sha"] = None
+        payload["migration_head"] = None
+    return jsonify(payload), 200
 
 
 @main_bp.before_app_request

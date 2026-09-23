@@ -49,7 +49,7 @@ def register_mobile_communication_v2_read_routes_v1(mobile_bp, route_globals) ->
                     _metric("Kaynak", "Gerçek", "message_threads ve messages kayıtları", "blue", "api"),
                 ],
             })
-        except Exception as exc:
+        except Exception:
             current_app.logger.exception("B48 mobile communication threads failed")
             return jsonify({
                 "source": "real_message_threads_v2_error_safe",
@@ -60,7 +60,6 @@ def register_mobile_communication_v2_read_routes_v1(mobile_bp, route_globals) ->
                 "items": [],
                 "rows": [],
                 "message": "Mesajlaşma kayıtları şu anda yüklenemedi. Sunucu logu kontrol edilmelidir.",
-                "warning": str(exc)[:240],
             })
 
     route_globals["_BYS360_P11_B7_COMMUNICATION_V2_READ_ROUTES_REGISTERED"] = True

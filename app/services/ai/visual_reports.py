@@ -82,12 +82,12 @@ def _clean_key(value: Any, fallback: str = "genel") -> str:
 
 def _label_module(module_type: str | None) -> str:
     key = _clean_key(module_type)
-    return MODULE_LABELS.get(key, key.replace("_", " ").title())
+    return MODULE_LABELS.get(key, "Bilinmiyor")
 
 
 def _label_status(status: str | None) -> str:
     key = _clean_key(status, "unknown")
-    return STATUS_LABELS.get(key, key.replace("_", " ").title())
+    return STATUS_LABELS.get(key, "Bilinmiyor")
 
 
 def _ratio(part: int, whole: int) -> int:

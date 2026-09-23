@@ -19,7 +19,7 @@
           <thead><tr><th>İşlem</th><th>Durum</th><th>Zaman</th></tr></thead>
           <tbody>
             {% for row in payload.automation.recent_logs %}
-            <tr><td>{{ row.action_type }}</td><td>{{ row.status }}</td><td>{{ row.executed_at }}</td></tr>
+            <tr><td>{{ row.action_type }}</td><td>{{ row.status_label }}</td><td>{{ row.executed_at }}</td></tr>
             {% else %}
             <tr><td colspan="3" class="text-muted">Kayıt bulunamadı.</td></tr>
             {% endfor %}

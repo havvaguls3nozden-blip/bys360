@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 from sqlalchemy import text
@@ -8,6 +9,8 @@ from app.extensions import db
 
 from .performance_bridge import has_performance_overview_permission
 from .repository import insert_agent_audit_log, table_columns, table_exists
+
+logger = logging.getLogger(__name__)
 
 TARGET_TABLE_CANDIDATES = (
     "performance_targets",
@@ -184,8 +187,9 @@ def build_dashboard_kpi_summary_for_user(user: Any) -> dict[str, Any]:
     try:
         rows = db.session.execute(text(sql), params).mappings().all()
     except Exception as exc:
+        logger.exception("BYS360 KPI/Hedef özeti okuma hatası | exc=%s", exc)
         return _empty_summary(
-            f"KPI/Hedef verisi okunurken güvenli boş durum üretildi: {exc}",
+            "KPI/Hedef verisi okunurken güvenli boş durum üretildi.",
             privileged=privileged,
             user_id=user_id,
         )

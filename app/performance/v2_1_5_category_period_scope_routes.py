@@ -62,8 +62,8 @@ def performance_v2_1_5_category_period_scope():
                 seed_default_categories(overwrite=False)
                 flash("Kategori listesi kontrol edildi.", "success")
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-            flash(f"Kapsam işlemi tamamlanamadı: {exc}", "danger")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
+            flash("Kapsam işlemi tamamlanamadı.", "danger")
         return redirect(url_for("main.performance_v2_1_5_category_period_scope"))
 
     cats = active_categories()

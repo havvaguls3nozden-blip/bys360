@@ -15,8 +15,14 @@ def _push_text(value, *, limit=500):
 
 
 def _is_sqlite() -> bool:
+    # BYS360 DEFECT AR: db.session.bind is always None on this Flask-SQLAlchemy
+    # runtime, so the previous db.session.bind.dialect.name lookup always raised
+    # AttributeError and the swallowed exception made this always return False --
+    # meaning SQLite always took the PostgreSQL SERIAL branch below, leaving
+    # mobile_push_tokens.id permanently NULL (same root cause already fixed in
+    # interim_notes_runtime.py::_dialect_name()).
     try:
-        return db.session.bind.dialect.name == "sqlite"  # type: ignore[union-attr]
+        return db.session.get_bind().dialect.name == "sqlite"
     except Exception:
         return False
 

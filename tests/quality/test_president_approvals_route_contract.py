@@ -8,25 +8,41 @@ değiştirmesini (silent flip) CI'da yakalar.
 
 Önemli düzeltme (Phase 12A koordinatör + 3 ajan bağımsız doğrulaması):
 `/workflow/president-approvals` başlangıç hipotezinde "aktif legacy akış" olarak
-anılmıştı. Bu YANLIŞTIR: `app/workflow/routes.py` hiçbir yerden import edilmiyor,
-dolayısıyla bu route runtime'da hiç kayıtlı değil (bkz. test_workflow_president_
+anılmıştı. Bu YANLIŞTIR: `app/workflow/routes.py` hiçbir yerden import edilmiyordu,
+dolayısıyla bu route runtime'da hiç kayıtlı değildi (bkz. test_workflow_president_
 approvals_confirmed_dead_at_runtime). Bu dosyadaki testler VARSAYIMI değil,
 KANITLANMIŞ GERÇEK DURUMU kilitler.
 
 Hiçbir gerçek POST/onayla/iade/sil çalıştırılmaz; POST testleri yalnızca Werkzeug
 matcher (`url_map.bind().match()`) seviyesindedir, handler invoke edilmez.
 
-Not (dead-route testi izolasyonu): `app.workflow.routes`'daki `@main_bp.route(...)`
-decorator'ları IMPORT anında çalışır ve paylaşılan `main_bp` Blueprint nesnesine
-kalıcı olarak yazılır. `tests/workflow/test_phase5w_workflow_schema_readiness.py`
-bu modülü izole birim testi amacıyla doğrudan import ediyor; tam test paketi
-içinde bu import session-scope `app` fixture'ından ÖNCE tetiklenirse, sonraki
+FOLLOW-UP (BYS360 Workflow Orphan Presentation Subsystem Temizliği, düzeltilmiş
+Alternatif A+): `app/workflow/routes.py` -- yukarıdaki "hiçbir yerden import
+edilmiyor" tespiti bağımsız olarak yeniden doğrulandıktan sonra -- artık
+runtime dışı olmakla kalmıyor, dosyanın kendisi de silindi (bkz. `git show
+88d148c61f11fe9cc8d323cd8cdce1d80a146dfe:app/workflow/routes.py` için silme
+öncesi tarihsel içerik). `tests/workflow/test_phase5w_workflow_schema_
+readiness.py` (bu dosyayı izole birim testi amacıyla doğrudan import ederek
+paylaşılan `main_bp` Blueprint nesnesini kirletebilen dosya -- aşağıdaki eski
+"dead-route testi izolasyonu" notunun konusu) de aynı dalgada silindi, çünkü
+test ettiği kod artık yok. `test_workflow_president_approvals_confirmed_dead_
+at_runtime` aşağıda hâlâ İZOLE bir alt-process kullanıyor -- artık gerekli
+olmasa da (kirletecek dosya kalmadı), test davranışını değiştirmeden
+bırakıldı; bu iyi bir savunma katmanıdır (gelecekte benzer bir dosya tekrar
+eklenirse aynı sınıf kirliliğe karşı hâlâ bağışıktır).
+
+Not (tarihsel -- artık kirletecek dosya yok, ama izolasyon deseni korunuyor):
+`app.workflow.routes`'daki `@main_bp.route(...)` decorator'ları IMPORT anında
+çalışır ve paylaşılan `main_bp` Blueprint nesnesine kalıcı olarak yazılır.
+`tests/workflow/test_phase5w_workflow_schema_readiness.py` bu modülü izole
+birim testi amacıyla doğrudan import ediyordu; tam test paketi içinde bu
+import session-scope `app` fixture'ından ÖNCE tetiklenirse, sonraki
 `create_app()` çağrıları da (aynı process içinde modül zaten cache'lendiği için)
-kirlenmiş `main_bp`'yi görür. Bu, ürünün kendisinde bir hata DEĞİL, yalnızca test
-suite'inin aynı process'i paylaşmasından kaynaklanan bir gözlem artefaktıdır.
-Bu yüzden `test_workflow_president_approvals_confirmed_dead_at_runtime` bilerek
-TAMAMEN İZOLE bir alt-process'te `create_app()` çalıştırır (3 ajanın da yaptığı
-gibi) — session `app` fixture'ına güvenmez.
+kirlenmiş `main_bp`'yi görürdü. Bu, ürünün kendisinde bir hata DEĞİLDİ, yalnızca
+test suite'inin aynı process'i paylaşmasından kaynaklanan bir gözlem
+artefaktıydı. Bu yüzden `test_workflow_president_approvals_confirmed_dead_at_
+runtime` bilerek TAMAMEN İZOLE bir alt-process'te `create_app()` çalıştırır (3
+ajanın da yaptığı gibi) — session `app` fixture'ına güvenmez.
 """
 from __future__ import annotations
 

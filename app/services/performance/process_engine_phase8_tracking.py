@@ -2,48 +2,28 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import bindparam, inspect, text
 
 from app.extensions import db
 
 logger = logging.getLogger(__name__)
 
-# PHASE8_TRACKING_PRIORITY_NUMERIC_COMPAT
-def _normalize_tracking_priority(value):
-    """Return numeric tracking priority for DB compatibility.
-
-    The tracking service may classify priorities with Turkish labels such as
-    'yuksek'. The existing production column is numeric, so we normalize labels
-    before persistence instead of changing the table type.
-    """
-    if value is None:
-        return 50
-    if isinstance(value, bool):
-        return 100 if value else 50
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: sessiz except/pass yakalandi (app/services/performance/process_engine_phase8_tracking.py)")
-    normalized = str(value).strip().lower()
-    mapping = {
-        "kritik": 100,
-        "acil": 100,
-        "yüksek": 80,
-        "yuksek": 80,
-        "orta": 50,
-        "normal": 50,
-        "düşük": 20,
-        "dusuk": 20,
-        "low": 20,
-        "medium": 50,
-        "high": 80,
-        "critical": 100,
-    }
-    return mapping.get(normalized, 50)
 PHASE8_VERSION = "2026-04-30-process-tracking-phase8"
+
+# BYS360 DEFECT AO: no SLA/threshold configuration for process-tracking
+# overdue detection exists anywhere in this codebase (searched config.py,
+# app/services/performance/, and every settings/module_settings source --
+# the closest matches, feedback_alert_service.REQUEST_SLA_DAYS=5 and
+# ai_decision/reminder_policy.critical_overdue_days=7, govern unrelated
+# features on different tables and are never imported here). This 7-day
+# value is the only threshold this module has ever defined -- it was
+# already hardcoded inline before this fix; it is kept as-is (not replaced
+# with an invented number) and simply given a name so every real column
+# derivation below uses the same, single, already-existing value.
+PHASE8_OVERDUE_THRESHOLD_DAYS = 7
 
 
 @dataclass(frozen=True)
@@ -52,52 +32,43 @@ class Phase8SyncResult:
     flows_updated: int = 0
 
 
-def _scalar(sql: str, params: dict[str, Any] | None = None) -> Any:
-    return db.session.execute(text(sql), params or {}).scalar()
+def _prepare_clause(sql: str, expanding: tuple[str, ...]):
+    """BYS360 DEFECT AB: builds a dialect-neutral TextClause. `expanding`
+    names bind parameters whose value is a Python list that must become a
+    real SQL IN-list (`IN (:p_1, :p_2, ...)`) at execute time, working
+    identically on PostgreSQL and SQLite -- unlike PostgreSQL's `= ANY(:x)`
+    array-bind syntax, which SQLite has no equivalent for at all."""
+    clause = text(sql)
+    if expanding:
+        clause = clause.bindparams(*(bindparam(name, expanding=True) for name in expanding))
+    return clause
 
 
-def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
-    return list(db.session.execute(text(sql), params or {}).mappings())
+def _scalar(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> Any:
+    return db.session.execute(_prepare_clause(sql, expanding), params or {}).scalar()
+
+
+def _rows(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> list[Any]:
+    return list(db.session.execute(_prepare_clause(sql, expanding), params or {}).mappings())
+
+
+def _execute(sql: str, params: dict[str, Any] | None = None, *, expanding: tuple[str, ...] = ()) -> Any:
+    return db.session.execute(_prepare_clause(sql, expanding), params or {})
 
 
 def table_exists(table_name: str) -> bool:
     """Return whether a table exists for the active SQLAlchemy database.
 
-    Local development may run on SQLite, while live commonly runs on PostgreSQL.
-    The old implementation used PostgreSQL information_schema directly and caused
-    500 errors on SQLite pages such as /performance/process-tracking.
+    BYS360 DEFECT AL: the prior implementation hand-rolled a dialect branch
+    (raw ``sqlite_master`` vs. raw PostgreSQL-only ``information_schema``),
+    duplicating logic that SQLAlchemy's ``inspect()`` already provides
+    dialect-neutrally by construction -- the same proven pattern already
+    used elsewhere in this module family (process_engine_phase4_flow.py,
+    phase6_president_approvals.py, phase7_president_rule.py).
     """
     try:
         bind = db.session.get_bind()
-        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
-
-        if dialect_name == "sqlite":
-            return bool(
-                _scalar(
-                    """
-                    SELECT 1
-                    FROM sqlite_master
-                    WHERE type = 'table'
-                      AND name = :table_name
-                    LIMIT 1
-                    """,
-                    {"table_name": table_name},
-                )
-            )
-
-        return bool(
-            _scalar(
-                """
-                SELECT EXISTS (
-                    SELECT 1
-                    FROM information_schema.tables
-                    WHERE table_schema = 'public'
-                      AND table_name = :table_name
-                )
-                """,
-                {"table_name": table_name},
-            )
-        )
+        return bool(inspect(bind).has_table(table_name))
     except Exception:
         logging.getLogger(__name__).exception(
             "BYS360 process tracking table_exists guvenli fallback | table=%s",
@@ -120,33 +91,17 @@ def column_exists(table_name: str, column_name: str) -> bool:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    """Return table column names for SQLite and PostgreSQL safely."""
+    """Return table column names for SQLite and PostgreSQL safely.
+
+    BYS360 DEFECT AL: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior hand-rolled sqlite_master/information_schema branch.
+    """
     try:
         bind = db.session.get_bind()
-        dialect_name = getattr(getattr(bind, "dialect", None), "name", "") or ""
-
-        if dialect_name == "sqlite":
-            safe_table = "\"" + str(table_name).replace("\"", "\"\"") + "\""
-            columns: set[str] = set()
-            for row in _rows(f"PRAGMA table_info({safe_table})"):
-                row_data = dict(row)
-                name = row_data.get("name")
-                if name:
-                    columns.add(str(name))
-            return columns
-
-        return {
-            row["column_name"]
-            for row in _rows(
-                """
-                SELECT column_name
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                """,
-                {"table_name": table_name},
-            )
-        }
+        inspector = inspect(bind)
+        if not inspector.has_table(table_name):
+            return set()
+        return {str(column["name"]) for column in inspector.get_columns(table_name)}
     except Exception:
         logger.exception(
             "BYS360 process tracking _table_columns guvenli fallback | table=%s",
@@ -204,7 +159,18 @@ def _period_name_select_expr(alias: str, cols: set[str]) -> str:
     return "CAST(f.period_id AS TEXT) AS period_name,"
 
 def _add_column(table_name: str, column_name: str, ddl_type: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column_name} {ddl_type}"))
+    """BYS360 DEFECT AI: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically), so every call to
+    ``apply_phase8_schema()`` was completely broken under SQLite. Existence
+    is now checked with this module's own dialect-neutral ``column_exists``
+    (already used elsewhere in this file), then a plain ``ADD COLUMN``
+    (portable to both dialects) runs only when the column is actually
+    missing -- preserving idempotency without depending on PostgreSQL-only
+    syntax."""
+    if column_exists(table_name, column_name):
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
 
 
 def _create_index(index_name: str, ddl: str) -> None:
@@ -286,8 +252,15 @@ def apply_phase8_schema() -> None:
 
 
 def normalize_role(value: Any) -> str:
-    raw = str(value or "").strip().lower()
-    tr_map = str.maketrans("çğıöşüâîûİ", "cgiosuaiui")
+    # BYS360 DEFECT AQ: 'İ'.lower() Python'da tek bir 'i' değil, 'i' +
+    # COMBINING DOT ABOVE (U+0307) olmak üzere İKİ kod noktası üretir --
+    # bu yüzden .lower() önce çalışırsa aşağıdaki tr_map'teki 'İ' anahtarı
+    # asla eşleşmez ve normalize edilmiş sonuçta artık nokta işareti kalır
+    # (ör. "Sİstem Yöneticisi" -> "si̇stem_yoneti̇ci̇si̇", beklenen
+    # "sistem_yoneticisi" değil). 'İ' burada .lower() çağrılmadan ÖNCE,
+    # tek kod noktalı haldeyken ayrı olarak 'i'ye çevrilir.
+    raw = str(value or "").strip().replace("İ", "i").lower()
+    tr_map = str.maketrans("çğıöşüâîû", "cgiosuaiu")
     return raw.translate(tr_map).replace(" ", "_").replace("-", "_")
 
 
@@ -309,9 +282,15 @@ def is_admin_user(user: Any) -> bool:
 
 
 def is_process_tracking_user(user: Any) -> bool:
+    """BYS360 DEFECT AO: previously OR'd an exact set-intersection check with
+    a substring fallback (``token in combined``), which made the exact check
+    pointless -- any allowed token that was merely a substring of role/unvan
+    (e.g. "baskan" inside "grup_baskani") passed regardless. Now exact-match
+    only, mirroring process_engine_phase6_president_approvals.py's proven
+    is_admin_user/is_president_user design: role/unvan are normalized, then
+    checked as whole tokens (split on whitespace), never as substrings."""
     role = normalize_role(getattr(user, "role", None))
     title = normalize_role(getattr(user, "unvan", None))
-    combined = f"{role} {title}"
     allowed_tokens = {
         "admin",
         "super_admin",
@@ -323,7 +302,8 @@ def is_process_tracking_user(user: Any) -> bool:
         "mali_musavir",
         "birim_sorumlusu",
     }
-    return bool(allowed_tokens.intersection(set(combined.split()))) or any(token in combined for token in allowed_tokens)
+    combined_words = set(f"{role} {title}".split())
+    return bool(combined_words & allowed_tokens)
 
 
 def can_view_process_tracking(user: Any) -> bool:
@@ -336,21 +316,30 @@ def can_manage_process_tracking(user: Any) -> bool:
     Bu işlem değerlendirme/karne verisini değil, yalnızca süreç takip listesi
     kayıtlarını kaldırır. Canlı kullanımda yetkiyi sınırlı tutmak için admin,
     üst yönetim ve performans/personel destek yetkilileriyle sınırlandırılır.
+    Grup Başkanı bu ekranı görüntüleyebilir (is_process_tracking_user) ancak
+    kayıt silme yetkisi yalnızca aşağıdaki daha dar listeye tanınır -- bu
+    ayrım isteğe bağlı değil, bu modülün kendi orijinal tasarımıdır.
+
+    BYS360 DEFECT AO: aynı substring-eşleşme kusuru burada da vardı --
+    role="grup_baskani" veya unvan="Başkanlığı Uzmanı" gibi girdiler, izin
+    verilen jetonların yalnızca bir alt dizesini içerdikleri için yanlışlıkla
+    yetki kazanıyordu. Artık process_engine_phase6_president_approvals.py'nin
+    kanıtlanmış tam-eşleşme deseniyle aynı şekilde çalışır.
     """
     role = normalize_role(getattr(user, "role", None))
     title = normalize_role(getattr(user, "unvan", None))
-    combined = f"{role} {title}"
     if role in {"admin", "super_admin", "sistem_yoneticisi"}:
         return True
-    allowed_tokens = (
+    allowed_tokens = {
         "baskan",
         "baskan_yardimcisi",
         "performans_yetkilisi",
         "personel_destek",
         "personel_ve_destek",
         "personel_destek_hizmetleri_grup_baskani",
-    )
-    return any(token in combined for token in allowed_tokens)
+    }
+    combined_words = set(f"{role} {title}".split())
+    return bool(combined_words & allowed_tokens)
 
 
 def _safe_text(value: Any, fallback: str = "-") -> str:
@@ -444,32 +433,81 @@ def _full_name_from_row(row: Any, prefix: str) -> str:
     return name or _safe_text(row.get(prefix + "_email"))
 
 
+# BYS360 DEFECT AO: AN's own investigation (see git history) proved every
+# tracking-specific field these functions used to read (waiting_days,
+# is_overdue, tracking_bucket, tracking_status, tracking_priority,
+# tracking_label, last_action_title, current_owner_name,
+# president_requested_at, ...) has no real column under any name in any
+# migration -- and a follow-up field-by-field investigation (this wave)
+# established that none of them need to become one: every value is either
+# already available on a real, migrated column under a different name
+# (current_owner_id, president_approval_status, updated_at) or is safely
+# computable at read time from real timestamp/status columns already on
+# performance_process_flows. This module no longer reads or gates any
+# ghost column; every value below comes from a real column or is derived
+# in Python from one (see _derive_tracking_fields()).
 def _status_clause(status_filter: str) -> tuple[str, dict[str, Any]]:
+    """Pure, deterministic clause-builder: every fragment below references
+    only real, always-present columns, so no schema introspection is
+    needed here at all (unlike the AN-era version, which had to gate each
+    fragment against whichever ghost columns happened to exist)."""
     normalized = str(status_filter or "all").strip().lower()
     if normalized in {"all", "tum", "tumu"}:
         return "", {}
     if normalized in {"waiting", "bekleyen"}:
-        return "AND COALESCE(f.current_owner_user_id, 0) <> 0 AND LOWER(COALESCE(f.tracking_bucket, f.current_status, '')) NOT IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti')", {}
+        return (
+            "AND f.current_owner_id IS NOT NULL "
+            "AND COALESCE(f.is_finalized, FALSE) = FALSE "
+            f"AND LOWER(COALESCE(f.current_status, '')) NOT IN {_sql_in(_COMPLETED_STATUS_TEXT)}",
+            {},
+        )
     if normalized in {"president", "baskan", "baskan_onayi"}:
-        return "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.tracking_bucket, '')) IN ('pending', 'bekliyor', 'president_pending', 'baskan_onayi_bekliyor', 'başkan_onayı_bekliyor')", {}
+        return (
+            "AND COALESCE(f.president_approval_required, FALSE) = TRUE "
+            "AND LOWER(COALESCE(f.president_approval_status, '')) NOT IN ('approved', 'returned', 'iade', 'iade_edildi')",
+            {},
+        )
     if normalized in {"overdue", "geciken"}:
-        return "AND COALESCE(f.is_overdue, FALSE) = TRUE", {}
+        # BYS360 DEFECT AO: is_overdue is purely a function of elapsed time
+        # since the last action (see _derive_tracking_fields()) -- it does
+        # not also require the flow to be unfinished. This matches the
+        # module's own pre-existing precedence (_row_bucket() already
+        # checked is_overdue before is_finalized/completed), not a new rule.
+        cutoff = datetime.utcnow() - timedelta(days=PHASE8_OVERDUE_THRESHOLD_DAYS)
+        return (
+            "AND COALESCE(f.last_action_at, f.started_at, f.created_at) <= :overdue_cutoff",
+            {"overdue_cutoff": cutoff},
+        )
     if normalized in {"completed", "tamamlanan"}:
-        return "AND (COALESCE(f.is_finalized, FALSE) = TRUE OR LOWER(COALESCE(f.current_status, '')) IN ('completed', 'finalized', 'kesinlesti', 'kesinleşti', 'tamamlandi', 'tamamlandı'))", {}
+        return (
+            "AND (COALESCE(f.is_finalized, FALSE) = TRUE "
+            f"OR LOWER(COALESCE(f.current_status, '')) IN {_sql_in(_COMPLETED_STATUS_TEXT)})",
+            {},
+        )
     if normalized in {"returned", "iade"}:
-        return "AND LOWER(COALESCE(f.president_status, f.president_approval_status, f.current_status, '')) IN ('returned', 'iade', 'iade_edildi')", {}
+        return "AND LOWER(COALESCE(f.president_approval_status, '')) IN ('returned', 'iade', 'iade_edildi')", {}
     return "", {}
 
 
 def _scope_clause(viewer: Any) -> tuple[str, dict[str, Any]]:
+    """BYS360 DEFECT AO: the "baskan" check below used to be a substring
+    test (``"baskan" in f"{role} {title}"``), which incorrectly granted
+    unrestricted scope to any role/unvan merely containing that text --
+    including "grup_baskani" (a distinct, narrower role) and "Başkanlığı"-
+    style institution-name references, the same defect class as
+    can_manage_process_tracking(). Now exact-match against {"baskan",
+    "baskan_yardimcisi"} -- both individually, explicitly enumerated
+    tokens in this same module's own can_manage_process_tracking()
+    allowed list, unlike "grup_baskani", which that list deliberately
+    excludes."""
     if is_admin_user(viewer):
         return "", {}
     viewer_id = int(getattr(viewer, "id", 0) or 0)
     role = normalize_role(getattr(viewer, "role", None))
     title = normalize_role(getattr(viewer, "unvan", None))
-    if "baskan" in f"{role} {title}":
+    if {role, title} & {"baskan", "baskan_yardimcisi"}:
         return "", {}
-    return "AND (f.current_owner_user_id = :viewer_id OR f.employee_id = :viewer_id)", {"viewer_id": viewer_id}
+    return "AND (f.current_owner_id = :viewer_id OR f.employee_id = :viewer_id)", {"viewer_id": viewer_id}
 
 
 def _build_search_clause(search: str) -> tuple[str, dict[str, Any]]:
@@ -487,16 +525,17 @@ def _build_search_clause(search: str) -> tuple[str, dict[str, Any]]:
         ):
             if column in user_cols:
                 search_parts.append(f"LOWER(COALESCE({alias}.{_qident(column)}, '')) LIKE :search")
-    search_parts.extend([
-        "LOWER(COALESCE(f.current_stage, '')) LIKE :search",
-        "LOWER(COALESCE(f.current_status, '')) LIKE :search",
-        "LOWER(COALESCE(f.tracking_label, '')) LIKE :search",
-        "LOWER(COALESCE(f.last_action_title, '')) LIKE :search",
-    ])
+    search_parts.append("LOWER(COALESCE(f.current_status, '')) LIKE :search")
     return "AND (" + " OR ".join(search_parts) + ")", {"search": f"%{cleaned.lower()}%"}
 
 
+def _sql_in(values: set[str]) -> str:
+    return "(" + ", ".join(f"'{value}'" for value in sorted(values)) + ")"
+
+
 def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int = 300) -> list[Any]:
+    if not table_exists("performance_process_flows"):
+        return []
     status_sql, status_params = _status_clause(status_filter)
     scope_sql, scope_params = _scope_clause(viewer)
     search_sql, search_params = _build_search_clause(search)
@@ -508,6 +547,17 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
         period_cols = _table_columns("performance_periods")
         period_join = "LEFT JOIN performance_periods pp ON pp.id = f.period_id"
         period_select = _period_name_select_expr("pp", period_cols)
+
+    # BYS360 DEFECT AO: president_requested_at has no real column on
+    # performance_process_flows under any name, but the real, migrated
+    # performance_president_approvals.requested_at (Phase6's own approval
+    # record, joined by flow_id) carries the same information -- a join,
+    # not a ghost-column read.
+    president_join = ""
+    president_requested_at_select = "NULL AS president_requested_at"
+    if table_exists("performance_president_approvals"):
+        president_join = "LEFT JOIN performance_president_approvals pa ON pa.flow_id = f.id"
+        president_requested_at_select = "pa.requested_at AS president_requested_at"
 
     user_cols = _table_columns("users") if table_exists("users") else set()
     emp_full_name = _name_select_expr("emp", user_cols, "emp_full_name")
@@ -528,26 +578,16 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
             {period_select}
             f.employee_id,
             f.current_status,
-            f.current_stage,
-            f.current_owner_user_id,
-            f.current_owner_name,
-            f.last_action_title,
+            f.current_owner_id,
             f.last_action_at,
-            f.waiting_since,
-            f.waiting_days,
-            f.is_overdue,
-            f.overdue_days,
-            f.tracking_status,
-            f.tracking_bucket,
-            f.tracking_priority,
-            f.tracking_label,
-            f.last_visible_action,
+            f.started_at,
+            f.created_at,
+            f.updated_at,
             f.final_score,
-            f.president_required,
-            f.president_status,
+            f.president_approval_required,
             f.president_approval_status,
-            f.president_requested_at,
             f.is_finalized,
+            {president_requested_at_select},
             {emp_full_name},
             {emp_ad},
             {emp_soyad},
@@ -558,15 +598,14 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
             {owner_email}
         FROM performance_process_flows f
         LEFT JOIN users emp ON emp.id = f.employee_id
-        LEFT JOIN users owner ON owner.id = f.current_owner_user_id
+        LEFT JOIN users owner ON owner.id = f.current_owner_id
         {period_join}
+        {president_join}
         WHERE 1=1
         {status_sql}
         {scope_sql}
         {search_sql}
-        ORDER BY COALESCE(f.is_overdue, FALSE) DESC,
-                 COALESCE(f.waiting_days, 0) DESC,
-                 COALESCE(f.last_action_at, f.updated_by_engine_at, f.created_at, CURRENT_TIMESTAMP) DESC
+        ORDER BY COALESCE(f.last_action_at, f.updated_at, f.started_at, f.created_at) ASC
         LIMIT :limit
         """,
         params,
@@ -574,19 +613,31 @@ def _flow_base_rows(*, viewer: Any, status_filter: str, search: str, limit: int 
 
 
 def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """BYS360 DEFECT AN: action_at/tracking_visible are not real columns on
+    performance_process_flow_steps under any migration or reachable
+    runtime schema path -- confirmed against a real, migration-built
+    database. Referencing them by name in WHERE/ORDER BY (not just the
+    SELECT list) raised OperationalError even though the SELECT itself is
+    a plain ``SELECT *``; row.get(...) below already tolerates their
+    absence, so only the two raw references need gating."""
     if not flow_ids:
         return {}
-    _table_columns("performance_process_flow_steps")
-    order_expr = "COALESCE(step_order, 0), COALESCE(action_at, created_at, CURRENT_TIMESTAMP), id"
+    step_cols = _table_columns("performance_process_flow_steps")
+    action_at_expr = "action_at" if "action_at" in step_cols else "NULL"
+    tracking_visible_filter = (
+        " AND COALESCE(tracking_visible, TRUE) = TRUE" if "tracking_visible" in step_cols else ""
+    )
+    order_expr = f"COALESCE(step_order, 0), COALESCE({action_at_expr}, created_at, CURRENT_TIMESTAMP), id"
     rows = _rows(
         f"""
         SELECT *
         FROM performance_process_flow_steps
-        WHERE flow_id = ANY(:flow_ids)
-          AND COALESCE(tracking_visible, TRUE) = TRUE
+        WHERE flow_id IN :flow_ids
+        {tracking_visible_filter}
         ORDER BY {order_expr}
         """,
         {"flow_ids": flow_ids},
+        expanding=("flow_ids",),
     )
     grouped: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
@@ -607,22 +658,30 @@ def _steps_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
 
 
 def _history_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
+    """BYS360 DEFECT AN: action_at is not a real column on
+    performance_scoring_history (no migration touches this table; the ORM
+    model only has created_at) -- confirmed against a real,
+    migration-built database. row.get("action_at") below already falls
+    back to created_at, so only the raw ORDER BY reference needs gating."""
     if not flow_ids:
         return {}
     if not column_exists("performance_scoring_history", "evaluation_id"):
         return {}
+    history_cols = _table_columns("performance_scoring_history")
+    action_at_expr = "h.action_at" if "action_at" in history_cols else "NULL"
     rows = _rows(
-        """
+        f"""
         SELECT
             h.*,
             f.id AS flow_id
         FROM performance_scoring_history h
         JOIN performance_process_flows f
           ON f.evaluation_id = h.evaluation_id
-        WHERE f.id = ANY(:flow_ids)
-        ORDER BY COALESCE(h.action_at, h.created_at, CURRENT_TIMESTAMP), h.id
+        WHERE f.id IN :flow_ids
+        ORDER BY COALESCE({action_at_expr}, h.created_at, CURRENT_TIMESTAMP), h.id
         """,
         {"flow_ids": flow_ids},
+        expanding=("flow_ids",),
     )
     grouped: dict[int, list[dict[str, Any]]] = {}
     for row in rows:
@@ -641,17 +700,32 @@ def _history_for_flows(flow_ids: list[int]) -> dict[int, list[dict[str, Any]]]:
     return grouped
 
 
+_COMPLETED_STATUS_TEXT = {"completed", "finalized", "kesinlesti", "kesinleşti", "tamamlandi", "tamamlandı"}
+
+
 def _row_bucket(row: Any) -> str:
-    raw = str(row.get("tracking_bucket") or row.get("current_status") or "monitoring").strip().lower()
-    if str(row.get("president_status") or row.get("president_approval_status") or "").lower() in {"pending", "bekliyor", "president_pending", "baskan_onayi_bekliyor", "başkan_onayı_bekliyor"}:
+    """BYS360 DEFECT AO: previously read tracking_bucket/president_status,
+    neither a real column under any migration -- always NULL/absent, so this
+    always fell through to the raw current_status passthrough regardless of
+    real approval/overdue state. Now built entirely from real columns:
+    president_approval_required/president_approval_status (real, model-
+    backed), is_overdue (derived by the caller from real timestamps before
+    calling this), is_finalized/current_status/current_owner_id (real).
+    Precedence unchanged from the prior design: president-pending beats
+    overdue, which beats completed, which beats waiting-on-owner."""
+    president_status = str(row.get("president_approval_status") or "").strip().lower()
+    if bool(row.get("president_approval_required")) and president_status not in {"approved", "returned"}:
         return "president_pending"
+    if president_status in {"returned", "iade", "iade_edildi"}:
+        return "returned"
     if row.get("is_overdue"):
         return "overdue"
-    if row.get("is_finalized") or raw in {"completed", "finalized", "kesinlesti", "kesinleşti", "tamamlandi", "tamamlandı"}:
+    current_status = str(row.get("current_status") or "").strip().lower()
+    if row.get("is_finalized") or current_status in _COMPLETED_STATUS_TEXT:
         return "completed"
-    if row.get("current_owner_user_id"):
+    if row.get("current_owner_id"):
         return "waiting"
-    return raw or "monitoring"
+    return "monitoring"
 
 
 def _visible_bucket(bucket: str) -> str:
@@ -664,6 +738,54 @@ def _visible_bucket(bucket: str) -> str:
         "monitoring": "Süreçte",
     }
     return labels.get(_normalize_status_key(bucket), "Süreçte")
+
+
+def _coerce_datetime(value: Any) -> datetime | None:
+    """Raw ``text()`` queries bypass SQLAlchemy's ORM-level DateTime result
+    processing, so a DATETIME column can come back as a plain ISO-format
+    string rather than a ``datetime`` object (SQLite's raw driver behavior
+    for hand-written SQL, unlike ORM-loaded attributes) -- the same
+    tolerance _safe_date() already applies via its own ``hasattr(value,
+    "strftime")`` check."""
+    if value is None or isinstance(value, datetime):
+        return value
+    try:
+        return datetime.fromisoformat(str(value))
+    except ValueError:
+        return None
+
+
+def _derive_tracking_fields(row: Any) -> dict[str, Any]:
+    """BYS360 DEFECT AO: waiting_days/is_overdue/overdue_days have no real
+    column under any name -- computed here from real, migrated timestamp
+    columns (last_action_at, falling back to started_at, then created_at)
+    instead of being read from a column that never exists. is_overdue is
+    purely time-based (see _status_clause()'s "overdue" branch for why it
+    does not also gate on is_finalized -- that mirrors this module's own
+    pre-existing bucket precedence, not a new rule). The threshold is
+    PHASE8_OVERDUE_THRESHOLD_DAYS -- see its own definition for why 7 was
+    kept rather than replaced with an invented number."""
+    reference_at = _coerce_datetime(
+        row.get("last_action_at") or row.get("started_at") or row.get("created_at")
+    )
+    waiting_days = max(0, (datetime.utcnow() - reference_at).days) if reference_at is not None else 0
+    is_overdue = waiting_days >= PHASE8_OVERDUE_THRESHOLD_DAYS
+    return {
+        "waiting_days": waiting_days,
+        "is_overdue": is_overdue,
+        "overdue_days": waiting_days if is_overdue else 0,
+    }
+
+
+def _derive_last_action_title(row: Any, flow_steps: list[dict[str, Any]]) -> str:
+    """BYS360 DEFECT AO: last_action_title has no real column on
+    performance_process_flows; the most recent real step (already fetched
+    by _steps_for_flows(), ordered oldest-to-newest) carries the same
+    information when one exists. Falls back to the flow's own real
+    current_status when no step history is available."""
+    if flow_steps:
+        return _safe_text(flow_steps[-1].get("title"), "Süreç takipte")
+    return _clean_process_label(row.get("current_status"), "Süreç takipte")
 
 
 def build_process_tracking_workspace(
@@ -688,11 +810,14 @@ def build_process_tracking_workspace(
         "monitoring": 0,
     }
     for row in rows:
-        bucket = _row_bucket(row)
+        derived = _derive_tracking_fields(row)
+        row_with_derived = {**row, **derived}
+        bucket = _row_bucket(row_with_derived)
         counts["total"] += 1
         counts[bucket if bucket in counts else "monitoring"] += 1
         flow_id = int(row.get("flow_id") or 0)
-        owner_name = _safe_text(row.get("current_owner_name"), "") or _full_name_from_row(row, "owner")
+        flow_steps = steps.get(flow_id, [])
+        owner_name = _full_name_from_row(row, "owner")
         if owner_name == "-":
             owner_name = "Süreçte bekleyen kişi yok"
         item = {
@@ -702,25 +827,25 @@ def build_process_tracking_workspace(
             "period_name": _safe_text(row.get("period_name"), "-"),
             "employee_id": row.get("employee_id"),
             "employee_name": _full_name_from_row(row, "emp"),
-            "current_stage": _clean_process_label(row.get("current_stage") or row.get("tracking_label"), "Süreç takipte"),
-            "current_status": _clean_process_label(row.get("current_status") or row.get("tracking_status"), "Süreçte"),
+            "current_stage": _clean_process_label(row.get("current_status"), "Süreç takipte"),
+            "current_status": _clean_process_label(row.get("current_status"), "Süreçte"),
             "bucket": bucket,
             "bucket_label": _visible_bucket(bucket),
             "status_label": _visible_bucket(bucket),
             "status_tone": _bucket_tone(bucket),
             "owner_name": owner_name,
-            "owner_user_id": row.get("current_owner_user_id"),
-            "last_action": _clean_process_label(row.get("last_visible_action") or row.get("last_action_title"), "Süreç takipte"),
+            "owner_user_id": row.get("current_owner_id"),
+            "last_action": _derive_last_action_title(row, flow_steps),
             "last_action_at": _safe_date(row.get("last_action_at")),
-            "waiting_since": _safe_date(row.get("waiting_since")),
-            "waiting_days": int(row.get("waiting_days") or 0),
-            "is_overdue": bool(row.get("is_overdue")),
-            "overdue_days": int(row.get("overdue_days") or 0),
+            "waiting_since": _safe_date(row.get("last_action_at") or row.get("started_at")),
+            "waiting_days": derived["waiting_days"],
+            "is_overdue": derived["is_overdue"],
+            "overdue_days": derived["overdue_days"],
             "final_score": _safe_score(row.get("final_score")),
-            "president_required": bool(row.get("president_required")),
-            "president_status": _clean_process_label(row.get("president_status") or row.get("president_approval_status"), "-"),
+            "president_required": bool(row.get("president_approval_required")),
+            "president_status": _clean_process_label(row.get("president_approval_status"), "-"),
             "president_requested_at": _safe_date(row.get("president_requested_at")),
-            "steps": steps.get(flow_id, []),
+            "steps": flow_steps,
             "history": histories.get(flow_id, []),
         }
         items.append(item)
@@ -747,24 +872,27 @@ def _delete_tracking_flow_ids(flow_ids: list[int]) -> int:
 
     try:
         if table_exists("performance_process_flow_steps") and column_exists("performance_process_flow_steps", "flow_id"):
-            db.session.execute(
-                text("DELETE FROM performance_process_flow_steps WHERE flow_id = ANY(:flow_ids)"),
+            _execute(
+                "DELETE FROM performance_process_flow_steps WHERE flow_id IN :flow_ids",
                 {"flow_ids": clean_ids},
+                expanding=("flow_ids",),
             )
 
         if table_exists("performance_process_notifications") and column_exists("performance_process_notifications", "flow_id"):
-            db.session.execute(
-                text("DELETE FROM performance_process_notifications WHERE flow_id = ANY(:flow_ids)"),
+            _execute(
+                "DELETE FROM performance_process_notifications WHERE flow_id IN :flow_ids",
                 {"flow_ids": clean_ids},
+                expanding=("flow_ids",),
             )
 
-        result = db.session.execute(
-            text("DELETE FROM performance_process_flows WHERE id = ANY(:flow_ids)"),
+        result = _execute(
+            "DELETE FROM performance_process_flows WHERE id IN :flow_ids",
             {"flow_ids": clean_ids},
+            expanding=("flow_ids",),
         )
         db.session.commit()
         try:
-            return int(result.rowcount or 0)  # type: ignore[attr-defined]
+            return int(result.rowcount or 0)
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return len(clean_ids)
@@ -794,53 +922,35 @@ def delete_visible_process_tracking_flows(
     return _delete_tracking_flow_ids(flow_ids)
 
 def synchronize_phase8_tracking(limit: int | None = None) -> Phase8SyncResult:
+    """Süreç takibi yenileme işlemi.
+
+    BYS360 DEFECT AO: this used to persist derived tracking values
+    (tracking_bucket/is_overdue/tracking_priority/...) into ghost columns
+    that no migration ever created, and its own SELECT omitted is_overdue/
+    tracking_bucket entirely -- making the "overdue" bucket structurally
+    unreachable from this function even though it independently computed
+    is_overdue correctly one line later (see AN/AO history for the full
+    defect). Since AO's field-by-field investigation established every one
+    of those values is safely computable at read time from real columns
+    (see _derive_tracking_fields(), build_process_tracking_workspace()),
+    there is nothing left to persist -- build_process_tracking_workspace()
+    always recomputes fresh values on every page load, so a stored,
+    potentially stale copy would only risk drifting from reality. This
+    function now verifies the flows are present and readable (proving the
+    "refresh" action genuinely reflects live data) without writing
+    anything.
+    """
     if not table_exists("performance_process_flows"):
         return Phase8SyncResult()
     sql_limit = "LIMIT :limit" if limit else ""
     params = {"limit": int(limit)} if limit else {}
     rows = _rows(
         f"""
-        SELECT id, current_status, current_stage, current_owner_user_id, current_owner_name,
-               waiting_since, waiting_days, is_finalized, president_status, president_approval_status,
-               president_required, last_action_title, last_action_at
+        SELECT id
         FROM performance_process_flows
         ORDER BY id DESC
         {sql_limit}
         """,
         params,
     )
-    updated = 0
-    for row in rows:
-        flow_id = int(row["id"])
-        bucket = _row_bucket(row)
-        waiting_days = int(row.get("waiting_days") or 0)
-        is_overdue = bool(row.get("is_overdue") or waiting_days >= 7)
-        priority = 80 if bucket == "president_pending" or is_overdue else "normal"
-        db.session.execute(
-            text(
-                """
-                UPDATE performance_process_flows
-                   SET tracking_status = COALESCE(current_status, tracking_status, 'takipte'),
-                       tracking_bucket = :bucket,
-                       tracking_priority = :priority,
-                       tracking_label = COALESCE(current_stage, tracking_label, 'Süreç takipte'),
-                       tracking_url = COALESCE(tracking_url, '/performans/surec-takibi'),
-                       is_overdue = :is_overdue,
-                       overdue_days = CASE WHEN :is_overdue THEN COALESCE(waiting_days, 0) ELSE COALESCE(overdue_days, 0) END,
-                       last_visible_action = COALESCE(last_action_title, last_visible_action, current_stage),
-                       tracking_updated_at = CURRENT_TIMESTAMP,
-                       process_version = :version
-                 WHERE id = :flow_id
-                """
-            ),
-            {
-                "bucket": bucket,
-                "priority": _normalize_tracking_priority(priority),
-                "is_overdue": is_overdue,
-                "version": PHASE8_VERSION,
-                "flow_id": flow_id,
-            },
-        )
-        updated += 1
-    db.session.commit()
-    return Phase8SyncResult(flows_checked=len(rows), flows_updated=updated)
+    return Phase8SyncResult(flows_checked=len(rows), flows_updated=0)

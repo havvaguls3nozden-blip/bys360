@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from functools import lru_cache
 from typing import Any
 
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.extensions import db
@@ -14,6 +15,7 @@ from app.route_registry import main_bp
 
 # BYS360_STUB_AI_V60_INTERIM_IMPORT
 from app.services.ai.stub_panel_bridge import build_interim_notes_ai_panel
+from app.services.performance.interim_notes_runtime import _id_sql
 
 logger = logging.getLogger(__name__)
 # /BYS360_STUB_AI_V60_INTERIM_IMPORT
@@ -53,12 +55,14 @@ def _int(v):
 
 @lru_cache(maxsize=32)
 def _cols(table):
+    # BYS360 DEFECT AL: raw dialect-branched information_schema/PRAGMA query
+    # replaced with SQLAlchemy's inspect(), which is dialect-neutral by
+    # construction.
     try:
-        if db.engine.dialect.name == 'postgresql':
-            rows = db.session.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name=:t"), {'t': table}).fetchall()
-            return {str(r[0]) for r in rows}
-        rows = db.session.execute(text(f'PRAGMA table_info({table})')).fetchall()
-        return {str(r[1]) for r in rows}
+        inspector = inspect(db.engine)
+        if not inspector.has_table(table):
+            return set()
+        return {str(col["name"]) for col in inspector.get_columns(table)}
     except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         db.session.rollback()
@@ -222,7 +226,7 @@ def _notes(people, employee_id=None, period_id=None, note_type=None, query=None)
     for r in rows:
         d = dict(r)
         key = d.get('note_type') or 'genel_gozlem'
-        d['note_type_label'] = NOTE_LABELS.get(key, key)
+        d['note_type_label'] = NOTE_LABELS.get(key, 'Bilinmiyor')
         d['note_type_icon'] = NOTE_ICONS.get(key, 'fa-regular fa-note-sticky')
         out.append(d)
     return out
@@ -250,7 +254,7 @@ def _access_denied():
 def performance_interim_notes():
     from flask import flash, redirect, render_template, request
     from flask_login import current_user
-    from sqlalchemy import text as _sql_text
+    from sqlalchemy import bindparam, text as _sql_text
 
     from app.extensions import db
 
@@ -268,9 +272,16 @@ def performance_interim_notes():
     scoped_people = _people()
     scoped_ids = [int(p.get('id')) for p in scoped_people if p.get('id') is not None]
 
-    def _rows(sql, params=None):
+    def _rows(sql, params=None, *, expanding=()):
+        # BYS360 DEFECT AR: `expanding` bir IN listesinin ham string
+        # birlestirme yerine gercek SQLAlchemy bind parametresi olarak
+        # genisletilmesini saglar (bkz. process_engine_phase8_tracking.py
+        # _prepare_clause, ayni desen).
+        clause = _sql_text(sql)
+        if expanding:
+            clause = clause.bindparams(*(bindparam(name, expanding=True) for name in expanding))
         try:
-            return list(db.session.execute(_sql_text(sql), params or {}).mappings())
+            return list(db.session.execute(clause, params or {}).mappings())
         except Exception:
             logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
             return []
@@ -284,9 +295,11 @@ def performance_interim_notes():
             return default
 
     def _ensure_table():
-        db.session.execute(_sql_text("""
+        # BYS360 DEFECT AR: id kolonu artik dialect'e gore uretiliyor; eskiden
+        # sabit SERIAL kullanildigi icin SQLite'ta id her zaman NULL kaliyordu.
+        db.session.execute(_sql_text(f"""
             CREATE TABLE IF NOT EXISTS performance_interim_notes_live (
-                id SERIAL PRIMARY KEY,
+                {_id_sql()},
                 personnel_id INTEGER,
                 period_id INTEGER,
                 note_type VARCHAR(40) NOT NULL DEFAULT 'genel',
@@ -294,7 +307,7 @@ def performance_interim_notes():
                 note TEXT NOT NULL,
                 scorecard_visible BOOLEAN NOT NULL DEFAULT FALSE,
                 created_by_user_id INTEGER,
-                created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             )
         """))
         db.session.commit()
@@ -402,14 +415,15 @@ def performance_interim_notes():
     if _is_admin_like():
         scope_where = ""
     elif scoped_ids:
-        scope_where = "WHERE n.personnel_id IN ({})".format(", ".join(str(int(i)) for i in scoped_ids))
+        scope_where = "WHERE n.personnel_id IN :scope_ids"
     else:
         scope_where = None
 
     if scope_where is None:
         note_items_raw = []
     else:
-        note_items_raw = _rows(f"""
+        note_items_raw = _rows(
+            f"""
             SELECT
                 n.id,
                 n.personnel_id,
@@ -418,7 +432,7 @@ def performance_interim_notes():
                 n.title,
                 n.note,
                 n.scorecard_visible,
-                TO_CHAR(n.created_at, 'DD.MM.YYYY HH24:MI') AS created_at_label,
+                n.created_at AS created_at_raw,
                 COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.ad, u.soyad)), ''), u.email, CAST(n.personnel_id AS TEXT)) AS personnel_name,
                 '' AS unit_name
             FROM performance_interim_notes_live n
@@ -426,11 +440,41 @@ def performance_interim_notes():
             {scope_where}
             ORDER BY n.created_at DESC, n.id DESC
             LIMIT 300
-        """)
+        """,
+            {"scope_ids": scoped_ids} if scoped_ids else None,
+            expanding=("scope_ids",) if scoped_ids else (),
+        )
+
+    # BYS360 DEFECT FS (Final Sweep A1-04): TO_CHAR(...) is PostgreSQL-only
+    # (no SQLite version has it, unlike CONCAT_WS which SQLite 3.44+ added).
+    # It previously failed on SQLite and was silently swallowed by _rows()'s
+    # broad except, rendering an empty note list with no visible error.
+    # Formatting the raw datetime in Python after fetch works identically on
+    # both dialects and preserves the exact "DD.MM.YYYY HH24:MI" display
+    # format already used elsewhere in this codebase (e.g. app/api/mobile/
+    # shared.py, app/admin/ai_routes.py).
+    def _format_created_at_label(raw_value):
+        if raw_value is None:
+            return None
+        if isinstance(raw_value, str):
+            for fmt in ("%Y-%m-%d %H:%M:%S.%f", "%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S.%f", "%Y-%m-%dT%H:%M:%S"):
+                try:
+                    raw_value = datetime.strptime(raw_value, fmt)
+                    break
+                except ValueError:
+                    continue
+            else:
+                return raw_value
+        try:
+            return raw_value.strftime("%d.%m.%Y %H:%M")
+        except Exception:
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            return None
 
     note_items = []
     for row in note_items_raw:
         item = dict(row)
+        item["created_at_label"] = _format_created_at_label(item.pop("created_at_raw", None))
         item["note_type_label"] = _type_label(item.get("note_type"))
         note_items.append(item)
 
@@ -493,8 +537,9 @@ def performance_interim_notes_create():
         db.session.commit()
         flash('Dönem içi not kaydedildi. Bu kayıt puan üretmez; değerlendirme döneminde hatırlatma ve süreç hafızası için kullanılır.', 'success')
     except SQLAlchemyError as exc:
+        logger.exception("Dönem içi not kaydedilirken veritabanı hatası: %s", exc)
         db.session.rollback()
-        flash(f'Dönem içi not kaydedilemedi: {exc.__class__.__name__}', 'danger')
+        flash('Dönem içi not kaydedilemedi.', 'danger')
     return redirect(url_for('main.performance_interim_notes', employee_id=emp or '', period_id=per or ''))
 
 # BYS360_PERFORMANCE_COMPLETION_PHASE10_INTERIM_GUIDANCE_BOUND

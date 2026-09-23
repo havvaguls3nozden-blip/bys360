@@ -129,12 +129,19 @@ def build_task_management_preflight_report(
             "quick_actions": [],
         }
 
-    scope_ids = {int(value) for value in (scope_user_ids or []) if value}
+    scope_ids: set[int] | None
+    if scope_user_ids is None:
+        scope_ids = None
+    else:
+        scope_ids = {int(value) for value in scope_user_ids if value}
     all_periods = PerformancePeriod.query.order_by(PerformancePeriod.id.desc()).all()
 
     evaluations_query = PerformanceEvaluation.query.filter_by(period_id=period.id)
-    if scope_ids:
-        evaluations_query = evaluations_query.filter(PerformanceEvaluation.employee_id.in_(list(scope_ids)))
+    if scope_ids is not None:
+        if scope_ids:
+            evaluations_query = evaluations_query.filter(PerformanceEvaluation.employee_id.in_(list(scope_ids)))
+        else:
+            evaluations_query = evaluations_query.filter(PerformanceEvaluation.employee_id == -1)
     evaluations = evaluations_query.all()
 
     period_validation = build_period_validation_report(
@@ -142,7 +149,7 @@ def build_task_management_preflight_report(
         all_periods=all_periods,
         evaluations=evaluations,
     )
-    health_report = build_performance_task_health_report(period, scope_ids or None)
+    health_report = build_performance_task_health_report(period, scope_ids)
     health_summary = health_report.get("summary") or {}
 
     blockers: list[dict[str, str]] = []

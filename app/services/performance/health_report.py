@@ -15,6 +15,7 @@ from app.services.performance.assignments import (
     get_latest_assignment_generation_logs,
     is_informational_special_case,
 )
+from app.services.performance.history import humanize_workflow_status
 
 LEVEL_TO_EVALUATION_FIELD = {
     1: "level_1_evaluator_id",
@@ -171,7 +172,7 @@ def _build_orphan_rows(
             "employee_name": _name(employee),
             "employee_unit": _unit(employee),
             "status": _clean_text(getattr(evaluation, "status", None)) or "bekliyor",
-            "workflow_status": _clean_text(getattr(evaluation, "workflow_status", None)) or "-",
+            "workflow_status": humanize_workflow_status(getattr(evaluation, "workflow_status", None)),
             "exempted": bool(getattr(evaluation, "evaluation_exempted", False)),
         })
 
@@ -277,20 +278,27 @@ def build_performance_task_health_report(period, scope_user_ids: Iterable[int] |
             "coverage_severity_summary": build_assignment_log_severity_summary([]),
         }
 
-    scope_user_ids = {int(value) for value in (scope_user_ids or []) if value}
-    scoped = bool(scope_user_ids)
+    normalized_scope_user_ids: set[int] | None
+    if scope_user_ids is None:
+        normalized_scope_user_ids = None
+    else:
+        normalized_scope_user_ids = {int(value) for value in scope_user_ids if value}
 
     user_query = User.query.filter(User.role != "admin", User.is_active.is_(True))
-    if scoped:
-        user_query = user_query.filter(User.id.in_(list(scope_user_ids)))
+    if normalized_scope_user_ids is not None:
+        user_query = user_query.filter(User.id.in_(list(normalized_scope_user_ids)))
     scoped_users = user_query.order_by(User.ad.asc(), User.soyad.asc()).all()
     scoped_user_ids = {int(user.id) for user in scoped_users}
 
     evaluation_query = PerformanceEvaluation.query.filter_by(period_id=period.id)
     assignment_query = EvaluationAssignment.query.filter_by(period_id=period.id)
-    if scoped_user_ids:
-        evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id.in_(list(scoped_user_ids)))
-        assignment_query = assignment_query.filter(EvaluationAssignment.employee_id.in_(list(scoped_user_ids)))
+    if normalized_scope_user_ids is not None:
+        if scoped_user_ids:
+            evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id.in_(list(scoped_user_ids)))
+            assignment_query = assignment_query.filter(EvaluationAssignment.employee_id.in_(list(scoped_user_ids)))
+        else:
+            evaluation_query = evaluation_query.filter(PerformanceEvaluation.employee_id == -1)
+            assignment_query = assignment_query.filter(EvaluationAssignment.employee_id == -1)
 
     evaluations = evaluation_query.order_by(PerformanceEvaluation.employee_id.asc()).all()
     assignments = assignment_query.order_by(EvaluationAssignment.employee_id.asc(), EvaluationAssignment.manager_level.asc(), EvaluationAssignment.id.asc()).all()
@@ -303,7 +311,7 @@ def build_performance_task_health_report(period, scope_user_ids: Iterable[int] |
     coverage_payload = get_latest_assignment_generation_logs(
         period.id,
         limit=800,
-        employee_ids=list(scoped_user_ids) if scoped_user_ids else None,
+        employee_ids=list(scoped_user_ids) if normalized_scope_user_ids is not None else None,
     )
     coverage_log_rows = [
         row for row in (coverage_payload.get("rows") or [])

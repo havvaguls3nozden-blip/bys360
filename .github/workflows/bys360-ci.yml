@@ -10,11 +10,62 @@ on:
 jobs:
   quality-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    # TD-032 remote-CI unblock (2026-08-17): the prior 25-minute budget was
+    # proven insufficient by a real remote run cancelled at ~25m18s with
+    # "Run integration and architecture tests" (Step2) at 99% -- 0 test
+    # failures, 0 errors, no concurrency/superseding-push mechanism
+    # configured in this workflow, and the timing matched timeout-minutes:
+    # 25 almost exactly. The budget was then raised to 45 minutes.
+    #
+    # Second remote-CI unblock (2026-09-15): 45 minutes was itself proven
+    # insufficient by the same failure mode recurring -- a real remote run
+    # cancelled by its own timeout-minutes: 45 mid-Step2 (0 test failures,
+    # 0 errors; see tests/architecture/test_postgres_migration_ci_enforcement_contract.py's
+    # test_quality_gate_job_timeout_has_an_evidence_backed_floor for the
+    # regression guard). An isolated GitHub Ubuntu diagnostic run of the
+    # exact canonical Step1+Step2 selection at this branch's SHA measured
+    # Step1 2m48s and Step2 alone 1h04m50s (total job 1h08m50s), after two
+    # Linux-only test-fixture portability defects (hardcoded Windows temp
+    # and repository-worktree paths) were fixed -- the Step2 runtime itself,
+    # not a defect, was the bottleneck. 90 minutes leaves a real margin
+    # (~20 min) over that measured total without being an unbounded budget.
+    timeout-minutes: 90
+
+    # TD-032 closure: real PostgreSQL 15 target for the migration-integrity
+    # gate below. Disposable, CI-only credentials -- never production
+    # secrets. Additive: nothing above/below this depends on it, and no
+    # existing step's command or semantics changed.
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: bys360_ci_test_only_password
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
+      # TD-032 remote-CI unblock (2026-08-16): actions/checkout@v4's default
+      # fetch-depth (1) produces a shallow clone with only the tip commit's
+      # object present. Several historical-wave contract tests (e.g.
+      # tests/quality/test_openapi_workflow_drift_cleanup_contract.py) run
+      # `git show <fixed-historical-sha>:<path>` to prove what a past commit
+      # actually contained -- a real, currently-reproduced shallow-clone
+      # error ("fatal: path ... does not exist in '<sha>'") because that
+      # commit object is absent from a depth-1 checkout, even though the
+      # path exists in the current working tree. fetch-depth: 0 fetches full
+      # history so every such fixed-ref lookup resolves identically to a
+      # local full clone. This is the only change to this step.
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
@@ -26,7 +77,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
           python -m pip install -r requirements.txt
-          python -m pip install ruff pytest pytest-cov pip-audit mypy
+          python -m pip install -r requirements-dev.txt
 
       - name: BYS360 secret/repo gate
         run: python scripts/quality/bys360_secret_repo_gate.py --root .
@@ -66,14 +117,30 @@ jobs:
       # re-measurement this addition is based on.
       #
       # NOT (BYS360 Phase 6, Critical Operational CI Coverage Expansion, 2026-07-27):
-      # tests/migrations, tests/workflow and tests/release are stable, isolated and
-      # required for schema/deployment coverage. Migration, workflow and release tests are
-      # stable, isolated and required for schema/deployment coverage: 0 cross-scope
-      # duplicate node IDs against the rest of this workflow or each other, 0 skip/xfail,
-      # no local conftest.py, each folder passed twice in isolation and once combined
-      # (46/46, 0 failed). tests/migrations runs real Alembic upgrade()/downgrade() against
-      # an isolated in-memory SQLite engine (no network, no persistent state); adds this
-      # step's runtime by only ~8% for the full added set of 46 tests.
+      # tests/migrations and tests/release are stable, isolated and required for
+      # schema/deployment coverage: 0 cross-scope duplicate node IDs against the
+      # rest of this workflow or each other, 0 skip/xfail, no local conftest.py,
+      # each folder passed twice in isolation and once combined. tests/migrations
+      # runs real Alembic upgrade()/downgrade() against an isolated in-memory
+      # SQLite engine (no network, no persistent state).
+      #
+      # NOT (BYS360 CI Coverage Gate Drift Closure): tests/workflow (originally
+      # added to this scope by the note above, when it still existed) was deleted
+      # in commit 5401195 ("remove orphan presentation subsystem") along with the
+      # dead app/workflow/ package it tested -- ORPHAN_CONFIRMED, see that
+      # commit's message for the full evidence trail. Leaving the now-nonexistent
+      # tests/workflow path in this command made pytest exit 4 ("file or
+      # directory not found") on its ENTIRE positional-argument list -- not just
+      # skipping 7 tests, but silently zeroing out this whole step's ~3400+ tests
+      # and its coverage.xml output, which in turn made every step after this one
+      # (coverage ratchet, mypy, ops audit, Quality9, pip-audit) unreachable in
+      # real CI. tests/workflow's replacement, the canonical cleanup contract
+      # tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_contract.py
+      # (82 tests: deleted-file absence, historical git-ref reproducibility,
+      # url_map invariance, migration byte-identity, route_registry manifest
+      # accuracy), is listed explicitly below -- it lives in tests/quality/ but
+      # carries no ci_safe marker, so the "Run quality tests" step's -m "ci_safe"
+      # filter does not select it; it must be named here to actually execute.
       #
       # NOT (BYS360 Phase 6, Communication/Behavior/Mobile CI Coverage Expansion,
       # 2026-07-27): tests/communication and tests/mobile are 0-import AST/source-contract
@@ -119,7 +186,61 @@ jobs:
       # runs + full-suite-mixed + post-full-suite isolated re-run all 3/3, 0
       # failed, identical whether or not the marker filter is applied.
       - name: Run integration and architecture tests
-        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/workflow tests/release tests/communication tests/behavior tests/mobile tests/test_10_10_core_static_gate.py tests/test_ai_analysis_excel_preview_static.py tests/test_ai_executive_report_static.py tests/test_ai_recommendation_priority_static.py tests/test_ai_routes.py tests/test_claude_phase5_function_signatures.py tests/test_claude_phase5_template_compilation.py tests/test_compat_redirects.py tests/test_datetime_utils.py tests/test_error_support.py tests/test_feedback_admin_endpoint_static.py tests/test_feedback_privacy_static.py tests/test_feedback_pulse_admin_tab_static.py tests/test_feedback_pulse_menu_visibility_static.py tests/test_feedback_pulse_privacy_behavior.py tests/test_hr_reports_template_no_unpack_static.py tests/test_live_scope_and_security_static.py tests/test_module_maturity_scoring.py tests/test_no_admin_org_units_duplicate_static.py tests/test_no_duplicate_admin_org_units_static.py tests/test_performance_archive_visibility_contract.py tests/test_performance_chain_constitution.py tests/test_performance_form_guard.py tests/test_performance_ops_center.py tests/test_performance_preflight.py tests/test_performance_publish_guard.py tests/test_performance_publish_preflight_static.py tests/test_personel_analizi_dalga7_static.py tests/test_score100_handover_docs_contract_v1.py tests/test_shared_cache_store_behavior.py tests/test_sp_routes_smoke.py tests/test_team_compare_publish_visibility.py tests/test_team_compare_service.py --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+        run: python -m pytest tests/integration tests/architecture tests/security tests/critical tests/services tests/migrations tests/release tests/communication tests/behavior tests/mobile tests/performance tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_contract.py tests/test_10_10_core_static_gate.py tests/test_ai_analysis_excel_preview_static.py tests/test_ai_executive_report_static.py tests/test_ai_recommendation_priority_static.py tests/test_ai_routes.py tests/test_claude_phase5_function_signatures.py tests/test_claude_phase5_template_compilation.py tests/test_compat_redirects.py tests/test_datetime_utils.py tests/test_error_support.py tests/test_feedback_admin_endpoint_static.py tests/test_feedback_privacy_static.py tests/test_feedback_pulse_admin_tab_static.py tests/test_feedback_pulse_menu_visibility_static.py tests/test_feedback_pulse_privacy_behavior.py tests/test_hr_reports_template_no_unpack_static.py tests/test_live_scope_and_security_static.py tests/test_module_maturity_scoring.py tests/test_no_admin_org_units_duplicate_static.py tests/test_no_duplicate_admin_org_units_static.py tests/test_performance_archive_visibility_contract.py tests/test_performance_chain_constitution.py tests/test_performance_form_guard.py tests/test_performance_ops_center.py tests/test_performance_preflight.py tests/test_performance_publish_guard.py tests/test_performance_publish_preflight_static.py tests/test_performance_publish_preflight_rules_behavior.py tests/test_personel_analizi_dalga7_static.py tests/test_score100_handover_docs_contract_v1.py tests/test_shared_cache_store_behavior.py tests/test_sp_routes_smoke.py tests/test_team_compare_publish_visibility.py tests/test_team_compare_service.py --cov=app --cov-append --cov-report=term-missing --cov-report=xml:reports/quality/coverage.xml --cov-fail-under=0 --tb=short -q
+
+      # TD-032 closure (2026-08-16): the `postgres:15` service above is a
+      # fresh container per job run, so `postgres` (its own maintenance DB)
+      # is always empty of app tables -- CREATE DATABASE here only adds the
+      # one disposable target database the gate below is allowed to touch,
+      # matching this gate's own naming contract
+      # (bys360_postgres_migration_integrity_gate.py's SAFE_DB_NAME_RE).
+      #
+      # TD-032 remote-CI unblock (2026-08-17): this job has no job-level
+      # `container:`, so it runs directly on the ubuntu-latest HOST runner,
+      # not inside a Docker container alongside the `postgres` service. Per
+      # GitHub's own documented service-container networking model, the
+      # service's Docker-network hostname ("postgres", the service label)
+      # is only resolvable from *other containers on that same job's
+      # network -- a host-runner process has no such DNS entry, only the
+      # published host port (`ports: 5432:5432` above already publishes it
+      # to the runner). Confirmed by the exact reproduced remote error:
+      # `psycopg2.OperationalError: could not translate host name "postgres"
+      # to address: Temporary failure in name resolution`. Fixed by using
+      # 127.0.0.1 (the runner's own loopback, where the published port
+      # lands) instead of the service label -- the correct host for a
+      # host-runner job with a port-mapped service, not a DNS problem to
+      # retry around.
+      - name: Create disposable PostgreSQL 15 migration-test database
+        run: |
+          python -c "
+          import psycopg2
+          conn = psycopg2.connect(host='127.0.0.1', port=5432, user='postgres', password='bys360_ci_test_only_password', dbname='postgres')
+          conn.autocommit = True
+          with conn.cursor() as cur:
+              cur.execute('CREATE DATABASE bys360_migration_test_ci;')
+          conn.close()
+          "
+
+      # TD-032 closure: same harness used for every local ad-hoc TD-032
+      # verification run in this repo's history (see
+      # scripts/quality/bys360_postgres_migration_integrity_gate.py) --
+      # empty DB -> flask db upgrade -> head match -> second upgrade is a
+      # no-op -> critical schema introspection, all against a real
+      # PostgreSQL 15 server, not SQLite. Host/db-name/PG-major guards are
+      # hardcoded in the gate itself (no bypass flag); this step only
+      # supplies a target that satisfies them.
+      #
+      # TD-032 remote-CI unblock (2026-08-17): host changed from the
+      # unreachable "postgres" service-label to 127.0.0.1, matching the
+      # create-database step above -- see that step's comment for the full
+      # host-runner-vs-container networking explanation. 127.0.0.1 was
+      # already in the gate's own ALLOWED_HOSTS (no harness change needed);
+      # only the now-unused "postgres" CI-host allowance in
+      # ALLOWED_CI_HOSTS is left as-is, unused but harmless.
+      - name: PostgreSQL 15 migration integrity gate
+        env:
+          BYS360_REALDB_MIGRATION_TEST_URL: postgresql://postgres:bys360_ci_test_only_password@127.0.0.1:5432/bys360_migration_test_ci
+        run: python scripts/quality/bys360_postgres_migration_integrity_gate.py
 
       # NOT (BYS360 Truthful Quality Gates, Campaign 1B, 2026-07-24): pyproject.toml
       # [tool.coverage.report] fail_under is enforced by pytest-cov on EVERY

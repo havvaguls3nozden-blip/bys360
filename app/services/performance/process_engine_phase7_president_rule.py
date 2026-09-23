@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 from app.security.sql_identifiers import quote_sql_identifier
@@ -83,35 +83,30 @@ def _exec(sql: str, params: dict[str, Any] | None = None) -> list[dict[str, Any]
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = current_schema()
-                  AND table_name = :table_name
-            )
-            """
-        ),
-        {"table_name": table_name},
-    ).scalar()
-    return bool(row)
+    """BYS360 DEFECT AK: raw PostgreSQL-only ``information_schema.tables``
+    query (filtered by the PostgreSQL-only ``current_schema()`` SQL
+    function) replaced with SQLAlchemy's ``inspect()``, which is
+    dialect-neutral by construction -- the same proven pattern already
+    used elsewhere in this codebase (process_engine_phase3_history.py,
+    process_engine_phase4_flow.py, process_engine_phase6_president_
+    approvals.py, process_engine_phase8_tracking.py, and this same file's
+    own AJ-fixed ``_add_column_if_missing``). SQLite has no
+    ``information_schema`` and no ``current_schema()`` function at all;
+    real execution confirmed ``sqlite3.OperationalError: no such table:
+    information_schema.tables`` unconditionally."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _columns(table_name: str) -> set[str]:
-    rows = db.session.execute(
-        text(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = current_schema()
-              AND table_name = :table_name
-            """
-        ),
-        {"table_name": table_name},
-    ).scalars().all()
-    return {str(row) for row in rows}
+    """BYS360 DEFECT AK: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query (same fix rationale as ``_table_exists`` above). Preserves the
+    missing-table contract exactly: an absent table returns an empty set,
+    matching the original query's behavior (a WHERE clause that matches no
+    rows), not an exception."""
+    if not _table_exists(table_name):
+        return set()
+    return {col["name"] for col in inspect(db.engine).get_columns(table_name)}
 
 
 def _first_existing(columns: set[str], candidates: Iterable[str]) -> str | None:
@@ -136,38 +131,77 @@ def _decimal_or_none(value: Any) -> Decimal | None:
         return None
 
 
+def _add_column_if_missing(table_name: str, column_name: str, ddl_type: str, existing_by_table: dict[str, set[str]]) -> None:
+    """BYS360 DEFECT AJ: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically, identical to Defect AI's
+    finding in process_engine_phase8_tracking.py). Existence is checked
+    first via SQLAlchemy's dialect-neutral ``inspect()`` (cached per table
+    in ``existing_by_table`` for this call), then a plain ``ADD COLUMN``
+    (portable to both dialects) runs only when the column is actually
+    missing. Deliberately does not reuse this file's own ``_table_exists``/
+    ``_columns`` (still PostgreSQL-only, used elsewhere in this file and
+    out of this fix's exact scope -- reported separately as finding AK)."""
+    existing = existing_by_table.get(table_name)
+    if existing is None:
+        existing = {col["name"] for col in inspect(db.engine).get_columns(table_name)} if inspect(db.engine).has_table(table_name) else set()
+        existing_by_table[table_name] = existing
+    if column_name in existing:
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
+    existing.add(column_name)
+
+
 def ensure_phase7_schema() -> None:
-    statements = [
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS phase7_rule_version VARCHAR(120)",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS chain_completed_at TIMESTAMP",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS president_required BOOLEAN DEFAULT FALSE",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS president_requested_at TIMESTAMP",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS president_completed_at TIMESTAMP",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS current_owner_user_id INTEGER",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS current_owner_name VARCHAR(255)",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS final_score NUMERIC(6,2)",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS current_status VARCHAR(80)",
-        "ALTER TABLE performance_process_flows ADD COLUMN IF NOT EXISTS president_status VARCHAR(80)",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS flow_id INTEGER",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS evaluation_id INTEGER",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS period_id INTEGER",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS employee_id INTEGER",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS final_score NUMERIC(6,2)",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS president_user_id INTEGER",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS president_name VARCHAR(255)",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS status VARCHAR(80) DEFAULT 'pending'",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS requested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS decided_at TIMESTAMP",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS decision_note TEXT",
-        "ALTER TABLE performance_president_approvals ADD COLUMN IF NOT EXISTS process_version VARCHAR(120)",
-        "ALTER TABLE performance_process_notifications ADD COLUMN IF NOT EXISTS president_approval_id INTEGER",
-        "ALTER TABLE performance_process_notifications ADD COLUMN IF NOT EXISTS process_version VARCHAR(120)",
+    flow_columns = {
+        "phase7_rule_version": "VARCHAR(120)",
+        "chain_completed_at": "TIMESTAMP",
+        "president_required": "BOOLEAN DEFAULT FALSE",
+        "president_requested_at": "TIMESTAMP",
+        "president_completed_at": "TIMESTAMP",
+        "current_owner_user_id": "INTEGER",
+        "current_owner_name": "VARCHAR(255)",
+        "final_score": "NUMERIC(6,2)",
+        "current_status": "VARCHAR(80)",
+        "president_status": "VARCHAR(80)",
+    }
+    president_approval_columns = {
+        "flow_id": "INTEGER",
+        "evaluation_id": "INTEGER",
+        "period_id": "INTEGER",
+        "employee_id": "INTEGER",
+        "final_score": "NUMERIC(6,2)",
+        "president_user_id": "INTEGER",
+        "president_name": "VARCHAR(255)",
+        "status": "VARCHAR(80) DEFAULT 'pending'",
+        "requested_at": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "decided_at": "TIMESTAMP",
+        "decision_note": "TEXT",
+        "process_version": "VARCHAR(120)",
+    }
+    notification_columns = {
+        "president_approval_id": "INTEGER",
+        "process_version": "VARCHAR(120)",
+    }
+
+    existing_by_table: dict[str, set[str]] = {}
+    for column_name, ddl_type in flow_columns.items():
+        _add_column_if_missing("performance_process_flows", column_name, ddl_type, existing_by_table)
+    for column_name, ddl_type in president_approval_columns.items():
+        _add_column_if_missing("performance_president_approvals", column_name, ddl_type, existing_by_table)
+    for column_name, ddl_type in notification_columns.items():
+        _add_column_if_missing("performance_process_notifications", column_name, ddl_type, existing_by_table)
+
+    # CREATE INDEX IF NOT EXISTS is valid, dialect-portable syntax on both
+    # PostgreSQL and SQLite -- unlike ADD COLUMN IF NOT EXISTS above, these
+    # were never part of Defect AJ and are left unchanged.
+    index_statements = [
         "CREATE INDEX IF NOT EXISTS ix_perf_phase7_flow_eval ON performance_process_flows(evaluation_id)",
         "CREATE INDEX IF NOT EXISTS ix_perf_phase7_flow_status ON performance_process_flows(current_status, president_status)",
         "CREATE INDEX IF NOT EXISTS ix_perf_phase7_president_eval ON performance_president_approvals(evaluation_id, status)",
         "CREATE INDEX IF NOT EXISTS ix_perf_phase7_notifications_recipient ON performance_process_notifications(recipient_user_id, notification_status)",
     ]
-    for statement in statements:
+    for statement in index_statements:
         db.session.execute(text(statement))
     db.session.commit()
 

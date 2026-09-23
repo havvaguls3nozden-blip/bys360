@@ -102,7 +102,7 @@ def _status_label(value: str | None) -> str:
         "iptal_edildi": "İptal edildi",
     }
     raw = (value or "").strip()
-    return labels.get(raw, raw or "-")
+    return labels.get(raw, "Bilinmiyor") if raw else "-"
 
 def _hours_between(start_value: datetime | None, end_value: datetime | None) -> float | None:
     if not start_value or not end_value:

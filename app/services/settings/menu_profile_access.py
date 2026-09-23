@@ -235,18 +235,27 @@ def save_role_menu_defaults_handler(
     role_menu_default_model: Any,
     db_session: Any,
     filter_live_menu_keys_func: Callable[[Iterable[Any]], list[str]],
+    filter_live_menu_rows_func: Callable[[Iterable[Any]], list[Any]],
     snapshot_role_menu_state_func: Callable[[str, Iterable[Any]], dict[str, bool]],
     build_complete_visibility_map_func: Callable[[Iterable[Any], Iterable[Any]], dict[str, bool]],
     create_settings_change_log_func: Callable[..., object],
 ) -> int:
-    """Rol menu varsayilanlarini kaydeder ve degisim gunlugu olusturur."""
+    """Rol menu varsayilanlarini kaydeder ve degisim gunlugu olusturur.
+
+    Kaldirilmis/decommission menu scope'una ait satirlara dokunmaz -- kardeş
+    save_unit_menu_profile_handler/save_user_menu_overrides_handler ile ayni
+    davranis (existing sorgusu live-row filtresinden gecer).
+    """
     normalized_role = (role_name or "").strip().lower()
     if not normalized_role:
         raise ValueError("Rol seçilmedi.")
     previous_state = snapshot_role_menu_state_func(normalized_role, all_menu_keys)
     all_menu_keys = list(dict.fromkeys(filter_live_menu_keys_func(all_menu_keys)))
     visible_keys = set(filter_live_menu_keys_func(visible_keys))
-    existing = {row.menu_key: row for row in role_menu_default_model.query.filter_by(role_name=normalized_role).all()}
+    existing = {
+        row.menu_key: row
+        for row in filter_live_menu_rows_func(role_menu_default_model.query.filter_by(role_name=normalized_role).all())
+    }
     changed = 0
     keep_keys = set(all_menu_keys)
     for menu_key in all_menu_keys:
@@ -352,13 +361,11 @@ def clear_user_menu_overrides_handler(
     updated_by_user_id: int | None,
     user_menu_permission_model: Any,
     db_session: Any,
-    filter_live_menu_rows_func: Callable[[Iterable[Any]], list[Any]],
-    snapshot_user_override_state_func: Callable[[int | None], dict[str, bool]],
     create_settings_change_log_func: Callable[..., object],
 ) -> int:
-    """Kisi bazli override satirlarini temizler ve loglar."""
-    previous_state = snapshot_user_override_state_func(user_id)
-    rows = filter_live_menu_rows_func(user_menu_permission_model.query.filter_by(user_id=user_id).all())
+    """Kisi bazli TUM override satirlarini (canli/kaldirilmis ayrimi yapmadan) temizler ve loglar."""
+    rows = user_menu_permission_model.query.filter_by(user_id=user_id).all()
+    previous_state = {row.menu_key: bool(row.is_visible) for row in rows}
     deleted = len(rows)
     for row in rows:
         db_session.delete(row)

@@ -54,7 +54,7 @@ def run_v2_1_4_category_scope_visibility_gate(create_probe: bool = False) -> dic
         checks.append(_check("dashboard_summary", "assigned_total" in dashboard, "Kategori kapsam dashboard özeti çalışıyor."))
         drafts = list_scope_drafts(include_inactive=False)
         checks.append(_check("draft_list", isinstance(drafts, list), f"Aktif taslak sayısı: {len(drafts)}"))
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        checks.append(_check("exception", False, str(exc)))
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
     return {"ok": all(item.get("ok") for item in checks), "checks": checks, "rule_version": RULE_VERSION}

@@ -39,7 +39,7 @@ def _full_name(user: Any) -> str:
 
 def _status_label(value: str | None) -> str:
     raw = (value or "").strip()
-    return STATUS_LABELS.get(raw, raw or "-")
+    return STATUS_LABELS.get(raw, "Bilinmiyor") if raw else "-"
 
 
 def _meeting_window_label(meeting: Any) -> str:

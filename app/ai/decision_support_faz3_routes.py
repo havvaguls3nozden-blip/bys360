@@ -47,15 +47,17 @@ def _run_faz3_json(builder: ResponseBuilder, *args: Any, commit: bool = False) -
         safe_db_rollback()
         return jsonify({"ok": False, "error": str(exc) or "Bu sayfaya erişim yetkiniz bulunmamaktadır."}), 403
     except LookupError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen LookupError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc) or "Kayıt bulunamadı."}), 404
+        return jsonify({"ok": False, "error": "Kayıt bulunamadı."}), 404
     except ValueError as exc:
+        logger.exception("BYS360 AI karar destek: beklenmeyen ValueError | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": str(exc)}), 400
+        return jsonify({"ok": False, "error": "Geçersiz istek parametresi."}), 400
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz3_routes.py | line=51")
+        logger.exception("BYS360 V6C guarded exception | file=app/ai/decision_support_faz3_routes.py | line=51 | exc=%s", exc)
         safe_db_rollback()
-        return jsonify({"ok": False, "error": f"Karar destek görünürlük kontrolünde beklenmeyen hata: {exc}"}), 500
+        return jsonify({"ok": False, "error": "Karar destek görünürlük kontrolünde beklenmeyen bir hata oluştu."}), 500
 
 
 @main_bp.route("/ai/decision-support/faz3/health")

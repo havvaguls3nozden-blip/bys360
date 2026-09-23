@@ -334,7 +334,7 @@ Seçili performans döneminin temel bilgilerini güncelleyin. Tarih, tür ve aç
                 <img src="{{ url_for('static', filename='img/catab_logo.png') }}"
                      alt="ÇATAB Logo"
                      class="hero-logo"
-                     onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/logo.png') }}';">
+                     data-fallback-src="{{ url_for('static', filename='img/logo.png') }}">
             </div>
             <div>
                 <div class="hero-title">Performans Dönemini Düzenle</div>

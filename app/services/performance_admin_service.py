@@ -133,6 +133,21 @@ def resolve_managers_for_user(employee):
     return level_1_manager, level_2_manager, level_3_manager
 
 
+PUBLISH_LOG_ACTION_LABELS = {
+    "publish": "Yayınlandı",
+    "unpublish": "Yayından Kaldırıldı",
+    "bulk_publish": "Toplu Yayınlandı",
+    "bulk_unpublish": "Toplu Yayından Kaldırıldı",
+}
+
+
+def humanize_publish_log_action(action_type: str | None) -> str:
+    clean = (action_type or "").strip()
+    if not clean:
+        return "-"
+    return PUBLISH_LOG_ACTION_LABELS.get(clean, "Bilinmiyor")
+
+
 def create_publish_log(period_id, actor_user_id, action_type, evaluation_id=None, employee_id=None, note=None):
     log = PerformancePublishLog(
         period_id=period_id,

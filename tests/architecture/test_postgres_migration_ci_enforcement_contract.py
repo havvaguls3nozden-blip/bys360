@@ -1,0 +1,223 @@
+"""TD-032 closure -- PostgreSQL 15 migration-integrity CI enforcement contract.
+
+Locks in that the real-PostgreSQL migration-integrity gate
+(``scripts/quality/bys360_postgres_migration_integrity_gate.py``) is not
+just a local ad-hoc script but genuinely wired into
+``.github/workflows/bys360-ci.yml``: a ``postgres:15`` service container is
+present, the gate is actually invoked (not merely referenced in a comment),
+it does not use production secrets, it is not marked ``continue-on-error``
+(an allow-failure step would make the gate decorative), and the pre-existing
+Step1/Step2 pytest commands are unchanged by this addition -- this is meant
+to be a purely additive CI change, not a rewrite of the existing gates.
+
+Also locks in the ``quality-gate`` job's runtime budget (2026-08-17,
+job-timeout unblock): a real remote run was cancelled by GitHub Actions at
+~25m18s, mid-Step2, at 99% test progress, 0 failures/errors -- the job's own
+``timeout-minutes: 25`` firing, not a hang or a test regression (confirmed:
+no ``concurrency:`` block exists anywhere in this workflow, and no
+superseding push landed before the cancellation). Local measurement this
+session put Step2 alone at ~26-28 minutes on its own, before counting
+checkout/install/Ruff/the PostgreSQL steps/coverage/mypy/quality9/pip-audit
+that share the same job budget. The test below asserts a floor, not the
+exact chosen value, so a future, evidence-based recalibration (e.g. if
+Step2 grows further) isn't blocked by an over-fitted exact-match assertion.
+"""
+from __future__ import annotations
+
+import re
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+CI_WORKFLOW = REPO_ROOT / ".github" / "workflows" / "bys360-ci.yml"
+
+STEP1_COMMAND_NEEDLE = 'pytest tests/quality -m "ci_safe"'
+STEP2_COMMAND_NEEDLE = "pytest tests/integration tests/architecture tests/security"
+
+
+def _workflow_text() -> str:
+    return CI_WORKFLOW.read_text(encoding="utf-8")
+
+
+def test_ci_workflow_file_exists() -> None:
+    assert CI_WORKFLOW.exists(), f"{CI_WORKFLOW} not found."
+
+
+_JOB_TIMEOUT_RE = re.compile(r"timeout-minutes:\s*(\d+)")
+_MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES = 40
+
+
+def test_quality_gate_job_timeout_has_an_evidence_backed_floor() -> None:
+    """Regression guard for the exact remote failure this wave fixed: the
+    job was killed by its own `timeout-minutes` mid-Step2 at 99% progress,
+    0 test failures. Asserts a FLOOR (not the exact current value) so a
+    future, deliberate, evidence-based change (e.g. Step2 growing further)
+    isn't blocked by an over-fitted exact-match assertion -- but a
+    regression back toward the old, proven-insufficient 25 minutes is
+    caught immediately."""
+    text = _workflow_text()
+    job_header = text[text.index("runs-on: ubuntu-latest") : text.index("\n    services:")]
+    match = _JOB_TIMEOUT_RE.search(job_header)
+    assert match, "Could not find quality-gate's job-level timeout-minutes."
+    timeout_minutes = int(match.group(1))
+    assert timeout_minutes >= _MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES, (
+        f"quality-gate timeout-minutes is {timeout_minutes}; must be at least "
+        f"{_MINIMUM_EVIDENCE_BACKED_TIMEOUT_MINUTES} (local measurement: Step2 alone "
+        "takes ~26-28 minutes, before checkout/install/Ruff/PostgreSQL/coverage/mypy/"
+        "quality9/pip-audit in the same job budget)."
+    )
+
+
+def test_postgres_15_service_is_declared() -> None:
+    text = _workflow_text()
+    assert "services:" in text
+    assert "postgres:" in text
+    assert "image: postgres:15" in text
+
+
+def test_postgres_service_has_a_healthcheck() -> None:
+    text = _workflow_text()
+    assert "pg_isready" in text, "postgres service must gate readiness with pg_isready (or equivalent)."
+
+
+def test_migration_integrity_gate_script_is_actually_invoked() -> None:
+    text = _workflow_text()
+    assert "run: python scripts/quality/bys360_postgres_migration_integrity_gate.py" in text, (
+        "The gate script must be genuinely invoked as a `run:` command, not just mentioned "
+        "in a comment."
+    )
+
+
+def test_migration_integrity_gate_script_exists() -> None:
+    gate_path = REPO_ROOT / "scripts" / "quality" / "bys360_postgres_migration_integrity_gate.py"
+    assert gate_path.exists(), f"{gate_path} referenced by CI but missing."
+
+
+def test_gate_env_var_is_wired_and_points_at_the_ci_service_host() -> None:
+    text = _workflow_text()
+    assert "BYS360_REALDB_MIGRATION_TEST_URL:" in text
+    assert "@127.0.0.1:5432/bys360_migration_test_ci" in text, (
+        "TD-032 remote-CI unblock (2026-08-17): this job has no job-level `container:`, "
+        "so it cannot resolve the postgres service's Docker-network label ('postgres') -- "
+        "only its published loopback port. See "
+        "test_create_db_step_and_harness_step_use_the_same_reachable_host below for the "
+        "full regression guard."
+    )
+
+
+_DSN_HOST_RE = re.compile(r"host='([^']+)'")
+_URL_HOST_RE = re.compile(r"@([^:/]+):5432/bys360_migration_test_ci")
+
+
+def test_create_db_step_and_harness_step_use_the_same_reachable_host() -> None:
+    """Regression guard for the exact remote failure this wave fixed:
+    `psycopg2.OperationalError: could not translate host name "postgres" to
+    address: Temporary failure in name resolution`. This job has no
+    job-level `container:`, so it runs directly on the runner host, not on
+    the same Docker network as the `postgres` service container -- the
+    service's Docker-network label is only resolvable from *other
+    containers* on that job's network. A host-runner job must use the
+    service's published port on the loopback interface instead (already
+    published: `ports: - 5432:5432` on the service). If this job is ever
+    moved under a job-level `container:`, this test's premise (and the
+    workflow's DSN hosts) needs re-deriving, not just re-asserting."""
+    text = _workflow_text()
+    job_header = text[text.index("runs-on: ubuntu-latest") : text.index("\n    steps:")]
+    assert "container:" not in job_header, (
+        "quality-gate now has a job-level `container:` -- the loopback-host requirement "
+        "this test enforces no longer applies as-is; re-derive the correct DSN host for "
+        "the new topology instead of just updating this assertion."
+    )
+
+    create_step_match = _DSN_HOST_RE.search(text)
+    assert create_step_match, "Could not find the create-database step's psycopg2.connect host=... argument."
+    create_step_host = create_step_match.group(1)
+
+    harness_step_match = _URL_HOST_RE.search(text)
+    assert harness_step_match, "Could not find the migration gate's BYS360_REALDB_MIGRATION_TEST_URL host."
+    harness_step_host = harness_step_match.group(1)
+
+    assert create_step_host == "127.0.0.1", (
+        f"Create-database step host is {create_step_host!r}; a host-runner job with no "
+        "job-level `container:` cannot resolve the postgres service's Docker-network "
+        "label and must use its published loopback port (127.0.0.1) instead."
+    )
+    assert harness_step_host == "127.0.0.1", (
+        f"Migration gate host is {harness_step_host!r}; must be 127.0.0.1 for the same "
+        "host-runner-vs-service-container reason as the create-database step."
+    )
+    assert create_step_host == harness_step_host, (
+        f"Create-database step host {create_step_host!r} and migration gate host "
+        f"{harness_step_host!r} must be identical -- both connect to the same disposable "
+        "PostgreSQL service."
+    )
+
+
+def test_no_production_secret_pattern_used_for_the_ci_postgres_credentials() -> None:
+    """The CI-only disposable password is a literal, self-documenting
+    placeholder hardcoded in the workflow -- not read from a real secret
+    store or an ``.env`` file (this repo's real secrets live in an
+    untracked ``.env``, never committed and never referenced here)."""
+    text = _workflow_text()
+    assert "bys360_ci_test_only_password" in text
+    assert ".env" not in text
+    assert "${{ secrets." not in text, (
+        "This workflow defines no GitHub Actions repository secrets to read; the "
+        "PostgreSQL credentials are disposable, CI-local, and hardcoded on purpose."
+    )
+
+
+def test_migration_integrity_gate_step_is_not_allow_failure() -> None:
+    """An allow-failure migration gate would be decorative, not enforcement."""
+    text = _workflow_text()
+    gate_step_start = text.index("- name: PostgreSQL 15 migration integrity gate")
+    next_step_start = text.find("\n      - name:", gate_step_start + 1)
+    gate_step_text = text[gate_step_start : next_step_start if next_step_start != -1 else len(text)]
+    assert "continue-on-error" not in gate_step_text
+
+
+def test_step1_pytest_command_is_unchanged() -> None:
+    text = _workflow_text()
+    assert STEP1_COMMAND_NEEDLE in text
+
+
+def test_step2_pytest_command_is_unchanged() -> None:
+    text = _workflow_text()
+    assert STEP2_COMMAND_NEEDLE in text
+
+
+def test_existing_named_steps_are_all_still_present() -> None:
+    """Every step name this workflow had before the TD-032 PostgreSQL
+    addition is still present, unrenamed and unremoved -- this addition
+    only inserts new steps, it does not touch any existing one."""
+    text = _workflow_text()
+    pre_existing_step_names = (
+        "Checkout",
+        "Set up Python 3.12",
+        "Install dependencies",
+        "BYS360 secret/repo gate",
+        "Build safe release audit",
+        "Ruff full-select gate (E,F,I,UP,B,SIM)",
+        "Compile Python source",
+        "BYS360 safe release audit",
+        "Run quality tests",
+        "Run integration and architecture tests",
+        "Coverage ratchet gate",
+        "Type check service layer",
+        "BYS360 operations audit",
+        "BYS360 Quality 9 CI contract gate",
+        "Ruff syntax/import sanity",
+        "Dependency vulnerability audit",
+        "Upload quality reports",
+    )
+    for step_name in pre_existing_step_names:
+        assert f"- name: {step_name}" in text, f"Pre-existing step {step_name!r} is missing or renamed."
+
+
+def test_new_steps_do_not_shadow_an_existing_step_name() -> None:
+    text = _workflow_text()
+    new_step_names = (
+        "Create disposable PostgreSQL 15 migration-test database",
+        "PostgreSQL 15 migration integrity gate",
+    )
+    for step_name in new_step_names:
+        assert text.count(f"- name: {step_name}") == 1

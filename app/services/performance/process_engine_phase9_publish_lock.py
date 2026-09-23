@@ -5,7 +5,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
 
 from app.extensions import db
 
@@ -47,36 +47,20 @@ PENDING_STATUSES = {
 
 
 def _table_exists(table_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT 1
-              FROM information_schema.tables
-             WHERE table_schema = current_schema()
-               AND table_name = :table_name
-             LIMIT 1
-            """
-        ),
-        {"table_name": table_name},
-    ).first()
-    return row is not None
+    """BYS360 DEFECT AL: raw PostgreSQL-only ``information_schema.tables``
+    query (filtered by the PostgreSQL-only ``current_schema()`` SQL
+    function) replaced with SQLAlchemy's ``inspect()``, which is
+    dialect-neutral by construction."""
+    return bool(inspect(db.engine).has_table(table_name))
 
 
 def _column_exists(table_name: str, column_name: str) -> bool:
-    row = db.session.execute(
-        text(
-            """
-            SELECT 1
-              FROM information_schema.columns
-             WHERE table_schema = current_schema()
-               AND table_name = :table_name
-               AND column_name = :column_name
-             LIMIT 1
-            """
-        ),
-        {"table_name": table_name, "column_name": column_name},
-    ).first()
-    return row is not None
+    if not _table_exists(table_name):
+        return False
+    return any(
+        column["name"] == column_name
+        for column in inspect(db.engine).get_columns(table_name)
+    )
 
 
 def _as_decimal(value: Any) -> Decimal | None:
@@ -140,11 +124,16 @@ def _latest_approval(evaluation_id: int | None, flow_id: int | None) -> dict[str
         params["flow_id"] = flow_id
     if not conditions:
         return None
+    # BYS360 DEFECT AM: the status expression referenced decision_status/
+    # visible_status, neither of which is a real column on
+    # performance_president_approvals (confirmed by the model and by every
+    # migration that owns this table) -- status (already first in the
+    # COALESCE) is the real, correct source.
     row = db.session.execute(
         text(
             f"""
             SELECT id,
-                   COALESCE(status, decision_status, visible_status, '') AS status,
+                   COALESCE(status, '') AS status,
                    COALESCE(final_score, score) AS final_score,
                    president_user_id,
                    requested_at
@@ -160,6 +149,13 @@ def _latest_approval(evaluation_id: int | None, flow_id: int | None) -> dict[str
 
 
 def _latest_flow(evaluation_id: int) -> dict[str, Any] | None:
+    """BYS360 DEFECT AM: query referenced ``president_required``, which does
+    not exist on performance_process_flows -- the real column is
+    ``president_approval_required`` (confirmed by the model and by every
+    migration that owns this table). The output key stays ``president_required``
+    (via the AS alias) since evaluate_publish_lock() reads that exact key.
+    ``current_stage`` was dropped: it is not a real column on this table and
+    is never read by any caller in this module."""
     if not _table_exists("performance_process_flows"):
         return None
     row = db.session.execute(
@@ -170,10 +166,9 @@ def _latest_flow(evaluation_id: int) -> dict[str, Any] | None:
                    period_id,
                    employee_id,
                    final_score,
-                   COALESCE(president_required, false) AS president_required,
-                   COALESCE(president_status, president_approval_status, '') AS president_status,
-                   COALESCE(current_status, '') AS current_status,
-                   COALESCE(current_stage, '') AS current_stage
+                   COALESCE(president_approval_required, false) AS president_required,
+                   COALESCE(president_approval_status, '') AS president_status,
+                   COALESCE(current_status, '') AS current_status
               FROM performance_process_flows
              WHERE evaluation_id = :evaluation_id
              ORDER BY id DESC

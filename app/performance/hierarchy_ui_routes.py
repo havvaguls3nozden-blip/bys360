@@ -174,9 +174,9 @@ def performance_hierarchy_assignments_live():
             flash("Hiyerarşi ataması kaydedildi.", "success")
             return redirect(url_for("main.performance_hierarchy_assignments_live", user_id=user.id, q=q, birim=birim))
         except Exception as exc:
-            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+            logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
             safe_db_rollback()
-            flash(f"Hiyerarşi ataması kaydedilirken hata oluştu: {exc}", "danger")
+            flash("Hiyerarşi ataması kaydedilirken hata oluştu.", "danger")
 
     filtered = cast("list[User]", assignment_payload["filtered_users"])
     selected_user = None

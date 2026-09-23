@@ -1,14 +1,90 @@
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import text
+from sqlalchemy import inspect, text
+from sqlalchemy.exc import IntegrityError
 
 from app.extensions import db
 
 PHASE4_VERSION = "2026-04-29-process-flow-phase4"
+
+_FINALIZED_STATUS_TOKENS = {"tamamlandi", "tamamlandı", "completed", "published"}
+
+
+def ensure_process_flow_for_evaluation(evaluation: Any, *, flush: bool = True) -> Any:
+    """Değerlendirmenin genel süreç takip kaydını oluşturur veya günceller.
+
+    BYS360 DEFECT AP: performance_process_flows tablosunun production'da
+    erişilebilir hiçbir writer'ı yoktu -- sync_phase4_flows()/_ensure_flow()
+    (bu dosyanın kendi eski Faz 4 yardımcıları) ve Phase7'nin eşdeğer akış
+    oluşturma yolu hiçbir yerden çağrılmıyordu, bu yüzden Süreç Takibi ekranı
+    doğru okuma mantığına sahip olsa da gösterecek veri bulamıyordu.
+
+    Bu fonksiyon, aynı süreç içinde zaten canlı ve çağrılan
+    low_score_process_service.ensure_low_score_process_for_evaluation ile
+    birebir aynı çağrı noktasından (değerlendirme tamamlandığında) tetiklenir
+    ve aynı ORM tabanlı "varsa güncelle, yoksa oluştur" desenini izler.
+
+    Bilinçli olarak ayrık tutulur: başkan onayı gerekip gerekmediği veya
+    düşük puan durumu gibi iş kararları burada tekrarlanmaz. Bu kayıt
+    yalnızca değerlendirmenin genel süreç durumunu (aşama, son işlem
+    zamanı, final puan) izler; düşük puan/başkan onayı iş akışının kendi
+    kaydı (PerformanceLowScoreProcess) tamamen ayrı ve o konuda tek
+    yetkili kaynak olmaya devam eder.
+    """
+    if evaluation is None or getattr(evaluation, "id", None) is None:
+        return None
+
+    from app.models.performance_process_engine_models import PerformanceProcessFlow
+
+    status = (getattr(evaluation, "status", "") or "").strip().lower()
+    step_key = status or "created"
+    is_finalized = status in _FINALIZED_STATUS_TOKENS
+    now = datetime.utcnow()
+
+    flow = PerformanceProcessFlow.query.filter_by(evaluation_id=evaluation.id).first()
+    if flow is not None:
+        flow.period_id = getattr(evaluation, "period_id", flow.period_id)
+        flow.employee_id = getattr(evaluation, "employee_id", flow.employee_id)
+        flow.current_step_key = step_key
+        flow.current_status = step_key
+        flow.final_score = getattr(evaluation, "final_total_100", flow.final_score)
+        flow.is_finalized = is_finalized
+        flow.last_action_at = now
+        if flush:
+            db.session.flush()
+        return flow
+
+    new_flow = PerformanceProcessFlow(
+        evaluation_id=evaluation.id,
+        period_id=getattr(evaluation, "period_id", None),
+        employee_id=getattr(evaluation, "employee_id", None),
+        current_step_key=step_key,
+        current_status=step_key,
+        final_score=getattr(evaluation, "final_total_100", None),
+        is_finalized=is_finalized,
+        started_at=now,
+        last_action_at=now,
+        rule_version=PHASE4_VERSION,
+    )
+    try:
+        with db.session.begin_nested():
+            db.session.add(new_flow)
+            db.session.flush()
+    except IntegrityError:
+        # Eşzamanlı iki çağrı aynı değerlendirme için yarışırsa (evaluation_id
+        # tekil alan): kaybeden tarafın eklemesi geri alınır (yalnızca bu
+        # savepoint kapsamında -- çağıranın kendi bekleyen değişiklikleri
+        # etkilenmez) ve kazanan tarafın kaydı okunup döndürülür.
+        existing = PerformanceProcessFlow.query.filter_by(evaluation_id=evaluation.id).first()
+        if existing is None:
+            raise
+        return existing
+    return new_flow
 
 
 @dataclass(frozen=True)
@@ -27,40 +103,42 @@ def _rows(sql: str, params: dict[str, Any] | None = None) -> list[Any]:
 
 
 def table_exists(table_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.tables
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-            )
-            """,
-            {"table_name": table_name},
+    """BYS360 DEFECT AJ: raw PostgreSQL-only ``information_schema.tables``
+    query replaced with SQLAlchemy's ``inspect()``, which is dialect-neutral
+    by construction (works identically against SQLite/PostgreSQL) -- the
+    same proven pattern already used by process_engine_phase3_history.py's
+    ``_table_exists`` and process_engine_phase8_tracking.py's own fixed
+    helpers.
+
+    BYS360 DEFECT AR: previously raised straight through on any inspect()
+    failure (e.g. a dropped connection), unlike ~20 other table-existence
+    helpers doing the identical conceptual check elsewhere in this codebase
+    (including this module's own family, process_engine_phase8_tracking.py),
+    which all log and return False. Aligned to that dominant convention."""
+    try:
+        return bool(inspect(db.engine).has_table(table_name))
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "BYS360 phase4 flow table_exists guvenli fallback | table=%s", table_name,
         )
-    )
+        return False
 
 
 def column_exists(table_name: str, column_name: str) -> bool:
-    return bool(
-        _scalar(
-            """
-            SELECT EXISTS (
-                SELECT 1
-                FROM information_schema.columns
-                WHERE table_schema = 'public'
-                  AND table_name = :table_name
-                  AND column_name = :column_name
-            )
-            """,
-            {"table_name": table_name, "column_name": column_name},
-        )
-    )
+    return column_name in _table_columns(table_name)
 
 
 def _add_column(table_name: str, column_name: str, ddl_type: str) -> None:
-    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN IF NOT EXISTS {column_name} {ddl_type}"))
+    """BYS360 DEFECT AJ: ``ADD COLUMN IF NOT EXISTS`` is PostgreSQL-only --
+    SQLite raises ``sqlite3.OperationalError: near "EXISTS": syntax error``
+    on it unconditionally (confirmed empirically, identical to Defect AI's
+    finding in process_engine_phase8_tracking.py). Existence is checked
+    first via ``column_exists`` (now dialect-neutral), then a plain
+    ``ADD COLUMN`` (portable to both dialects) runs only when the column is
+    actually missing."""
+    if column_exists(table_name, column_name):
+        return
+    db.session.execute(text(f"ALTER TABLE {table_name} ADD COLUMN {column_name} {ddl_type}"))
 
 
 def _create_index(index_name: str, ddl: str) -> None:
@@ -145,18 +223,12 @@ def apply_phase4_schema() -> None:
 
 
 def _table_columns(table_name: str) -> set[str]:
-    return {
-        row["column_name"]
-        for row in _rows(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = 'public'
-              AND table_name = :table_name
-            """,
-            {"table_name": table_name},
-        )
-    }
+    """BYS360 DEFECT AJ: dialect-neutral via SQLAlchemy ``inspect()``,
+    replacing the prior raw PostgreSQL-only ``information_schema.columns``
+    query (same fix rationale as ``table_exists`` above)."""
+    if not table_exists(table_name):
+        return set()
+    return {col["name"] for col in inspect(db.engine).get_columns(table_name)}
 
 
 def _insert_if_columns(table_name: str, payload: dict[str, Any]) -> int:

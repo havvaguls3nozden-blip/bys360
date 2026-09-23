@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "document_status": "CANONICAL",
+  "handover_document": "docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md",
+  "last_validated": "2026-08-24",
+  "source_sha": "cb2e57c5d1829ea743c696ae78595a20755f3f07",
+  "source_branch": "phase5-critical-lint-clean-v1",
+  "source_history_chain": [
+    "15deffb8b1e067c12016680fa748c44e780a6270",
+    "32517cf5e9c52b9ab4b6263240d20fec3468c415",
+    "cb2e57c5d1829ea743c696ae78595a20755f3f07"
+  ],
+  "package": {
+    "name": "BYS360_FULL_LIVE_cb2e57c.zip",
+    "sha256": "895dc9d57021a0107682edb06fd2b99e2f6d17d1d7e6db97fcf6edb9274c476c",
+    "file_count": 2136,
+    "excluded_count": 1056,
+    "deterministic_build_verified": true,
+    "verification_method": "REPO_VERIFIED_THIS_SESSION"
+  },
+  "database": {
+    "engine": "PostgreSQL 15",
+    "revision": "e0efcd07abf7",
+    "revision_verification_method": "REPO_VERIFIED_MIGRATION_CHAIN_PARSE",
+    "migration_files_total": 74,
+    "migration_heads": 1,
+    "migration_required_for_this_release": false
+  },
+  "production": {
+    "state": "UPDATED",
+    "deployment_token": "PASS_BYS360_CB2E57C_CLEAN_PRODUCTION_DEPLOYMENT",
+    "service": "PASS",
+    "local_health": 200,
+    "public_health": 200,
+    "smoke": "PASS",
+    "security_critical_count": 0,
+    "new_critical_errors": 0,
+    "utf8_windows_startup": "PASS",
+    "clean_application_install": true,
+    "live_scheduled_task": {
+      "name": "BYS360 Live Waitress 80",
+      "state": "Running"
+    },
+    "portal_video_acceptance": "PASS",
+    "verification_method": "OPERATOR_ATTESTED",
+    "verification_provenance": "Operator-supplied production deployment log and live browser acceptance evidence dated 2026-08-24. The documentation-generation session itself did not have direct RDP or production access."
+  },
+  "quality": {
+    "step1": { "passed": 554, "skipped": 1, "failed": 0 },
+    "step2": { "passed": 4049, "skipped": 1, "failed": 0 },
+    "quality_ci_exact_head": "PASS",
+    "score100_ci_exact_head": "PASS",
+    "exact_head_sha_verified": "cb2e57c5d1829ea743c696ae78595a20755f3f07",
+    "ci_evidence_method": "USER_SUPPLIED_SCREENSHOT_EXACT_CHECKOUT_SHA",
+    "scores": {
+      "scored_commit": "cb2e57c5d1829ea743c696ae78595a20755f3f07",
+      "evidence_limited_run": {
+        "description": "Calculator run with no --evidence-file supplied (pure local re-execution).",
+        "code_quality": 100,
+        "test_assurance": 91.05,
+        "security": 60,
+        "ci_release": 60,
+        "operations": 100,
+        "documentation_handover": 85,
+        "maintainability": 100,
+        "live_readiness_raw": 80.4705,
+        "live_readiness_final": 80,
+        "transferability_raw": 88.289,
+        "transferability_final": 88,
+        "reconciliation_ceiling_waiver_active": false,
+        "evidence_completeness_ceiling_applied": true,
+        "unverified_evidence_count": 2,
+        "fully_verified": false,
+        "report_file": "C:/bys360_pytest_tmp/score_evidenceless_cb2e57c.json"
+      },
+      "evidence_aware_run": {
+        "description": "Calculator run with --evidence-file supplying genuine, previously visually-inspected exact-head Quality + Score100 GitHub Actions screenshot evidence (evidence_type=REMOTE_CI_VERIFIED, provenance=USER_SUPPLIED_REMOTE_PROOF) bound to this exact commit_sha.",
+        "code_quality": 100,
+        "test_assurance": 91.05,
+        "security": 100,
+        "ci_release": 100,
+        "operations": 100,
+        "documentation_handover": 85,
+        "maintainability": 100,
+        "live_readiness_raw": 97.6705,
+        "live_readiness_final": 98,
+        "transferability_raw": 95.089,
+        "transferability_final": 95,
+        "reconciliation_ceiling_waiver_active": true,
+        "evidence_completeness_ceiling_applied": false,
+        "unverified_evidence_count": 0,
+        "fully_verified": true,
+        "canonical_evidence_composition": { "remote_verified_gates": 10, "registry_derived_gates": 1, "unknown_gates": 0, "evidence_conflict_gates": 0, "completeness": "FULL" },
+        "evidence_file": "C:/bys360_pytest_tmp/bys360_canonical_evidence_cb2e57c.json",
+        "report_file": "C:/bys360_pytest_tmp/score_evidenceaware_cb2e57c.json"
+      },
+      "current_canonical": {
+        "live_raw": 97.6705,
+        "live_final": 98,
+        "transfer_raw": 95.089,
+        "transfer_final": 95,
+        "score_evidence_provenance": "Evidence-aware run for scored_commit=cb2e57c5d1829ea743c696ae78595a20755f3f07 only. Requires that exact commit's own fresh exact-head Quality + Score100 CI evidence -- does not carry forward automatically to any later commit (including the documentation-only commits that added/corrected this file), which must each supply their own fresh evidence to keep this ceiling waiver active for themselves.",
+        "governance_ceiling": {
+          "current_ceiling": 89,
+          "ceiling_numerically_applied": false,
+          "reason": "reconciliation_ceiling_waiver_active=true for this scored_commit, per all 8 independently-verified conditions in scripts/quality/bys360_score_reconcile_v1.py's waiver_active computation (see docs/handover/BYS360_FINAL_HANDOVER_AND_SUSTAINABILITY.md section 26.1 for the full 8-condition trace)."
+        }
+      },
+      "verification_method": "REPO_VERIFIED_THIS_SESSION",
+      "verification_command": "python scripts/quality/bys360_score_reconcile_v1.py --root . --scored-commit <sha> [--evidence-file <path>]",
+      "note": "This block previously (incorrectly) reported live_final=80/transfer_final=88 as canonical, based on an evidence-less run only. That run genuinely and correctly reflects a LOCAL_EVIDENCE_LIMITED_SCORE, not the canonical current score -- it does not account for cb2e57c's real, already-obtained exact-head Quality+Score100 CI evidence (the same screenshots already used to attest cb2e57c's push in this session). Re-running with that evidence supplied is what produced the current_canonical block above."
+    }
+  },
+  "historical_governance": {
+    "approved_state": "HISTORICAL_UNRECONSTRUCTABLE",
+    "approved_decision_record": "BYS360-GOV-LEGACY-001",
+    "legacy_total": 38,
+    "mapped_legacy_open_count": 0,
+    "unmapped_legacy_open_count": 38,
+    "governance_only_final_score_delta": 0,
+    "ceiling_waiver_decision": {
+      "decision_id": "BYS360-GOV-CEILING-WAIVER-001",
+      "decision_status": "APPROVED",
+      "approval_mode": "HUMAN_EXPLICIT_TOKEN",
+      "approval_date": "2026-08-23",
+      "approver_role": "HUMAN_PROJECT_OWNER",
+      "source": "config/quality/bys360_technical_debt_registry.json (reconciliation_ceiling_waiver_decision field, registry_version 1.1.0)",
+      "note": "This is a real, approved decision record -- NOT a hypothetical/example name. An earlier version of this file incorrectly stated it was not approved; that was based on reading only docs/governance/BYS360_GOV_HISTORICAL_GAP_ACCEPTANCE_POLICY_V1.md (which does describe it as a future example), without also checking the technical debt registry JSON where the actual decision was later recorded. Decision-record presence alone does not make the ceiling waiver active for any given commit's score -- see quality.scores above for the per-commit activation mechanism."
+    },
+    "verification_method": "REPO_VERIFIED"
+  },
+  "secrets_in_this_file": false
+}

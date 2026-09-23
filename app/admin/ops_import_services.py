@@ -187,8 +187,8 @@ def admin_user_import_impl():
                 from app.services.hierarchy_admin_service import ensure_unit_exists_strict
                 unit = ensure_unit_exists_strict(birim, ust_birim, role)
             except Exception as exc:
-                __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/admin/ops_routes.py:621)")
-                errors.append(f"Satır {rowno}: birim oluşturulamadı -> {exc}")
+                __import__("logging").getLogger(__name__).exception("BYS360 kalite denetimi: except bloğu loglandı (app/admin/ops_routes.py:621) | exc=%s", exc)
+                errors.append(f"Satır {rowno}: birim oluşturulamadı.")
                 continue
 
             if not unit:
@@ -250,7 +250,8 @@ def admin_user_import_impl():
                     created += 1
                     touched_users.append(user)
             except Exception as exc:
-                errors.append(f"Satır {rowno}: {exc}")
+                __import__("logging").getLogger(__name__).exception("BYS360 Excel içe aktarma satır hatası | rowno=%s | exc=%s", rowno, exc)
+                errors.append(f"Satır {rowno}: kayıt işlenirken beklenmeyen bir hata oluştu.")
 
         if errors:
             db.session.rollback()

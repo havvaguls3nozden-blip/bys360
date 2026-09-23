@@ -151,7 +151,7 @@ Geri bildirim talebi için tarih, saat ve görüşme tipini aynı kurumsal akı�
           <label for="meeting_type">Toplantı türü</label>
           <select id="meeting_type" name="meeting_type">
             <option value="yuz_yuze">Yüz Yüze</option>
-            <option value="online">Online</option>
+            <option value="online">Çevrimiçi</option>
             <option value="telefon">Telefon</option>
           </select>
         </div>
@@ -223,7 +223,7 @@ Geri bildirim talebi için tarih, saat ve görüşme tipini aynı kurumsal akı�
   const previewState = document.getElementById('schedulePreviewState');
   const previewMeetings = document.getElementById('schedulePreviewMeetings');
   const suggestionList = document.getElementById('scheduleSuggestionList');
-  const typeMap = { yuz_yuze: 'Yüz Yüze', online: 'Online', telefon: 'Telefon' };
+  const typeMap = { yuz_yuze: 'Yüz Yüze', online: 'Çevrimiçi', telefon: 'Telefon' };
   let previewAbortController = null;
 
   function syncSummary(){

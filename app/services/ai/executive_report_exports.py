@@ -116,7 +116,7 @@ def _clean_key(value: Any, fallback: str = "general") -> str:
 
 def _module_label(value: Any) -> str:
     key = _clean_key(value)
-    return MODULE_LABELS.get(key, key.replace("_", " ").title())
+    return MODULE_LABELS.get(key, "Bilinmiyor")
 
 
 def _status_bucket(value: Any) -> str:

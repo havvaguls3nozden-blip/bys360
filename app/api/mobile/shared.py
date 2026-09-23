@@ -97,7 +97,7 @@ def _role_key(user: User) -> str:
 def _has_global_scope(user: User) -> bool:
     role = _role_key(user)
     label = ((getattr(user, "role_label", "") or "").strip().lower())
-    return role in _GLOBAL_ROLES or label in _GLOBAL_ROLES or "admin" in role or "başkan" in role or "baskan" in role
+    return role in _GLOBAL_ROLES or label in _GLOBAL_ROLES
 
 
 def _full_name(user: User | None) -> str:

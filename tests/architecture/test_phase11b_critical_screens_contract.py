@@ -4,6 +4,25 @@ Statik metin tabanlı kontrat testleri: gerçek tarayıcı/cihaz render'ı
 doğrulamaz, yalnızca kaynak koddaki responsive/güvenlik/dil kurallarının
 var olduğunu ve gerilemediğini denetler. Phase 11A'daki
 test_phase11a_responsive_foundation_contract.py ile aynı desen.
+
+BYS360 Workflow Orphan Presentation Subsystem Temizliği update: this file
+originally carried 4 tests under "Legacy approval screen touch-target
+safety" that `.read_text()`'d `app/templates/workflow/president_
+approvals.html` and `app/workflow/routes.py`, asserting CSS-class/route-
+source properties of that screen under the label "legacy" -- implying it
+was an active, if old, live screen. A later, independent audit proved this
+wrong: `app/workflow/routes.py` was never imported by any startup code (see
+`tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_
+contract.py` for the full evidence), so that "legacy screen" never actually
+rendered in production, and both files were deleted in that same wave.
+There is no live behavior left for those 4 tests to protect -- they are
+removed here (not converted to an absence contract; unlike a route/
+endpoint's mere existence, "does this dead template's CSS still use a given
+class name" has no meaningful absence-contract form). `test_foundation_css_
+covers_legacy_approval_buttons` below is UNCHANGED -- it only reads the
+still-live, unrelated `bys360_responsive_foundation_v11a.css`, which other
+active templates may still rely on for the same `.wf-btn`/`.pa-btn`
+classes.
 """
 from pathlib import Path
 
@@ -30,35 +49,6 @@ def test_foundation_css_covers_legacy_approval_buttons():
     css = text("app/static/css/bys360_responsive_foundation_v11a.css")
     assert ".wf-btn" in css
     assert ".pa-btn" in css  # canonical screen coverage from Phase 11A must not regress
-
-
-def test_legacy_approval_action_buttons_use_wf_btn_class():
-    template = text("app/templates/workflow/president_approvals.html")
-    assert 'btn btn-sm btn-success wf-btn" name="action" value="APPROVE"' in template
-    assert 'btn btn-sm btn-warning wf-btn" name="action" value="RETURN"' in template
-    assert 'btn btn-sm btn-outline-danger wf-btn" name="action" value="REJECT"' in template
-
-
-def test_legacy_approval_actions_stack_full_width_on_mobile():
-    template = text("app/templates/workflow/president_approvals.html")
-    assert ".wf-decision-form{flex-direction:column;align-items:stretch}" in template
-    assert ".wf-decision-form button{width:100%}" in template
-
-
-def test_legacy_approval_route_and_auth_guard_unchanged():
-    routes = text("app/workflow/routes.py")
-    assert "@main_bp.route('/workflow/president-approvals')" in routes
-    assert "def workflow_president_approvals():" in routes
-    assert "if not (_can_view() or _can_decide()):" in routes
-    assert "WORKFLOW_VIEW_ROLES = set(ADMIN_FAMILY_ROLES)" in routes
-    assert "def workflow_president_decide" in routes
-    for action in ["APPROVE", "RETURN", "REJECT"]:
-        assert f'"{action}"' in routes or f"'{action}'" in routes
-
-
-def test_legacy_approval_csrf_token_preserved():
-    template = text("app/templates/workflow/president_approvals.html")
-    assert "csrf_token()" in template
 
 
 # --- 404/500 error pages: UTF-8 content, independent shell, no technical leak ---
@@ -106,10 +96,24 @@ def test_error_pages_do_not_leak_technical_terms():
 
 
 def test_error_pages_meet_touch_target_and_reduced_motion():
+    # BYS360 CSP STYLE-3A KOORDINATOR DUZELTMESI: bu iki sayfanin ortak,
+    # byte-birebir ayni statik <style> blogu Style-3A dalgasinda harici
+    # app/static/css/error_pages_404_500_shared.css dosyasina tasindi (bkz.
+    # o dalganin kontrat testleri, tests/security/test_csp_style3a_
+    # duplicate_block_extraction_contract.py) -- deklarasyonlarin kendisi
+    # DEGISMEDI, yalnizca konumu degisti. Bu test artik hem sablonun dogru
+    # stylesheet'i yukledigini HEM DE garanti edilen erisilebilirlik
+    # ozelliklerinin (44px dokunma hedefi + reduced-motion destegi) o
+    # stylesheet icinde hala var oldugunu dogrular -- garanti kaybolmadi,
+    # yalnizca nereye bakildigi degisti.
+    css = text("app/static/css/error_pages_404_500_shared.css")
+    assert "min-height:44px" in css
+    assert "prefers-reduced-motion: reduce" in css
     for rel in ["app/templates/errors/404.html", "app/templates/errors/500.html"]:
         content = text(rel)
-        assert "min-height:44px" in content
-        assert "prefers-reduced-motion: reduce" in content
+        assert "css/error_pages_404_500_shared.css" in content, (
+            f"{rel} artik erisilebilirlik garantisini tasiyan stylesheet'i yuklemiyor."
+        )
 
 
 def test_active_error_handler_passes_title_and_message_to_templates():
@@ -184,8 +188,11 @@ def test_notification_select_is_a_label_with_touch_target():
 def test_mobile_flutter_directory_is_untouched_by_this_phase():
     # Phase 11B never edits mobile_flutter/; this only asserts the directory,
     # if present, is not referenced from any file this phase modified.
+    # app/templates/workflow/president_approvals.html was in this list
+    # originally -- removed, along with its whole confirmed-dead subsystem,
+    # by the later BYS360 Workflow Orphan Presentation Subsystem Temizliği
+    # (see this file's module docstring).
     for rel in [
-        "app/templates/workflow/president_approvals.html",
         "app/templates/settings.html",
         "app/templates/notifications_list.html",
         "app/static/js/faz4_support_account_mobile.js",

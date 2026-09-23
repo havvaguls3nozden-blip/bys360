@@ -19,7 +19,11 @@ function Register-BysTask($Name, $Script, $Hour, $Minute, $LogName) {
     $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arg
     $trigger = New-ScheduledTaskTrigger -Daily -At ([datetime]::Today.AddHours($Hour).AddMinutes($Minute))
     $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable
-    Register-ScheduledTask -TaskName $Name -Action $action -Trigger $trigger -Settings $settings -Force | Out-Null
+    # BYS360 DEFECT Y: explicit unattended-service principal -- without this,
+    # Register-ScheduledTask defaults to the current interactive caller's
+    # identity/logon type, which this daily mail task cannot depend on.
+    $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+    Register-ScheduledTask -TaskName $Name -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
     Write-Host "OK: $Name -> $($Hour.ToString('00')):$($Minute.ToString('00')) | $logDir\$LogName"
 }
 Register-BysTask "BYS360 Daily Weather Personnel Mail" "scripts\communication\send_daily_weather_personnel_mail.py" $MorningHour $MorningMinute "daily_weather_personnel_mail.log"

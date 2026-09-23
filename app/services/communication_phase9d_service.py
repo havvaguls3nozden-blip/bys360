@@ -8,6 +8,7 @@ from app.core.datetime_utils import utc_now
 from app.extensions import db
 from app.models import Notification, SupportTicket, SurveyAssignment
 from app.models.communication_phase5_models import CommunicationAutomationLog
+from app.services.communication_gate_status_labels import gate_status_label
 from app.services.communication_phase5_service import OPEN_TICKET_STATUSES, log_action, safe_str
 from app.services.communication_phase9_service import (
     phase9_first72_snapshot,
@@ -140,13 +141,16 @@ def _window_status(window_key: str, logs: list[CommunicationAutomationLog]) -> s
 def _gates(release: dict[str, Any], support: dict[str, int], feedback: dict[str, int], hotfix: dict[str, int], signal: dict[str, int]) -> list[dict[str, Any]]:
     blockers = int((release.get('gate_counts') or {}).get('fail', 0) or 0)
     warnings = int((release.get('gate_counts') or {}).get('warn', 0) or 0)
-    return [
+    rows = [
         {'label': 'İlk 72 saat yayın kapısı', 'status': 'pass' if blockers == 0 else 'warn' if warnings >= 0 else 'fail', 'owner': 'BT / Proje', 'detail': f'Canlı kapı blokajı: {blockers} | Uyarı: {warnings}', 'action': 'Blokajlı kapılar kapanmadan tam açılış genişletilmesin.'},
         {'label': 'Destek kuyruğu ve atama disiplini', 'status': 'pass' if support['open_total'] <= 15 and support['unassigned_total'] == 0 and support['stale_total'] == 0 else 'warn' if support['open_total'] <= 35 else 'fail', 'owner': 'Destek', 'detail': f"Açık: {support['open_total']} | Atanmamış: {support['unassigned_total']} | Duran: {support['stale_total']}", 'action': 'İlk gün atanmamış ve duran kayıt bırakılmamalı.'},
         {'label': 'Bildirim ve anket geri beslemesi', 'status': 'pass' if feedback['pending_assignments'] <= 20 and feedback['unread_notifications'] <= 100 else 'warn', 'owner': 'İK / Süreç Sahibi', 'detail': f"Bekleyen anket ataması: {feedback['pending_assignments']} | Okunmamış bildirim: {feedback['unread_notifications']}", 'action': 'İlk 72 saatte kullanıcı yanıtını geciktiren düğümler temizlensin.'},
         {'label': 'Hotfix baskısı', 'status': 'pass' if hotfix['critical'] == 0 and hotfix['high'] <= 1 else 'warn' if hotfix['critical'] == 0 else 'fail', 'owner': 'BT', 'detail': f"Toplam hotfix: {hotfix['total']} | High: {hotfix['high']} | Critical: {hotfix['critical']}", 'action': 'Kritik hotfix varsa değişiklik penceresi daraltılmalı.'},
         {'label': 'Saha izleme sinyalleri', 'status': 'pass' if signal['critical'] == 0 and signal['risk'] <= 1 else 'warn' if signal['critical'] == 0 else 'fail', 'owner': 'Proje / Yönetim', 'detail': f"Stabil: {signal['stable']} | İzle: {signal['watch']} | Risk: {signal['risk']} | Kritik: {signal['critical']}", 'action': 'Kritik sinyal kayıtlarında aynı vardiyada müdahale kararı alınmalı.'},
     ]
+    for row in rows:
+        row['status_label'] = gate_status_label(row['status'])
+    return rows
 
 
 def _counts(gates: list[dict[str, Any]]) -> dict[str, int]:
@@ -176,7 +180,11 @@ def _summary_cards(release: dict[str, Any], support: dict[str, int], hotfix: dic
 
 
 def _window_rows(logs: list[CommunicationAutomationLog]) -> list[dict[str, Any]]:
-    return [{**item, 'status': _window_status(item['key'], logs)} for item in _checkin_window_rows()]
+    rows = []
+    for item in _checkin_window_rows():
+        status = _window_status(item['key'], logs)
+        rows.append({**item, 'status': status, 'status_label': gate_status_label(status)})
+    return rows
 
 
 def _watch_items(release: dict[str, Any], support: dict[str, int], feedback: dict[str, int], hotfix: dict[str, int], signals: dict[str, int]) -> list[dict[str, Any]]:
@@ -206,7 +214,7 @@ def _hotfix_rows(logs: list[CommunicationAutomationLog]) -> list[dict[str, Any]]
         if row.action_type != 'phase9d_hotfix':
             continue
         severity = safe_str((row.payload_json or {}).get('severity')).lower()
-        rows.append({'title': row.summary or 'Hotfix kaydı', 'severity': HOTFIX_SEVERITY_LABELS.get(severity, severity or '-'), 'note': safe_str((row.payload_json or {}).get('note')), 'executed_at': row.executed_at, 'status': row.status})
+        rows.append({'title': row.summary or 'Hotfix kaydı', 'severity': HOTFIX_SEVERITY_LABELS.get(severity, 'Bilinmiyor') if severity else '-', 'note': safe_str((row.payload_json or {}).get('note')), 'executed_at': row.executed_at, 'status': row.status})
     return rows[:12]
 
 
@@ -216,7 +224,7 @@ def _signal_rows(logs: list[CommunicationAutomationLog]) -> list[dict[str, Any]]
         if row.action_type != 'phase9d_signal':
             continue
         state = safe_str((row.payload_json or {}).get('status')).lower()
-        rows.append({'title': row.summary or 'İzleme sinyali', 'status': SIGNAL_STATUS_LABELS.get(state, state or '-'), 'note': safe_str((row.payload_json or {}).get('note')), 'executed_at': row.executed_at})
+        rows.append({'title': row.summary or 'İzleme sinyali', 'status': SIGNAL_STATUS_LABELS.get(state, 'Bilinmiyor') if state else '-', 'note': safe_str((row.payload_json or {}).get('note')), 'executed_at': row.executed_at})
     return rows[:12]
 
 
@@ -249,7 +257,17 @@ def phase9d_stabilization_snapshot() -> dict[str, Any]:
         'handoff_rows': _handoff_rows(),
         'hotfix_rows': _hotfix_rows(logs),
         'signal_rows': _signal_rows(logs),
-        'recent_logs': logs,
+        'recent_logs': [
+            {
+                'action_type': row.action_type,
+                'status': row.status,
+                'status_label': gate_status_label(row.status),
+                'summary': row.summary,
+                'executed_at': row.executed_at,
+                'payload_json': row.payload_json,
+            }
+            for row in logs
+        ],
         'smoke_rows': first72.get('smoke_rows', []),
     }
 
@@ -269,7 +287,7 @@ def phase9d_payload() -> dict[str, Any]:
         'hotfix_rows': payload['hotfix_rows'],
         'signal_rows': payload['signal_rows'],
         'smoke_rows': payload['smoke_rows'],
-        'recent_logs': [{'action_type': row.action_type, 'status': row.status, 'summary': row.summary, 'executed_at': row.executed_at, 'payload_json': row.payload_json} for row in payload['recent_logs']],
+        'recent_logs': payload['recent_logs'],
     }
 
 
@@ -286,14 +304,14 @@ def build_phase9d_markdown() -> str:
     ]
     for row in payload['gates']:
         lines.extend([
-            f"- **{row['label']}** [{row['status']}]",
+            f"- **{row['label']}** [{row['status_label']}]",
             f"  - Sahip: {row['owner']}",
             f"  - Detay: {row['detail']}",
             f"  - Aksiyon: {row['action']}",
         ])
     lines.extend(['', '## 72 saat pencereleri'])
     for row in payload['window_rows']:
-        lines.append(f"- **{row['title']}** [{row['status']}] — {row['focus']}")
+        lines.append(f"- **{row['title']}** [{row['status_label']}] — {row['focus']}")
     lines.extend(['', '## Sıcak izleme başlıkları'])
     for row in payload['watch_items']:
         lines.append(f"- **{row['title']}** — {row['metric']} | {row['detail']}")

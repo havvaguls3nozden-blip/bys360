@@ -36,11 +36,14 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="core_refactor_final_lock",
         title="Core Refactor Faz 1-10 final kilidi",
         category="architecture",
-        required_paths=(
-            "scripts/check_core_refactor_faz10_gate.py",
-            "scripts/run_core_refactor_quality_chain.py",
-            "docs/refactor/CORE_REFACTOR_FAZ10.md",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): these 3 paths never existed in
+        # this repo (mechanically confirmed) -- they described a release-
+        # chain-runner architecture that was never built. The actual current
+        # release-quality gate is the canonical CI Step1+Step2 pipeline plus
+        # the individual scripts/quality/bys360_*.py gates. Emptied rather
+        # than resurrected per explicit instruction not to create placeholder
+        # scripts.
+        required_paths=(),
         command_markers=("CORE_REFACTOR_FAZ10_GATE_OK", "CORE_REFACTOR_QUALITY_CHAIN_OK"),
         evidence_outputs=("reports/refactor/", "docs/refactor/generated/"),
         release_value="app factory, route bootstrap, schema contract, model namespace ve route registry kanıtları kilitlenir.",
@@ -49,11 +52,10 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="scorecard_cleanup_lock",
         title="Scorecard 8.5 temizlik kilidi",
         category="release_hygiene",
-        required_paths=(
-            "scripts/check_scorecard_8_5_cleanup_gate.py",
-            "scripts/cleanup_scorecard_8_5_artifacts.py",
-            ".releaseignore",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the 2 scorecard-specific
+        # cleanup scripts never existed; .releaseignore is real and is the
+        # actual evidence backing this item's release_value claim below.
+        required_paths=(".releaseignore",),
         command_markers=("SCORECARD_8_5_CLEANUP_GATE_OK",),
         evidence_outputs=("ENV.md", ".releaseignore"),
         release_value="root ENV pointer ve docs/refactor/generated canlı paket dışı kuralı korunur.",
@@ -62,10 +64,9 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="home_phase1_lock",
         title="Anasayfa Faz 1 ve hava durumu fallback kilidi",
         category="home_experience",
-        required_paths=(
-            "scripts/check_home_phase1_gate.py",
-            "tests/architecture/test_home_phase1_contract.py",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): neither path ever existed;
+        # no current equivalent identified. Emptied rather than resurrected.
+        required_paths=(),
         command_markers=("HOME_PHASE1_GATE_OK",),
         evidence_outputs=("docs/refactor/",),
         release_value="Gün Özeti, hava durumu önerileri ve güvenli fallback akışı doğrulanır.",
@@ -74,10 +75,9 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="final_quality_faz1_services",
         title="Final Quality Faz 1 servis sözleşmeleri",
         category="service_tests",
-        required_paths=(
-            "scripts/run_final_quality_faz1_chain.py",
-            "app/refactor/final_quality_service_contract.py",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the chain-runner script never
+        # existed; the contract module itself is real and live.
+        required_paths=("app/refactor/final_quality_service_contract.py",),
         command_markers=("FINAL_QUALITY_FAZ1_CHAIN_OK",),
         evidence_outputs=("reports/refactor/final_quality_faz1_report.json",),
         release_value="Canlı servis sözleşmeleri, anasayfa hava durumu ve canlı kaynak testleri kanıtlanır.",
@@ -86,10 +86,9 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="final_quality_faz2_performance_rules",
         title="Final Quality Faz 2 performans kural matrisi",
         category="performance_rules",
-        required_paths=(
-            "scripts/run_final_quality_faz2_chain.py",
-            "app/refactor/final_quality_performance_rules.py",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the chain-runner script never
+        # existed; the contract module itself is real and live.
+        required_paths=("app/refactor/final_quality_performance_rules.py",),
         command_markers=("FINAL_QUALITY_FAZ2_CHAIN_OK",),
         evidence_outputs=("reports/refactor/final_quality_faz2_performance_rule_matrix.json",),
         release_value="Kör değerlendirme yasağı, yayın görünürlüğü, amir zinciri ve 3. amir modu testle korunur.",
@@ -98,10 +97,9 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="final_quality_faz3_live_backbone",
         title="Final Quality Faz 3 canlı omurga entegrasyon kanıtı",
         category="live_backbone",
-        required_paths=(
-            "scripts/run_final_quality_faz3_chain.py",
-            "app/refactor/final_quality_live_backbone_contract.py",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the chain-runner script never
+        # existed; the contract module itself is real and live.
+        required_paths=("app/refactor/final_quality_live_backbone_contract.py",),
         command_markers=("FINAL_QUALITY_FAZ3_CHAIN_OK",),
         evidence_outputs=("reports/refactor/final_quality_faz3_live_backbone.json",),
         release_value="Kimlik, yetki, personel, performans, izin-vekalet, mesaj, anket, destek ve AI omurgası doğrulanır.",
@@ -110,10 +108,9 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="final_quality_faz4_security_compliance",
         title="Final Quality Faz 4 güvenlik, KVKK ve audit kanıtı",
         category="security_compliance",
-        required_paths=(
-            "scripts/run_final_quality_faz4_chain.py",
-            "app/refactor/final_quality_security_compliance_contract.py",
-        ),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the chain-runner script never
+        # existed; the contract module itself is real and live.
+        required_paths=("app/refactor/final_quality_security_compliance_contract.py",),
         command_markers=("FINAL_QUALITY_FAZ4_CHAIN_OK",),
         evidence_outputs=("reports/refactor/final_quality_faz4_security_compliance.json",),
         release_value="KVKK, KVKK-GDPR eşdeğeri, TS 27001, ISO 42001 ve audit izlenebilirliği kanıtlanır.",
@@ -122,19 +119,22 @@ FINAL_RELEASE_EVIDENCE_ITEMS: Final[tuple[ReleaseEvidenceItem, ...]] = (
         key="clean_live_release_gate",
         title="Clean live release gate",
         category="release_hygiene",
-        required_paths=("scripts/check_clean_live_release_gate.py", ".releaseignore"),
+        # BYS360 DEFECT FS (Final Sweep A3-16): the gate script never
+        # existed; .releaseignore is real and directly relevant.
+        required_paths=(".releaseignore",),
         command_markers=("CLEAN_LIVE_RELEASE_GATE_OK",),
         evidence_outputs=("reports/refactor/clean_live_release_gate.json",),
         release_value="Canlı pakete env, pycache, pytest cache, generated audit ve geliştirme kalıntıları girmemelidir.",
     ),
     ReleaseEvidenceItem(
-        key="claude_10_10_gate",
+        # BYS360 DEFECT FS (Final Sweep A3-15/A3-16): key and required_paths
+        # both carried a development-tool trace ("claude"); neither script
+        # ever existed in this repo. Renamed to a neutral institutional
+        # identifier and emptied rather than resurrected.
+        key="release_artifact_hygiene_gate",
         title="Maintenance 10/10 kalite gate",
         category="quality_gate",
-        required_paths=(
-            "scripts/check_claude_10_10_gate.py",
-            "scripts/cleanup_claude_release_artifacts.py",
-        ),
+        required_paths=(),
         command_markers=("QUALITY_GATE_OK",),
         evidence_outputs=("reports/refactor/",),
         release_value="Maintenance değerlendirmesinde tekrar eden paket/artefakt eksikleri yakalanır.",
@@ -170,7 +170,7 @@ FINAL_RELEASE_EVIDENCE_CATEGORIES: Final[tuple[ReleaseEvidenceCategory, ...]] = 
     ReleaseEvidenceCategory(
         key="release_hygiene",
         title="Canlı paket temizlik kanıtı",
-        items=("scorecard_cleanup_lock", "clean_live_release_gate", "claude_10_10_gate"),
+        items=("scorecard_cleanup_lock", "clean_live_release_gate", "release_artifact_hygiene_gate"),
         required_marker="CLEAN_LIVE_RELEASE_GATE_OK",
     ),
     ReleaseEvidenceCategory(

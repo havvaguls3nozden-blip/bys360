@@ -64,7 +64,7 @@
     <h5 class="mb-3">Son hareketler</h5>
     <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Talep</th><th>Yeni durum</th><th>Not</th><th>Zaman</th></tr></thead><tbody>
       {% for row in payload.recent_history %}
-      <tr><td>#{{ row.ticket_id }}</td><td>{{ row.new_status }}</td><td>{{ row.note or '-' }}</td><td>{{ row.created_at }}</td></tr>
+      <tr><td>#{{ row.ticket_id }}</td><td>{{ payload.status_labels.get(row.new_status, 'Bilinmiyor') }}</td><td>{{ row.note or '-' }}</td><td>{{ row.created_at }}</td></tr>
       {% else %}
       <tr><td colspan="4" class="text-muted">Hareket kaydı bulunamadı.</td></tr>
       {% endfor %}

@@ -49,7 +49,7 @@ def run_v2_1_3_personnel_category_card_gate() -> dict[str, Any]:
         checks.append(_check("template_helper", helper.get("display_name") == "Kategori Atanmamış", "Personel kartı Jinja helper güvenli çalışıyor."))
         summary = category_card_summary()
         checks.append(_check("summary", "visible_personnel_count" in summary, "Kategori kart özeti çalışıyor."))
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
-        checks.append(_check("exception", False, str(exc)))
+        checks.append(_check("exception", False, "Kalite kapısı kontrolü sırasında beklenmeyen bir hata oluştu."))
     return {"ok": all(item.get("ok") for item in checks), "checks": checks, "rule_version": RULE_VERSION}

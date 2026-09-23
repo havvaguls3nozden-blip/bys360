@@ -2,13 +2,17 @@ from __future__ import annotations
 
 import re
 import uuid
+from types import ModuleType
 
 from app.core.datetime_utils import utc_now
 
 try:
-    import pymupdf
+    pymupdf: ModuleType | None = None
+    import pymupdf as _pymupdf
 except Exception:  # pragma: no cover
-    pymupdf = None
+    pass
+else:
+    pymupdf = _pymupdf
 from pathlib import Path
 
 from flask import abort, current_app

@@ -114,9 +114,9 @@ def performance_archive_import():
                 if not result.get("created", 0) and not result.get("skipped", 0):
                     flash("Excel dosyasında aktarılacak satır bulunamadı.", "info")
             except Exception as exc:
-                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+                logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
                 db.session.rollback()
-                flash(f"Excel aktarımı yapılamadı: {exc}", "danger")
+                flash("Excel aktarımı yapılamadı.", "danger")
 
     return safe_render(
         "performance/archive/import.html",
@@ -198,9 +198,9 @@ def performance_archive_new():
         flash("Geçmiş performans puanı arşive eklendi.", "success")
         return redirect(url_for("main.performance_archive_detail", result_id=result.id))
     except Exception as exc:
-        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
+        logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı. | exc=%s", exc)
         db.session.rollback()
-        flash(f"Kayıt eklenemedi: {exc}", "danger")
+        flash("Kayıt eklenemedi.", "danger")
         return safe_render(
             "performance/archive/form.html",
             "<h3>Geçmiş Puan Ekle</h3>",

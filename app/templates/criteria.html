@@ -525,7 +525,7 @@
                                 </div>
 
                                 <div class="criterion-actions">
-                                    <button type="button" class="mini-btn edit" onclick="toggleEditBox('edit-box-{{ item.id }}')">
+                                    <button type="button" class="mini-btn edit" data-toggle-edit-box="edit-box-{{ item.id }}">
                                         <i class="fa-solid fa-pen"></i>
                                         Düzenle
                                     </button>
@@ -543,7 +543,7 @@
                                         </button>
                                     </form>
 
-                                    <form method="post" action="{{ url_for('main.performance_criteria_delete', criteria_id=item.id) }}" onsubmit="return confirm('Bu kriter silinsin mi?');">
+                                    <form method="post" action="{{ url_for('main.performance_criteria_delete', criteria_id=item.id) }}" data-confirm="Bu kriter silinsin mi?">
                                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                         <button type="submit" class="mini-btn delete">
                                             <i class="fa-solid fa-trash"></i>
@@ -588,7 +588,7 @@
                                                     <i class="fa-solid fa-floppy-disk"></i>
                                                     Güncelle
                                                 </button>
-                                                <button type="button" class="btn-soft secondary" onclick="toggleEditBox('edit-box-{{ item.id }}')">
+                                                <button type="button" class="btn-soft secondary" data-toggle-edit-box="edit-box-{{ item.id }}">
                                                     <i class="fa-solid fa-xmark"></i>
                                                     Kapat
                                                 </button>
@@ -615,6 +615,21 @@
         if (!box) return;
         box.classList.toggle("show");
     }
+
+    document.addEventListener('click', function (event) {
+        const btn = event.target.closest('[data-toggle-edit-box]');
+        if (!btn) return;
+        toggleEditBox(btn.getAttribute('data-toggle-edit-box'));
+    });
+
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            const message = form.getAttribute('data-confirm');
+            if (message && !window.confirm(message)) {
+                event.preventDefault();
+            }
+        });
+    });
 
     (function () {
         const searchInput = document.getElementById("criteriaSearch");

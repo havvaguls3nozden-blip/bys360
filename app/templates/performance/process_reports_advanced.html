@@ -434,7 +434,7 @@
 
     <form class="bys-report-toolbar" method="get">
         <input id="bysReportSearch" class="bys-report-input" type="search" placeholder="Amir, personel, durum veya işlem ara...">
-        <select class="bys-report-select" name="status" onchange="this.form.submit()">
+        <select class="bys-report-select" name="status" data-autosubmit="1">
             <option value="" {% if not status_filter %}selected{% endif %}>Tüm durumlar</option>
             <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Bekleyenler</option>
             <option value="overdue" {% if status_filter == 'overdue' %}selected{% endif %}>Gecikenler</option>
@@ -664,6 +664,14 @@
     }
 
     if (search) search.addEventListener("input", applySearch);
+})();
+
+(function () {
+    document.querySelectorAll('[data-autosubmit]').forEach(function (el) {
+        el.addEventListener('change', function () {
+            if (this.form) this.form.submit();
+        });
+    });
 })();
 </script>
 {% endblock %}

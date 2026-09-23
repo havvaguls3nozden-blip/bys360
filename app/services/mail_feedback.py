@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from app.services.feedback_service import (
+    FEEDBACK_MEETING_STATUS_LABELS,
+    FEEDBACK_REQUEST_STATUS_LABELS,
+)
 from app.services.mail_core import (
     AUTOMATION_SETTING_DEFINITIONS,
     MAIL_TEMPLATE_DEFINITIONS,
@@ -84,7 +88,7 @@ def send_feedback_request_mail(feedback: FeedbackRequest) -> dict[str, Any]:
 Personel: {employee.ad} {employee.soyad}
 Sicil No: {employee.sicil_no or '-'}
 Dönem: {feedback.period.title if feedback.period else '-'}
-Durum: {feedback.status}
+Durum: {FEEDBACK_REQUEST_STATUS_LABELS.get(feedback.status, "Bilinmiyor" if feedback.status else "-")}
 
 Talep Açıklaması:
 {feedback.reason or '-'}
@@ -125,7 +129,7 @@ def send_feedback_response_mail(feedback: FeedbackRequest) -> tuple[bool, str]:
 
 Performans değerlendirme geri bildirim talebiniz güncellenmiştir.
 
-Durum: {feedback.status}
+Durum: {FEEDBACK_REQUEST_STATUS_LABELS.get(feedback.status, "Bilinmiyor" if feedback.status else "-")}
 
 Yanıt:
 {feedback.response or 'Henüz yanıt girilmedi.'}
@@ -182,7 +186,7 @@ Tarih: {meeting_date}
 Saat: {meeting_start} - {meeting_end}
 Toplantı Türü: {meeting.meeting_type or '-'}
 Konum / Bağlantı: {meeting.location or '-'}
-Durum: {meeting.status or '-'}
+Durum: {FEEDBACK_MEETING_STATUS_LABELS.get(meeting.status, "Bilinmiyor" if meeting.status else "-")}
 
 Toplantı Notu:
 {meeting.note or 'Not girilmedi.'}
@@ -238,13 +242,7 @@ def send_feedback_meeting_status_update_mail(meeting: FeedbackMeeting) -> dict[s
     meeting_start = meeting.meeting_start.strftime("%H:%M") if meeting.meeting_start else "-"
     meeting_end = meeting.meeting_end.strftime("%H:%M") if meeting.meeting_end else "-"
 
-    status_label_map = {
-        "planlandi": "Planlandı",
-        "tamamlandi": "Tamamlandı",
-        "ertelendi": "Ertelendi",
-        "iptal_edildi": "İptal Edildi",
-    }
-    status_label = status_label_map.get(meeting.status, meeting.status or "-")
+    status_label = FEEDBACK_MEETING_STATUS_LABELS.get(meeting.status, "Bilinmiyor" if meeting.status else "-")
 
     subject = f"BYS360 Randevu Durumu Güncellendi | {status_label}"
 

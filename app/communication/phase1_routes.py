@@ -9,7 +9,11 @@ from flask import flash, redirect, request, url_for
 from flask_login import current_user, login_required
 
 from app.extensions import db
-from app.models.communication_phase1_models import CommunicationBulletin
+from app.models.communication_phase1_models import (
+    CommunicationBulletin,
+    CommunicationBulletinAudience,
+    CommunicationBulletinReceipt,
+)
 from app.route_registry import main_bp
 from app.route_support import menu_key_required, safe_render
 from app.services.communication_phase1_service import (
@@ -89,8 +93,8 @@ def communication_phase1_bulletin_new():
         except CommunicationPhase1Error as exc:
             flash(str(exc), "warning")
         except Exception as exc:  # pragma: no cover
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=90")
-            flash(f"Duyuru oluşturulamadı: {exc}", "danger")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=90 | exc=%s", exc)
+            flash("Duyuru oluşturulamadı.", "danger")
 
     return safe_render(
         "communication/phase1_bulletin_form.html",
@@ -104,7 +108,7 @@ def communication_phase1_bulletin_new():
 @menu_key_required("announcements")
 def communication_phase1_bulletin_detail(bulletin_id: int):
     bulletin = CommunicationBulletin.query.get_or_404(bulletin_id)
-    audiences = bulletin.audiences.order_by("id").all()
+    audiences = bulletin.audiences.order_by(CommunicationBulletinAudience.id).all()
 
     my_receipt = None
     try:
@@ -112,12 +116,12 @@ def communication_phase1_bulletin_detail(bulletin_id: int):
         if my_receipt is not None:
             db.session.add(my_receipt)
             db.session.commit()
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=113")
+    except Exception as exc:
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=113 | exc=%s", exc)
         db.session.rollback()
         my_receipt = get_bulletin_receipt(bulletin.id, current_user.id, create_if_missing=False)
 
-    receipts = bulletin.receipts.order_by("created_at desc").all()
+    receipts = bulletin.receipts.order_by(CommunicationBulletinReceipt.created_at.desc()).all()
     receipt_summary = bulletin_receipt_summary(bulletin)
     return safe_render(
         "communication/phase1_bulletin_detail.html",
@@ -149,8 +153,8 @@ def communication_phase1_bulletin_publish(bulletin_id: int):
     except CommunicationPhase1Error as exc:
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=148")
-        flash(f"Duyuru yayımlanamadı: {exc}", "danger")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=148 | exc=%s", exc)
+        flash("Duyuru yayımlanamadı.", "danger")
 
     return redirect(url_for("main.communication_phase1_bulletin_detail", bulletin_id=bulletin_id))
 
@@ -188,7 +192,7 @@ def communication_phase1_bulletin_acknowledge(bulletin_id: int):
         db.session.rollback()
         flash(str(exc), "warning")
     except Exception as exc:  # pragma: no cover
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=186")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/phase1_routes.py | line=186 | exc=%s", exc)
         db.session.rollback()
-        flash(f"Duyuru onayı kaydedilemedi: {exc}", "danger")
+        flash("Duyuru onayı kaydedilemedi.", "danger")
     return redirect(url_for("main.communication_phase1_bulletin_detail", bulletin_id=bulletin_id))

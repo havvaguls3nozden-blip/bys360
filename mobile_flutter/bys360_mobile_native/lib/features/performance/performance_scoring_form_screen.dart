@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/network/api_client.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/bys360_copy.dart';
 import '../../core/widgets/api_state.dart';
 import '../../core/widgets/bys_page.dart';
 import '../../core/widgets/metric_card.dart';
@@ -123,12 +124,7 @@ class _PerformanceScoringFormScreenState extends State<PerformanceScoringFormScr
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_cleanError(message))));
   }
 
-  String _cleanError(Object? error) {
-    final text = (error ?? '').toString();
-    if (text.contains('403')) return 'Bu işlem için yetkiniz bulunmamaktadır.';
-    if (text.contains('Socket') || text.contains('Connection') || text.contains('Timeout')) return 'BYS360 sunucusuna şu anda ulaşılamadı. Lütfen tekrar deneyin.';
-    return text.replaceFirst('İşlem tamamlanamadı: ', '').replaceFirst('ApiException: ', '').trim().isEmpty ? 'İşlem tamamlanamadı. Lütfen tekrar deneyin.' : text.replaceFirst('İşlem tamamlanamadı: ', '').replaceFirst('ApiException: ', '').trim();
-  }
+  String _cleanError(Object? error) => BYS360Copy.error(error);
 
   @override
   Widget build(BuildContext context) {

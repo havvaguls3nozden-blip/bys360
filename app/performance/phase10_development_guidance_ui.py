@@ -642,7 +642,7 @@ def normalize_recommendation(row: dict[str, Any]) -> dict[str, Any]:
         "follow_frequency": _safe(row.get("follow_frequency"), "monthly"),
         "follow_frequency_label": FOLLOW_FREQUENCY_LABELS.get(_safe(row.get("follow_frequency"), "monthly"), "Aylık"),
         "publication_status": publication_status,
-        "publication_label": STATUS_LABELS.get(publication_status, publication_status.replace("_", " ").title()),
+        "publication_label": STATUS_LABELS.get(publication_status, "Taslak"),
         "visibility_label": visibility_label,
         "visibility_badge": visibility_badge,
         "show_on_scorecard": show_on_scorecard,
@@ -753,9 +753,16 @@ def _concat_name_expr(cols: set[str]) -> str:
     elif "soyad" in cols:
         fallback_exprs.append("NULLIF(TRIM(COALESCE(soyad, '')), '')")
 
+    # BYS360 DEFECT FS (Final Sweep FS-R2): the PostgreSQL-only `::text` cast
+    # broke on SQLite ("unrecognized token: ':'"), silently swallowed by
+    # _fetch_people_options()'s broad except into an empty personnel picker.
+    # Every column listed here is already a text/string column (users.email,
+    # users.sicil_no, users.full_name_cache, users._full_name_compat, etc.),
+    # so the cast was also functionally redundant -- removed outright rather
+    # than reformulated as a portable CAST(... AS TEXT).
     for c in ("full_name", "full_name_cache", "ad_soyad", "name", "display_name", "email", "sicil_no"):
         if c in cols:
-            fallback_exprs.append(f"NULLIF(TRIM(COALESCE({c}::text, '')), '')")
+            fallback_exprs.append(f"NULLIF(TRIM(COALESCE({c}, '')), '')")
 
     fallback_exprs.append("CAST(id AS TEXT)")
     return "COALESCE(" + ", ".join(fallback_exprs) + ")"

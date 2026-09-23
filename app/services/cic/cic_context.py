@@ -420,6 +420,17 @@ def _cic_v45_header_key(value: object) -> str | None:
     return mapping.get(h)
 
 def _cic_v45_ensure_schema() -> None:
+    # BYS360 DEFECT AJ: the "if col not in cols" Python guards below were
+    # already correct, but each guarded ALTER statement's own SQL string
+    # still contained the literal "ADD COLUMN IF NOT EXISTS" keywords --
+    # PostgreSQL-only syntax that SQLite's parser rejects unconditionally
+    # (sqlite3.OperationalError: near "EXISTS": syntax error) regardless of
+    # whether the Python-level guard is correct, since this is a parse-time
+    # failure, not a "column already exists" runtime condition. Confirmed
+    # empirically: against a real SQLite users table missing all three
+    # columns, this function used to silently add none of them (the broad
+    # except below swallowed the error) -- now, with the keywords dropped,
+    # it adds all three correctly.
     try:
         from sqlalchemy import inspect as _sa_inspect, text as _sa_text
         inspector = _sa_inspect(db.engine)
@@ -428,11 +439,11 @@ def _cic_v45_ensure_schema() -> None:
         cols = {c.get("name") for c in inspector.get_columns("users")}
         with db.engine.begin() as conn:
             if "birth_date" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS birth_date DATE"))
+                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN birth_date DATE"))
             if "hire_date" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS hire_date DATE"))
+                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN hire_date DATE"))
             if "celebration_opt_out" not in cols:
-                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN IF NOT EXISTS celebration_opt_out BOOLEAN NOT NULL DEFAULT FALSE"))
+                conn.execute(_sa_text("ALTER TABLE users ADD COLUMN celebration_opt_out BOOLEAN NOT NULL DEFAULT FALSE"))
     except Exception:
         __import__("logging").getLogger(__name__).exception("BYS360 SAFE V5: sessiz except loglandi: app/services/corporate_information_center.py:2625")
         pass

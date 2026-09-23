@@ -30,36 +30,44 @@ class _StrategicConflict(TypedDict):
     indexes: tuple[int, int]
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2 kaldirdi
+# /performans/baskan-onaylari icin main.president_low_score_approvals_center'in
+# kendi route kaydini (app/performance/president_low_score_card_routes.py),
+# bu url_map'ten bu bes route'un TUMUNDEN once tam olarak bir Rule kaldirdi --
+# asagidaki tum "indexes" degerleri buna gore -1 kaydirildi (mekanik olarak
+# yeniden dogrulandi, bkz. tests/quality/test_route_conflict_runtime_contract.py
+# KNOWN_CONFLICTS guncellemesi). Endpoint isimleri ve winner/shadowed iliskisi
+# degismedi.
 STRATEGIC_CONFLICTS: dict[str, _StrategicConflict] = {
     "/performans/stratejik/kpi-dashboard": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_dashboard_tr",
         "shadowed": "strategic_performance.kpi_dashboard",
-        "indexes": (798, 878),
+        "indexes": (797, 877),
     },
     "/performans/stratejik/hedefler": {
         "methods": {"GET"},
         "winner": "main.sp1_kpi_targets_tr",
         "shadowed": "strategic_performance.target_list",
-        "indexes": (800, 880),
+        "indexes": (799, 879),
     },
     "/performans/stratejik/yetkinlik-kutuphanesi": {
         "methods": {"GET"},
         "winner": "main.sp1_competency_library_tr",
         "shadowed": "strategic_performance.competency_library",
-        "indexes": (806, 879),
+        "indexes": (805, 878),
     },
     "/performans/stratejik/oz-degerlendirme": {
         "methods": {"GET", "POST"},
         "winner": "main.sp1_self_review_tr",
         "shadowed": "strategic_performance.self_review",
-        "indexes": (808, 883),
+        "indexes": (807, 882),
     },
     "/performans/stratejik/ai-kpi-analiz": {
         "methods": {"GET"},
         "winner": "main.sp1_ai_kpi_analysis_tr",
         "shadowed": "strategic_performance.ai_kpi_analysis",
-        "indexes": (810, 884),
+        "indexes": (809, 883),
     },
 }
 
@@ -226,17 +234,23 @@ def test_strategic_menu_endpoints_resolve_to_shadowed_names_but_main_wins(app):
     assert alias_endpoint == "strategic_performance.ai_kpi_analysis"
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2'nin
+# /performans/baskan-onaylari route kaydi kaldirmasi, url_map'ten tam olarak
+# bir Rule (985->984) ve bir endpoint (main.president_low_score_approvals_
+# center artik hicbir yerde kayitli degil, 880->879) dusurdu; unique path
+# sayisi (960) degismedi. Manifest indexleri de bu kaldirmadan once
+# geldikleri icin -1 kaydirildi -- mekanik olarak yeniden dogrulandi.
 def test_manifest_winner_and_route_snapshot_are_deterministic_across_factories(
     fresh_runtime_snapshot,
 ):
-    expected_snapshot = [985, 960, 880]
+    expected_snapshot = [984, 960, 879]
 
     for runtime in fresh_runtime_snapshot.values():
         assert runtime["counts"] == expected_snapshot
         entries = runtime["entries"]["/manifest.webmanifest"]
         assert [(entry["index"], entry["endpoint"]) for entry in entries] == [
-            (812, "main.bys360_pwa_manifest"),
-            (906, "pwa.manifest_webmanifest"),
+            (811, "main.bys360_pwa_manifest"),
+            (905, "pwa.manifest_webmanifest"),
         ]
         assert (
             runtime["winners"]["/manifest.webmanifest|GET"]
@@ -384,30 +398,74 @@ print(json.dumps(payload))
 
 
 def test_source_only_candidates_have_dependencies_that_block_safe_removal():
-    route_registry = (REPO_ROOT / "app" / "route_registry.py").read_text(encoding="utf-8")
-    workflow_test = (
-        REPO_ROOT / "tests" / "workflow" / "test_phase5w_workflow_schema_readiness.py"
-    ).read_text(encoding="utf-8")
-    workflow_template = (
-        REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
-    ).read_text(encoding="utf-8")
+    """BYS360 P0 update: this test used to also assert that
+    `app/templates/performance_v2_phase6_dashboard.html` contained
+    `"main.workflow_executive_dashboard"` -- but that reference was itself a
+    LIVE BUG, not a legitimate "blocks safe removal" dependency: the
+    template is rendered by the genuinely ACTIVE `/performance/v2/faz6`
+    route, and the referenced endpoint does not exist at runtime (`app.
+    workflow.routes` is never imported at startup), so every real request
+    to that page raised `werkzeug.routing.exceptions.BuildError` (a 500).
+    See `tests/performance/test_phase6_dashboard_dead_workflow_link_fix.py`
+    for the full fix evidence -- the dead button/link was removed from that
+    template entirely.
+
+    BYS360 Workflow Orphan Presentation Subsystem Temizliği update: with that
+    live bug gone, `app.workflow.routes` had ZERO remaining application/CLI/
+    test dependencies of any kind (independently re-verified) -- so it no
+    longer belongs in a list of candidates that "block safe removal". It (and
+    its sibling `app.workflow.dashboard_upgrade_routes`, and their 14
+    templates, and the now-pointless `"app.workflow.routes"` manifest string
+    in `app/route_registry.py`, and the two test files that only tested that
+    now-deleted code) were removed in that same wave -- see
+    `tests/quality/test_workflow_orphan_presentation_subsystem_cleanup_
+    contract.py` for the full removal evidence. This test's remaining
+    assertions cover only the OTHER, still-genuinely-source-only
+    `app.routes_president_scorecard_v2` candidate, which no wave has touched.
+
+    BYS360 OpenAPI ve Route Dokümantasyonu Workflow Drift Kapanışı update:
+    `docs/api/openapi_draft.json` used to still contain the stale
+    `main_bp_workflow_president_approvals` operationId (and 11 sibling dead-
+    workflow-route entries) documenting the now-deleted route -- confirmed
+    at the time there is no canonical generator script for that file in this
+    repo (`docs/api/BYS360_OPENAPI_BOOTSTRAP.md`, which would have documented
+    one, was itself deleted in commit `e1b8c62c`). A dedicated later wave
+    removed exactly those 12 dead path entries via a deterministic,
+    programmatic JSON edit (pure deletion, zero unrelated diff -- verified
+    byte-identical elsewhere, including `/api/mobile`'s 72 operations and all
+    `components`/`security` sections) -- see `tests/quality/test_openapi_
+    workflow_drift_cleanup_contract.py` for the full removal evidence.
+    """
     scorecard_test = (
         REPO_ROOT / "tests" / "security" / "test_sql_identifier_escaping_negative.py"
     ).read_text(encoding="utf-8")
     scorecard_template = (
         REPO_ROOT / "app" / "templates" / "performance" / "president_approvals_v2.html"
     ).read_text(encoding="utf-8")
-    openapi = (REPO_ROOT / "docs" / "api" / "openapi_draft.json").read_text(
-        encoding="utf-8"
-    )
 
-    assert '"app.workflow.routes"' in route_registry
-    assert "from app.workflow import routes" in workflow_test
-    assert "main.workflow_executive_dashboard" in workflow_template
     assert "from app.routes_president_scorecard_v2 import _qident" in scorecard_test
     assert "president_scorecard_v2.president_approval_scorecard_v2" in scorecard_template
-    assert "main_bp_workflow_president_approvals" in openapi
-    assert "president_scorecard_v2_bp_president_approvals_tr_v2" in openapi
+
+
+def test_workflow_routes_manifest_string_and_dead_test_dependencies_are_gone():
+    """Companion, positive-direction check for the removal documented above:
+    the two dependencies that used to "block safe removal" of `app.workflow.
+    routes` (the route_registry.py manifest string, and the test file that
+    directly imported it) are both confirmed gone."""
+    route_registry = (REPO_ROOT / "app" / "route_registry.py").read_text(encoding="utf-8")
+    assert '"app.workflow.routes"' not in route_registry
+    assert not (REPO_ROOT / "app" / "workflow").exists()
+    assert not (REPO_ROOT / "tests" / "workflow").exists()
+
+
+def test_performance_v2_phase6_dashboard_no_longer_references_the_dead_workflow_endpoint():
+    """Companion, positive-direction check for the P0 fix documented above:
+    locks in that the dead reference stays gone."""
+    workflow_template = (
+        REPO_ROOT / "app" / "templates" / "performance_v2_phase6_dashboard.html"
+    ).read_text(encoding="utf-8")
+    assert "main.workflow_executive_dashboard" not in workflow_template
+    assert "/workflow/executive-dashboard" not in workflow_template
 
 
 def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):
@@ -423,11 +481,19 @@ def test_performance_blueprint_symbol_is_orphaned_but_package_is_live(app):
     )
 
 
+# FORWARD-COMPATIBILITY FOLLOW-UP (BYS360 DEFECT AQ): AQ-2, /performans/
+# baskan-onaylari icin main.president_low_score_approvals_center'in kendi
+# route kaydini kaldirdiktan sonra bu URL artik tek endpoint'e sahip --
+# dolayisiyla asagidaki conflict dedektoru bu URL'yi artik cakisma olarak
+# GORMUYOR (9 -> 8 bilinen cakisma). Karne alt-route'u
+# (/performans/baskan-onaylari/<int:approval_id>/karne) ve diger 7 bilinen
+# cakisma DEGISMEDEN kaldi -- mekanik olarak yeniden dogrulandi.
 def test_phase12a_route_and_conflict_totals_remain_unchanged(fresh_runtime_snapshot):
     runtime = fresh_runtime_snapshot["first"]
-    assert runtime["counts"] == [985, 960, 880]
+    assert runtime["counts"] == [984, 960, 879]
     conflicts = set(runtime["conflicts"])
-    assert len(conflicts) == 9
+    assert len(conflicts) == 8
     assert set(STRATEGIC_CONFLICTS) <= conflicts
     assert "/manifest.webmanifest" in conflicts
-    assert "/performans/baskan-onaylari" in conflicts
+    assert "/performans/baskan-onaylari" not in conflicts
+    assert "/performans/baskan-onaylari/<int:approval_id>/karne" in conflicts

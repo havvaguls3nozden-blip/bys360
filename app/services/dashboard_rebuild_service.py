@@ -151,8 +151,14 @@ def _user_label(user: Any) -> str:
 
 
 def _is_manager(user: Any) -> bool:
-    role = _normalize_role(user)
-    return role in MANAGER_ROLES or "baskan" in role or "başkan" in role or "admin" in role
+    # BYS360 DEFECT FS (Final Sweep A2-04): the substring fallback
+    # (`"baskan" in role`) matched any role string merely *containing* those
+    # letters, which could surface manager-only quick-action navigation
+    # links to a non-manager. UI/navigation exposure only -- this flag never
+    # gated real data (see _resolve_scope_ids, an independent exact-match
+    # function used for all actual scope filtering). MANAGER_ROLES already
+    # lists every legitimate manager role variant explicitly.
+    return _normalize_role(user) in MANAGER_ROLES
 
 
 def _resolve_scope_ids(user: Any) -> list[int] | None:
@@ -351,7 +357,7 @@ def _unit_average(reader: _Reader, period_id: int | None, scope_ids: list[int] |
     label_expr = "COALESCE(" + ", ".join(label_parts + ["'Birim bilgisi yok'"]) + ")"
     rows = reader.rows(
         f"""
-        SELECT {label_expr} AS label, ROUND(AVG(pe.final_total_100), 1) AS avg_score, COUNT(*) AS row_count
+        SELECT {label_expr} AS label, ROUND(CAST(AVG(pe.final_total_100) AS NUMERIC), 1) AS avg_score, COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id
         {where}
@@ -381,7 +387,7 @@ def _category_average(reader: _Reader, period_id: int | None, scope_ids: list[in
     rows = reader.rows(
         f"""
         SELECT COALESCE(NULLIF(u.personnel_category,''), 'Diğer') AS label,
-               ROUND(AVG(pe.final_total_100), 1) AS avg_score,
+               ROUND(CAST(AVG(pe.final_total_100) AS NUMERIC), 1) AS avg_score,
                COUNT(*) AS row_count
         FROM performance_evaluations pe
         JOIN users u ON u.id = pe.employee_id

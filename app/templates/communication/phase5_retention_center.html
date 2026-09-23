@@ -19,7 +19,7 @@
         <form method="post" action="{{ url_for('main.communication_phase5_save_retention_policy') }}">
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
           <div class="row g-3">
-            <div class="col-12"><label class="form-label">Kapsam</label><select class="form-select" name="data_scope"><option value="notifications">notifications</option><option value="support">support</option><option value="surveys">surveys</option><option value="digest_logs">digest_logs</option><option value="automation_logs">automation_logs</option></select></div>
+            <div class="col-12"><label class="form-label">Kapsam</label><select class="form-select" name="data_scope"><option value="notifications">Bildirimler</option><option value="support">Destek</option><option value="surveys">Anketler</option><option value="digest_logs">Özet Logları</option><option value="automation_logs">Otomasyon Logları</option></select></div>
             <div class="col-md-6"><label class="form-label">Sakla (gün)</label><input class="form-control" type="number" min="1" max="3650" name="keep_days" value="365"></div>
             <div class="col-md-6"><label class="form-label">Arşivle (gün)</label><input class="form-control" type="number" min="0" max="3650" name="archive_after_days" value="180"></div>
             <div class="col-md-6"><label class="form-label">Anonimleştir (gün)</label><input class="form-control" type="number" min="0" max="3650" name="anonymize_after_days"></div>
@@ -38,7 +38,7 @@
           <thead><tr><th>Kapsam</th><th>Sakla</th><th>Arşivle</th><th>Sil</th><th>Aktif</th></tr></thead>
           <tbody>
             {% for row in payload.policies %}
-            <tr><td>{{ row.data_scope }}</td><td>{{ row.keep_days }} gün</td><td>{{ row.archive_after_days or '-' }}</td><td>{{ row.purge_after_days or '-' }}</td><td>{{ 'Evet' if row.is_active else 'Hayır' }}</td></tr>
+            <tr><td>{{ payload.scope_labels.get(row.data_scope, 'Bilinmiyor') }}</td><td>{{ row.keep_days }} gün</td><td>{{ row.archive_after_days or '-' }}</td><td>{{ row.purge_after_days or '-' }}</td><td>{{ 'Evet' if row.is_active else 'Hayır' }}</td></tr>
             {% else %}
             <tr><td colspan="5" class="text-muted">Politika kaydı bulunamadı.</td></tr>
             {% endfor %}
@@ -54,7 +54,7 @@
       <thead><tr><th>Kapsam</th><th>Toplam</th><th>1 yıldan eski</th><th>Oran</th><th>Durum</th></tr></thead>
       <tbody>
         {% for item in payload.stats %}
-        <tr><td>{{ item.scope }}</td><td>{{ item.total }}</td><td>{{ item.older_than_1y }}</td><td>%{{ item.old_ratio }}</td><td>{{ item.status }}</td></tr>
+        <tr><td>{{ item.scope_label }}</td><td>{{ item.total }}</td><td>{{ item.older_than_1y }}</td><td>%{{ item.old_ratio }}</td><td>{{ item.status_label }}</td></tr>
         {% endfor %}
       </tbody>
     </table></div>

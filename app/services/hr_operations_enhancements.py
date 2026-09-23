@@ -68,7 +68,7 @@ def _full_name(user: Any) -> str:
 
 def _label(mapping: dict[str, str], value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return mapping.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return mapping.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _manager_from_sicil(user: Any, attr_name: str) -> str:

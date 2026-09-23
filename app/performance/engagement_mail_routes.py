@@ -64,7 +64,7 @@ def performance_mail_automation_settings():
     except Exception as exc:
         current_app.logger.exception("Mail otomasyon ayarları kaydedilemedi: %s", exc)
         db.session.rollback()
-        flash(f"Mail otomasyon ayarları kaydedilemedi: {exc}", "danger")
+        flash("Mail otomasyon ayarları kaydedilemedi.", "danger")
 
     if period_id:
         return redirect(url_for("main.performance_mail_reminders", period_id=period_id))
@@ -99,7 +99,7 @@ def performance_run_mail_automation():
     except Exception as exc:
         current_app.logger.exception("Mail otomasyonu çalıştırılamadı: %s", exc)
         db.session.rollback()
-        flash(f"Mail otomasyonu çalıştırılamadı: {exc}", "danger")
+        flash("Mail otomasyonu çalıştırılamadı.", "danger")
 
     if period_id:
         return redirect(url_for("main.performance_mail_reminders", period_id=period_id))
@@ -165,7 +165,7 @@ def performance_send_test_mail():
     except Exception as exc:
         current_app.logger.exception("Performans test maili gönderilemedi: %s", exc)
         db.session.rollback()
-        flash(f"Test maili gönderilemedi: {exc}", "danger")
+        flash("Test maili gönderilemedi.", "danger")
 
     if period_id:
         return redirect(url_for("main.performance_mail_reminders", period_id=period_id))
@@ -276,7 +276,7 @@ def performance_send_mail_reminders(period_id):
     except Exception as exc:
         current_app.logger.exception('Toplu hatırlatma gönderimi başarısız: %s', exc)
         db.session.rollback()
-        flash(f"Mail gönderimi sırasında hata oluştu: {exc}", "danger")
+        flash("Mail gönderimi sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.performance_mail_reminders", period_id=period_id))
 
@@ -307,7 +307,7 @@ def performance_send_selected_mail_reminders(period_id):
     except Exception as exc:
         current_app.logger.exception('Seçili hatırlatma gönderimi başarısız: %s', exc)
         db.session.rollback()
-        flash(f'Mail gönderimi sırasında hata oluştu: {exc}', 'danger')
+        flash('Mail gönderimi sırasında hata oluştu.', 'danger')
 
     return redirect(url_for('main.performance_mail_reminders', period_id=period_id))
 
@@ -334,7 +334,7 @@ def performance_mail_templates():
         except Exception as exc:
             current_app.logger.exception('Mail şablonu kaydı başarısız: %s', exc)
             db.session.rollback()
-            flash(str(exc), 'danger')
+            flash('Mail şablonları kaydedilemedi.', 'danger')
         return redirect(url_for('main.performance_mail_templates'))
 
     template_rows = get_performance_mail_template_rows()
@@ -364,7 +364,7 @@ def performance_retry_failed_mail_logs(period_id):
     except Exception as exc:
         current_app.logger.exception('Başarısız mailleri yeniden deneme başarısız: %s', exc)
         db.session.rollback()
-        flash(f'Yeniden deneme sırasında hata oluştu: {exc}', 'danger')
+        flash('Yeniden deneme sırasında hata oluştu.', 'danger')
 
     return redirect(url_for('main.performance_mail_reminders', period_id=period_id))
 
@@ -384,7 +384,7 @@ def performance_retry_single_mail_log(mail_log_id):
     except Exception as exc:
         current_app.logger.exception('Tekil mail yeniden deneme başarısız: %s', exc)
         db.session.rollback()
-        flash(f'Yeniden deneme sırasında hata oluştu: {exc}', 'danger')
+        flash('Yeniden deneme sırasında hata oluştu.', 'danger')
 
     return redirect(url_for('main.performance_mail_reminders', period_id=period_id))
 
@@ -406,7 +406,7 @@ def performance_send_single_mail_reminder(period_id, manager_id):
     except Exception as exc:
         current_app.logger.exception('Tekil hatırlatma gönderimi başarısız: %s', exc)
         db.session.rollback()
-        flash(f"Mail gönderimi sırasında hata oluştu: {exc}", "danger")
+        flash("Mail gönderimi sırasında hata oluştu.", "danger")
         return redirect(url_for("main.performance_mail_reminders", period_id=period_id))
 
     if result.get('status') == 'sent':

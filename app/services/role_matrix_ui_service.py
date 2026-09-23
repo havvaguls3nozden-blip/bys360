@@ -145,6 +145,12 @@ GROUPS: tuple[MatrixGroup, ...] = (
             MatrixRow("performance_interim_notes", "Dönem İçi Notlar", "performance_interim_notes", "fa-regular fa-note-sticky", PERFORMANCE_MANAGEMENT_ROLES, "Ara dönem gözlem ve gelişim notları"),
             MatrixRow("performance_development_guidance", "Gelişim Rehberi", "performance_development_guidance", "fa-solid fa-seedling", PERFORMANCE_MANAGEMENT_ROLES, "Gelişim önerisi ve rehber not alanları"),
             MatrixRow("performance_meeting_p3_reminders", "Hatırlatma ve Aksatan Amirler", "performance_meeting_p3_reminders", "fa-solid fa-bell", PERFORMANCE_MANAGEMENT_ROLES, "Geciken değerlendirme görevleri ve hatırlatmalar"),
+            # BYS360_MEETING_DEV_P0_NAV_FIX_MATRIX_ROWS
+            MatrixRow("performance_meeting_development", "Toplantı Geliştirme", "performance_meeting_development", "fa-solid fa-chalkboard-user", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı kararlarına bağlı personel kategorisi, dönem kapsamı ve gözlem notu yönetimi"),
+            MatrixRow("performance_meeting_test_scenarios", "Toplantı Testleri", "performance_meeting_test_scenarios", "fa-solid fa-vial", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı geliştirme akışının test senaryoları ve kabul kontrol özeti"),
+            MatrixRow("performance_meeting_development_faz3", "Toplantı Derinleştirme", "performance_meeting_development_faz3", "fa-solid fa-diagram-project", PERFORMANCE_MANAGEMENT_ROLES, "Personel kategori eşleştirmesi ve geçmiş (legacy) karne kayıtlarının derinleştirme ekranı"),
+            MatrixRow("performance_meeting_final_gate", "Final Kontrol", "performance_meeting_final_gate", "fa-solid fa-shield-halved", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı geliştirme sürecinin final kontrol kapısı: hata, uyarı ve tamamlanma özeti"),
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_MATRIX_ROWS
             MatrixRow("performance_reports", "Performans Raporları", "performance_reports", "fa-solid fa-chart-simple", PERFORMANCE_MANAGEMENT_ROLES, "Dönem, birim, ekip, kategori ve kişi bazlı raporlar"),
             MatrixRow("team_analysis", "Ekip Analizi", "performance_team_compare", "fa-solid fa-people-group", PERFORMANCE_MANAGEMENT_ROLES, "Yönetici ekip kıyası ve dağılım görünümü"),
             MatrixRow("feedback_meetings", "Gelişim Görüşmeleri", "performance_feedback_meetings", "fa-solid fa-comments", PERFORMANCE_MANAGEMENT_ROLES, "Performans sonrası görüşme ve gelişim takibi"),
@@ -576,6 +582,12 @@ _BYS360_PERF_RM_V8_ROWS = (
     MatrixRow("performance_interim_notes", "Dönem İçi Notlar", "performance_interim_notes", "fa-regular fa-note-sticky", PERFORMANCE_MANAGEMENT_ROLES, "Ara dönem gözlem ve gelişim notları."),
     MatrixRow("performance_development_guidance", "Gelişim Rehberi", "performance_development_guidance", "fa-solid fa-seedling", PERFORMANCE_MANAGEMENT_ROLES, "Gelişim önerisi ve rehber not alanları."),
     MatrixRow("performance_meeting_p3_reminders", "Hatırlatma ve Aksatan Amirler", "performance_meeting_p3_reminders", "fa-solid fa-bell", PERFORMANCE_MANAGEMENT_ROLES, "Geciken değerlendirme görevleri ve hatırlatmalar."),
+    # BYS360_MEETING_DEV_P0_NAV_FIX_MATRIX_ROWS
+    MatrixRow("performance_meeting_development", "Toplantı Geliştirme", "performance_meeting_development", "fa-solid fa-chalkboard-user", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı kararlarına bağlı personel kategorisi, dönem kapsamı ve gözlem notu yönetimi."),
+    MatrixRow("performance_meeting_test_scenarios", "Toplantı Testleri", "performance_meeting_test_scenarios", "fa-solid fa-vial", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı geliştirme akışının test senaryoları ve kabul kontrol özeti."),
+    MatrixRow("performance_meeting_development_faz3", "Toplantı Derinleştirme", "performance_meeting_development_faz3", "fa-solid fa-diagram-project", PERFORMANCE_MANAGEMENT_ROLES, "Personel kategori eşleştirmesi ve geçmiş (legacy) karne kayıtlarının derinleştirme ekranı."),
+    MatrixRow("performance_meeting_final_gate", "Final Kontrol", "performance_meeting_final_gate", "fa-solid fa-shield-halved", PERFORMANCE_MANAGEMENT_ROLES, "Toplantı geliştirme sürecinin final kontrol kapısı: hata, uyarı ve tamamlanma özeti."),
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_MATRIX_ROWS
     MatrixRow("performance_feedback_aftercare", "Görüşme Sonrası Notlar", "performance_feedback_aftercare", "fa-solid fa-clipboard-check", PERFORMANCE_MANAGEMENT_ROLES, "Görüşme sonrası not ve değerlendirme takibi."),
     MatrixRow("performance_feedback_aftercare_new", "Personel ve Dönem Görüşmesi", "performance_feedback_aftercare_new", "fa-solid fa-user-clock", PERFORMANCE_MANAGEMENT_ROLES, "Personel/dönem bazlı görüşme kaydı."),
     MatrixRow("performance_feedback_meeting_guide", "Geri Bildirim Rehberi", "performance_feedback_meeting_guide", "fa-solid fa-comments", PERFORMANCE_MANAGEMENT_ROLES, "Geri bildirim görüşmesi rehber ekranı."),

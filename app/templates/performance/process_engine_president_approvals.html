@@ -136,7 +136,7 @@
               {% endif %}
 
               {% if can_delete_president_records %}
-                <form method="post" action="{{ url_for('main.performance_president_approval_delete', approval_id=row.approval_id) }}" onsubmit="return confirm('Bu kayıt Başkan Onayları listesinden kaldırılacak. Personel, karne ve puan verisi silinmez. Devam edilsin mi?');">
+                <form method="post" action="{{ url_for('main.performance_president_approval_delete', approval_id=row.approval_id) }}" data-confirm="Bu kayıt Başkan Onayları listesinden kaldırılacak. Personel, karne ve puan verisi silinmez. Devam edilsin mi?">
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <input type="hidden" name="status_filter" value="{{ status_filter }}">
                   <button class="pa-btn pa-btn-danger" type="submit"><i class="fa-solid fa-trash-can"></i> Listeden Kaldır</button>
@@ -168,6 +168,17 @@
     list.querySelectorAll('.pa-record').forEach(function(card){
       const text = card.getAttribute('data-search') || '';
       card.classList.toggle('pa-hidden', q && !text.includes(q));
+    });
+  });
+})();
+
+(function(){
+  document.querySelectorAll('form[data-confirm]').forEach(function(form){
+    form.addEventListener('submit', function(event){
+      const message = form.getAttribute('data-confirm');
+      if (message && !window.confirm(message)) {
+        event.preventDefault();
+      }
     });
   });
 })();

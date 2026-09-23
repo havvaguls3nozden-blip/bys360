@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from dataclasses import dataclass
 from typing import Any
@@ -10,6 +11,8 @@ from flask import current_app
 
 from .module_scope import visible_module_options
 from .stub_engine import build_stub_response, get_stub_engine_snapshot
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(slots=True)
@@ -200,7 +203,8 @@ class _WrappedClient(BaseAIClient):
             return self.inner.generate(system_prompt=safe_system, user_prompt=safe_user, prompt_version=prompt_version)
         except (urlerror.HTTPError, urlerror.URLError, TimeoutError, json.JSONDecodeError, ValueError) as exc:
             if current_app.config.get("AI_ALLOW_STUB_FALLBACK", True):
-                return _resolve_stub(f"Gerçek sağlayıcıya erişilemedi: {exc}").generate(
+                logger.exception("BYS360 AI: gerçek sağlayıcıya erişilemedi, stub yanıta düşülüyor | exc=%s", exc)
+                return _resolve_stub("Gerçek sağlayıcıya erişilemedi.").generate(
                     system_prompt=safe_system,
                     user_prompt=safe_user,
                     prompt_version=prompt_version,

@@ -22,7 +22,7 @@ from app.extensions import db
 logger = logging.getLogger(__name__)
 
 
-RULE_VERSION = "claude_feedback_state_machine_v1"
+RULE_VERSION = "feedback_state_machine_v1"
 
 
 @dataclass(frozen=True)
@@ -302,7 +302,7 @@ def ensure_feedback_pipeline_flow(*, actor_id: int | None = None, title: str = "
         return None
 
 
-def claude_feedback_state_machine_contract() -> dict[str, Any]:
+def feedback_state_machine_contract() -> dict[str, Any]:
     return {
         "rule_version": RULE_VERSION,
         "step_order": [step.key for step in STATE_STEPS],

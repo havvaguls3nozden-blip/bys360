@@ -241,6 +241,10 @@ def build_menu_visibility_map(
             "performance_process_tracking", "performance_process_reports", "performance_president_approvals",
             "performance_personnel_support_publish_approval", "performance_interim_notes",
             "performance_development_guidance", "performance_meeting_p3_reminders",
+            # BYS360_MEETING_DEV_P0_NAV_FIX_PERFORMANCE_CHILDREN
+            "performance_meeting_development", "performance_meeting_test_scenarios",
+            "performance_meeting_development_faz3", "performance_meeting_final_gate",
+            # /BYS360_MEETING_DEV_P0_NAV_FIX_PERFORMANCE_CHILDREN
             "performance_kpi_dashboard", "performance_kpi_management", "performance_competency_library",
             "performance_self_assessment", "performance_kpi_analysis", "performance_feedback_aftercare",
             "performance_feedback_aftercare_new", "performance_feedback_meeting_guide", "performance_feedback_followup",

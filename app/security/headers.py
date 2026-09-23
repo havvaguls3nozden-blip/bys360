@@ -21,6 +21,8 @@ DEFAULT_CSP = {
     "frame-ancestors": "'self'",
     "img-src": "'self' data: blob: https:",
     "style-src": "'self' 'unsafe-inline' https:",
+    "style-src-elem": "'self' 'unsafe-inline' https:",
+    "style-src-attr": "'unsafe-inline'",
     "script-src": "'self' https:",
     "font-src": "'self' data: https:",
     "connect-src": "'self' https:",
@@ -31,6 +33,7 @@ DEFAULT_CSP = {
 }
 
 _SCRIPT_TAG_WITHOUT_NONCE_RE = re.compile(r"<script\b(?![^>]*\bnonce=)", re.IGNORECASE)
+_STYLE_TAG_WITHOUT_NONCE_RE = re.compile(r"<style\b(?![^>]*\bnonce=)", re.IGNORECASE)
 
 
 def _config_get(config: Mapping[str, Any] | Any, key: str, default: Any = None) -> Any:
@@ -73,10 +76,11 @@ def build_csp_header(config: Mapping[str, Any] | Any, *, csp_nonce: str | None =
 
 
 def inject_csp_nonce_into_html(response: Any, *, csp_nonce: str | None) -> Any:
-    """HTML yanitindaki script etiketlerine nonce ekler.
+    """HTML yanitindaki script ve style etiketlerine nonce ekler.
 
-    Bu merkezi uygulama sayesinde 100+ template icindeki inline scriptler tek tek
-    elle degistirilmeden nonce tabanli CSP'ye gecilebilir.
+    Bu merkezi uygulama sayesinde 100+ template icindeki inline scriptler ve
+    style bloklari tek tek elle degistirilmeden nonce tabanli CSP'ye gecilebilir.
+    Script ve style etiketleri ayni istek icin ayni nonce degerini paylasir.
     """
     if not csp_nonce:
         return response
@@ -90,9 +94,11 @@ def inject_csp_nonce_into_html(response: Any, *, csp_nonce: str | None) -> Any:
     except Exception as exc:
         logger.exception("BYS360 critical exception captured in app/security/headers.py", exc_info=exc)
         return response
-    if '<script' not in html.lower():
+    html_lower = html.lower()
+    if '<script' not in html_lower and '<style' not in html_lower:
         return response
     html = _SCRIPT_TAG_WITHOUT_NONCE_RE.sub(f'<script nonce="{csp_nonce}"', html)
+    html = _STYLE_TAG_WITHOUT_NONCE_RE.sub(f'<style nonce="{csp_nonce}"', html)
     response.set_data(html)
     return response
 

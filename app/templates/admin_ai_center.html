@@ -4,6 +4,7 @@
 {% block page_title %}AI Karar Destek Merkezi{% endblock %}
 {% block page_subtitle %}Güncel canlı omurgadaki AI izlerini, yönetişim çizgisini ve operasyon sinyallerini tek merkezde birleştirir.{% endblock %}
 {% block ai_inner %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_ai_center_workspace.css') }}">
 <div class="ai-shell">
   <section class="ai-panel ai-hero">
     <div class="ai-hero-grid">
@@ -11,7 +12,7 @@
         <div class="ai-kicker">Kurumsal AI vitrini</div>
         <h3 class="ai-title">BYS360 karar destek omurgasını tek ekranda yönetin</h3>
         <p class="ai-sub">Bu merkez, serbest sohbet mantığında çalışan bir alan değildir. AI; yönetilebilir istemler, kayıt altına alınan çıktılar, rol bazlı görünürlük ve insan onayı ile çalışan kontrollü karar destek katmanı olarak konumlanır.</p>
-        <div class="ai-actions" style="margin-top:16px">
+        <div class="ai-actions admin-ai-center-spacing-top-md">
           <span class="ai-badge {{ 'success' if center_snapshot.using_stub_mode else 'warning' }}">
             <i class="fa-solid {{ 'fa-brain' if center_snapshot.using_stub_mode else 'fa-plug-circle-check' }}"></i>
             {{ center_snapshot.provider_label }}
@@ -89,9 +90,9 @@
         <div class="ai-spotlight-metric"><div class="k">Maske oranı</div><div class="v">%{{ card.masked_rate }}</div></div>
         <div class="ai-spotlight-metric"><div class="k">Negatif geri bildirim</div><div class="v">{{ card.negative_feedback }}</div></div>
       </div>
-      <div class="ai-mini" style="margin-top:14px">Hata {{ card.failed_total }} · Ortalama {{ card.avg_latency_ms }} ms</div>
-      <div class="ai-note" style="margin-top:14px">{{ card.next_step }}</div>
-      <div class="ai-actions" style="margin-top:14px">
+      <div class="ai-mini admin-ai-center-spacing-top-sm">Hata {{ card.failed_total }} · Ortalama {{ card.avg_latency_ms }} ms</div>
+      <div class="ai-note admin-ai-center-spacing-top-sm">{{ card.next_step }}</div>
+      <div class="ai-actions admin-ai-center-spacing-top-sm">
         <a class="ai-link" href="{{ card.href }}"><i class="fa-solid fa-arrow-up-right-from-square"></i> {{ card.href_label }}</a>
       </div>
     </article>
@@ -102,7 +103,7 @@
     <article class="ai-panel">
       <div class="ai-kicker">Hızlı operasyon</div>
       <h3 class="ai-title">Yönetim masasında en sık açılan alanlar</h3>
-      <div class="ai-actions" style="margin-top:16px">
+      <div class="ai-actions admin-ai-center-spacing-top-md">
         <a class="ai-link" href="{{ url_for('main.admin_ai_requests') }}"><i class="fa-solid fa-timeline"></i> İşlem günlükleri</a>
         <a class="ai-link" href="{{ url_for('main.admin_ai_recommendations') }}"><i class="fa-solid fa-list-check"></i> Öneri merkezi</a>
         <a class="ai-link" href="{{ url_for('main.admin_ai_module_health') }}"><i class="fa-solid fa-heart-pulse"></i> Modül sağlığı</a>
@@ -120,7 +121,7 @@
     <article class="ai-panel">
       <div class="ai-kicker">Yönetişim ve yayın</div>
       <h3 class="ai-title">Canlı güvenlik ve görünürlük kapıları</h3>
-      <div class="ai-actions" style="margin-top:16px">
+      <div class="ai-actions admin-ai-center-spacing-top-md">
         <a class="ai-link" href="{{ url_for('main.admin_ai_preflight') }}"><i class="fa-solid fa-shield-halved"></i> Ön kontrol</a>
         <a class="ai-link" href="{{ url_for('main.admin_ai_smoke') }}"><i class="fa-solid fa-vial-circle-check"></i> Hızlı doğrulama</a>
         <a class="ai-link" href="{{ url_for('main.admin_ai_governance_hub') }}"><i class="fa-solid fa-shield-heart"></i> Yönetişim merkezi</a>

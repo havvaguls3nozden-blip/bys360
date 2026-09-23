@@ -22,6 +22,26 @@ BANNER_ALLOWED_PREFIXES = (
     "main.strategy_",
 )
 
+# BYS360_H1E_N_RISK_BANNER_EVENT_LABELS: the focus-row loop below only ever
+# admits these 4 event_type values (see the filter at the end of
+# get_global_risk_banner_context's focus_rows comprehension), so this is a
+# small closed vocabulary, not the open-ended audit-log event_type this
+# module also touches elsewhere -- "Kapsama sorunu" matches the existing
+# Turkish phrasing already used for the same "uncovered" concept in
+# app/templates/performance_tasks.html; "Muaf" matches
+# PERFORMANCE_MODE_LABELS' existing "exclude"->"Muaf" convention.
+_EVENT_TYPE_LABELS: dict[str, str] = {
+    "uncovered": "Kapsama Sorunu",
+    "chain_issue": "Zincir Sorunu",
+    "warning": "Uyarı",
+    "exempted": "Muaf",
+}
+
+
+def _event_type_label(value: Any) -> str:
+    raw = (value or "").strip().lower()
+    return _EVENT_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
+
 
 def _coverage_tone(score: int) -> tuple[str, str]:
     if score >= 12:
@@ -93,7 +113,7 @@ def get_global_risk_banner_context() -> dict[str, Any]:
             or "Tanımsız Birim",
             "manager_level": _row_value(row, "manager_level", None),
             "reason": _row_value(row, "reason", None),
-            "event_label": (_row_value(row, "event_type", "") or "").replace("_", " ").title(),
+            "event_label": _event_type_label(_row_value(row, "event_type", "")),
         }
         for row in filtered_rows
         if (_row_value(row, "event_type", "") or "") in {"uncovered", "chain_issue", "warning", "exempted"}

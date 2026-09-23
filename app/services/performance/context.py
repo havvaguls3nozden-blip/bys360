@@ -59,14 +59,15 @@ def get_selected_period(period_id: int | None = None, *, fallback_to_active: boo
 
 def get_weight_config_for_period(period: PerformancePeriod | None) -> PerformanceWeightConfig | None:
     if period:
-        row = (
+        # BYS360 DEFECT X sibling: same-root bug as get_active_weight_config
+        # in app/services/performance/common.py -- a period-scoped lookup
+        # must never silently fall back to another period's config.
+        return (
             PerformanceWeightConfig.query
             .filter_by(period_id=period.id, is_active=True)
             .order_by(PerformanceWeightConfig.id.desc())
             .first()
         )
-        if row:
-            return row
     return (
         PerformanceWeightConfig.query
         .filter_by(is_active=True)

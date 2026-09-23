@@ -26,7 +26,7 @@
         <option value="">Tümü</option>
         {% for item in priority_options %}
           {% set priority_key = (item or '')|lower %}
-          <option value="{{ item }}" {% if selected_priority == item %}selected{% endif %}>{{ priority_label_map.get(priority_key, item) }}</option>
+          <option value="{{ item }}" {% if selected_priority == item %}selected{% endif %}>{{ priority_label_map.get(priority_key, 'Bilinmiyor') }}</option>
         {% endfor %}
       </select>
     </div>
@@ -116,7 +116,7 @@
           {% set row_value = row[1] if row is sequence and row is not string and row|length > 1 else 0 %}
         {% endif %}
         {% set priority_key = (row_key or '')|lower %}
-        <div class="d-flex justify-content-between border-bottom py-2"><span>{{ priority_label_map.get(priority_key, row_key) }}</span><strong>{{ row_value }}</strong></div>
+        <div class="d-flex justify-content-between border-bottom py-2"><span>{{ priority_label_map.get(priority_key, 'Bilinmiyor') }}</span><strong>{{ row_value }}</strong></div>
       {% else %}
         <div class="text-muted">Kayıt yok.</div>
       {% endfor %}

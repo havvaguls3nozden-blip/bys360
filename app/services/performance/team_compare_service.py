@@ -92,14 +92,14 @@ def score_band(value: float) -> str:
     return "mid"
 
 
-def status_view(status_value: str, *, status_options: list[tuple[str, str]] | None = None) -> tuple[str, str]:
+def status_view(status_value: str | None, *, status_options: list[tuple[str, str]] | None = None) -> tuple[str, str]:
     status_label_map = {value: label for value, label in (status_options or STATUS_OPTIONS)}
     normalized = (status_value or "").strip()
     if normalized == "tamamlandi":
         return "done", status_label_map.get(normalized, "Tamamlandı")
     if normalized == "kismen_tamamlandi":
         return "partial", status_label_map.get(normalized, "Kısmen Tamamlandı")
-    return "pending", status_label_map.get(normalized, normalized or "Bekliyor")
+    return "pending", status_label_map.get(normalized, "Bekliyor")
 
 
 def attention_view(*, visible_score: float, status_class: str) -> tuple[str, str]:

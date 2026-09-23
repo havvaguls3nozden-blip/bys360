@@ -142,7 +142,7 @@ def status_label(raw: Any) -> str:
     }
     if not key:
         return "Bekliyor"
-    return labels.get(key, key.replace("_", " ").title())
+    return labels.get(key, "Bilinmiyor")
 
 
 def status_class(raw: Any) -> str:

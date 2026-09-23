@@ -7,9 +7,12 @@ BYS360 SP-3A KPI Dashboard Live Service V2
 """
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from sqlalchemy import inspect, text
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from flask_sqlalchemy import SQLAlchemy
@@ -29,6 +32,24 @@ TARGET_TABLE_CANDIDATES = [
     "sp1_target_cards",
     "sp1_targets",
 ]
+
+
+def _has_global_kpi_scope(user: Any) -> bool:
+    # BYS360 DEFECT AR: bu ekrana erisim is_top_or_manager ile kapiliyor
+    # (admin, sistem_yoneticisi, baskan, baskan_yardimcisi, grup_baskani,
+    # koordinator, performans_yetkilisi, ik, mali_musavir, birim_sorumlusu)
+    # -- ama bu roller kurum genelinde ayni gorunurluge sahip degil. Yeni
+    # bir rol/kapsam ayrimi icat etmek yerine, uygulamada zaten kurulu ve
+    # denetlenmis olan ayni ayrim yeniden kullanilir (role_group_for
+    # "global" donenler organizasyon capinda; digerleri kendi
+    # kapsamlariyla sinirli).
+    try:
+        from app.services.ai_decision.visibility_scope import role_group_for
+
+        return role_group_for(user) == "global"
+    except Exception:
+        logger.exception("BYS360 SP3A KPI rol kapsami belirlenemedi.")
+        return False
 
 
 def _safe_tables() -> set[str]:
@@ -168,6 +189,7 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     weight_col = _col(cols, "weight", "agirlik")
     active_col = _col(cols, "is_active", "active")
     owner_col = _col(cols, "owner_name", "owner", "sahip", "unit_name", "birim_adi")
+    owner_id_col = _col(cols, "owner_user_id", "user_id", "created_by_id", "assigned_to_id", "sahip_id")
     due_col = _col(cols, "end_date", "bitis", "due_date")
 
     if not id_col or not name_col:
@@ -183,7 +205,30 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     select_parts.append(f"{owner_col} AS owner_name" if owner_col else "NULL AS owner_name")
     select_parts.append(f"{due_col} AS due_date" if due_col else "NULL AS due_date")
 
-    where_clause = f"WHERE COALESCE({active_col}, true) = true" if active_col else ""
+    where_parts = []
+    params: dict[str, Any] = {}
+    if active_col:
+        where_parts.append(f"COALESCE({active_col}, true) = true")
+    # BYS360 DEFECT AR: current_user parametresi eskiden hic kullanilmiyordu --
+    # koordinator/grup_baskani/birim_sorumlusu gibi orta kademe yoneticiler
+    # (is_top_or_manager kapisindan gecen ama gercek Baskan/Admin/IK
+    # yetkisine sahip olmayan roller) her istekte tum kurumun KPI/hedef
+    # verisini goruyordu -- bu uygulamada baska yerde (ai_decision.
+    # visibility_scope.role_group_for) zaten kurulu olan global/manager_scope
+    # ayrimiyla tutarsizdi. Global-olmayan roller icin, tablo bir sahip-id
+    # kolonu tasiyorsa sonuc o kullanicinin kendi kayitlariyla sinirlanir.
+    if owner_id_col and not _has_global_kpi_scope(current_user):
+        current_user_id = getattr(current_user, "id", None)
+        if current_user_id is not None:
+            where_parts.append(f"{owner_id_col} = :current_user_id")
+            params["current_user_id"] = int(current_user_id)
+        else:
+            # Kimlik cikarilamiyorsa (beklenmeyen kullanici nesnesi), yedek
+            # olarak sinirsiz sonuc DONMEZ -- kapsamsiz bir cikti asla
+            # verilmez; guvenli varsayilan bos sonuctur.
+            where_parts.append("1 = 0")
+
+    where_clause = ("WHERE " + " AND ".join(where_parts)) if where_parts else ""
     sql = f"""
         SELECT {", ".join(select_parts)}
         FROM {target_table}
@@ -193,9 +238,10 @@ def build_sp3a_kpi_dashboard_context(current_user=None) -> dict[str, Any]:
     """
 
     try:
-        rows = db.session.execute(text(sql)).mappings().all()  # type: ignore[union-attr]
+        rows = db.session.execute(text(sql), params).mappings().all()  # type: ignore[union-attr]
     except Exception as exc:
-        return _empty_context(f"KPI verisi okunurken sorun oluştu: {exc}")
+        logger.exception("BYS360 SP3A KPI verisi okunamadı | exc=%s", exc)
+        return _empty_context("KPI verisi okunurken sorun oluştu.")
 
     targets: list[dict[str, Any]] = []
     total_rate = 0.0

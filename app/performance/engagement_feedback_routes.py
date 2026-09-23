@@ -22,6 +22,8 @@ from app.services.feedback_service import (
     can_create_feedback_request,
     get_feedback_evaluation,
     get_feedback_meeting,
+    get_feedback_meeting_status_label,
+    get_feedback_request_status_label,
     get_feedback_response_text,
     get_open_feedback_request,
     persist_feedback_response,
@@ -277,7 +279,7 @@ def feedback_watch_run_alerts():
     except Exception as exc:
         db.session.rollback()
         current_app.logger.exception("Faz 6 takip uyarıları çalıştırılamadı: %s", exc)
-        flash(f"Takip uyarıları çalıştırılırken hata oluştu: {exc}", "danger")
+        flash("Takip uyarıları çalıştırılırken hata oluştu.", "danger")
     return redirect(url_for("main.feedback_watch_dashboard", scope=selected_scope))
 
 
@@ -302,7 +304,11 @@ def feedback_executive_summary_dashboard():
         "feedback_executive_summary_dashboard.html",
         "<h3>Yönetici Özet Merkezi</h3>",
         selected_scope=selected_scope,
-        preset=preset,
+        # `preset` is intentionally NOT passed explicitly here: `dashboard`
+        # (from build_feedback_executive_summary) already carries the same
+        # resolved/validated preset string under its own "preset" key.
+        # Passing it twice raised `TypeError: safe_render() got multiple
+        # values for keyword argument 'preset'`.
         preset_options=[{"value": key, "label": value} for key, value in SUMMARY_PRESET_LABELS.items() if key in {"daily", "weekly"}],
         scope_options=scope_ctx.get("scope_options"),
         scope_label=scope_ctx.get("scope_label"),
@@ -345,7 +351,7 @@ def feedback_executive_summary_run_digest():
         db.session.commit()
         flash(
             (
-                f"{SUMMARY_PRESET_LABELS.get(preset, preset)} yönetici özeti çalıştırıldı. "
+                f"{SUMMARY_PRESET_LABELS.get(preset, 'Bilinmiyor')} yönetici özeti çalıştırıldı. "
                 f"Bildirim: {result['notification_sent']}, atlanan mevcut bildirim: {result['notification_skipped']}, "
                 f"e-posta başarılı: {result['mail_success_count']}."
             ),
@@ -356,7 +362,7 @@ def feedback_executive_summary_run_digest():
     except Exception as exc:
         db.session.rollback()
         current_app.logger.exception("Performans yönetici özeti çalıştırılamadı: %s", exc)
-        flash(f"Yönetici özeti çalıştırılırken hata oluştu: {exc}", "danger")
+        flash("Yönetici özeti çalıştırılırken hata oluştu.", "danger")
     return redirect(url_for("main.feedback_executive_summary_dashboard", scope=selected_scope, preset=preset))
 
 
@@ -814,9 +820,9 @@ def manager_feedback_request_schedule(request_id):
                 flash("Randevu oluşturuldu ve bildirimler gönderildi.", "success")
             return redirect(url_for("main.manager_feedback_request_detail", request_id=req.id, scope=scope_ctx.get("selected_scope")))
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/performance/engagement_feedback_routes.py | line=819")
+            logger.exception("BYS360 V6C guarded exception | file=app/performance/engagement_feedback_routes.py | line=819 | exc=%s", exc)
             db.session.rollback()
-            flash(f"Randevu oluşturulurken hata oluştu: {exc}", "danger")
+            flash("Randevu oluşturulurken hata oluştu.", "danger")
             return redirect(request.url)
 
     return safe_render(
@@ -853,6 +859,8 @@ def feedback_meeting_detail(meeting_id):
         response_text=response_text,
         meeting_timeline=meeting_timeline,
         can_manage_meeting=can_manage_meeting,
+        get_feedback_meeting_status_label=get_feedback_meeting_status_label,
+        get_feedback_request_status_label=get_feedback_request_status_label,
         **_scope_render_kwargs(scope_ctx),
     )
 

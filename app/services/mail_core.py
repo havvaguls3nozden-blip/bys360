@@ -435,9 +435,9 @@ def send_email(to_email: str, subject: str, body: str) -> tuple[bool, str]:
                 server.login(settings["username"], settings["password"])
             server.sendmail(settings["default_sender"], [target], msg.as_string())
         return True, "Mail başarıyla gönderildi."
-    except Exception as exc:
+    except Exception:
         logger.exception("BYS360 V6C guarded exception | file=app/services/mail_core.py | line=436")
-        return False, str(exc)
+        return False, "E-posta gönderilemedi. Sunucu logları kontrol edilmelidir."
 
 __all__ = [
     "annotations",

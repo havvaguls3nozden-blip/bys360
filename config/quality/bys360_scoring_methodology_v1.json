@@ -1,0 +1,188 @@
+{
+  "schema_version": "1.0",
+  "methodology_version": "1.0.0",
+  "methodology_name": "BYS360 Canonical Quality / Readiness / Transferability Scoring Methodology",
+  "effective_from": "2026-08-18",
+  "model_family": "hybrid_gate_rubric_minus_penalty",
+  "design_note": "New canonical methodology, not a historical reconstruction. Legacy scores (Code Quality=68, Test Assurance=61, Security=70, CI/Release=79, Operations=64, Documentation/Handover=55, Maintainability=65, LIVE_READINESS=68, TRANSFERABILITY=61) are preserved as an unrelated historical snapshot in docs/governance/BYS360_SCORING_METHODOLOGY_V1.md and must never be used as calibration targets for this methodology's weights or formulas.",
+  "rounding": {
+    "category_precision": 2,
+    "composite_rule": "round_half_up",
+    "composite_precision": 0
+  },
+  "missing_evidence_policy": {
+    "rule": "unknown_contributes_zero_never_renormalized",
+    "description": "A gate or rubric signal that cannot currently be measured contributes 0 to its component (same numeric effect as a measured FAIL) and is never excluded from its denominator (excluding it would let unmeasurability inflate the score of everything else). Every such signal is recorded with status UNKNOWN (distinct from FAIL) in the calculator's trace output, and counted in a top-level unverified_evidence_count. The composite report exposes fully_verified=true only when unverified_evidence_count is 0 across all categories.",
+    "rejected_alternatives": [
+      "neutral/50-point contribution: treats an unverified claim as half-credible, wrong default for a readiness score",
+      "silent exclusion from denominator: lets an agent inflate scores by making measurement unavailable",
+      "ceiling-only (no point deduction): too weak alone; the evidence-completeness ceiling below is a second, independent layer on top of this rule, not a replacement for it"
+    ]
+  },
+  "double_counting_policy": {
+    "rule": "each_measurable_gate_has_exactly_one_primary_category",
+    "description": "Every CI/quality gate is assigned to exactly one category's gate_component. No gate command appears in more than one category's gates[] list. A debt-registry item's category field determines which single category's debt_penalty it affects; category is required to be a PRIMARY_CATEGORY per item, with no automatic secondary/global penalty."
+  },
+  "interpreter_resolution": {
+    "order": ["--python CLI flag (explicit)", "BYS360_QUALITY_PYTHON environment variable", "sys.executable (the interpreter currently running the calculator)"],
+    "note": "Gate commands below are declared as portable {kind, module|script, args} structures, never a hardcoded absolute interpreter path -- a prior version of this file hardcoded C:\\bys360\\project\\.venv\\Scripts\\python.exe, which broke on any machine/drive/checkout other than the one it was authored on. The calculator resolves and reports which interpreter it actually used (path + source) in every report. This is necessary but not sufficient: interpreter identity alone does not guarantee tool version. Gates with an expected_version are additionally version-checked before being trusted (see pinned_tool_versions and each gate's expected_version) -- a wrong-version tool result is reported as VERSION_MISMATCH, scored identically to UNKNOWN (0 contribution, counted in unverified_evidence_count), never silently accepted as PASS. This was found to be a real, not hypothetical, gap during authoring: the project's own canonical shared venv was found to have ruff 0.15.21 installed, off-pin from requirements-dev.txt's ruff==0.16.0."
+  },
+  "pinned_tool_versions": {"ruff": "0.16.0", "mypy": "2.3.0"},
+  "evidence_precedence_policy": {
+    "concept": "CANONICAL_PROJECT_EVIDENCE ('what is the verified state of this exact commit?') is kept strictly separate from LOCAL_ENVIRONMENT_DIAGNOSTICS ('can this machine reproduce that state?'). LIVE_READINESS and TRANSFERABILITY are always computed from CANONICAL_PROJECT_EVIDENCE only.",
+    "manifest_path": "config/quality/bys360_canonical_evidence.json",
+    "precedence_order": [
+      "1. COMMIT_BOUND_REMOTE_VERIFIED: a canonical-evidence-manifest entry whose commit_sha exactly matches the commit being scored wins unconditionally, including over a disagreeing local result. A local VERSION_MISMATCH never invalidates valid matching remote evidence; a matching remote FAIL is never overridden by a local PASS.",
+      "2. LOCAL_VERIFIED: when no matching-commit remote evidence exists, a deterministically-correct local execution (right interpreter, and the correct pinned tool version if the gate declares one) may itself serve as canonical evidence.",
+      "3. UNKNOWN: neither of the above applies. No unsupported points are ever awarded.",
+      "Evidence recorded for a *different* commit SHA is never reused -- rejected as STALE_COMMIT_EVIDENCE_REJECTED, falling through to tier 2 or 3.",
+      "Multiple manifest entries for the same gate+commit that disagree on status is an EVIDENCE_CONFLICT -- canonical becomes UNKNOWN, never an arbitrary pick."
+    ],
+    "freshness_policy": "Exact commit SHA is the only freshness criterion in v1 -- no time-based expiry. Commit-bound evidence is historical fact about that commit and does not go stale with the passage of time, only by no longer matching the commit being scored.",
+    "trusted_evidence_types": ["REMOTE_CI_VERIFIED", "LOCAL_VERIFIED", "REGISTRY_DERIVED", "STATIC_REPOSITORY_FACT", "UNKNOWN"],
+    "local_diagnostic_only_statuses": ["VERSION_MISMATCH", "LOCAL_TOOL_MISSING", "LOCAL_EXECUTION_FAILURE"],
+    "manifest_provenance_values": ["USER_SUPPLIED_REMOTE_PROOF", "AUTOMATED_INGESTION"],
+    "note": "This wave does not add automated GitHub API ingestion. Manifest entries are recorded explicitly/manually (provenance=USER_SUPPLIED_REMOTE_PROOF) unless a later, separately-approved CI-integration wave adds AUTOMATED_INGESTION. No evidence auto-sync exists today."
+  },
+  "categories": {
+    "Code Quality": {
+      "gate_component_weight": 0.80,
+      "rubric_component_weight": 0.20,
+      "gates": [
+        {"name": "ruff_full_select", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check", "app", "config.py", "wsgi.py", "run.py", "scripts", "tests"], "pass_rule": "exit_code_0"},
+        {"name": "mypy_full_scope", "kind": "python_module", "module": "mypy", "expected_version": "2.3.0",
+         "args": ["app", "tests", "scripts", "--ignore-missing-imports", "--no-error-summary"], "pass_rule": "exit_code_0"},
+        {"name": "quality9_gate", "kind": "python_script", "script": "scripts/quality/bys360_quality9_ci_gate.py",
+         "args": ["--root", "."], "pass_rule": "json_ok_field_true"}
+      ],
+      "rubric": [
+        {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
+      ]
+    },
+    "Test Assurance": {
+      "gate_component_weight": 0.80,
+      "rubric_component_weight": 0.20,
+      "gates": [
+        {"name": "coverage_ratchet", "kind": "python_script", "script": "scripts/quality/bys360_coverage_ratchet.py",
+         "args": ["--coverage-xml", "reports/quality/coverage.xml", "--baseline", "reports/quality/coverage_baseline.json"], "pass_rule": "exit_code_0"}
+      ],
+      "rubric": [
+        {"name": "coverage_pct_progress", "source": "coverage_baseline.combined_pct", "description": "20 * min(combined_pct / 50, 1) -- 50% is the aspirational interim target, not the current floor"}
+      ]
+    },
+    "Security": {
+      "gate_component_weight": 0.80,
+      "rubric_component_weight": 0.20,
+      "gates": [
+        {"name": "secret_repo_gate", "kind": "python_script", "script": "scripts/quality/bys360_secret_repo_gate.py",
+         "args": ["--root", "."], "pass_rule": "json_ok_field_true"},
+        {"name": "dependency_audit", "kind": "python_module", "module": "pip_audit",
+         "args": ["-r", "requirements.txt", "--progress-spinner", "off"], "pass_rule": "exit_code_0_or_supplied_evidence",
+         "evidence_note": "Slow/network-dependent; treated UNKNOWN unless a fresh result is explicitly supplied to the calculator via --evidence."}
+      ],
+      "rubric": [
+        {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
+      ],
+      "note": "ruff/mypy are deliberately NOT in this category's gate list (they are Code Quality's) to avoid diluting genuine security signal, per adversarial review."
+    },
+    "CI-Release": {
+      "gate_component_weight": 0.80,
+      "rubric_component_weight": 0.20,
+      "gates": [
+        {"name": "ruff_syntax_import_sanity", "kind": "python_module", "module": "ruff", "expected_version": "0.16.0",
+         "args": ["check", "app", "config.py", "wsgi.py", "run.py", "scripts", "--select", "E9,F63,F7,F82"], "pass_rule": "exit_code_0"},
+        {"name": "postgres_migration_integrity_gate", "kind": "python_script", "script": "scripts/quality/bys360_postgres_migration_integrity_gate.py",
+         "args": [], "pass_rule": "exit_code_0_or_supplied_evidence",
+         "evidence_note": "Structurally CI-only (needs a live PostgreSQL 15 service); treated UNKNOWN in a local run unless a fresh CI result is explicitly supplied to the calculator via --evidence."}
+      ],
+      "rubric": [
+        {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
+      ]
+    },
+    "Operations": {
+      "gate_component_weight": 0.80,
+      "rubric_component_weight": 0.20,
+      "gates": [
+        {"name": "ops_audit", "kind": "python_script", "script": "scripts/quality/bys360_ops_audit.py",
+         "args": ["--mode", "ci", "--source-paths", "app", "config.py", "wsgi.py", "run.py"], "pass_rule": "exit_code_0"}
+      ],
+      "rubric": [
+        {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "20 minus (2 points per OPEN item in this category, capped at 20)"}
+      ]
+    },
+    "Documentation-Handover": {
+      "gate_component_weight": 0.70,
+      "rubric_component_weight": 0.30,
+      "gates": [
+        {"name": "handover_docs_contract", "kind": "python_module", "module": "pytest",
+         "args": ["tests/test_score100_handover_docs_contract_v1.py", "-q"], "pass_rule": "exit_code_0"}
+      ],
+      "rubric": [
+        {"name": "registry_reconciliation_transparency", "source": "registry.reconciliation_status", "description": "30 if FULLY_RECONCILED, 15 if PARTIALLY_RECONCILED with a documented reconciliation_note, 0 otherwise -- rewards honest disclosure, not just document existence"}
+      ]
+    },
+    "Maintainability": {
+      "gate_component_weight": 0.60,
+      "rubric_component_weight": 0.40,
+      "gates": [
+        {"name": "no_open_p0_or_p1_anywhere", "kind": "registry_derived", "description": "0 OPEN items with severity P0 or P1 in the whole registry", "pass_rule": "boolean"}
+      ],
+      "rubric": [
+        {"name": "open_debt_inverse", "source": "registry_open_count_in_category", "description": "40 minus (4 points per OPEN item in this category, capped at 40) -- Maintainability is registry-driven since no single CI gate directly measures it"}
+      ],
+      "note": "Deliberately has no ruff/mypy sub-metric to avoid double-counting with Code Quality, per double_counting_policy. Gated primarily on the absence of open P0/P1 debt anywhere (an unresolved P1 undermines whole-repo maintainability regardless of its assigned category) plus its own category's open-item count."
+    }
+  },
+  "debt_penalty_policy": {
+    "severity_weights": {"P0": 40, "P1": 20, "P2": 8, "P3": 3, "UNCLASSIFIED": 5},
+    "penalty_cap_per_category": 30,
+    "applies_to": "status == OPEN items only, whose category field matches the scoring category (no cross-category penalty)",
+    "rationale": "UNCLASSIFIED is deliberately non-zero (5, between P3's 3 and P2's 8) so leaving an item permanently unclassified is never a free way to avoid a penalty -- it must still be evaluated eventually. penalty_cap_per_category (30) prevents one category's debt from being wiped out by penalties alone; the composite-level evidence-completeness ceiling (below) provides the outer bound for missing-evidence risk, while measured (not missing) weakness is bounded by each category's own gate+rubric ceiling (max 100 before penalty)."
+  },
+  "evidence_completeness_ceiling": {
+    "value": 89,
+    "applies_when": "any category feeding the composite has an UNKNOWN gate or rubric signal, OR registry.reconciliation_status != 'FULLY_RECONCILED'",
+    "applies_to": "LIVE_READINESS and TRANSFERABILITY composites only, not individual category scores",
+    "rationale": "A confidence gate on the composite, not a per-category penalty: it caps the headline number when the underlying evidence set is incomplete, without artificially suppressing a category that happens to be fully and honestly measured. It does NOT substitute for each category's own gate/rubric/penalty math correctly scoring a fully-measured-but-weak category below 89 already -- see docs/governance/BYS360_SCORING_METHODOLOGY_V1.md worked examples."
+  },
+  "composites": {
+    "LIVE_READINESS": {
+      "description": "Production-readiness relevance weighting: how much would a failure in this category hurt if this code ran in production today.",
+      "weights": {
+        "Security": 0.22,
+        "Test Assurance": 0.21,
+        "CI-Release": 0.21,
+        "Operations": 0.20,
+        "Code Quality": 0.10,
+        "Maintainability": 0.03,
+        "Documentation-Handover": 0.03
+      }
+    },
+    "TRANSFERABILITY": {
+      "description": "New-maintainer-onboarding relevance weighting: how much this category determines whether someone unfamiliar with the codebase can safely take it over.",
+      "weights": {
+        "Documentation-Handover": 0.22,
+        "Maintainability": 0.22,
+        "Test Assurance": 0.18,
+        "Code Quality": 0.15,
+        "CI-Release": 0.10,
+        "Operations": 0.06,
+        "Security": 0.07
+      }
+    }
+  },
+  "anti_gaming_notes": {
+    "implemented_in_v1": [
+      "Coverage rubric uses coverage_ratchet's own combined_pct (line+branch), materially harder to inflate with tautological line-only tests than a line-only metric.",
+      "Handover doc substance is gated by the pre-existing tests/test_score100_handover_docs_contract_v1.py character-floor contract, not merely file existence.",
+      "UNCLASSIFIED debt items cost 5 points (not 0), so leaving items permanently unclassified is not a free scoring strategy.",
+      "Gate lists are literal, versioned commands (not prose), so two independent runs of the calculator against the same commit must produce the same category scores."
+    ],
+    "known_v1_gaps_deferred_to_v2": [
+      "Suppression-comment counting (# noqa, # type: ignore deltas) is not yet a tracked sub-metric; a finding could in principle be silenced rather than fixed without this methodology detecting it.",
+      "broad_except count (used inside ops_audit/quality9) is except-block-count based, not statement-count based; merging many small except blocks into one large one could reduce the count without reducing actual defensive-coding sloppiness.",
+      "No independent AST-based same-name-multiple-definition detector; duplicate-code detection currently relies on the debt registry being manually kept current, not on automated re-discovery."
+    ]
+  }
+}

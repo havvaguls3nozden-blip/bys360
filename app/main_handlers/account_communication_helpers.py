@@ -146,6 +146,12 @@ PERFORMANCE_ROLE_MATRIX_V12_ITEMS: list[dict[str, Any]] = [
     {"key": "performance_meeting_p3_reminders", "label": "Hatırlatma ve Aksatan Amirler", "icon": "fa-solid fa-bell"},
     {"key": "performance_interim_notes", "label": "Dönem İçi Notlar", "icon": "fa-regular fa-note-sticky"},
     {"key": "performance_development_guidance", "label": "Gelişim Rehberi", "icon": "fa-solid fa-seedling"},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_ITEMS
+    {"key": "performance_meeting_development", "label": "Toplantı Geliştirme", "icon": "fa-solid fa-chalkboard-user"},
+    {"key": "performance_meeting_test_scenarios", "label": "Toplantı Testleri", "icon": "fa-solid fa-vial"},
+    {"key": "performance_meeting_development_faz3", "label": "Toplantı Derinleştirme", "icon": "fa-solid fa-diagram-project"},
+    {"key": "performance_meeting_final_gate", "label": "Final Kontrol", "icon": "fa-solid fa-shield-halved"},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ROLE_MATRIX_V12_ITEMS
     {"key": "performance_process_tracking", "label": "Süreç Takibi", "icon": "fa-solid fa-route"},
     {"key": "performance_process_reports", "label": "Süreç Raporları", "icon": "fa-solid fa-chart-line"},
     {"key": "performance_president_approvals", "label": "Başkan / Üst Onayları", "icon": "fa-solid fa-stamp"},
@@ -572,174 +578,6 @@ __all__ = [
     "_collect_role_matrix_visible_keys_from_form",
     "enforce_first_login_security_flow",
 ]
-# BYS360_ASSISTANT_ROLE_MATRIX_SETTINGS_V11_BEGIN
-ASSISTANT_POLICY_ROLE_OPTIONS = [
-    ("admin", "Admin"),
-    ("baskan", "Başkan"),
-    ("baskan_yardimcisi", "Başkan Yardımcısı"),
-    ("grup_baskani", "Grup Başkanı"),
-    ("mali_musavir", "Mali Müşavir"),
-    ("koordinator", "Koordinatör"),
-    ("birim_sorumlusu", "Birim Sorumlusu"),
-    ("personel", "Personel"),
-    ("kullanici", "Rolsüz/Kullanıcı"),
-]
-
-ASSISTANT_DEFAULT_VISIBLE_ROLES = {
-    "admin",
-    "baskan",
-    "baskan_yardimcisi",
-    "grup_baskani",
-    "mali_musavir",
-    "koordinator",
-    "birim_sorumlusu",
-}
-
-ASSISTANT_ROLE_MATRIX_ROWS = [
-    {
-        "key": "assistant_module",
-        "label": "Sanal Asistan Modülü",
-        "icon": "fa-solid fa-sparkles",
-        "description": "Ana anahtar. Kapalı rolde asistan penceresi, hızlı rehber, güvenli özet ve yönlendirme kartları görünmez.",
-    },
-]
-
-
-def _assistant_visible_roles_from_settings():
-    try:
-        from app.services.assistant_settings_service import get_assistant_settings
-        raw = str((get_assistant_settings() or {}).get("visible_roles") or "")
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/main_handlers/account_communication_helpers.py | line=614")
-        raw = ",".join(sorted(ASSISTANT_DEFAULT_VISIBLE_ROLES))
-    roles = {
-        str(item or "").strip().lower().replace("ı", "i").replace("İ", "i").replace(" ", "_").replace("-", "_")
-        for item in raw.replace(";", ",").replace("\n", ",").split(",")
-        if str(item or "").strip()
-    }
-    return {role for role in roles if role and role != "__none__"}
-
-
-def _build_assistant_role_matrix():
-    visible_roles = _assistant_visible_roles_from_settings()
-    if not visible_roles:
-        visible_roles = set()
-    role_rows = []
-    item_rows = []
-    for role_key, role_label in ASSISTANT_POLICY_ROLE_OPTIONS:
-        role_rows.append({
-            "role_key": role_key,
-            "role_label": role_label,
-            "visible_count": 1 if role_key in visible_roles else 0,
-            "recommended_count": 1 if role_key in ASSISTANT_DEFAULT_VISIBLE_ROLES else 0,
-        })
-
-    for item in ASSISTANT_ROLE_MATRIX_ROWS:
-        states = []
-        visible_count = 0
-        recommended_roles = []
-        for role_key, role_label in ASSISTANT_POLICY_ROLE_OPTIONS:
-            is_visible = role_key in visible_roles
-            is_recommended = role_key in ASSISTANT_DEFAULT_VISIBLE_ROLES
-            if is_visible:
-                visible_count += 1
-            if is_recommended:
-                recommended_roles.append(role_label)
-            states.append({
-                "role_key": role_key,
-                "role_label": role_label,
-                "is_visible": is_visible,
-                "is_recommended": is_recommended,
-            })
-        item_rows.append({
-            "key": item["key"],
-            "label": item["label"],
-            "icon": item["icon"],
-            "description": item["description"],
-            "visible_count": visible_count,
-            "states": states,
-            "recommended_roles": recommended_roles,
-        })
-
-    return {
-        "roles": role_rows,
-        "rows": item_rows,
-        "items": item_rows,
-        "item_count": len(item_rows),
-        "visible_roles": sorted(visible_roles),
-    }
-
-
-def _upsert_assistant_module_setting(setting_key, label, value_text, value_type="string", description="", updated_by_user_id=None):
-    from app.models import ModuleSetting
-    row = ModuleSetting.query.filter_by(module_key="assistant", setting_key=setting_key).first()
-    if not row:
-        row = ModuleSetting(
-            module_key="assistant",
-            setting_key=setting_key,
-            label=label,
-            value_type=value_type,
-            description=description,
-            is_active=True,
-        )
-        db.session.add(row)
-    row.label = label
-    row.value_text = str(value_text)
-    row.value_type = value_type
-    row.description = description
-    row.is_active = True
-    row.updated_by_user_id = updated_by_user_id
-    return row
-
-
-def save_assistant_role_matrix_from_form(form, *, updated_by_user_id=None):
-    selected_roles = []
-    for role_key, _role_label in ASSISTANT_POLICY_ROLE_OPTIONS:
-        if form.get(f"assistant_role_policy__{role_key}__assistant_module"):
-            selected_roles.append(role_key)
-
-    visible_roles_value = ",".join(selected_roles) if selected_roles else "__none__"
-    _upsert_assistant_module_setting(
-        "enabled",
-        "Sanal Asistan Aktif",
-        "true",
-        "bool",
-        "Sanal Asistan genel aktiflik bayrağı. Rol bazlı görünürlük ayrıca visible_roles ile yönetilir.",
-        updated_by_user_id=updated_by_user_id,
-    )
-    _upsert_assistant_module_setting(
-        "visible_roles",
-        "Sanal Asistan Görünür Rolleri",
-        visible_roles_value,
-        "string",
-        "Sanal Asistan ana menüsü, penceresi ve tüm kısa yolları hangi rollerde görünecek.",
-        updated_by_user_id=updated_by_user_id,
-    )
-    db.session.commit()
-    return len(selected_roles)
-
-
-def reset_assistant_role_matrix_defaults(*, updated_by_user_id=None):
-    visible_roles_value = ",".join(sorted(ASSISTANT_DEFAULT_VISIBLE_ROLES))
-    _upsert_assistant_module_setting(
-        "enabled",
-        "Sanal Asistan Aktif",
-        "true",
-        "bool",
-        "Sanal Asistan genel aktiflik bayrağı.",
-        updated_by_user_id=updated_by_user_id,
-    )
-    _upsert_assistant_module_setting(
-        "visible_roles",
-        "Sanal Asistan Görünür Rolleri",
-        visible_roles_value,
-        "string",
-        "Önerilen rol politikası: yönetici rolleri açık, personel/kullanıcı kapalı.",
-        updated_by_user_id=updated_by_user_id,
-    )
-    db.session.commit()
-    return len(ASSISTANT_DEFAULT_VISIBLE_ROLES)
-# BYS360_ASSISTANT_ROLE_MATRIX_SETTINGS_V11_END
 
 # BYS360_PERSONEL_ROLE_MATRIX_CURRENT_SCOPE_V1_BEGIN
 # Ayarlar > Modül Bazlı Rol Matrisleri içinde Personel Yönetimi güncel canlı kapsamı.
@@ -801,14 +639,52 @@ ROLE_MATRIX_POLICY_CONFIGS = [
 if not any(isinstance(config, dict) and config.get("key") == "personnel" for config in ROLE_MATRIX_POLICY_CONFIGS):
     ROLE_MATRIX_POLICY_CONFIGS.insert(0, _BYS360_PERSONNEL_POLICY_CONFIG)
 
+# Kept for backward-compat: account_settings_helpers.py / account_visibility_helpers.py
+# import this name directly. It is always None (no earlier _build_role_matrix_policy_items
+# definition exists in this module) and is intentionally unused below.
 _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS = globals().get("_build_role_matrix_policy_items")
+
 
 def _build_role_matrix_policy_items(grouped_menu_definitions, flat_menu_items, matrix_key):
     if (matrix_key or "").strip() == "personnel":
         return [dict(item) for item in PERSONNEL_ROLE_MATRIX_CURRENT_SCOPE_ITEMS]
-    if callable(_BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS):
-        return _BYS360_PREVIOUS_BUILD_ROLE_MATRIX_POLICY_ITEMS(grouped_menu_definitions, flat_menu_items, matrix_key)
-    return []
+
+    config = _role_matrix_policy_config_map().get((matrix_key or "").strip())
+    if not config:
+        return []
+
+    items = []
+    seen = set()
+    for group_label in config.get("menu_groups", []):
+        for item in list(grouped_menu_definitions.get(group_label, []) or []):
+            if not isinstance(item, dict):
+                continue
+            key = item.get("key")
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            items.append(item)
+
+    for extra_key in config.get("extra_keys", []):
+        if extra_key in seen:
+            continue
+        item = _find_menu_item_by_key(flat_menu_items, extra_key)
+        if item:
+            seen.add(extra_key)
+            items.append(item)
+
+    for synthetic_item in config.get("synthetic_items", []) or []:
+        if not isinstance(synthetic_item, dict):
+            continue
+        key = synthetic_item.get("key")
+        if not key or key in seen:
+            continue
+        seen.add(key)
+        enriched = dict(synthetic_item)
+        enriched.setdefault("settings_key", key)
+        enriched.setdefault("section", config.get("title") or "Sanal Asistan")
+        items.append(enriched)
+    return items
 # BYS360_PERSONEL_ROLE_MATRIX_CURRENT_SCOPE_V1_END
 
 # BYS360_SETTINGS_MENU_ROLE_MATRIX_ALL_TABS_V1_BEGIN
@@ -843,6 +719,12 @@ _BYS360_ALL_MENU_ROLE_MATRIX_ITEMS = [
     {'key': 'performance_interim_notes', 'label': 'Dönem İçi Notlar', 'icon': 'fa-regular fa-note-sticky', 'settings_key': 'performance_interim_notes', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
     {'key': 'performance_development_guidance', 'label': 'Gelişim Rehberi', 'icon': 'fa-solid fa-seedling', 'settings_key': 'performance_development_guidance', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
     {'key': 'performance_meeting_p3_reminders', 'label': 'Hatırlatma ve Aksatan Amirler', 'icon': 'fa-solid fa-bell', 'settings_key': 'performance_meeting_p3_reminders', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    # BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_ITEMS
+    {'key': 'performance_meeting_development', 'label': 'Toplantı Geliştirme', 'icon': 'fa-solid fa-chalkboard-user', 'settings_key': 'performance_meeting_development', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_test_scenarios', 'label': 'Toplantı Testleri', 'icon': 'fa-solid fa-vial', 'settings_key': 'performance_meeting_test_scenarios', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_development_faz3', 'label': 'Toplantı Derinleştirme', 'icon': 'fa-solid fa-diagram-project', 'settings_key': 'performance_meeting_development_faz3', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    {'key': 'performance_meeting_final_gate', 'label': 'Final Kontrol', 'icon': 'fa-solid fa-shield-halved', 'settings_key': 'performance_meeting_final_gate', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu']},
+    # /BYS360_MEETING_DEV_P0_NAV_FIX_ALL_MENU_ROLE_MATRIX_ITEMS
     {'key': 'performance_archive', 'label': 'Geçmiş Karne Arşivi', 'icon': 'fa-solid fa-box-archive', 'settings_key': 'performance_archive', 'section': 'Performans Yönetimi', 'required_roles': ['admin', 'baskan', 'baskan_yardimcisi', 'grup_baskani', 'mali_musavir', 'koordinator', 'birim_sorumlusu', 'personel']},
     {'key': 'performance_history_import', 'label': 'Geçmiş Puan Aktarımı', 'icon': 'fa-solid fa-file-import', 'settings_key': 'performance_history_import', 'section': 'Performans Yönetimi', 'required_roles': ['admin']},
     {'key': 'performance_mail_settings', 'label': 'Performans Mail Ayarları', 'icon': 'fa-solid fa-envelope-open-text', 'settings_key': 'performance_mail_settings', 'section': 'Performans Yönetimi', 'required_roles': ['admin']},
@@ -916,6 +798,7 @@ ROLE_MATRIX_POLICY_CONFIGS = [
             "team_performance_comparison_history", "performance_feedback_meetings", "performance_publish",
             "performance_president_approvals", "performance_personnel_support_publish_approval", "performance_process_tracking",
             "performance_process_reports", "performance_interim_notes", "performance_development_guidance", "performance_meeting_p3_reminders",
+            "performance_meeting_development", "performance_meeting_test_scenarios", "performance_meeting_development_faz3", "performance_meeting_final_gate",
             "performance_archive", "performance_history_import", "performance_mail_settings", "performance_kpi_dashboard",
             "performance_kpi_management", "performance_competency_library", "performance_self_assessment", "performance_kpi_analysis"
         ] if k in _BYS360_ALL_MENU_ROLE_MATRIX_ITEM_BY_KEY],

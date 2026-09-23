@@ -62,6 +62,20 @@ robocopy "C:\bys360\backups\predeploy_YYYYMMDD_HHMMSS\project" "C:\bys360\projec
 Start-ScheduledTask -TaskName "BYS360 Live Waitress 80"
 ```
 
+Yukarıdaki adımların otomasyonu için `scripts\windows\rollback_bys360_live_release_v1.ps1`
+kullanılabilir (TD-036). Script, varsayılan olarak DRY-RUN çalışır (sadece
+plan basar, hiçbir dosya kopyalamaz); gerçek uygulamak için `-Apply` verilir.
+`.env`, `instance\`, `logs\`, `uploads` (`app\static\uploads` dahil) ve
+`reports\` her koşulda korunur, hiçbir zaman üzerine yazılmaz. Örnek:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\rollback_bys360_live_release_v1.ps1 `
+  -BackupRoot "C:\bys360\backups\predeploy_YYYYMMDD_HHMMSS" -Apply
+```
+
+Bu script sadece KOD geri dönüşünü kapsar; PostgreSQL restore'u yukarıdaki
+manuel adım olarak ayrı kalır (aşağıya bakınız).
+
 ### PostgreSQL restore
 
 ```powershell

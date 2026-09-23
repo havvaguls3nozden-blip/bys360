@@ -1,0 +1,57 @@
+/* BYS360 CSP Style-2A pilot -- Admin AI / Analiz Merkezi (Excel önizleme)
+   workspace layout utility classes.
+
+   Scope: app/templates/admin_analysis_excel_preview.html only (extends
+   admin_ai_base.html, which is out of scope for this pilot and was not
+   touched). The template previously carried fully-static inline
+   style="..." attributes with no Jinja expressions inside any of the
+   converted attribute values, and did not load any page-specific external
+   stylesheet of its own (only its own page-local <style> block, left
+   untouched here, plus the shared .ai-* rules defined inline in
+   admin_ai_base.html's own <style> block).
+
+   Behavior-preserving pilot: every declaration below reproduces, byte for
+   byte, a declaration that previously lived in a style="..." attribute on
+   the corresponding element. No forced-priority declarations, no ID
+   selectors, no CSS custom properties.
+
+   Cascade note: admin_ai_base.html's <style> block (which defines
+   .ai-actions and .ai-filters) renders BEFORE {% block ai_inner %} in the
+   document, and this stylesheet's <link> is placed after this template's
+   own local <style> block (itself inside ai_inner) -- so for the one
+   property these rules share with .ai-filters (grid-template-columns),
+   source order gives this file's rule priority at equal specificity,
+   exactly like the inline style="..." attribute it replaces used to via
+   attribute-specificity. */
+
+/* Three <div class="ai-actions" ...> / <div class="analysis-upload-box" ...>
+   elements shared the identical style="margin-top:16px" declaration.
+   Named with an admin-analysis- prefix (coordinator reconciliation,
+   Style-2A continuation): a generically-named .section-spacing-top-md
+   with an identical declaration also exists in
+   faz4_support_account_mobile.css (support module). The two never load
+   on the same page, so there was no real runtime collision, but the
+   shared generic name was renamed here to a module-scoped one to remove
+   the ambiguity rather than leave two same-named classes in the repo. */
+.admin-analysis-spacing-top-md {
+  margin-top: 16px;
+}
+
+/* Two <div class="analysis-table-scroll" ...> elements shared the identical
+   style="margin-top:14px" declaration (a different value from the 16px
+   group above, kept as its own class rather than merged). Same rename
+   rationale as .admin-analysis-spacing-top-md above (collision with
+   faz3_communication_hr_mobile.css's .section-spacing-top-sm). */
+.admin-analysis-spacing-top-sm {
+  margin-top: 14px;
+}
+
+/* .ai-filters style="grid-template-columns:repeat(3,minmax(0,1fr));
+   margin-top:14px" combined two properties in one declaration set -- kept
+   as one dedicated class instead of decomposing into shared utilities,
+   since .ai-filters (defined in admin_ai_base.html) already ships its own
+   4-column grid-template-columns default that this override replaces. */
+.ai-filters-3col {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}

@@ -160,7 +160,7 @@
             {% if recent_batch_rows %}
             <div class="table-wrap"><table class="table-clean mini-table"><thead><tr><th>Personel</th><th>Paket</th><th>Sonuç</th><th>Tarih</th></tr></thead><tbody>
                 {% for row in recent_batch_rows %}
-                <tr><td>{{ row.user_name }}</td><td>{{ row.category_label }} · {{ row.source_name }}</td><td>{{ row.success_count }}/{{ row.total_file_count }}<br><span class="muted">{{ row.status }}</span></td><td>{{ row.created_at or '-' }}</td></tr>
+                <tr><td>{{ row.user_name }}</td><td>{{ row.category_label }} · {{ row.source_name }}</td><td>{{ row.success_count }}/{{ row.total_file_count }}<br><span class="muted">{{ row.status_label }}</span></td><td>{{ row.created_at or '-' }}</td></tr>
                 {% endfor %}
             </tbody></table></div>
             {% else %}<div class="empty-state">Henüz toplu belge yükleme kaydı oluşmadı.</div>{% endif %}
@@ -363,7 +363,7 @@
                 <tr><td>{{ row.assignment_type_label }}</td><td><strong>{{ row.position_title }}</strong><br><span class="muted">{{ row.unit_name }} · {{ row.manager_name }}</span></td><td>{{ row.start_date or '-' }}</td><td><div class="inline-actions"><a class="btn-soft secondary" href="{{ url_for('main.hr_personnel_operations', scope=selected_scope_mode, user_id=selected_user_id, edit_position_id=row.id) }}">Düzenle</a><form class="inline-form" method="post" action="{{ url_for('main.hr_personnel_position_delete', position_id=row.id) }}"><input type="hidden" name="form_token" value="{{ position_delete_token }}"><input type="hidden" name="scope" value="{{ selected_scope_mode }}"><input type="hidden" name="user_id" value="{{ selected_user_id }}"><button class="btn-soft danger" type="submit">Sil</button></form></div></td></tr>
             {% endfor %}
             {% for row in selected_movement_rows %}
-                <tr><td>Hareket</td><td>{{ row.assignment_type }}<br><span class="muted">{{ row.unit_name }} · {{ row.reason }}</span></td><td>{{ row.start_date or '-' }}</td><td>—</td></tr>
+                <tr><td>Hareket</td><td>{{ row.assignment_type_label }}<br><span class="muted">{{ row.unit_name }} · {{ row.reason }}</span></td><td>{{ row.start_date or '-' }}</td><td>—</td></tr>
             {% endfor %}
             </tbody></table></div>
             {% else %}<div class="empty-state">Seçili personele ait durum veya görev geçmişi bulunmuyor.</div>{% endif %}

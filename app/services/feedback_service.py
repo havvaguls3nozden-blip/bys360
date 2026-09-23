@@ -181,6 +181,39 @@ CAMPAIGN_TYPE_LABELS = {
     "training_feedback_with_pulse": "Eğitim + Nabız",
 }
 
+CAMPAIGN_STATUS_LABELS = {
+    "draft": "Taslak",
+    "published": "Yayında",
+    "active": "Aktif",
+    "closed": "Kapatıldı",
+}
+
+ACTION_PRIORITY_LABELS = {
+    "high": "Yüksek",
+    "medium": "Orta",
+    "low": "Düşük",
+    "normal": "Orta",
+}
+
+FEEDBACK_MEETING_STATUS_LABELS = {
+    "planlandi": "Planlandı",
+    "tamamlandi": "Tamamlandı",
+    "ertelendi": "Ertelendi",
+    "iptal_edildi": "İptal Edildi",
+}
+
+FEEDBACK_REQUEST_STATUS_LABELS = {
+    "bekliyor": "Bekliyor",
+    "beklemede": "Beklemede",
+    "incelendi": "İncelendi",
+    "cevaplandi": "Cevaplandı",
+    "kapatildi": "Kapatıldı",
+    "randevulandi": "Randevulandı",
+    "gorusme_tamamlandi": "Görüşme tamamlandı",
+    "randevu_ertelendi": "Randevu ertelendi",
+    "randevu_iptal": "Randevu iptal edildi",
+}
+
 
 def is_manager_family(user) -> bool:
     return (getattr(user, "role", "") or "").strip().lower() in MANAGER_ROLES
@@ -202,7 +235,43 @@ def get_campaign_type_label(campaign_or_type: FeedbackCampaign | str | None) -> 
     else:
         raw = getattr(campaign_or_type, "campaign_type", "")
     key = (raw or "survey").strip().lower()
-    return CAMPAIGN_TYPE_LABELS.get(key, key.replace("_", " ").title())
+    return CAMPAIGN_TYPE_LABELS.get(key, "Bilinmiyor")
+
+
+def get_campaign_status_label(campaign_or_status: FeedbackCampaign | str | None) -> str:
+    if isinstance(campaign_or_status, str):
+        raw = campaign_or_status
+    else:
+        raw = getattr(campaign_or_status, "status", "")
+    key = (raw or "draft").strip().lower()
+    return CAMPAIGN_STATUS_LABELS.get(key, "Bilinmiyor")
+
+
+def get_action_priority_label(action_or_priority) -> str:
+    if isinstance(action_or_priority, str):
+        raw = action_or_priority
+    else:
+        raw = getattr(action_or_priority, "priority", "")
+    key = (raw or "medium").strip().lower()
+    return ACTION_PRIORITY_LABELS.get(key, "Bilinmiyor")
+
+
+def get_feedback_meeting_status_label(meeting_or_status) -> str:
+    if isinstance(meeting_or_status, str):
+        raw = meeting_or_status
+    else:
+        raw = getattr(meeting_or_status, "status", "")
+    key = (raw or "planlandi").strip().lower()
+    return FEEDBACK_MEETING_STATUS_LABELS.get(key, "Bilinmiyor")
+
+
+def get_feedback_request_status_label(request_or_status) -> str:
+    if isinstance(request_or_status, str):
+        raw = request_or_status
+    else:
+        raw = getattr(request_or_status, "status", "")
+    key = (raw or "bekliyor").strip().lower()
+    return FEEDBACK_REQUEST_STATUS_LABELS.get(key, "Bilinmiyor")
 
 
 def campaign_includes_pulse(campaign: FeedbackCampaign | None) -> bool:

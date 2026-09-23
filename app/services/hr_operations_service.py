@@ -22,6 +22,7 @@ from app.models import (
     User,
 )
 from app.route_support import issue_form_token
+from app.services.hr_operations_enhancements import POSITION_ASSIGNMENT_TYPE_LABELS
 
 # --- BYS360 third-manager Excel import compatibility patch ---
 THIRD_MANAGER_STANDARD_KEY = "ucuncu_yonetici_sicil"
@@ -98,6 +99,13 @@ DOCUMENT_STATUS_LABELS = {
     "arsiv": "Arşiv",
     "pasif": "Pasif",
     "iptal": "İptal",
+}
+
+BATCH_STATUS_LABELS = {
+    "isleniyor": "İşleniyor",
+    "tamamlandi": "Tamamlandı",
+    "kismi": "Kısmi Tamamlandı",
+    "hata": "Başarısız",
 }
 
 NOTE_TYPE_LABELS = {
@@ -288,27 +296,32 @@ def _document_label(value: str | None, category_map: dict[str, dict[str, Any]] |
 
 def _document_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return DOCUMENT_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return DOCUMENT_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _note_type_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return NOTE_TYPE_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return NOTE_TYPE_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _note_priority_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return NOTE_PRIORITY_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return NOTE_PRIORITY_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _note_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return NOTE_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return NOTE_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _status_event_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return STATUS_EVENT_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return STATUS_EVENT_LABELS.get(raw, "Bilinmiyor" if raw else "-")
+
+
+def _batch_status_label(value: str | None) -> str:
+    raw = (value or "").strip().lower()
+    return BATCH_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _build_selected_timeline(selected_user_id: int, category_map: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -475,6 +488,7 @@ def build_hr_personnel_operations_context(hr_scope: dict[str, Any] | None, scope
                     "total_file_count": int(getattr(row, "total_file_count", 0) or 0),
                     "success_count": int(getattr(row, "success_count", 0) or 0),
                     "status": getattr(row, "status", None) or "tamamlandi",
+                    "status_label": _batch_status_label(getattr(row, "status", None) or "tamamlandi"),
                     "created_at": getattr(row, "created_at", None),
                 })
 
@@ -526,6 +540,7 @@ def build_hr_personnel_operations_context(hr_scope: dict[str, Any] | None, scope
                 "unit_name": getattr(row, "unit_name_snapshot", None) or "-",
                 "parent_unit_name": getattr(row, "parent_unit_name_snapshot", None) or "-",
                 "assignment_type": getattr(row, "assignment_type", None) or "-",
+                "assignment_type_label": POSITION_ASSIGNMENT_TYPE_LABELS.get((getattr(row, "assignment_type", None) or "").strip().lower(), "Bilinmiyor" if getattr(row, "assignment_type", None) else "-"),
                 "reason": getattr(row, "reason", None) or "-",
                 "start_date": getattr(row, "start_date", None),
                 "end_date": getattr(row, "end_date", None),
@@ -712,6 +727,7 @@ def build_hr_personnel_operations_context(hr_scope: dict[str, Any] | None, scope
                 "unit_name": getattr(row, "unit_name_snapshot", None) or "-",
                 "parent_unit_name": getattr(row, "parent_unit_name_snapshot", None) or "-",
                 "assignment_type": getattr(row, "assignment_type", None) or "-",
+                "assignment_type_label": POSITION_ASSIGNMENT_TYPE_LABELS.get((getattr(row, "assignment_type", None) or "").strip().lower(), "Bilinmiyor" if getattr(row, "assignment_type", None) else "-"),
                 "reason": getattr(row, "reason", None) or "-",
                 "start_date": getattr(row, "start_date", None),
                 "end_date": getattr(row, "end_date", None),
@@ -841,6 +857,7 @@ def build_personnel_profile_hr_context(user: User | None) -> dict[str, Any]:
             "unit_name": getattr(row, "unit_name_snapshot", None) or "-",
             "parent_unit_name": getattr(row, "parent_unit_name_snapshot", None) or "-",
             "assignment_type": getattr(row, "assignment_type", None) or "-",
+            "assignment_type_label": POSITION_ASSIGNMENT_TYPE_LABELS.get((getattr(row, "assignment_type", None) or "").strip().lower(), "Bilinmiyor" if getattr(row, "assignment_type", None) else "-"),
             "reason": getattr(row, "reason", None) or "-",
             "start_date": getattr(row, "start_date", None),
             "end_date": getattr(row, "end_date", None),

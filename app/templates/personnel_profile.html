@@ -297,7 +297,7 @@ Personelin kimlik, kurumsal konum, hiyerarşi ve hesap durumu bilgilerini tek ek
                 <div class="avatar-wrap">
                     <img src="{{ profile.avatar_url }}"
                          alt="{{ profile.full_name }}"
-                         onerror="this.onerror=null;this.src='{{ url_for('static', filename='img/default-avatar.svg') }}';">
+                         data-fallback-src="{{ url_for('static', filename='img/default-avatar.svg') }}">
                 </div>
 
                 <div>
@@ -534,7 +534,7 @@ Personelin kimlik, kurumsal konum, hiyerarşi ve hesap durumu bilgilerini tek ek
                     <div class="manager-title">Son hareketler</div>
                     {% for row in hr_context.movement_rows[:4] %}
                         <div class="manager-name">{{ row.unit_name }}</div>
-                        <div class="manager-sub">{{ row.assignment_type }} · {{ row.start_date }}{% if row.is_current %} · Güncel{% endif %}<br>{{ row.reason }}</div>
+                        <div class="manager-sub">{{ row.assignment_type_label }} · {{ row.start_date }}{% if row.is_current %} · Güncel{% endif %}<br>{{ row.reason }}</div>
                     {% else %}
                         <div class="manager-name">Kayıt yok</div>
                     {% endfor %}

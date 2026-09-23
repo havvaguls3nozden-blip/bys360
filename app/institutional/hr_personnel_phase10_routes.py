@@ -99,7 +99,7 @@ def _require_user_in_scope(user_id: int | None, scope_user_ids: set[int]) -> Use
 
 def _transfer_status_label(value: str | None) -> str:
     raw = (value or "").strip().lower()
-    return TRANSFER_STATUS_LABELS.get(raw, raw.replace("_", " ").title() if raw else "-")
+    return TRANSFER_STATUS_LABELS.get(raw, "Bilinmiyor" if raw else "-")
 
 
 def _document_category_label(value: str | None) -> str:
@@ -414,5 +414,5 @@ def hr_personnel_asset_transfer_save():
     except Exception as exc:
         logger.exception("Beklenmeyen hata: %s", exc)
         safe_db_rollback()
-        flash(str(exc), "danger")
+        flash("İşlem sırasında beklenmeyen bir hata oluştu. Lütfen tekrar deneyin.", "danger")
     return redirect(url_for("main.hr_personnel_asset_transfer_center", scope=request.form.get("scope") or "personal", user_id=request.form.get("to_user_id") or request.form.get("from_user_id")))

@@ -867,7 +867,12 @@ def mobile_performance_in_period_notes(user: User):
     return delegate_mobile_performance_in_period_notes(user)
 
 def _bys360_legacy_mobile_performance_development_suggestions(user: User):
-    items = _v2852_items_from_models(['PerformanceDevelopmentSuggestion', 'PerformanceDevelopmentPlan', 'DevelopmentSuggestion', 'FeedbackActionPlan'], ['employee_name', 'title', 'suggestion_title', 'name'], ['suggestion', 'description', 'development_area', 'action_text'], ['status', 'state'], ['period_name', 'created_at', 'owner_name'], ['priority', 'score'], limit=100, progress=65)
+    # BYS360_SECURITY_FIX_DEFECT_O1: _v2852_items_from_models() runs a
+    # zero-filter, organization-wide query (see _v2852_query()) across every
+    # model in its list. That unscoped shortcut must only ever be reachable
+    # for _has_global_scope() callers; non-global callers must go straight to
+    # the already-correctly-scoped _snapshot_query_for(user) fallback below.
+    items = _v2852_items_from_models(['PerformanceDevelopmentSuggestion', 'PerformanceDevelopmentPlan', 'DevelopmentSuggestion', 'FeedbackActionPlan'], ['employee_name', 'title', 'suggestion_title', 'name'], ['suggestion', 'description', 'development_area', 'action_text'], ['status', 'state'], ['period_name', 'created_at', 'owner_name'], ['priority', 'score'], limit=100, progress=65) if _has_global_scope(user) else []
     if not items:
         try:
             q = _snapshot_query_for(user).order_by(PerformanceResultSnapshot.id.desc())
@@ -965,9 +970,12 @@ def _v2853_ensure_interim_notes_table():
         logger.exception("BYS360 performans modülünde beklenmeyen hata yakalandı.")
         try:
             from sqlalchemy import text as _sql_text
-            db.session.execute(_sql_text('''
+
+            from app.services.performance.interim_notes_runtime import _id_sql
+            # BYS360 DEFECT AR: id artik dialect'e gore uretiliyor (eskiden sabit SERIAL SQLite'ta kalici NULL kaliyordu).
+            db.session.execute(_sql_text(f'''
                 CREATE TABLE IF NOT EXISTS performance_interim_notes (
-                    id SERIAL PRIMARY KEY,
+                    {_id_sql()},
                     period_id INTEGER NULL,
                     employee_id INTEGER NULL,
                     employee_user_id INTEGER NULL,
@@ -1004,7 +1012,7 @@ def _bys360_legacy__v2853_note_type_label(value):
         'genel_gozlem': 'Genel Gözlem',
     }
     key = str(value or 'genel_gozlem').strip().lower()
-    return mapping.get(key, key.replace('_', ' ').title())
+    return mapping.get(key, 'Bilinmiyor')
 
 def _v2853_note_type_label(value):
     from app.api.mobile.services import performance_period_service as _bys360_performance_period_service  # noqa: I001 - kept single-line for route-file line budget

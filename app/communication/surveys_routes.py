@@ -10,6 +10,7 @@ from app.extensions import db
 from app.models import Survey, SurveyAssignment, SurveyQuestion, SurveyResponse, User
 from app.route_registry import main_bp
 from app.route_support import consume_form_token, menu_key_required, safe_render
+from app.services.communication_phase2_service import SURVEY_TARGET_TYPE_LABELS, SURVEY_TYPE_LABELS
 from app.services.message_service import (
     notify_user as _notify_user,
     survey_manager_allowed as _service_survey_manager_allowed,
@@ -78,8 +79,8 @@ logger = logging.getLogger(__name__)
 
 try:
     from zoneinfo import ZoneInfo as _ZoneInfo
-except Exception:  # pragma: no cover
-    logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=71")
+except Exception as exc:  # pragma: no cover
+    logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=71 | exc=%s", exc)
     _ZoneInfo = None  # type: ignore[assignment,misc]
 
 
@@ -104,6 +105,8 @@ def _render_survey_take(*, survey, questions, matched_assignment):
         questions=questions,
         matched_assignment=matched_assignment,
         submit_token=submit_token,
+        survey_type_label=SURVEY_TYPE_LABELS.get(getattr(survey, "survey_type", None) or "kurum_ici", "Bilinmiyor"),
+        target_type_label=SURVEY_TARGET_TYPE_LABELS.get(getattr(matched_assignment, "target_type", None) or "", "Genel atama") if matched_assignment else "Genel atama",
     )
 
 
@@ -399,10 +402,10 @@ def survey_submit(survey_id):
         )
         flash("Anket yanıtınız kaydedildi.", "success")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=390")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=390 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_submit", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket gönderilirken hata oluştu: {exc}", "danger")
+        flash("Anket gönderilirken hata oluştu.", "danger")
         return redirect(url_for("main.survey_take", survey_id=survey.id))
 
     return redirect(url_for("main.surveys_list"))
@@ -418,8 +421,8 @@ def survey_target_users():
     query_text = (request.args.get("q") or "").strip()
     try:
         limit = int(request.args.get("limit") or 20)
-    except Exception:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=409")
+    except Exception as exc:
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=409 | exc=%s", exc)
         limit = 20
     return jsonify({"ok": True, "items": _service_target_user_search_items(query_text, limit=limit)})
 
@@ -483,7 +486,7 @@ def survey_manage():
                 )
             }
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=472")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=472 | exc=%s", exc)
             _survey_session_reset()
             _log_communication_exception("survey_manage_counts", exc, survey_ids=survey_ids[:20])
 
@@ -623,7 +626,7 @@ def survey_create():
             db.session.rollback()
             flash(str(exc), "warning")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=611")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=611 | exc=%s", exc)
             db.session.rollback()
             _log_communication_exception(
                 "survey_create",
@@ -755,7 +758,7 @@ def survey_edit(survey_id):
             db.session.rollback()
             flash(str(exc), "warning")
         except Exception as exc:
-            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=742")
+            logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=742 | exc=%s", exc)
             db.session.rollback()
             _log_communication_exception(
                 "survey_edit",
@@ -820,10 +823,10 @@ def survey_publish(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=806")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=806 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_publish", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket yayımlanırken hata oluştu: {exc}", "danger")
+        flash("Anket yayımlanırken hata oluştu.", "danger")
     return redirect(url_for("main.survey_manage"))
 
 
@@ -844,10 +847,10 @@ def survey_unpublish(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=829")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=829 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_unpublish", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket güncellenirken hata oluştu: {exc}", "danger")
+        flash("Anket güncellenirken hata oluştu.", "danger")
     return redirect(url_for("main.survey_manage"))
 
 
@@ -868,10 +871,10 @@ def survey_close(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=852")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=852 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_close", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket kapatılırken hata oluştu: {exc}", "danger")
+        flash("Anket kapatılırken hata oluştu.", "danger")
     return redirect(url_for("main.survey_manage"))
 
 
@@ -892,10 +895,10 @@ def survey_archive(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=875")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=875 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_archive", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket arşive alınırken hata oluştu: {exc}", "danger")
+        flash("Anket arşive alınırken hata oluştu.", "danger")
     return redirect(url_for("main.survey_manage", status="archived"))
 
 
@@ -916,10 +919,10 @@ def survey_restore(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=898")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=898 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_restore", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket geri alınırken hata oluştu: {exc}", "danger")
+        flash("Anket geri alınırken hata oluştu.", "danger")
     return redirect(url_for("main.survey_manage", status="draft"))
 
 
@@ -967,7 +970,7 @@ def survey_bulk_action():
         flash(str(exc), "warning")
         return redirect(url_for("main.survey_manage", status=current_status))
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=948")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=948 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception(
             "survey_bulk_action",
@@ -976,7 +979,7 @@ def survey_bulk_action():
             action=action,
             user_id=getattr(current_user, "id", None),
         )
-        flash(f"Toplu anket işlemi sırasında hata oluştu: {exc}", "danger")
+        flash("Toplu anket işlemi sırasında hata oluştu.", "danger")
 
     return redirect(url_for("main.survey_manage", status=current_status))
 
@@ -1000,10 +1003,10 @@ def survey_delete(survey_id):
     except ValueError as exc:
         flash(str(exc), "warning")
     except Exception as exc:
-        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=980")
+        logger.exception("BYS360 V6C guarded exception | file=app/communication/surveys_routes.py | line=980 | exc=%s", exc)
         db.session.rollback()
         _log_communication_exception("survey_delete", exc, survey_id=survey.id, user_id=getattr(current_user, "id", None))
-        flash(f"Anket silinirken hata oluştu: {exc}", "danger")
+        flash("Anket silinirken hata oluştu.", "danger")
 
     return redirect(url_for("main.survey_manage"))
 

@@ -413,7 +413,7 @@ Amir zincirlerini, zincir tiplerini ve dönem bazlı değerlendirme ağırlıkla
 
         <div class="field">
           <label>Dönem</label>
-          <select class="form-select" onchange="window.location='{{ url_for('main.performance_hierarchy_settings') }}?period_id=' + this.value + '&scope={{ selected_scope or '' }}'">
+          <select class="form-select" data-nav-base="{{ url_for('main.performance_hierarchy_settings') }}" data-nav-scope="{{ selected_scope or '' }}">
             <option value="">Dönem seçiniz</option>
             {% for p in periods %}
               <option value="{{ p.id }}" {% if selected_period and selected_period.id == p.id %}selected{% endif %}>{{ p.title }}</option>
@@ -469,4 +469,15 @@ Amir zincirlerini, zincir tiplerini ve dönem bazlı değerlendirme ağırlıkla
   </div>
 </div>
 </div>
+
+<script>
+(function () {
+    var periodSelect = document.querySelector('select[data-nav-base]');
+    if (periodSelect) {
+        periodSelect.addEventListener('change', function () {
+            window.location = periodSelect.getAttribute('data-nav-base') + '?period_id=' + periodSelect.value + '&scope=' + periodSelect.getAttribute('data-nav-scope');
+        });
+    }
+})();
+</script>
 {% endblock %}
