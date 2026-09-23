@@ -152,8 +152,10 @@ REVIEW veya BLOCKED olarak sınıflandırır.
 **SHA:** `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6`
 
 Bu, en son canlıya alma (deployment) sırasında doğrulanan kaynak kod kimliğidir. İki zorunlu
-CI iş akışının (Score100 Kalite Kapısı V1 ve quality-gate) bu tam SHA üzerinde başarıyla
-çalıştığı doğrulanmıştır.
+CI iş akışının (BYS360 Quality Assurance Gate V1 ve quality-gate) bu tam SHA üzerinde başarıyla
+çalıştığı doğrulanmıştır. Branş koruması tarafından zorunlu kılınan teknik kontrol bağlamı
+(required check context) hâlâ tarihsel/kararlı ad olan `score100-quality-gate`'tir -- yukarıdaki
+"BYS360 Quality Assurance Gate V1" yalnızca insan-okur iş akışı adıdır.
 
 **Kararlı kaynak dalı (stable source branch):** `assistant-v2-full` — bu dal, tam olarak bu
 SHA'nın ucundadır ve production kaynak kimliğini temsil eder.
