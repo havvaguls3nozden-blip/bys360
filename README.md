@@ -19,8 +19,34 @@ BYS360, kurum içi yönetim süreçlerini tek merkezde toplayan; personel, perfo
 - Backend: Python / Flask
 - Veritabanı: PostgreSQL; local geliştirme için SQLite kullanılabilir
 - Sunum: Waitress / Windows servis veya görev zamanlayıcı yapısı
-- Mobil: Flutter istemci altyapısı
+- Mobil: Flutter istemci altyapısı (PWA/mobil API katmanı `app/api/mobile` altında)
 - CI: Ruff, mypy, pytest, pip-audit ve özel secret/security gate kontrolleri
+
+### BYS360 Sanal Asistan (Assistant V2) Mimarisi
+
+Sanal Asistan; serbest metin girişini önce native, deterministik bir güvenlik/kapsam
+sınıflandırıcısından (`safety_classifier.py`), ardından yine native bir niyet
+yönlendiricisinden (`intent_router.py` + `domain_vocabulary.py`) geçirir. Eşleşen istek,
+merkezi bir yetenek kaydı (`capability_registry.py`) üzerinden tek bir yetkilendirme
+kapısına (`capability_dispatcher.py`) düşer; yetki kontrolü her zaman ilgili servis
+çağrısından **önce** yapılır ve herhangi bir çalışma zamanı hatası "sistem hatası" olarak
+kapatılır (sessiz yeniden deneme veya yorum yapma yoktur). Yanıt, ham servis verisini
+insan-okur Türkçe metne çeviren ayrı bir sunum katmanından (`response_composer.py`) geçer.
+Bu akışın hiçbir adımı harici bir büyük dil modeli servisine bağımlı değildir; mimari,
+bunu doğrulayan kendi otomatik testine (`test_assistant_v2_external_ai_absence_contract_v1.py`)
+sahiptir.
+
+### Yetkilendirme Modeli
+
+- Menü görünürlüğü tek başına yetki değildir; her backend route ayrıca kendi yetki
+  kontrolünü uygular (bkz. `SECURITY.md`).
+- Rol tabanlı görünürlük (`role_display.py`, admin/başkan/grup başkanı/mali müşavir/hukuk
+  müşaviri vb. kapalı rol sözlüğü) ile modül bazlı politika ayarları (ör. Sanal Asistan'ın
+  kendi rol matrisi) ayrı katmanlardır; bir modülün kendi sunum etiketi, merkezi rol
+  sözlüğünü değiştirmeden özelleştirilebilir.
+- Performans verisi, anket cevapları ve mesaj içerikleri gibi hassas alanlar için ayrı,
+  regex/anahtar-kelime tabanlı bir "hassas istek" sınıflandırması vardır; bu sınıflandırma
+  eşleştiğinde yanıt üretilmez.
 
 ## Local Kurulum
 
@@ -71,6 +97,67 @@ python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report=term-missing 
 ```
 
 Bu, ortak kullanım için doğrudan kopyalanıp çalıştırılabilecek bir alt kümedir; CI'nin gerçekte çalıştırdığı tam pytest komutları (entegrasyon/mimari/servis/migration testlerinin tamamı ve coverage ratchet gate'i dahil) çok daha uzundur ve sık değişebilir, bu yüzden burada birebir kopyalanmamıştır -- birebir güncel hali için `.github/workflows/bys360-ci.yml` tek doğru kaynaktır. Adım adım, açıklamalı kurulum ve kalite kontrol akışı (venv, `.env`, seed data, tam kalite koşumu) için `CONTRIBUTING.md` içindeki "Yeni geliştirici başlangıç akışı" bölümüne bakın.
+
+## CI ve Deterministik Release Süreci
+
+- CI, GitHub Actions üzerinde iki zorunlu iş akışıyla çalışır: `.github/workflows/bys360-ci.yml`
+  ("quality-gate") ve `.github/workflows/bys360-score100-quality-gate-v1.yml`
+  ("BYS360 Puanı 100 Kalite Kapısı V1"). İkisi de her push/PR'da Ruff, mypy, pytest ve
+  proje-özel secret/security kapılarını çalıştırır.
+- Yayına alınacak paket, doğrudan klasör zip'lenerek değil, tek yetkili (canonical) builder
+  ile üretilir: `scripts/release/build_bys360_safe_release.py`. Kaynak dosya listesi
+  yalnızca Git'in takip ettiği dosyalardan gelir (dosya sistemine fallback yoktur); çalışma
+  ağacı HEAD ile birebir örtüşmüyorsa build başarısız olur. Üretilen paket, kaynak commit
+  SHA'sını (`RELEASE_SOURCE_SHA.txt`), deterministik bir dosya manifestosunu ve her dosya
+  için SHA256 özet listesini içerir; aynı SHA'dan yapılan iki bağımsız build birebir aynı
+  SHA256'yı üretir (bkz. `DEPLOYMENT.md` bölüm 8, `SECURITY.md` bölüm 4).
+- Paket, kendi doğrulama modu (`--verify`) ile ayrıca kontrol edilir: eksik dosya, yasaklı
+  yol (`.env`, `tests/`, sertifika/anahtar uzantıları vb.), beklenmeyen ekstra dosya veya
+  SHA256 uyuşmazlığı varsa doğrulama FAIL verir.
+- Ayrı, bağımsız bir secret tarayıcı (`scripts/release/scan_bys360_release_secrets.py`)
+  paketlenmiş her dosyayı tekrar tarar; bu adım builder'ın kendi iç kontrolünden bağımsızdır.
+- **Exact-SHA dağıtım modeli**: canlıya alınan her paket, üretildiği tam Git commit SHA'sı ile
+  etiketlenir ve iz sürülür; "hangi dal" değil "hangi tam SHA" sorusu tek doğruluk kaynağıdır.
+- **Aday hazırlığı (candidate preparation) ve shadow-DB migration provası**: release paketi
+  canlıya geçmeden önce, canlı servise hiç dokunmadan ayrı bir aday dizinine açılır, kendi
+  sanal ortamını kurar ve veritabanı migration'ını **atılabilir (disposable), yalnızca bu
+  amaçla oluşturulup provanın sonunda silinen bir "shadow" veritabanına** karşı prova eder;
+  bu adım production veritabanına asla yazmaz (bkz. `docs/handover/CANDIDATE_PREPARATION.md`,
+  `docs/handover/DATABASE_MIGRATION.md`).
+- **Health/readiness kontrolü**: aday, canlıya alınmadan önce kendi sağlık uç noktası
+  (`/healthz`) üzerinden ayağa kalkma testinden geçer; cutover yalnızca bu kontrol
+  geçtikten sonra gerçekleşir.
+- **Rollback tasarımı**: her cutover öncesi kod ve veritabanı yedeği alınır; geri dönüş,
+  ayrı bir script (`scripts/windows/rollback_bys360_live_release_v1.ps1`) ile
+  varsayılan olarak önce DRY-RUN (yalnızca plan) modunda çalışır, gerçek uygulama için
+  açık `-Apply` bayrağı gerektirir; `.env`, `instance/`, `logs/`, `uploads/` ve `reports/`
+  her koşulda korunur ve asla üzerine yazılmaz (bkz. `BACKUP_RUNBOOK.md`).
+
+## Mevcut Doğrulanmış Canlı Kaynak (Current Verified Production Source)
+
+**SHA:** `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6`
+
+Bu, en son canlıya alma (deployment) sırasında doğrulanan kaynak kod kimliğidir. Bu SHA,
+`origin/hotfix/assistant-v2-live-role-weather-routing` dalının tam ucudur ve iki zorunlu CI
+iş akışının (Score100 Kalite Kapısı V1 ve quality-gate) bu tam SHA üzerinde başarıyla
+çalıştığı ayrıca doğrulanmıştır.
+
+## İnceleme Rehberi (Review Guidance)
+
+Dış teknik incelemeciler (Ministry review) için:
+
+- **Kaynak kod ve commit geçmişi:** repoyu klonlayıp `git log`, `git blame` ve tam dal/etiket
+  listesiyle (`git branch -a`, `git tag`) inceleyin; hiçbir geçmiş yeniden yazılmamıştır
+  (`filter-repo`/force-push kullanılmamıştır).
+- **CI kanıtı:** GitHub "Actions" sekmesinden yukarıdaki iki zorunlu iş akışının geçmiş
+  koşumlarını, hangi tam SHA'yı checkout ettiklerini ve sonuçlarını doğrudan görebilirsiniz.
+- **Testler:** `tests/` dizini; hedefli kalite testleri için `tests/quality`, davranış
+  sözleşmeleri için `tests/behavior`, release paketleme testleri için `tests/release`.
+- **Release/paket kanıtı:** `scripts/release/build_bys360_safe_release.py --verify <zip>`
+  komutu ve paketle birlikte üretilen manifest/SHA256 dosyaları.
+- **Canlı kaynak anlık görüntüsü (production snapshot):** yukarıdaki "Mevcut Doğrulanmış
+  Canlı Kaynak" bölümündeki tam SHA; bu SHA'ya işaret eden değişmez (immutable) bir etiket
+  eklenmesi ayrıca planlanmaktadır.
 
 ## Doküman Haritası
 
