@@ -217,8 +217,9 @@ Dış teknik incelemeciler (Ministry review) için:
 - **Release/paket kanıtı:** `scripts/release/build_bys360_safe_release.py --verify <zip>`
   komutu ve paketle birlikte üretilen manifest/SHA256 dosyaları.
 - **Canlı kaynak anlık görüntüsü (production snapshot):** yukarıdaki "Mevcut Doğrulanmış
-  Canlı Kaynak" bölümündeki tam SHA; bu SHA'ya işaret eden değişmez (immutable) bir etiket
-  eklenmesi ayrıca planlanmaktadır.
+  Canlı Kaynak" bölümündeki tam SHA. Doğrulanmış production SHA,
+  `bys360-prod-2026.09.23-1ea5c5dc` adlı annotated production tag ile işaretlenmiştir; tag,
+  yönetişim gereği taşınmaması ve silinmemesi gereken production kimliği olarak kullanılır.
 
 ## Doküman Haritası
 
