@@ -174,6 +174,9 @@ production, veritabanı, migration, secret, push/deploy ve geçmiş yeniden yazm
 açıkça engeller ve önerilen değişiklikleri otomatik uygulamadan önce SAFE, CONTROLLED,
 REVIEW veya BLOCKED olarak sınıflandırır.
 
+Yapay zekâ kullanım sınırları ve insan denetimi için `AI_USAGE_POLICY.md`; güncel production
+kimliği ve branch rolleri için `SOURCE_OF_TRUTH.md` esas kısa referanstır.
+
 ## Mevcut Doğrulanmış Canlı Kaynak (Current Verified Production Source)
 
 **SHA:** `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6`
@@ -226,6 +229,8 @@ Dış teknik incelemeciler (Ministry review) için:
 - `SECURITY.md`: Güvenlik, secret ve paketleme kuralları
 - `DEPLOYMENT.md`: Yayına alma ve servis çalıştırma notları
 - `BACKUP_RUNBOOK.md`: Yedekleme ve geri dönüş prosedürü
+- `SOURCE_OF_TRUTH.md`: Güncel production kimliği ve branch rolleri (kısa canonical referans)
+- `AI_USAGE_POLICY.md`: Yapay zekâ kullanım sınırları ve insan denetimi
 
 ## Kaynak Paket Kuralları
 
