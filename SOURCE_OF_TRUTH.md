@@ -95,9 +95,18 @@ production cutover yapıldığında bu belge güncellenir.
 
 | Alan | Değer |
 |---|---|
-| Proposed immutable production tag | `bys360-prod-2026.09.23-1ea5c5dc` |
-| Target SHA | `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6` |
-| Status | PENDING HUMAN APPROVAL |
+| Production tag | `bys360-prod-2026.09.23-1ea5c5dc` |
+| Tag type | annotated |
+| Tag object SHA | `1c6d9859efe856191f2f60245008ab6eb90f638c` |
+| Target production SHA | `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6` |
 
-Bu tag henüz oluşturulmamıştır (2026-09-24 itibarıyla mevcut değildir). Oluşturulduğunda review
-branch'inin merge commit'ine değil, doğrudan yukarıdaki production SHA'sına atanmalıdır.
+Amaç: BYS360'ın 2026-09-23 doğrulanmış production kimliğini, kurumsal inceleme ve teknik devir
+için sabit bir Git referansı olarak işaretlemek.
+
+Tag object SHA, tag nesnesinin kendisidir; tag'in işaret ettiği commit (peeled target) yukarıdaki
+production SHA'dır. Tag, review branch'inin merge commit'ine değil, doğrudan production SHA'sına
+bağlıdır.
+
+Bu tag BYS360 yönetişiminde immutable production identity olarak kabul edilir; taşınmamalı ve
+silinmemelidir. Şu anda ayrı bir GitHub tag koruma kuralı (tag ruleset) doğrulanmadığından,
+GitHub'ın tag güncelleme veya silme işlemlerini teknik olarak engellediği iddia edilmez.
