@@ -43,7 +43,10 @@ sahiptir.
 - Rol tabanlı görünürlük (`role_display.py`, admin/başkan/grup başkanı/mali müşavir/hukuk
   müşaviri vb. kapalı rol sözlüğü) ile modül bazlı politika ayarları (ör. Sanal Asistan'ın
   kendi rol matrisi) ayrı katmanlardır; bir modülün kendi sunum etiketi, merkezi rol
-  sözlüğünü değiştirmeden özelleştirilebilir.
+  sözlüğünü değiştirmeden özelleştirilebilir. Örnek: merkezi sözlükte `mali_musavir` →
+  "Mali Müşavir" ve `hukuk_musaviri` → "Hukuk Müşaviri" ayrı rollerdir; yalnız Sanal Asistan
+  rol matrisi, `mali_musavir` iç rol anahtarını kendi ekranında "Hukuk Müşaviri" etiketiyle
+  gösterir. Bu, anahtarı sistem genelinde yeniden tanımlamaz.
 - Performans verisi, anket cevapları ve mesaj içerikleri gibi hassas alanlar için ayrı,
   regex/anahtar-kelime tabanlı bir "hassas istek" sınıflandırması vardır; bu sınıflandırma
   eşleştiğinde yanıt üretilmez.
@@ -97,6 +100,30 @@ python -m pytest tests/quality -m "ci_safe" --cov=app --cov-report=term-missing 
 ```
 
 Bu, ortak kullanım için doğrudan kopyalanıp çalıştırılabilecek bir alt kümedir; CI'nin gerçekte çalıştırdığı tam pytest komutları (entegrasyon/mimari/servis/migration testlerinin tamamı ve coverage ratchet gate'i dahil) çok daha uzundur ve sık değişebilir, bu yüzden burada birebir kopyalanmamıştır -- birebir güncel hali için `.github/workflows/bys360-ci.yml` tek doğru kaynaktır. Adım adım, açıklamalı kurulum ve kalite kontrol akışı (venv, `.env`, seed data, tam kalite koşumu) için `CONTRIBUTING.md` içindeki "Yeni geliştirici başlangıç akışı" bölümüne bakın.
+
+## Doğrulanmış Coverage Durumu (Verified Coverage Snapshot)
+
+| Alan | Değer |
+|---|---|
+| Doğrulanmış production SHA | `1ea5c5dcf6161104dc8adb04a982cba0eba8e8e6` |
+| GitHub Actions run | `35823128265` (`quality-gate` işi) |
+| CI ölçüm tarihi | 2026-09-23 |
+| Ölçülen combined coverage | 42.1228% |
+| Kayıtlı ratchet baseline | 27.62% |
+| Tolerans | 0.50 yüzde puan |
+| Etkin eşik | 27.12% |
+
+- **42.1228%**, CI'nın bu production SHA üzerinde gerçekten ölçtüğü combined (line + branch)
+  coverage değeridir. Tarihli bir ölçüm anlık görüntüsüdür; coverage hedefi, garanti edilen
+  alt sınır veya yeni baseline değildir.
+- **27.62%**, `reports/quality/coverage_baseline.json` içinde kayıtlı regression floor'dur
+  (2026-08-11 ölçümü). `scripts/quality/bys360_coverage_ratchet.py`, CI ölçümünü bu değerin
+  0.50 puan altıyla (27.12%) karşılaştırır; bunun altına düşen ölçüm CI'yı başarısız kılar.
+- Baseline, mevcut ölçüme otomatik olarak yükseltilmez; yükseltme yalnız ayrı, insan
+  tarafından incelenen bir yeniden-baseline işlemiyle yapılır.
+- `pyproject.toml` içindeki `fail_under = 18`, Campaign 1B (2026-07-24, ölçüm 18.85%)
+  döneminden kalan tarihsel alt sınırdır; güncel regression kapısı yukarıdaki ratchet
+  mekanizmasıdır.
 
 ## CI ve Deterministik Release Süreci
 
@@ -160,9 +187,14 @@ CI iş akışının (BYS360 Quality Assurance Gate V1 ve quality-gate) bu tam SH
 **Kararlı kaynak dalı (stable source branch):** `assistant-v2-full` — bu dal, tam olarak bu
 SHA'nın ucundadır ve production kaynak kimliğini temsil eder.
 
-**Bu inceleme dalı (`docs/ministry-review-readme`):** doğrudan yukarıdaki doğrulanmış production
+**Bu inceleme dalı (`docs/ministry-review-readme`):** Ministry/dış teknik inceleme yüzeyi ve
+repodaki güncel varsayılan (default) daldır. Doğrudan yukarıdaki doğrulanmış production
 kaynağı üzerine kuruludur ve inceleme dokümantasyonu ile korunan inceleme/kaynak dalları için CI
 governance tetikleyici hizalamasını ekler. Production dalı değildir; production kimliği yukarıdaki
+tam SHA ve `assistant-v2-full` dalıdır.
+
+**`main`:** production kaynak doğruluğu (source of truth) değildir. PR #1 birleştirmesi nedeniyle
+ayrı bir tarihsel/entegrasyon soy hattı (lineage) içerir; production kimliği her zaman yukarıdaki
 tam SHA ve `assistant-v2-full` dalıdır.
 
 ## İnceleme Rehberi (Review Guidance)
